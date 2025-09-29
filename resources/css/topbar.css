@@ -1,0 +1,191 @@
+.h3.text-truncate {
+    font-weight: 500;
+}
+
+.toggle-password-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.25rem;
+    color: #6c757d;
+}
+
+.toggle-password-btn:hover {
+    color: #0d6efd;
+}
+
+/* ----- Aturan CSS untuk Desktop (Lebar Layar >= 768px) ----- */
+/* Pastikan elemen li induk memiliki posisi relatif */
+.navbar-nav .nav-item.dropdown {
+    position: relative;
+    /* Ini sudah ada di HTML, tapi dikonfirmasi di sini */
+}
+
+/* Atur ulang dropdown ke perilaku default Bootstrap di desktop */
+@media (min-width: 768px) {
+    .navbar-nav .dropdown-menu {
+        position: absolute;
+        /* Default Bootstrap */
+        top: 100%;
+        /* Default Bootstrap */
+        right: 0;
+        /* Untuk dropdown-menu-right */
+        left: auto;
+        /* Untuk dropdown-menu-right */
+        transform: none;
+        /* Biarkan Popper.js yang mengaturnya jika ada */
+        margin-top: 0.125rem;
+        /* Margin default Bootstrap */
+        padding: 0.5rem 0;
+        /* Padding default Bootstrap */
+        min-width: 10rem;
+        /* min-width default Bootstrap (160px) */
+        max-width: none;
+        /* Hapus batasan max-width dari mobile */
+        width: auto;
+        /* Biarkan lebar otomatis */
+        border-radius: 0.25rem;
+        /* Default Bootstrap */
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+        /* Default Bootstrap */
+    }
+
+    .navbar-nav .dropdown-menu .dropdown-item {
+        text-align: left;
+        /* Default Bootstrap */
+        padding: 0.5rem 1rem;
+        /* Default Bootstrap */
+        white-space: nowrap;
+        /* Default Bootstrap */
+        overflow: visible;
+        /* Biarkan overflow terlihat di desktop */
+        text-overflow: clip;
+        /* Biarkan teks utuh */
+        font-size: 1rem;
+        /* Ukuran font default Bootstrap */
+    }
+
+    /* Nama pengguna di desktop */
+    .user-name-display {
+        max-width: none;
+        /* Hapus batasan max-width dari mobile */
+        overflow: visible;
+        /* Biarkan terlihat penuh */
+        text-overflow: clip;
+        /* Biarkan teks utuh */
+        white-space: nowrap;
+        /* Teks tidak patah baris */
+        display: inline !important;
+        /* Default display */
+    }
+
+    /* Judul halaman di desktop */
+    .h3.text-truncate {
+        max-width: none;
+        font-weight: 500;
+        /* Hapus batasan max-width dari mobile */
+    }
+}
+
+/* ----- Aturan CSS untuk Mobile (Lebar Layar < 768px) ----- */
+@media (max-width: 767.98px) {
+    .navbar-nav .dropdown-menu {
+        /* Posisi: Pastikan menempel ke bawah dari elemen toggle */
+        position: absolute !important;
+        top: calc(100% + 5px) !important;
+        /* Posisikan tepat di bawah, dengan sedikit spasi */
+        left: auto !important;
+        right: 0 !important;
+        /* Rata kanan dari toggle */
+        transform: none !important;
+        /* Pastikan tidak ada transform yang mengganggu */
+        margin: 0 !important;
+        /* Hapus margin default yang mungkin ada */
+        padding: 0.5rem 0;
+        /* Padding vertikal di dalam dropdown */
+
+        /* Ukuran dan Penampilan */
+        min-width: 160px;
+        /* Lebar minimum yang cukup */
+        max-width: 200px;
+        /* Lebar maksimum yang pas */
+        width: auto;
+        /* Sesuaikan dengan konten, tapi dibatasi min/max */
+
+        border-radius: 0.35rem;
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+    }
+
+    .navbar-nav .dropdown-menu .dropdown-item {
+        text-align: left;
+        padding: 0.75rem 1rem;
+        /* Padding item agar mudah disentuh */
+        white-space: nowrap;
+        /* Pastikan teks tidak patah baris */
+        overflow: hidden;
+        /* Sembunyikan jika ada overflow */
+        text-overflow: ellipsis;
+        /* Tampilkan elipsis jika terpotong */
+        font-size: 0.9rem;
+        /* Ukuran font sedikit lebih kecil */
+    }
+
+    /* Pastikan nama pengguna tidak terlalu panjang */
+    .user-name-display {
+        max-width: 80px;
+        /* Batasi lebar nama pengguna di mobile */
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        display: inline-block !important;
+    }
+
+    /* Penyesuaian judul halaman */
+    .h3.text-truncate {
+        max-width: calc(100% - 130px);
+        font-weight: 500;
+        /* Beri ruang lebih di topbar */
+    }
+}
+
+/* Penyesuaian khusus untuk layar sangat kecil (misal: lebar < 400px) */
+@media (max-width: 400px) {
+    .navbar-nav .dropdown-menu {
+        min-width: unset;
+        width: 90%;
+        left: 5% !important;
+        /* Pusatkan */
+        right: auto !important;
+    }
+
+    .user-name-display {
+        max-width: 60px;
+    }
+
+    .h3.text-truncate {
+        max-width: calc(100% - 110px);
+        font-weight: 500;
+    }
+}
+
+.nav-top {
+    margin-right: 0;
+}
+
+.akun-dropdown {
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease, opacity 0.3s ease;
+}
+
+.akun-dropdown.show {
+    max-height: 500px;
+    opacity: 1;
+    transition: max-height 0.3s ease, opacity 0.3s ease;
+}
+
+div.akun-dropdown form .btn.btn-account {
+    font-size: 0.85rem;
+    padding-left: 2rem;
+}

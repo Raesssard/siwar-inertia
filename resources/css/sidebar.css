@@ -1,0 +1,91 @@
+.sidebar {
+    position: fixed;
+    /* supaya nempel di kiri */
+    top: 0;
+    left: 0;
+    height: 100vh;
+    /* full tinggi layar */
+    width: 250px;
+    /* lebar sidebar */
+    display: flex;
+    flex-direction: column;
+    background-color: #4e73df;
+    /* sesuaikan warna */
+    z-index: 1030;
+    /* di atas konten lain */
+}
+
+
+
+ul.navbar-nav li.nav-item .nav-link {
+    width: 100%;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+ul.navbar-nav li.nav-item .nav-link:hover {
+    width: 100%;
+    color: rgba(255, 255, 255, 0.85);
+    font-weight: bold;
+}
+
+.sidebar-brand-icon-logo {
+    width: 110px;
+    height: 110px;
+    object-fit: contain;
+    filter: brightness(0) invert(1);
+}
+
+.sidebar-brand-icon {
+    transform: none !important;
+}
+
+.sidebar-brand {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#accordionSidebar.toggled .sidebar-brand-icon-logo {
+    width: 50px;
+    height: 50px;
+    margin-left: 26px;
+}
+
+#accordionSidebar.toggled .sidebar-brand {
+    width: 4.375rem !important;
+    padding-left: 0;
+    padding-right: 0;
+}
+
+#accordionSidebar.toggled .sidebar-brand .sidebar-brand-icon {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+.sidebar-brand-icon-logo {
+    margin-right: 0;
+}
+
+@media (max-width: 767.98px) {
+    .sidebar-brand-icon-logo {
+        width: 50px;
+        height: 50px;
+        margin-right: 10px;
+    }
+
+    .sidebar {
+        position: relative;
+        width: 100%;
+        height: auto;
+    }
+
+    .main-content {
+        margin-left: 0;
+    }
+}
+
+.arrow-toggle {
+color: rgba(255, 255, 255, 0.5);
+}

@@ -1,0 +1,118 @@
+/* ================================================================== */
+/* General Card Styling                                               */
+/* ================================================================== */
+.card {
+    width: 100%;
+    height: auto;
+}
+
+.card-clickable {
+    border-radius: 0.35rem;
+    /* biar rounded */
+    transition: transform 0.15s ease-out, box-shadow 0.15s ease-out;
+    cursor: pointer;
+}
+
+.card-clickable:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0.6rem 1rem rgba(0, 0, 0, .15);
+}
+
+.card-clickable:active {
+    transform: translateY(1px);
+    box-shadow: 0 0.2rem 0.5rem rgba(0, 0, 0, .1);
+}
+
+.card-clickable .text-decoration-none {
+    display: block;
+    /* link cover seluruh card */
+    color: inherit;
+    /* biar nggak berubah warna */
+}
+
+.text-gray-800 {
+    color: #5a5c69 !important;
+}
+
+.text-gray-400 {
+    color: #d1d3e2 !important;
+}
+
+/* ================================================================== */
+/* Card Body Text                                                     */
+/* ================================================================== */
+.card-body {
+    margin: 0;
+    width: 100%;
+}
+
+.card-body .text-xs {
+    text-align: left;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+}
+
+.card-body .h4 {
+    text-align: left;
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+}
+
+/* ================================================================== */
+/* Icon Column                                                        */
+/* ================================================================== */
+.card-body .col-auto {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.card-body .fa-3x,
+.card-body .bi {
+    font-size: 2rem;
+    opacity: 0.75;
+}
+
+/* ================================================================== */
+/* Responsive Breakpoints                                             */
+/* ================================================================== */
+@media (max-width: 767.98px) {
+    .card-body {
+        margin: 0;
+        width: 100%;
+    }
+
+    .card-body .h4 {
+        font-size: 1.2rem;
+    }
+
+    .card-body .text-xs {
+        font-size: 0.65rem;
+    }
+
+    .card-body .fa-3x,
+    .card-body .bi {
+        font-size: 1.5rem;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .card-body {
+        margin: 0;
+        width: 100%;
+    }
+
+    .card-body .h4 {
+        font-size: 1rem;
+    }
+
+    .card-body .text-xs {
+        font-size: 0.55rem;
+    }
+
+    .card-body .fa-3x,
+    .card-body .bi {
+        font-size: 1.25rem;
+    }
+}

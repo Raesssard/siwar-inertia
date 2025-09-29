@@ -1,0 +1,28 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+}
+
+.judul {
+    margin-bottom: 1.5rem;
+    font-size: 2rem;
+}
+
+.cards {
+    display: flex;
+    gap: 1rem;
+}
+
+.card {
+    text-align: center;
+    padding: 1rem;
+    width: 200px;
+}
+
+.btn {
+    margin-top: 1rem; /* sama seperti mt-3 di bootstrap */
+    margin-bottom: 0.5rem;
+}
