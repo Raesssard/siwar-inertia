@@ -12,7 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('kartu_keluarga', function (Blueprint $table) {
-            $table->char('no_kk', 16)->primary()->unique();
+            $table->id(); // id sebagai primary key baru
+
+            $table->char('no_kk', 16)->unique(); // tetap ada & unique
             $table->string('no_registrasi')->unique(); 
             $table->text('alamat');
             $table->unsignedBigInteger('id_rt')->nullable(); 
@@ -28,7 +30,6 @@ return new class extends Migration
             $table->string('kode_pos');
             $table->date('tgl_terbit');
 
-            // 🔹 Ganti enum → foreignId
             $table->foreignId('kategori_iuran')
                 ->constrained('kategori_golongan')
                 ->cascadeOnDelete();

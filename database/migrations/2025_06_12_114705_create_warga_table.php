@@ -9,8 +9,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('warga', function (Blueprint $table) {
-            $table->char('nik', 16)->primary(); 
-            $table->char('no_kk', 16);
+            $table->id(); // id sebagai primary key baru
+
+            $table->char('nik', 16)->unique(); // tetap ada & unique
+            $table->char('no_kk', 16); // tetap ada
 
             $table->foreign('no_kk')
                 ->references('no_kk')
@@ -31,7 +33,6 @@ return new class extends Migration
             $table->enum('golongan_darah', ['A', 'B', 'AB', 'O'])->nullable();
             $table->enum('kewarganegaraan', ['WNI', 'WNA']);
 
-            // --- Penambahan Kolom untuk WNA ---
             $table->string('no_paspor')->nullable()->unique();
             $table->date('tgl_terbit_paspor')->nullable();
             $table->date('tgl_berakhir_paspor')->nullable();
@@ -43,18 +44,15 @@ return new class extends Migration
             $table->string('no_kitap')->nullable()->unique();
             $table->date('tgl_terbit_kitap')->nullable();
             $table->date('tgl_berakhir_kitap')->nullable();
-            // --- Akhir Penambahan ---
 
             $table->string('nama_ayah');
             $table->string('nama_ibu');
             $table->enum('status_warga', ['penduduk', 'pendatang']);
 
-            // --- Tambahan khusus untuk pendatang ---
-            $table->string('alamat_asal')->nullable(); // alamat sebelum pindah
-            $table->string('alamat_domisili')->nullable(); // alamat tempat tinggal di sini
-            $table->date('tanggal_mulai_tinggal')->nullable(); // sejak kapan tinggal di wilayah ini
-            $table->string('tujuan_pindah')->nullable(); // alasan datang (kerja, sekolah, dll.)
-            // --- Akhir tambahan ---
+            $table->string('alamat_asal')->nullable();
+            $table->string('alamat_domisili')->nullable();
+            $table->date('tanggal_mulai_tinggal')->nullable();
+            $table->string('tujuan_pindah')->nullable();
 
             $table->timestamps();
         });

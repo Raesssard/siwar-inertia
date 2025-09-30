@@ -29,7 +29,7 @@ export default function Sidebar({ toggleKeParent }) {
         <>
             <ul className={`navbar-nav bg-gradient-primary sidebar sidebar-dark accordion d-none d-md-block ${toggle}`} id="accordionSidebar">
 
-                <Link className="sidebar-brand" href="/warga">
+                <Link className="sidebar-brand" href="/dashboard">
                     <div className="sidebar-brand-icon">
                         <img src={logo} alt="SiWar Logo" className="sidebar-brand-icon-logo" />
                     </div>
@@ -37,8 +37,8 @@ export default function Sidebar({ toggleKeParent }) {
 
                 <hr className="sidebar-divider my-0" />
 
-                <li className={`nav-item ${isActive(url, '/warga', true) ? 'active' : ''}`}>
-                    <Link className="nav-link" href="/warga">
+                <li className={`nav-item ${isActive(url, '/dashboard', true) ? 'active' : ''}`}>
+                    <Link className="nav-link" href="/dashboard">
                         <i className="fas fa-fw fa-tachometer-alt mr-2"></i>
                         <span>Dashboard</span>
                     </Link>
