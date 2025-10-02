@@ -1,33 +1,7 @@
 import React from "react";
 import Layout from "@/Layouts/Layout";
-
-function StatCard({ href, border, color, title, value, icon }) {
-    return (
-        <a href={href} className="text-decoration-none">
-            <div className={`card ${border} shadow py-2 card-clickable`}>
-                <div className="card-body">
-                    <div className="row align-items-center">
-                        {/* Text */}
-                        <div className="col">
-                            <div
-                                className={`text-xs font-weight-bold ${color} text-uppercase mb-1`}
-                            >
-                                {title}
-                            </div>
-                            <div className="h4 mb-0 font-weight-bolder text-gray-800">
-                                {value ?? 0}
-                            </div>
-                        </div>
-                        {/* Icon */}
-                        <div className="col-auto">
-                            <i className={`${icon} fa-3x text-gray-400`}></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </a>
-    );
-}
+import { StatCard } from "../Component/Card";
+import { Head, usePage } from "@inertiajs/react";
 
 export default function DashboardAdmin({
     jumlah_rw,
@@ -36,8 +10,16 @@ export default function DashboardAdmin({
     jumlah_roles,
     jumlah_permissions,
 }) {
+    const { props } = usePage()
+    const { title } = usePage().props
+    const role = props.auth?.currentRole
     return (
-        <Layout title="Dashboard Admin">
+        <Layout>
+            {/* title di component Head, bukan di Layout */}
+            <Head title={`${title} ${role.length <= 2
+                ? role.toUpperCase()
+                : role.charAt(0).toUpperCase() + role.slice(1)}`}
+            />
             <div className="dashboard-cards">
                 <StatCard
                     href="/admin/rw"

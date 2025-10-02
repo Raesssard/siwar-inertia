@@ -34,7 +34,6 @@
     overflow-y: auto;
 }
 
-/* Sidebar Modal Mobile */
 .modal.fade .modal-dialog.modal-dialog-slideout-left {
     transform: translateX(-100%);
     transition: transform .3s ease-out;
@@ -175,4 +174,225 @@ form.form-filter select.form-select {
     height: 2.35rem;
     margin: auto;
     justify-content: center;
+}
+
+h4.fw-bold.text-success,
+h5.fw-bold.text-success {
+    font-weight: 500;
+    text-align: left;
+}
+
+div.card-body div.flex.gap-4 div.card-clickable {
+    text-align: center;
+    break-inside: avoid;
+    margin-bottom: 16px;
+    padding-bottom: 16px;
+    border-radius: 8px;
+    background: #fff;
+    border: 1px;
+    box-shadow: 0 0.2rem 0.5rem rgba(0, 0, 0, 0.1);
+    display: inline-block;
+    width: 100%;
+}
+
+div.card-body div.flex.gap-4 div.card-clickable div.text-sm {
+    font-size: 0.75rem;
+}
+
+div.card-body.pengaduan,
+div.card-body.pengumuman {
+    min-height: 63vh;
+    max-height: 63vh;
+    overflow-y: auto;
+    padding-right: 8px;
+    border-top: 1px solid lightgray;
+    border-bottom: 1px solid lightgray;
+}
+
+div.card-body.pengaduan::-webkit-scrollbar,
+div.card-body.pengumuman::-webkit-scrollbar {
+    display: none;
+}
+
+div.card-body.pengaduan button.scroll-top-btn,
+div.card-body.pengumuman button.scroll-top-btn
+ {
+    position: sticky;
+    bottom: 10px;
+    left: calc(100% - 70px);
+    z-index: 10;
+
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+div.card-body.pengaduan button.scroll-top-btn.show,
+div.card-body.pengumuman button.scroll-top-btn.show
+ {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+div.komen input.komen,
+input.edit-judul {
+    border: 0;
+    border-bottom: 1px solid lightgray;
+    border-radius: 0;
+}
+
+div.komen input.komen:focus,
+input.edit-judul:focus {
+    border: none;
+    border-bottom: 1px solid lightgray;
+    border-radius: 0;
+    color: #6e707e;
+    background-color: transparent;
+    outline: none;
+    box-shadow: none;
+}
+
+div.komen input.komen:focus-visible,
+input.edit-judul:focus-visible {
+    border: none;
+    border-bottom: 1px solid lightgray;
+    border-radius: 0;
+    color: #6e707e;
+    background-color: transparent;
+    outline: none;
+    box-shadow: none;
+}
+
+div.komen button {
+    border: none;
+    border-radius: 0;
+    color: gray;
+    height: 37.6px;
+    border-bottom: 1px solid lightgray;
+    background-color: transparent;
+    outline: none;
+    box-shadow: none;
+}
+
+div.komen button:focus,
+div.komen button:focus-visible,
+div.komen button:hover,
+div.komen button:disabled,
+div.komen button.btn-primary:not(:disabled):not(.disabled):active {
+    background-color: transparent;
+    color: #4e73df;
+    border-bottom: 1px solid lightgray;
+    outline: none;
+    box-shadow: none;
+}
+
+div.komen button:disabled {
+    cursor: not-allowed;
+}
+
+div.komen {
+    margin-top: auto;
+}
+
+ul.navbar-nav.sidebar#accordionSidebar {
+    position: fixed;
+    z-index: 1000;
+}
+
+div.modal-komen {
+    min-height: 700px;
+    max-height: 700px;
+}
+
+div.komen-section::-webkit-scrollbar {
+    display: none;
+}
+
+p.isi-pengaduan,
+p.isi-pengumuman,
+p.komen {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    word-break: break-word;
+    white-space: normal;
+}
+
+p.isi-pengaduan.clamped,
+p.isi-pengumuman.clamped {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+p.isi-pengaduan.expanded,
+p.isi-pengumuman.expanded {
+    display: block;
+}
+
+p.komen {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+}
+
+p.komen.line-clamp-none {
+    -webkit-line-clamp: unset;
+}
+
+button.btn-expand {
+    font-size: 0.9rem;
+}
+
+textarea.edit-isi {
+    border: 1px solid lightgray;
+    border-radius: 0;
+}
+
+button.edit-file {
+    border: none;
+    border-radius: 0;
+    color: gray;
+    height: 37.6px;
+    background-color: transparent;
+    outline: none;
+    box-shadow: none;
+}
+
+button.edit-file:focus,
+button.edit-file:focus-visible,
+button.edit-file.btn-outline-primary:not(:disabled):not(.disabled):active,
+button.edit-file:hover {
+    background-color: transparent;
+    color: #4e73df;
+    outline: none;
+    box-shadow: none;
+}
+
+button.edit-file:disabled {
+    cursor: not-allowed;
+}
+
+embed.pdf-preview {
+    display: block;
+    width: 100%;
+    height: 100%;
+    max-height: 80vh;
+    border: none;
+}
+
+#preview {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    max-height: 80vh;
+    width: 100%;
+    height: 100%;
+}
+
+#preview .pdf-preview {
+    width: 100%;
+    height: 100%;
 }

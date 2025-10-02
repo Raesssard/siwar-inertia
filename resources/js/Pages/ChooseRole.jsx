@@ -6,7 +6,6 @@ import '../../css/choose-role.css'
 export default function ChooseRole({ roles }) {
     const [selectedRole, setSelectedRole] = useState("")
     const { auth } = usePage().props
-    const user = auth?.user
 
     function submit(e) {
         e.preventDefault()

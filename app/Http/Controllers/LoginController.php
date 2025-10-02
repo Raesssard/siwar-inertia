@@ -62,6 +62,7 @@ class LoginController extends Controller
                     'nik' => 'Hanya Kepala Keluarga yang bisa login.',
                 ]);
             }
+            return Inertia::location(route('dashboard'));
         }
 
         // Semua role diarahkan ke Dashboard.jsx

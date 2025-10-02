@@ -6,7 +6,7 @@ import { PasswordModal } from "../Pages/Component/Modal"
 
 export default function Topbar({ modalShow }) {
     const { props } = usePage()
-    const user = props.auth?.users
+    const user = props.auth?.user
     const roles = props.auth?.roles || []
     const [showPasswordModal, setShowPasswordModal] = useState(false)
     const [gantiAkun, setGantiAkun] = useState(false)
