@@ -253,3 +253,93 @@ export function DetailPengumuman({ selectedData, detailShow, onClose }) {
         </>
     )
 }
+
+// --- Modal Tambah RW ---
+export function AddRwModal({ form, handleChange, handleAdd, onClose }) {
+    return (
+        <div className="modal fade show"
+             style={{ display: "block", backgroundColor: "rgba(0,0,0,0.5)" }}>
+            <div className="modal-dialog modal-dialog-centered">
+                <div className="modal-content modal-custom">
+                    <form onSubmit={handleAdd}>
+                        <div className="modal-header">
+                            <h5>Tambah RW</h5>
+                            <button type="button" className="btn-close" onClick={onClose} />
+                        </div>
+                        <div className="modal-body">
+                            <div className="form-group">
+                                <label>NIK</label>
+                                <input type="text" name="nik" value={form.nik} onChange={handleChange} />
+                            </div>
+                            <div className="form-group">
+                                <label>Nomor RW</label>
+                                <input type="text" name="nomor_rw" value={form.nomor_rw} onChange={handleChange} />
+                            </div>
+                            <div className="form-group">
+                                <label>Nama Ketua RW</label>
+                                <input type="text" name="nama_ketua_rw" value={form.nama_ketua_rw} onChange={handleChange} />
+                            </div>
+                            <div className="form-group">
+                                <label>Mulai Menjabat</label>
+                                <input type="date" name="mulai_menjabat" value={form.mulai_menjabat} onChange={handleChange} />
+                            </div>
+                            <div className="form-group">
+                                <label>Akhir Jabatan</label>
+                                <input type="date" name="akhir_jabatan" value={form.akhir_jabatan} onChange={handleChange} />
+                            </div>
+                        </div>
+                        <div className="modal-footer">
+                            <button type="button" className="btn-custom btn-secondary" onClick={onClose}>Batal</button>
+                            <button type="submit" className="btn-custom btn-primary">Simpan</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    )
+}
+
+// --- Modal Edit RW ---
+export function EditRwModal({ form, handleChange, handleEdit, onClose }) {
+    return (
+        <div className="modal fade show"
+             style={{ display: "block", backgroundColor: "rgba(0,0,0,0.5)" }}>
+            <div className="modal-dialog modal-dialog-centered">
+                <div className="modal-content modal-custom">
+                    <form onSubmit={handleEdit}>
+                        <div className="modal-header">
+                            <h5>Edit RW</h5>
+                            <button type="button" className="btn-close" onClick={onClose} />
+                        </div>
+                        <div className="modal-body">
+                            <div className="form-group">
+                                <label>NIK</label>
+                                <input type="text" name="nik" value={form.nik} onChange={handleChange} />
+                            </div>
+                            <div className="form-group">
+                                <label>Nomor RW</label>
+                                <input type="text" name="nomor_rw" value={form.nomor_rw} onChange={handleChange} />
+                            </div>
+                            <div className="form-group">
+                                <label>Nama Ketua RW</label>
+                                <input type="text" name="nama_ketua_rw" value={form.nama_ketua_rw} onChange={handleChange} />
+                            </div>
+                            <div className="form-group">
+                                <label>Mulai Menjabat</label>
+                                <input type="date" name="mulai_menjabat" value={form.mulai_menjabat} onChange={handleChange} />
+                            </div>
+                            <div className="form-group">
+                                <label>Akhir Jabatan</label>
+                                <input type="date" name="akhir_jabatan" value={form.akhir_jabatan} onChange={handleChange} />
+                            </div>
+                        </div>
+                        <div className="modal-footer">
+                            <button type="button" className="btn-custom btn-secondary" onClick={onClose}>Batal</button>
+                            <button type="submit" className="btn-custom btn-primary">Update</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    )
+}

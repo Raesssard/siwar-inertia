@@ -15,12 +15,32 @@ class AdminRwController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $rw = Rw::paginate(10);
+        $query = Rw::query();
+
+        // Search NIK atau Nama Ketua RW
+        if ($request->filled('search')) {
+            $query->where(function($q) use ($request) {
+                $q->where('nik', 'like', '%' . $request->search . '%')
+                ->orWhere('nama_ketua_rw', 'like', '%' . $request->search . '%');
+            });
+        }
+
+        // Filter berdasarkan Nomor RW
+        if ($request->filled('nomor_rw')) {
+            $query->where('nomor_rw', $request->nomor_rw);
+        }
+
+        $rw = $query->paginate(10)->withQueryString();
+
+        // Ambil semua nomor RW unik buat dropdown
+        $nomorRwList = Rw::select('nomor_rw')->distinct()->orderBy('nomor_rw')->get();
 
         return Inertia::render('Admin/Rw', [
-            'rw' => $rw
+            'rw' => $rw,
+            'filters' => $request->only(['search', 'nomor_rw']),
+            'nomorRwList' => $nomorRwList,
         ]);
     }
 
