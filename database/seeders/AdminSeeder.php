@@ -33,16 +33,7 @@ class AdminSeeder extends Seeder
 
         $admin->syncRoles(['admin']);
 
-        $warga = User::updateOrCreate(
-            ['nik' => '0000000000000002'],
-            [
-                'nama' => 'Andi Kurniawan',
-                'password' => Hash::make('password'), // ganti sesuai kebutuhan
-                'id_rw' => null,
-            ]
-        );
 
-        $warga->syncRoles(['warga', 'rt']);
         $kampung = Kategori_golongan::where('jenis', 'kampung')->first();
 
         $rw = Rw::create([
@@ -101,5 +92,18 @@ class AdminSeeder extends Seeder
             'nama_ibu' => 'Siti Kurniawan',
             'status_warga' => 'penduduk',
         ]);
+
+        // akun sementara, cuma buat tes
+        $warga = User::updateOrCreate(
+            ['nik' => '0000000000000002'],
+            [
+                'nama' => 'Andi Kurniawan',
+                'password' => Hash::make('password'),
+                'id_rw' => 1,
+                'id_rt' => 1,
+            ]
+        );
+
+        $warga->syncRoles(['warga', 'rt']);
     }
 }

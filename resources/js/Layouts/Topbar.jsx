@@ -7,6 +7,7 @@ import { PasswordModal } from "../Pages/Component/Modal"
 export default function Topbar({ modalShow }) {
     const { props } = usePage()
     const user = props.auth?.user
+    const currentRole = props.auth?.currentRole
     const roles = props.auth?.roles || []
     const [showPasswordModal, setShowPasswordModal] = useState(false)
     const [gantiAkun, setGantiAkun] = useState(false)
@@ -113,29 +114,30 @@ export default function Topbar({ modalShow }) {
                             <>
                                 <button
                                     type="button"
-                                    className="dropdown-item"
+                                    className={`btn-account dropdown-item ${gantiAkun ? 'active' : ''}`}
                                     onClick={accountChange}
                                 >
                                     <i className="fas fa-users-cog fa-sm fa-fw mr-2 text-gray-400"></i>
                                     Ganti akun
                                 </button>
                                 {gantiAkun && (
-                                    <div className="akun-dropdown mt-1">
+                                    <div className={`akun-dropdown ${gantiAkun ? "show" : ""}`}>
+                                        <div className="dropdown-divider"></div>
                                         {roles.map((rol, index) => (
                                             <form key={index} onSubmit={submit}>
                                                 <input type="hidden" name="role" value={rol} />
                                                 <button
                                                     type="submit"
-                                                    className="dropdown-item"
+                                                    className={`btn-account dropdown-item ${currentRole === rol ? 'active' : ''}`}
                                                     onClick={() => setSelectedRole(rol)}
+                                                    disabled={currentRole === rol}
                                                 >
                                                     <i className="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
-                                                    {`Akun ${
-                                                        rol.length <= 2
-                                                            ? rol.toUpperCase()
-                                                            : rol.charAt(0).toUpperCase() +
-                                                              rol.slice(1)
-                                                    }`}
+                                                    {`Akun ${rol.length <= 2
+                                                        ? rol.toUpperCase()
+                                                        : rol.charAt(0).toUpperCase() +
+                                                        rol.slice(1)
+                                                        }`}
                                                 </button>
                                             </form>
                                         ))}
@@ -150,9 +152,10 @@ export default function Topbar({ modalShow }) {
                         <Link
                             href="/logout"
                             method="post"
+                            as="button"
                             className="dropdown-item"
                         >
-                            <i className="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
+                            <i className="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>{" "}
                             Logout
                         </Link>
                     </div>

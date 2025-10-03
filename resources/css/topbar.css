@@ -189,3 +189,10 @@ div.akun-dropdown form .btn.btn-account {
     font-size: 0.85rem;
     padding-left: 2rem;
 }
+
+button.btn-account.active:disabled {
+    background-color: #4e73df !important;
+    color: white !important;
+    cursor: not-allowed !important;
+    opacity: 1 !important;
+}
