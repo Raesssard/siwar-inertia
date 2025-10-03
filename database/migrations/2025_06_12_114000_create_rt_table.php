@@ -15,8 +15,8 @@ return new class extends Migration
             $table->id();
             $table->char('no_kk', 16);
             $table->char('nik', 16)->unique();
-            $table->string('rt');
-            $table->string('nama');
+            $table->string('nomor_rt', 3); // 🔹 ganti 'rt' jadi 'nomor_rt'
+            $table->string('nama_ketua_rt');        // 🔹 nama ketua RT
             $table->date('mulai_menjabat');
             $table->date('akhir_jabatan');
             $table->unsignedBigInteger('id_rw');
@@ -30,6 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('rukun_tetangga');
+        Schema::dropIfExists('rt'); // 🔹 harus sama dengan nama tabel di up()
     }
 };
