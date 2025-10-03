@@ -56,8 +56,6 @@ export default function FilePreview({ filePath, judul, displayStyle }) {
     }
 
     return (
-        <p>
-            <i className="fas fa-file"></i> File tidak didukung
-        </p>
+<div className="mt-3"></div>
     )
 }

@@ -24,6 +24,8 @@ export default function Pengaduan() {
     const cardBodyRef = useRef(null)
     const [showButton, setShowButton] = useState(false)
     const [pengaduanList, setPengaduanList] = useState(pengaduanFromServer)
+    const [total, setTotal] = useState(total_pengaduan)
+    const [totalFiltered, setTotalFiltered] = useState(total_pengaduan_filtered)
     const { get, data, setData } = useForm({
         search: '',
         tahun: '',
@@ -136,12 +138,12 @@ export default function Pengaduan() {
                 <div className="d-flex align-items-center gap-1">
                     <i className="fas fa-paper-plane me-2 text-primary"></i>
                     <span className="fw-semibold text-dark">
-                        {total_pengaduan ?? 0} Pengaduan
+                        {total ?? 0} Pengaduan
                     </span>
                 </div>
 
                 <div className="text-muted">
-                    Menampilkan {total_pengaduan_filtered} dari total {total_pengaduan} data
+                    Menampilkan {totalFiltered} dari total {total} data
                 </div>
             </div>
             <div className="col-12">
@@ -214,6 +216,8 @@ export default function Pengaduan() {
                     }}
                     onDeleted={(deletedId) => {
                         setPengaduanList(prev => prev.filter(item => item.id !== deletedId))
+                        setTotal(prev => prev - 1)
+                        setTotalFiltered(prev => prev - 1)
                         setShowModalDetail(false)
                     }}
                     userData={user}
@@ -223,6 +227,8 @@ export default function Pengaduan() {
                     onClose={() => setShowModalTambah(false)}
                     onAdded={(newPengaduan) => {
                         setPengaduanList(prev => [newPengaduan, ...prev])
+                        setTotal(prev => prev + 1)
+                        setTotalFiltered(prev => prev + 1)
                         setSelected(newPengaduan)
                         setShowModalDetail(true)
                     }}

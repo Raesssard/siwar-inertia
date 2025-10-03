@@ -1,6 +1,8 @@
 import React, { useEffect, useRef, useState } from "react"
 import { Link, useForm, usePage } from "@inertiajs/react"
 import logo from '../../../../public/img/logo.png'
+import { Inertia } from "@inertiajs/inertia"
+import axios from "axios"
 
 // Modal sidebar buat mobile mah nanti aja
 export function ModalSidebar({ modalIsOpen, modalShow }) {

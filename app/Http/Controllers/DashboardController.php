@@ -111,8 +111,6 @@ class DashboardController extends Controller
                 ]
             );
         }
-        return Inertia::render('Dashboard', array_merge($data, [
-            'debug_user' => $user->load('warga.kartuKeluarga.rukunTetangga', 'warga.kartuKeluarga.rw'),
-        ]));
+        return Inertia::render('Dashboard', $data);
     }
 }
