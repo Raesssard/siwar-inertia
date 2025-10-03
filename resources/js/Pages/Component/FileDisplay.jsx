@@ -56,6 +56,6 @@ export default function FilePreview({ filePath, judul, displayStyle }) {
     }
 
     return (
-<div className="mt-3"></div>
+        <div className="mt-3"></div>
     )
 }

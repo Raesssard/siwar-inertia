@@ -21,6 +21,8 @@ export default function Pengumuman() {
     const cardBodyRef = useRef(null)
     const [showButton, setShowButton] = useState(false)
     const { props } = usePage()
+    const [total, setTotal] = useState(total_pengumuman)
+    const [totalFiltered, setTotalFiltered] = useState(total_pengumuman_filtered)
     const { get, data, setData } = useForm({
         search: '',
         tahun: '',
@@ -45,6 +47,12 @@ export default function Pengumuman() {
             })
         }
     }
+
+    useEffect(() => {
+        setTotal(total_pengumuman)
+        setTotalFiltered(total_pengumuman_filtered)
+    }, [total_pengumuman, total_pengumuman_filtered])
+
     useEffect(() => {
         const handleScroll = () => {
             if (cardBodyRef.current) {
@@ -115,12 +123,12 @@ export default function Pengumuman() {
                 <div className="d-flex align-items-center gap-1">
                     <i className="fas fa-bullhorn me-2 text-primary"></i>
                     <span className="fw-semibold text-dark">
-                        {total_pengumuman ?? 0} Pengumuman
+                        {total ?? 0} Pengumuman
                     </span>
                 </div>
 
                 <div className="text-muted">
-                    Menampilkan {total_pengumuman_filtered} dari total {total_pengumuman} data
+                    Menampilkan {totalFiltered} dari total {total} data
                 </div>
             </div>
             <div className="col-12">

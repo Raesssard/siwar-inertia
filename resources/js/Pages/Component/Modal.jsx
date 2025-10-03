@@ -3,6 +3,7 @@ import { Link, useForm, usePage } from "@inertiajs/react"
 import logo from '../../../../public/img/logo.png'
 import { Inertia } from "@inertiajs/inertia"
 import axios from "axios"
+import { FormatWaktu } from "../Warga/Pengaduan"
 
 // Modal sidebar buat mobile mah nanti aja
 export function ModalSidebar({ modalIsOpen, modalShow }) {
@@ -399,12 +400,20 @@ export function DetailPengumuman({ selectedData, detailShow, onClose }) {
                                     <div className="p-3 border-bottom caption-section">
                                         <h5 className="fw-bold mb-1 mt-2">{selectedData.judul}</h5>
                                         <small className="text-muted">
-                                            {selectedData.rukun_tetangga ? selectedData.rukun_tetangga.nama : selectedData.rw.nama_ketua_rw} • {" "}
+                                            <strong>
+                                                {selectedData.rukun_tetangga ? selectedData.rukun_tetangga.nama : selectedData.rw.nama_ketua_rw}
+                                            </strong> • {" "}
                                             {selectedData.rukun_tetangga
                                                 ? `${selectedData.rukun_tetangga.jabatan.nama_jabatan.charAt(0).toUpperCase()}${selectedData.rukun_tetangga.jabatan.nama_jabatan.slice(1)} RT`
                                                 : `${selectedData.rw.jabatan.nama_jabatan.charAt(0).toUpperCase()}${selectedData.rw.jabatan.nama_jabatan.slice(1)} RW`} •
                                             RT {selectedData.rukun_tetangga?.rt}/{""}
-                                            RW {selectedData.rw?.nomor_rw}
+                                            RW {selectedData.rw?.nomor_rw}{" "}
+                                            {/* • {new Date(selectedData.created_at).toLocaleDateString("id-ID", {
+                                                day: "2-digit",
+                                                month: "short",
+                                                year: "numeric",
+                                            })} */}
+                                            • <FormatWaktu createdAt={selectedData.created_at} />
                                         </small>
                                         <p
                                             ref={textRef}
@@ -427,13 +436,7 @@ export function DetailPengumuman({ selectedData, detailShow, onClose }) {
                                                 <div key={i} className="mb-3">{console.log(komen)}
                                                     <small className="fw-bold"><strong>{komen.user?.nama}</strong></small>{" "}
                                                     <small className="text-muted">
-                                                        {new Date(komen.created_at).toLocaleString("id-ID", {
-                                                            day: "2-digit",
-                                                            month: "short",
-                                                            year: "numeric",
-                                                            hour: "2-digit",
-                                                            minute: "2-digit",
-                                                        })}
+                                                        <FormatWaktu createdAt={komen.created_at} />
                                                     </small>
 
                                                     <p
@@ -653,8 +656,17 @@ export function DetailPengaduan({ selectedData, detailShow, onClose, onUpdated, 
                                                 <h5 className="fw-bold mb-1 mt-2">{selectedData.judul}</h5>
                                             )}
                                             <small className="text-muted">
-                                                {selectedData.warga?.nama} • RT {selectedData.warga?.kartu_keluarga?.rukun_tetangga?.rt}/RW{" "}
-                                                {selectedData.warga?.kartu_keluarga?.rw?.nomor_rw}
+                                                <strong>
+                                                    {selectedData.warga?.nama}
+                                                </strong>{" "}
+                                                • RT {selectedData.warga?.kartu_keluarga?.rukun_tetangga?.rt}/RW{" "}
+                                                {selectedData.warga?.kartu_keluarga?.rw?.nomor_rw}{" "}
+                                                {/* • {new Date(selectedData.created_at).toLocaleDateString("id-ID", {
+                                                    day: "2-digit",
+                                                    month: "short",
+                                                    year: "numeric",
+                                                })} */}
+                                                • <FormatWaktu createdAt={selectedData.created_at} />
                                             </small>
                                             <p
                                                 ref={textRef}
@@ -677,13 +689,7 @@ export function DetailPengaduan({ selectedData, detailShow, onClose, onUpdated, 
                                                     <div key={i} className="mb-3">
                                                         <small className="fw-bold"><strong>{komen.user?.nama}</strong></small>{" "}
                                                         <small className="text-muted">
-                                                            {new Date(komen.created_at).toLocaleString("id-ID", {
-                                                                day: "2-digit",
-                                                                month: "short",
-                                                                year: "numeric",
-                                                                hour: "2-digit",
-                                                                minute: "2-digit",
-                                                            })}
+                                                            <FormatWaktu createdAt={komen.created_at} />
                                                         </small>
 
                                                         <p

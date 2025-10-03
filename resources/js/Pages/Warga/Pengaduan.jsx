@@ -7,6 +7,36 @@ import { DetailPengaduan, TambahPengaduan } from "../Component/Modal"
 import { FilterPengaduan } from "../Component/Filter"
 import { Inertia } from "@inertiajs/inertia"
 
+export function FormatWaktu({ createdAt }) {
+    const now = new Date()
+    const created = new Date(createdAt)
+    const diffMs = now - created
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24))
+
+    if (diffDays < 1) {
+        const diffHours = Math.floor(diffMs / (1000 * 60 * 60))
+        const diffMinutes = Math.floor(diffMs / (1000 * 60))
+
+        if (diffHours > 0) return `${diffHours} jam yang lalu`
+        if (diffMinutes > 0) return `${diffMinutes} menit yang lalu`
+        return "baru saja"
+    }
+
+    if (diffDays < 30) {
+        return `${diffDays} hari yang lalu`
+    }
+
+    return (
+        <>
+            {created.toLocaleDateString("id-ID", {
+                day: "2-digit",
+                month: "short",
+                year: "numeric",
+            })}
+        </>
+    )
+}
+
 export default function Pengaduan() {
     const { pengaduan: pengaduanFromServer,
         title,
@@ -47,8 +77,10 @@ export default function Pengaduan() {
     }
 
     useEffect(() => {
+        setTotal(total_pengaduan)
+        setTotalFiltered(total_pengaduan_filtered)
         setPengaduanList(pengaduanFromServer)
-    }, [pengaduanFromServer])
+    }, [total_pengaduan, total_pengaduan_filtered, pengaduanFromServer])
 
     useEffect(() => {
         const handleScroll = () => {
@@ -156,22 +188,18 @@ export default function Pengaduan() {
                                 columnClassName="space-y-4"
                             >
                                 {pengaduanList.map((item, index) => (
-                                    <div key={index} className="card-clickable" onClick={() => modalDetail(item)}>
+                                    <div key={index} className="card-clickable d-flex justify-content-center align-items-center flex-column" onClick={() => modalDetail(item)}>
                                         <FileDisplay
                                             filePath={`/storage/${item.file_path}`}
                                             judul={item.file_name}
                                             displayStyle={imgStyle} />
                                         <h2 className="font-semibold text-lg mb-2 text-left mx-3">{item.judul}</h2>
-                                        <div className="text-sm text-gray-500 mb-2 mx-3 flex justify-between">
+                                        <div className="text-sm text-gray-500 mb-2 d-flex gap-2">
                                             <span><i className="fas fa-user mr-1"></i>{item.warga.nama}</span>
-                                            <span><i className="fas fa-clock mr-1"></i>{new Date(item.created_at).toLocaleDateString("id-ID", {
-                                                day: "2-digit",
-                                                month: "short",
-                                                year: "numeric",
-                                            })}</span>
+                                            <span><i className="fas fa-clock mr-1"></i><FormatWaktu createdAt={item.created_at} /></span>
                                         </div>
                                         {item.nik_warga !== user.nik ? (
-                                            <div className="text-sm text-gray-500 mb-2 mx-3 flex justify-between">
+                                            <div className="text-sm text-gray-500 mb-2 d-flex gap-2">
                                                 <span><i className="fas fa-users mr-1"></i>RT {item.warga?.kartu_keluarga?.rukun_tetangga?.rt}/RW {item.warga?.kartu_keluarga?.rw?.nomor_rw}</span>
                                             </div>
                                         ) : ""
