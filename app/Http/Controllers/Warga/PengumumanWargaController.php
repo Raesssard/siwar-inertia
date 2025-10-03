@@ -138,7 +138,7 @@ class PengumumanWargaController extends Controller
         //     'total_pengumuman'
         // ));
 
-        return Inertia::render('Pengumuman', [
+        return Inertia::render('Warga/Pengumuman', [
             'pengumuman' => $pengumuman,
             'rukun_tetangga' => $rukun_tetangga,
             'title' => $title,

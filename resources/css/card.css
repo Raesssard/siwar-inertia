@@ -3,22 +3,19 @@
 /* ================================================================== */
 .card {
     width: 100%;
-    height: 100%;
-    border-radius: 0.5rem;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
+    height: auto;
 }
 
 .card-clickable {
+    border-radius: 0.35rem;
+    /* biar rounded */
     transition: transform 0.15s ease-out, box-shadow 0.15s ease-out;
     cursor: pointer;
 }
 
 .card-clickable:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 0.6rem 1.2rem rgba(0, 0, 0, .15);
+    transform: translateY(-5px);
+    box-shadow: 0 0.6rem 1rem rgba(0, 0, 0, .2);
 }
 
 .card-clickable:active {
@@ -28,30 +25,38 @@
 
 .card-clickable .text-decoration-none {
     display: block;
+    /* link cover seluruh card */
     color: inherit;
-    height: 100%;
+    /* biar nggak berubah warna */
+}
+
+.text-gray-800 {
+    color: #5a5c69 !important;
+}
+
+.text-gray-400 {
+    color: #d1d3e2 !important;
 }
 
 /* ================================================================== */
 /* Card Body Text                                                     */
 /* ================================================================== */
 .card-body {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
+    margin: 0;
+    width: 100%;
 }
 
 .card-body .text-xs {
+    text-align: left;
     font-size: 0.75rem;
-    font-weight: 600;
-    margin-bottom: 0.25rem;
+    letter-spacing: 0.05em;
 }
 
 .card-body .h4 {
+    text-align: left;
     font-size: 1.5rem;
     font-weight: 700;
-    margin: 0;
+    margin-bottom: 0.25rem;
 }
 
 /* ================================================================== */
@@ -66,13 +71,18 @@
 .card-body .fa-3x,
 .card-body .bi {
     font-size: 2rem;
-    opacity: 0.8;
+    opacity: 0.75;
 }
 
 /* ================================================================== */
 /* Responsive Breakpoints                                             */
 /* ================================================================== */
 @media (max-width: 767.98px) {
+    .card-body {
+        margin: 0;
+        width: 100%;
+    }
+
     .card-body .h4 {
         font-size: 1.2rem;
     }
@@ -88,6 +98,11 @@
 }
 
 @media (max-width: 575.98px) {
+    .card-body {
+        margin: 0;
+        width: 100%;
+    }
+
     .card-body .h4 {
         font-size: 1rem;
     }
@@ -101,19 +116,30 @@
         font-size: 1.25rem;
     }
 }
+
 /* === Dashboard Card Layout === */
 .dashboard-cards {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
     gap: 1.25rem;
-    margin: 1rem auto;   /* auto -> biar center */
-    max-width: 1200px;   /* biar gak terlalu lebar */
+    margin: 1rem auto;
+    /* auto -> biar center */
+    max-width: 1200px;
+    /* biar gak terlalu lebar */
     padding: 0 1rem;
 }
 
-.card {
-    height: 120px;
+div.card.dashboard {
+    height: 120px !important;
     display: flex;
     flex-direction: column;
     justify-content: center;
+}
+
+div.card-body.dashboard {
+    height: 100px !important;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 0 0.75rem;
 }

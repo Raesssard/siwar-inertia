@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react"
-import { Link, usePage } from "@inertiajs/react"
+import React, { useEffect, useRef, useState } from "react"
+import { Link, useForm, usePage } from "@inertiajs/react"
 import logo from '../../../../public/img/logo.png'
 
 // Modal sidebar buat mobile mah nanti aja
@@ -345,11 +345,11 @@ export function DetailPengumuman({ selectedData, detailShow, onClose }) {
                 }}
             >
                 <div
-                    className="modal-dialog modal-lg modal-dialog-scrollable modal-dialog-centered"
+                    className="modal-dialog modal-komen modal-lg modal-dialog-scrollable modal-dialog-centered"
                     onClick={(e) => e.stopPropagation()}
                 >
                     <div className="modal-content modal-komen shadow-lg border-0">
-                        <div className="modal-body p-0">
+                        <div className="modal-body p-0 m-0">
                             <div className="d-flex flex-row modal-komen">
                                 {selectedData?.dokumen_path ? (
                                     <div className="flex-fill border-end bg-black d-flex align-items-center justify-content-center" style={{ maxWidth: "50%" }}>
@@ -576,11 +576,11 @@ export function DetailPengaduan({ selectedData, detailShow, onClose, onUpdated, 
                 }}
             >
                 <div
-                    className="modal-dialog modal-lg modal-dialog-scrollable modal-dialog-centered"
+                    className="modal-dialog modal-komen modal-lg modal-dialog-scrollable modal-dialog-centered"
                     onClick={(e) => e.stopPropagation()}
                 >
                     <div className="modal-content modal-komen shadow-lg border-0">
-                        <div className="modal-body p-0">
+                        <div className="modal-body p-0 m-0">
                             {isEdit ? (
                                 <EditPengaduan
                                     toggle={toggleEdit}
@@ -1097,11 +1097,11 @@ export function TambahPengaduan({ tambahShow, onClose, onAdded }) {
                 }}
             >
                 <div
-                    className="modal-dialog modal-lg modal-dialog-scrollable modal-dialog-centered"
+                    className="modal-dialog modal-komen modal-lg modal-dialog-scrollable modal-dialog-centered"
                     onClick={(e) => e.stopPropagation()}
                 >
                     <div className="modal-content modal-komen shadow-lg border-0">
-                        <div className="modal-body p-0">
+                        <div className="modal-body p-0 m-0">
                             <div className="d-flex flex-row modal-komen">
                                 {previewUrl ? (
                                     <div className="flex-fill border-end bg-black d-flex align-items-center justify-content-center" style={{ maxWidth: "50%" }}>
