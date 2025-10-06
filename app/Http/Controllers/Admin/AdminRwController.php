@@ -20,10 +20,10 @@ class AdminRwController extends Controller
         $query = Rw::query();
 
         // Search NIK atau Nama Ketua RW
-        if ($request->filled('search')) {
+        if ($request->filled('keyword')) {
             $query->where(function($q) use ($request) {
-                $q->where('nik', 'like', '%' . $request->search . '%')
-                ->orWhere('nama_ketua_rw', 'like', '%' . $request->search . '%');
+                $q->where('nik', 'like', '%' . $request->keyword . '%')
+                  ->orWhere('nama_ketua_rw', 'like', '%' . $request->keyword . '%');
             });
         }
 
@@ -39,7 +39,7 @@ class AdminRwController extends Controller
 
         return Inertia::render('Admin/Rw', [
             'rw' => $rw,
-            'filters' => $request->only(['search', 'nomor_rw']),
+            'filters' => $request->only(['keyword', 'nomor_rw']),
             'nomorRwList' => $nomorRwList,
         ]);
     }
@@ -70,7 +70,8 @@ class AdminRwController extends Controller
 
         $user->assignRole('rw');
 
-        return redirect()->route('admin.rw.index')->with('success', 'Rukun Warga berhasil ditambahkan.');
+        // 🔥 Inertia redirect
+        return Inertia::location(route('admin.rw.index'));
     }
 
     /**
@@ -117,7 +118,8 @@ class AdminRwController extends Controller
             ]);
         }
 
-        return redirect()->route('admin.rw.index')->with('success', 'Rukun Warga berhasil diperbarui.');
+        // 🔥 Inertia redirect
+        return Inertia::location(route('admin.rw.index'));
     }
 
     /**
@@ -131,7 +133,8 @@ class AdminRwController extends Controller
             User::where('id_rw', $rw->id)->delete();
             $rw->delete();
 
-            return redirect()->back()->with('success', 'RW berhasil dihapus.');
+            // 🔥 Inertia redirect
+            return Inertia::location(route('admin.rw.index'));
         } catch (\Illuminate\Database\QueryException $e) {
             return redirect()->back()->with('error', 'Tidak bisa menghapus RW karena masih digunakan.');
         }

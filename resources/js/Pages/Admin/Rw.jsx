@@ -2,9 +2,11 @@
 import React, { useState } from "react";
 import { Inertia } from "@inertiajs/inertia";
 import Layout from "@/Layouts/Layout";
+import { route } from "ziggy-js";
+import { router } from '@inertiajs/react';
 import { AddRwModal, EditRwModal } from "@/Pages/Component/Modal";
 
-export default function Rw({ rw, filters }) {
+export default function Rw({ rw, filters, nomorRwList }) {
     const [showAdd, setShowAdd] = useState(false);
     const [showEdit, setShowEdit] = useState(null);
 
@@ -73,7 +75,21 @@ export default function Rw({ rw, filters }) {
 
     const applyFilter = (e) => {
         e.preventDefault();
-        Inertia.get(route("admin.rw.index"), search, { preserveState: true });
+        router.get(route("admin.rw.index"), search, {
+            replace: true,
+            preserveScroll: true,
+        });
+    };
+
+    const resetFilter = () => {
+        setSearch({
+            keyword: "",
+            nomor_rw: "",
+        });
+        router.get(route("admin.rw.index"), {}, {
+            replace: true,
+            preserveScroll: true,
+        });
     };
 
     return (
@@ -87,18 +103,33 @@ export default function Rw({ rw, filters }) {
                     value={search.keyword}
                     onChange={handleSearchChange}
                 />
-                <input
-                    type="text"
+
+                {/* Dropdown nomor RW */}
+                <select
                     name="nomor_rw"
-                    placeholder="Cari Nomor RW..."
                     value={search.nomor_rw}
                     onChange={handleSearchChange}
-                />
-                <button type="submit" className="btn-custom btn-secondary">
+                    className="ms-2"
+                >
+                    <option value="">-- Semua Nomor RW --</option>
+                    {nomorRwList.map((rwItem, index) => (
+                        <option key={index} value={rwItem.nomor_rw}>
+                            RW {rwItem.nomor_rw}
+                        </option>
+                    ))}
+                </select>
+
+                <button type="submit" className="btn-custom btn-secondary ms-2">
                     Filter
                 </button>
+                <button
+                    type="button"
+                    onClick={resetFilter}
+                    className="btn-custom btn-light bg-gray-300 ms-2"
+                >
+                    Reset
+                </button>
             </form>
-
             {/* Table */}
             <div className="table-container">
                 <div className="table-header">
