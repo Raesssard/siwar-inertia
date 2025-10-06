@@ -12,12 +12,12 @@ export function StatCard({ href, color, title, value, icon }) {
                             {/* Text */}
                             <div className="col mr-2">
                                 <div
-                                    className={`text-xs font-weight-bold text-${color} text-uppercase mb-1 text-align-start`}
+                                    className={`text-xs font-weight-bold text-${color} text-uppercase ${value ? "mb-1" : ""} text-align-start`}
                                 >
                                     {title}
                                 </div>
                                 <div className="h4 mb-0 font-weight-bolder text-gray-800">
-                                    {value ?? 0}
+                                    {value ?? ""}
                                 </div>
                             </div>
                             {/* Icon */}

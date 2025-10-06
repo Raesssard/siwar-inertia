@@ -32,7 +32,7 @@ export function ModalSidebar({ modalIsOpen, modalShow }) {
                                     ×
                                 </button>
                             </div>
-                            <div className="modal-body p-0">
+                            <div className="modal-body p-0 m-0">
                                 <ul className="navbar-nav sidebar sidebar-dark accordion">
                                     <hr className="sidebar-divider my-0" />
                                     <li className={`nav-item ${isActive(url, '/warga') ? 'active' : ''}`}>
@@ -436,7 +436,7 @@ export function DetailPengumuman({ selectedData, detailShow, onClose }) {
                                                 <div key={i} className="mb-3">{console.log(komen)}
                                                     <small className="fw-bold"><strong>{komen.user?.nama}</strong></small>{" "}
                                                     <small className="text-muted">
-                                                        <FormatWaktu createdAt={komen.created_at} />
+                                                        • <FormatWaktu createdAt={komen.created_at} />
                                                     </small>
 
                                                     <p
@@ -689,7 +689,7 @@ export function DetailPengaduan({ selectedData, detailShow, onClose, onUpdated, 
                                                     <div key={i} className="mb-3">
                                                         <small className="fw-bold"><strong>{komen.user?.nama}</strong></small>{" "}
                                                         <small className="text-muted">
-                                                            <FormatWaktu createdAt={komen.created_at} />
+                                                            • <FormatWaktu createdAt={komen.created_at} />
                                                         </small>
 
                                                         <p

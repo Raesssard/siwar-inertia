@@ -194,12 +194,12 @@ export default function Pengaduan() {
                                             judul={item.file_name}
                                             displayStyle={imgStyle} />
                                         <h2 className="font-semibold text-lg mb-2 text-left mx-3">{item.judul}</h2>
-                                        <div className="text-sm text-gray-500 mb-2 d-flex gap-2">
+                                        <div className="text-sm text-gray-500 mb-2 d-flex gap-4">
                                             <span><i className="fas fa-user mr-1"></i>{item.warga.nama}</span>
                                             <span><i className="fas fa-clock mr-1"></i><FormatWaktu createdAt={item.created_at} /></span>
                                         </div>
                                         {item.nik_warga !== user.nik ? (
-                                            <div className="text-sm text-gray-500 mb-2 d-flex gap-2">
+                                            <div className="text-sm text-gray-500 mb-2 d-flex gap-4">
                                                 <span><i className="fas fa-users mr-1"></i>RT {item.warga?.kartu_keluarga?.rukun_tetangga?.rt}/RW {item.warga?.kartu_keluarga?.rw?.nomor_rw}</span>
                                             </div>
                                         ) : ""

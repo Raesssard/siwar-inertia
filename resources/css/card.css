@@ -95,6 +95,38 @@
     .card-body .bi {
         font-size: 1.5rem;
     }
+
+    .dashboard-cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.25rem;
+        margin: 1rem auto;
+        max-width: 1200px;
+        padding: 0 1rem;
+        overflow-x: hidden;
+    }
+
+    div.card.dashboard {
+        min-height: 120px;
+        height: auto !important;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    div.card-body.dashboard {
+        height: auto !important;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: 0.75rem;
+    }
+
+    .card-body .h4,
+    .card-body .text-xs {
+        overflow-wrap: break-word;
+        word-wrap: break-word;
+    }
 }
 
 @media (max-width: 575.98px) {
@@ -115,6 +147,43 @@
     .card-body .bi {
         font-size: 1.25rem;
     }
+
+    .dashboard-cards {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+        margin: 1rem auto;
+        max-width: 1200px;
+        padding: 0 0.5rem;
+        overflow-x: hidden;
+    }
+
+    div.card.dashboard {
+        min-height: 100px;
+        height: auto !important;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    div.card-body.dashboard {
+        height: auto !important;
+        padding: 0.75rem;
+    }
+
+    .card-body .h4 {
+        font-size: 0.9rem;
+    }
+
+    .card-body .text-xs {
+        font-size: 0.6rem;
+    }
+
+    .card-body .h4,
+    .card-body .text-xs {
+        overflow-wrap: break-word;
+        word-wrap: break-word;
+    }
 }
 
 /* === Dashboard Card Layout === */
@@ -123,9 +192,7 @@
     grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
     gap: 1.25rem;
     margin: 1rem auto;
-    /* auto -> biar center */
     max-width: 1200px;
-    /* biar gak terlalu lebar */
     padding: 0 1rem;
 }
 

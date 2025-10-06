@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Admin\AdminRwController;
+use App\Http\Controllers\Warga\LihatKKController;
 use App\Http\Controllers\Warga\PengaduanController;
 use App\Http\Controllers\Warga\PengumumanWargaController;
 
@@ -33,5 +34,6 @@ Route::middleware(['auth'])->group(function () {
             ->name('pengaduan.komentar.komen');
         Route::post('/pengumuman/{id}/komentar', [PengumumanWargaController::class, 'komen'])
             ->name('pengumuman.komentar.komen');
+        Route::get('kk', [LihatKKController::class, 'index'])->name('kk');
     });
 });

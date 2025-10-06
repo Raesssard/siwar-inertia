@@ -209,8 +209,11 @@ div.card-body.pengumuman {
     border-bottom: 1px solid lightgray;
 }
 
+#content::-webkit-scrollbar,
 div.card-body.pengaduan::-webkit-scrollbar,
-div.card-body.pengumuman::-webkit-scrollbar {
+div.card-body.pengumuman::-webkit-scrollbar,
+div.komen-section::-webkit-scrollbar,
+div.table-responsive::-webkit-scrollbar {
     display: none;
 }
 
@@ -303,14 +306,10 @@ div.modal-komen {
 }
 
 .modal-dialog.modal-komen {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: calc(100vh - 3.5rem);
-}
-
-div.komen-section::-webkit-scrollbar {
-    display: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: calc(100vh - 3.5rem);
 }
 
 p.isi-pengaduan,
@@ -336,7 +335,7 @@ p.isi-pengumuman.expanded {
     display: block;
 }
 
-p.komen {   
+p.komen {
     overflow: hidden;
     display: -webkit-box;
     -webkit-line-clamp: 3;
