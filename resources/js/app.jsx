@@ -4,11 +4,6 @@ import 'bootstrap-icons/font/bootstrap-icons.css'
 import '../css/app.css'
 import '../css/sb-admin-2-custom.css'
 import '../css/crud.css'
-// import "../css/card.css" // 🔥 tambahin ini 
-// itu kan card.css cuma buat card dashboard doang kan? 
-// mending disimpen di Card.jsx, 
-// takutnya card lain selain yg dashboard juga kena, 
-// nanti malah harus override css-nya
 import React from 'react'
 import { createInertiaApp } from '@inertiajs/react'
 import { createRoot } from 'react-dom/client'
