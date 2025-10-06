@@ -1,0 +1,346 @@
+.modal-dialog.modal-fullscreen {
+    margin: 0;
+    max-width: 100vw;
+    height: 100vh;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-dialog.modal-fullscreen .modal-content {
+    height: 100%;
+    width: 100%;
+    border-radius: 0;
+    /* Tambahkan atau pastikan latar belakang modal-content adalah hitam/gelap */
+    background-color: #333;
+    /* Warna latar belakang gelap untuk modal secara keseluruhan */
+}
+
+/* --- Penyesuaian untuk modal-body --- */
+.modal-body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex-grow: 1;
+    overflow-y: auto;
+    overflow-x: auto;
+    padding: 1rem !important;
+    /* Ini kunci untuk latar belakang modal-body */
+    background-color: none;
+    /* Warna gelap yang sama dengan modal-content */
+    /* Atau bisa juga rgba(0,0,0,0.8) jika ingin sedikit transparan */
+}
+
+/* --- Penyesuaian Spesifik untuk Gambar di dalam Modal Body --- */
+#documentPreviewImage {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    min-height: auto;
+    height: auto;
+    /* Jika gambar memiliki area transparan, ini akan terlihat di atas background modal-body */
+    background-color: transparent;
+    /* Pastikan tidak ada latar belakang putih dari gambar itu sendiri */
+}
+
+/* --- Penyesuaian Spesifik untuk Iframe PDF di dalam Modal Body --- */
+#documentPreviewPdf {
+    width: 100%;
+    height: calc(100vh - 120px);
+    overflow: hidden;
+    /* Sembunyikan scrollbar bawaan iframe */
+    min-height: 400px;
+    background-color: transparent;
+    /* Coba atur background iframe ke transparan. */
+    /* Efeknya mungkin terbatas karena PDF itu sendiri memiliki latar. */
+}
+
+body {
+    /* Penting: Mencegah scroll pada seluruh elemen body */
+    overflow: hidden;
+}
+
+/* Ini adalah elemen yang akan di-scroll */
+#content {
+    /* Mengisi sisa tinggi viewport yang tersedia */
+    height: calc(100vh - 100px);
+    /* Contoh: 100vh dikurangi tinggi topbar (misal 56px) */
+    overflow-y: auto;
+    /* Aktifkan scroll vertikal otomatis */
+    overflow-x: hidden;
+    /* Sembunyikan scroll horizontal jika tidak dibutuhkan */
+    padding-top: 0;
+    /* Sesuaikan padding agar tidak terlalu mepet topbar */
+    padding-bottom: 0;
+    /* Sesuaikan padding bawah */
+}
+
+/* Jika Anda ingin hanya card-body yang scrollable */
+.scrollable-card-body {
+    max-height: calc(100vh - 200px);
+    /* Contoh: Atur tinggi maksimal agar card-body bisa di-scroll */
+    overflow-y: auto;
+    /* Aktifkan scroll vertikal */
+}
+
+/* General Styling for KK Look-Alike */
+.kk-container {
+    font-family: 'Arial', sans-serif;
+    color: #333;
+    line-height: 1.5;
+    border: 2px solid #0056b3;
+    /* Darker blue border for KK look */
+    padding: 2rem;
+    background-color: #f8faff;
+    /* Light blueish background */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.kk-header {
+    border-bottom: 2px solid #0056b3;
+    padding-bottom: 1rem;
+    margin-bottom: 2rem;
+}
+
+.kk-header-top-line p {
+    margin-bottom: 0;
+    font-size: 0.9rem;
+}
+
+.kk-header-main-title h4 {
+    font-size: 1.8rem;
+    margin-bottom: 0.5rem;
+    color: #0056b3;
+    /* Darker blue for main title */
+    text-transform: uppercase;
+}
+
+.no-kk-big {
+    font-size: 1.5rem;
+    margin-top: 0;
+    color: #007bff;
+    /* Primary blue */
+}
+
+.no-kk-big span {
+    letter-spacing: 1px;
+    /* Spacing for KK number */
+}
+
+.kk-info-grid p {
+    margin-bottom: 0.5rem;
+}
+
+.kk-info-grid strong {
+    color: #555;
+}
+
+/* Table Styling for Anggota Keluarga */
+.table-scroll-container {
+    max-height: 50vh;
+    /* Ini sudah benar untuk scroll tabel internal */
+    overflow-y: auto;
+    overflow-x: auto;
+    border: 1px solid #dee2e6;
+    border-radius: 0.25rem;
+}
+
+.table-scroll-container thead.sticky-top {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background-color: #eaf7f7;
+    /* Light greenish-blue for sticky header */
+    box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.1);
+}
+
+.table-scroll-container .table-sm th,
+.table-scroll-container .table-sm td {
+    padding: 0.4rem 0.6rem;
+    /* Slightly more padding for readability */
+    white-space: nowrap;
+    /* Prevent text wrapping in table cells */
+}
+
+.kk-table th,
+.kk-table td {
+    vertical-align: middle;
+}
+
+/* KK Footer Styling */
+.kk-footer p {
+    margin-bottom: 0.2rem;
+    font-size: 0.9rem;
+}
+
+.kk-footer strong {
+    font-size: 1rem;
+    color: #000;
+}
+
+/* Document Upload/Display Section */
+.kk-document-section {
+    background-color: #eaf0f6;
+    /* Light gray-blue background */
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+}
+
+.document-preview-wrapper {
+    position: relative;
+    display: inline-block;
+    /* To center the image/pdf thumbnail */
+    cursor: pointer;
+    border: 1px solid #ddd;
+    border-radius: 0.5rem;
+    overflow: hidden;
+    max-width: 100%;
+    /* Ensure it doesn't overflow */
+}
+
+.document-preview-wrapper img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    transition: transform 0.3s ease;
+}
+
+.document-preview-wrapper:hover img {
+    transform: scale(1.02);
+}
+
+.view-document-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    font-size: 1.2rem;
+    text-align: center;
+}
+
+.document-preview-wrapper:hover .view-document-overlay {
+    opacity: 1;
+}
+
+.view-document-overlay i {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.pdf-thumbnail-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    background-color: #fff;
+    border: 1px dashed #ccc;
+    border-radius: 0.5rem;
+    min-height: 150px;
+    /* Adjust as needed */
+}
+
+.pdf-icon-lg {
+    font-size: 4rem;
+    /* Larger PDF icon */
+    color: #dc3545;
+    /* Red color for PDF */
+    margin-bottom: 0.5rem;
+}
+
+.pdf-filename {
+    font-size: 0.9rem;
+    color: #333;
+    margin-bottom: 0;
+}
+
+.no-document-text {
+    color: #6c757d;
+    font-style: italic;
+    padding: 1.5rem;
+    border: 1px dashed #ccc;
+    border-radius: 0.5rem;
+    background-color: #f0f0f0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 767.98px) {
+    .kk-container {
+        padding: 1rem;
+    }
+
+    .kk-header-main-title h4 {
+        font-size: 1.5rem;
+    }
+
+    .no-kk-big {
+        font-size: 1.2rem;
+    }
+
+    .kk-info-grid.row.row-cols-md-2 .col {
+        padding-bottom: 0.5rem;
+        /* Add some space between rows in single column layout */
+    }
+
+    .table-scroll-container .table-sm th,
+    .table-scroll-container .table-sm td {
+        font-size: 0.7rem !important;
+        padding: 0.3rem !important;
+    }
+
+    .kk-footer .col-12 {
+        text-align: center;
+        margin-bottom: 1.5rem;
+        /* Space between signature blocks on small screens */
+    }
+
+    .kk-document-upload .input-group {
+        flex-direction: column;
+    }
+
+    .kk-document-upload .input-group input,
+    .kk-document-upload .input-group button {
+        width: 100%;
+    }
+
+    .kk-document-upload .input-group button {
+        margin-top: 0.5rem;
+    }
+
+    .document-preview-wrapper {
+        max-width: 90%;
+        /* Smaller on small screens */
+    }
+}
+
+@media (max-width: 575.98px) {
+    .kk-header-top-line {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .kk-header-right-reg {
+        text-align: center;
+        margin-top: 0.5rem;
+    }
+
+    .kk-info-grid.row.row-cols-md-2 {
+        display: block;
+        /* Force single column on very small screens */
+    }
+
+    .kk-info-grid .col {
+        width: 100%;
+    }
+}

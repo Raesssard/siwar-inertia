@@ -1,17 +1,14 @@
-import "../../css/sidebar.css";
-import logo from "../../../public/img/logo.png";
-import { Link, usePage } from "@inertiajs/react";
-import React, { useState } from "react";
+import '../../css/sidebar.css'
+import logo from '../../../public/img/logo.png'
+import { Link, usePage } from "@inertiajs/react"
+import React, { useState } from "react"
+import { SidebarLink } from '../Pages/Component/SidebarLink'
+import { getAdminLinks, getWargaLinks } from "../Pages/Component/GetPropRole"
 
 export default function Sidebar({ toggleKeParent }) {
-    const [toggle, setToggle] = useState("");
-    const { url } = usePage();
-    const isActive = (url, pattern, exact = false) => {
-        if (exact) {
-            return url === pattern;
-        }
-        return url.startsWith(pattern);
-    };
+    const [toggle, setToggle] = useState("")
+    const { props } = usePage()
+    const role = props.auth?.currentRole
 
     const toggleSidebar = (e) => {
         e.preventDefault();
@@ -20,6 +17,25 @@ export default function Sidebar({ toggleKeParent }) {
         toggleKeParent(tgl);
     };
 
+    const rotation = toggle ? 'right' : 'left'
+    let statLinks = [];
+
+    switch (role) {
+        case "admin":
+            statLinks = getAdminLinks();
+            break;
+        case "rw":
+            statLinks = getRwLinks();
+            break;
+        case "rt":
+            statLinks = getRtLinks();
+            break;
+        case "warga":
+            statLinks = getWargaLinks();
+            break;
+        default:
+            statLinks = [];
+    }
     const rotation = toggle ? "right" : "left";
 
     return (
@@ -40,6 +56,9 @@ export default function Sidebar({ toggleKeParent }) {
 
                 <hr className="sidebar-divider my-0" />
 
+                {statLinks.map((link, index) => (
+                    <SidebarLink key={index} {...link} />
+                ))}
                 {/* Dashboard */}
                 <li
                     className={`nav-item ${

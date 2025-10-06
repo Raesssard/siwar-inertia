@@ -4,10 +4,14 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Admin\AdminRwController;
+use App\Http\Controllers\Warga\LihatKKController;
+use App\Http\Controllers\Warga\PengaduanController;
+use App\Http\Controllers\Warga\PengumumanWargaController;
 use App\Http\Controllers\Admin\AdminRtController;
 use App\Http\Controllers\Admin\AdminKategoriGolonganController;
 use App\Http\Controllers\Admin\AdminRoleController;
 use Inertia\Inertia;
+
 
 Route::get('/', function () {
     return view('welcome');
@@ -32,5 +36,15 @@ Route::middleware(['auth'])->group(function () {
         Route::resource('kategori-golongan', AdminKategoriGolonganController::class)->except(['create', 'edit', 'show']);
         Route::resource('roles', AdminRoleController::class)->except(['create', 'edit', 'show']);
         Route::put('roles/{id}/permissions', [AdminRoleController::class, 'updatePermissions'])->name('roles.permissions.update');
+    });
+
+    Route::prefix('warga')->as('warga.')->group(function () {
+        Route::get('pengumuman', [PengumumanWargaController::class, 'index'])->name('pengumuman');
+        Route::resource('pengaduan', PengaduanController::class);
+        Route::post('/pengaduan/{id}/komentar', [PengaduanController::class, 'komen'])
+            ->name('pengaduan.komentar.komen');
+        Route::post('/pengumuman/{id}/komentar', [PengumumanWargaController::class, 'komen'])
+            ->name('pengumuman.komentar.komen');
+        Route::get('kk', [LihatKKController::class, 'index'])->name('kk');
     });
 });

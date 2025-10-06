@@ -1,20 +1,44 @@
 // resources/js/Pages/Dashboard.jsx
 import React from "react";
-import { usePage } from "@inertiajs/react";
-import DashboardAdmin from "./Admin/DashboardAdmin";
+import { Head, usePage } from "@inertiajs/react";
+import '../../css/card.css'
+import Layout from "@/Layouts/Layout";
+import { StatCard } from "./Component/Card";
+import { getAdminCards, getWargaCards } from "./Component/GetPropRole"
 
-export default function Dashboard(props) {
-  const { props: page } = usePage();
-  // Bisa dapat roles dari shared auth (sesuaikan kalau kamu share lain)
-  const roles = page?.auth?.roles || page?.auth?.user?.roles || [];
-  const isAdmin = Array.isArray(roles) ? roles.includes('admin') : roles === 'admin';
+export default function Dashboard() {
+  const { role, title, ...rest } = usePage().props
+  let statCards = [];
 
-  // Untuk sekarang: kalau admin → tampilkan DashboardAdmin
-  if (isAdmin) {
-    // lempar semua props ke DashboardAdmin (controller sudah mengirim jumlah_*)
-    return <DashboardAdmin {...page} />;
+  switch (role) {
+    case "admin":
+      statCards = getAdminCards(rest);
+      break;
+    case "rw":
+      statCards = getRwCards(rest);
+      break;
+    case "rt":
+      statCards = getRtCards(rest);
+      break;
+    case "warga":
+      statCards = getWargaCards(rest);
+      break;
+    default:
+      statCards = [];
   }
 
-  // fallback: tampilkan DashboardAdmin juga (sementara), atau ganti dengan halaman lain
-  return <DashboardAdmin {...page} />;
+  return (
+    <Layout>
+      {/* diubah lagi, biar keliatan lebih ringkas */}
+      <Head title={`${title} ${role.length <= 2
+        ? role.toUpperCase()
+        : role.charAt(0).toUpperCase() + role.slice(1)}`}
+      />
+      <div className="dashboard-cards">
+        {statCards.map((card, index) => (
+          <StatCard key={index} {...card} />
+        ))}
+      </div>
+    </Layout>
+  )
 }
