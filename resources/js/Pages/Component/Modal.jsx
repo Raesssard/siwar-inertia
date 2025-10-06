@@ -4,14 +4,19 @@ import logo from '../../../../public/img/logo.png'
 import { Inertia } from "@inertiajs/inertia"
 import axios from "axios"
 import { FormatWaktu } from "../Warga/Pengaduan"
+// resources/js/Pages/Component/Modal.jsx
+import React from "react";
+import { Link, usePage } from "@inertiajs/react";
+import logo from "../../../../public/img/logo.png";
 
-// Modal sidebar buat mobile mah nanti aja
+/* ===========================
+   Modal Sidebar (Mobile)
+=========================== */
 export function ModalSidebar({ modalIsOpen, modalShow }) {
-    const { url } = usePage()
+    const { url } = usePage();
+    const isActive = (url, pattern) => url.startsWith(pattern);
 
-    const isActive = (url, pattern) => {
-        return url.startsWith(pattern)
-    }
+    if (!modalIsOpen) return null;
 
     return (
         <>
@@ -42,225 +47,785 @@ export function ModalSidebar({ modalIsOpen, modalShow }) {
                                         </Link>
                                     </li>
 
+/* ===========================
+   Modal Password
+=========================== */
+export function PasswordModal({ show }) {
+    if (!show) return null;
 
-                                    <li className={`nav-item ${isActive(url, '/warga/pengumuman') ? 'active' : ''}`}>
-                                        <Link className="nav-link" href="/warga/pengumuman">
-                                            <i className="fas fa-bullhorn mr-2"></i>
-                                            <span>Pengumuman</span>
-                                        </Link>
-                                    </li>
-
-                                    <li className={`nav-item ${isActive(url, '/warga/pengaduan') ? 'active' : ''}`}>
-                                        <Link className="nav-link" href="/warga/pengaduan">
-                                            <i className="fas fa-paper-plane mr-2"></i>
-                                            <span>Pengaduan</span>
-                                        </Link>
-                                    </li>
-
-                                    <li className={`nav-item ${isActive(url, '/warga/kk') ? 'active' : ''}`}>
-                                        <Link className="nav-link" href="/warga/kk">
-                                            <i className="fas fa-id-card mr-2"></i>
-                                            <span>Lihat KK</span>
-                                        </Link>
-                                    </li>
-                                    <li className={`nav-item ${isActive(url, '/warga/tagihan') ? 'active' : ''}`}>
-                                        <Link className="nav-link" href="/warga/tagihan">
-                                            <i className="fas fa-hand-holding-usd mr-2"></i>
-                                            <span>Lihat Tagihan</span>
-                                        </Link>
-                                    </li>
-                                    <li className={`nav-item ${isActive(url, '/warga/transaksi') ? 'active' : ''}`}>
-                                        <Link className="nav-link" href="/warga/transaksi">
-                                            <i className="fas fa-money-bill-wave mr-2"></i>
-                                            <span>Lihat Transaksi</span>
-                                        </Link>
-                                    </li>
-                                    <hr className="sidebar-divider d-none d-md-block" />
-                                </ul>
+    return (
+        <div
+            className="modal fade show"
+            style={{ display: "block", backgroundColor: "rgba(0,0,0,0.5)" }}
+            tabIndex="-1"
+        >
+            <div className="modal-dialog modal-dialog-centered">
+                <div className="modal-content">
+                    <form onSubmit={() => show(false)}>
+                        <div className="modal-header">
+                            <h5 className="modal-title">
+                                <i className="fas fa-key text-primary me-1"></i>{" "}
+                                Ubah Password
+                            </h5>
+                            <button
+                                type="button"
+                                className="btn-close"
+                                onClick={() => show(false)}
+                            />
+                        </div>
+                        <div className="modal-body">
+                            <div className="form-floating mb-3 position-relative">
+                                <input
+                                    type="password"
+                                    name="current_password"
+                                    className="form-control"
+                                    id="current_password"
+                                    placeholder="Password Lama"
+                                    required
+                                />
+                                <label htmlFor="current_password">
+                                    <i className="fas fa-lock me-2"></i>
+                                    Password Lama
+                                </label>
+                            </div>
+                            <div className="form-floating mb-3 position-relative">
+                                <input
+                                    type="password"
+                                    name="password"
+                                    className="form-control"
+                                    id="password"
+                                    placeholder="Password Baru"
+                                    required
+                                    minLength="6"
+                                />
+                                <label htmlFor="password">
+                                    <i className="fas fa-lock me-2"></i>
+                                    Password Baru
+                                </label>
+                            </div>
+                            <div className="form-floating mb-3 position-relative">
+                                <input
+                                    type="password"
+                                    name="password_confirmation"
+                                    className="form-control"
+                                    id="password_confirmation"
+                                    placeholder="Konfirmasi Password Baru"
+                                    required
+                                />
+                                <label htmlFor="password_confirmation">
+                                    <i className="fas fa-lock me-2"></i>
+                                    Konfirmasi Password
+                                </label>
                             </div>
                         </div>
-                    </div>
+                        <div className="modal-footer">
+                            <button
+                                type="button"
+                                className="btn btn-secondary"
+                                onClick={() => show(false)}
+                            >
+                                Batal
+                            </button>
+                            <button type="submit" className="btn btn-primary">
+                                Simpan Perubahan
+                            </button>
+                        </div>
+                    </form>
                 </div>
-            )}
-        </>
-    )
+            </div>
+        </div>
+    );
 }
 
-export function PasswordModal({ show }) {
+/* ===========================
+   Modal Detail Pengumuman
+=========================== */
+export function DetailPengumuman({ selectedData, detailShow, onClose }) {
+    if (!detailShow || !selectedData) return null;
+
     return (
-        <>
-            <div
-                className="modal fade show"
-                style={{ display: "block", backgroundColor: "rgba(0,0,0,0.5)" }}
-                tabIndex="-1"
-            >
-                <div className="modal-dialog modal-dialog-centered">
-                    <div className="modal-content">
-                        <form onSubmit={() => show(false)}>
-                            <div className="modal-header">
-                                <h5 className="modal-title">
-                                    <i className="fas fa-key text-primary me-1"></i>{" "}
-                                    Ubah Password
-                                </h5>
-                                <button
-                                    type="button"
-                                    className="btn-close"
-                                    onClick={() => show(false)}
-                                />
+        <div
+            className="modal fade show"
+            tabIndex="-1"
+            style={{
+                display: "block",
+                backgroundColor: "rgba(0,0,0,0.5)",
+            }}
+        >
+            <div className="modal-dialog modal-lg modal-dialog-scrollable">
+                <div className="modal-content shadow-lg border-0">
+                    <div className="modal-header bg-success text-white">
+                        <h5 className="modal-title mb-0">Detail Pengumuman</h5>
+                        <button
+                            type="button"
+                            className="btn-close btn-close-white"
+                            onClick={onClose}
+                        />
+                    </div>
+                    <div className="modal-body px-4 pt-4 pb-3">
+                        <h4 className="fw-bold text-success mb-2">
+                            {selectedData.judul}
+                        </h4>
+                        <div className="d-flex align-items-center mb-3">
+                            <span className="text-muted me-3">
+                                <i className="bi bi-calendar me-1"></i>
+                                {new Date(
+                                    selectedData.tanggal
+                                ).toLocaleDateString("id-ID", {
+                                    weekday: "long",
+                                    day: "numeric",
+                                    month: "long",
+                                    year: "numeric",
+                                })}
+                            </span>
+                            {selectedData.id_rt ? (
+                                <span className="text-dark fw-semibold">
+                                    Dari RT:{" "}
+                                    {selectedData.rukun_tetangga?.rt ?? "-"}
+                                </span>
+                            ) : (
+                                <span className="text-dark fw-semibold">
+                                    Dari RW: {selectedData.rw?.nomor_rw ?? "-"}
+                                </span>
+                            )}
+                        </div>
+                        <ul className="list-unstyled mb-3 small">
+                            <li>
+                                <strong>Kategori:</strong>{" "}
+                                <span className="ms-1">
+                                    {selectedData.kategori ?? "-"}
+                                </span>
+                            </li>
+                        </ul>
+                        <hr className="my-3" />
+                        <div className="mb-4">
+                            <h5 className="fw-bold text-success mb-2">
+                                Isi Pengumuman:
+                            </h5>
+                            <div
+                                className="border rounded bg-light p-3"
+                                style={{ lineHeight: "1.6" }}
+                            >
+                                {selectedData.isi}
                             </div>
-                            <div className="modal-body">
-                                <div className="form-floating mb-3 position-relative">
-                                    <input
-                                        type="password"
-                                        name="current_password"
-                                        className="form-control"
-                                        id="current_password"
-                                        placeholder="Password Lama"
-                                        required
-                                    />
-                                    <label htmlFor="current_password">
-                                        <i className="fas fa-lock me-2"></i>
-                                        Password Lama
-                                    </label>
+                        </div>
+                        <div className="mb-3">
+                            <h5 className="fw-bold text-success mb-2">
+                                Dokumen Terlampir:
+                            </h5>
+                            {selectedData.dokumen_path ? (
+                                <div className="border rounded bg-light p-3 d-flex align-items-center justify-content-between">
+                                    <div>
+                                        <i className="bi bi-file-earmark-text me-2"></i>
+                                        <span>
+                                            {selectedData.dokumen_name ??
+                                                "Dokumen Terlampir"}
+                                        </span>
+                                        <small className="text-muted d-block mt-1">
+                                            Klik tombol di samping untuk
+                                            melihat atau mengunduh.
+                                        </small>
+                                    </div>
+                                    <a
+                                        href={selectedData.dokumen_url}
+                                        target="_blank"
+                                        className="btn btn-primary btn-sm"
+                                    >
+                                        <i className="bi bi-download"></i> Unduh
+                                    </a>
                                 </div>
-                                <div className="form-floating mb-3 position-relative">
-                                    <input
-                                        type="password"
-                                        name="password"
-                                        className="form-control"
-                                        id="password"
-                                        placeholder="Password Baru"
-                                        required
-                                        minLength="6"
-                                    />
-                                    <label htmlFor="password">
-                                        <i className="fas fa-lock me-2"></i>
-                                        Password Baru
-                                    </label>
+                            ) : (
+                                <div className="text-muted p-3 border rounded bg-light">
+                                    Tidak ada dokumen yang terlampir.
                                 </div>
-                                <div className="form-floating mb-3 position-relative">
-                                    <input
-                                        type="password"
-                                        name="password_confirmation"
-                                        className="form-control"
-                                        id="password_confirmation"
-                                        placeholder="Konfirmasi Password Baru"
-                                        required
-                                    />
-                                    <label htmlFor="password_confirmation">
-                                        <i className="fas fa-lock me-2"></i>
-                                        Konfirmasi Password
-                                    </label>
-                                </div>
-                            </div>
-                            <div className="modal-footer">
-                                <button
-                                    type="button"
-                                    className="btn btn-secondary"
-                                    onClick={() => show(false)}
-                                >
-                                    Batal
-                                </button>
-                                <button type="submit" className="btn btn-primary">
-                                    Simpan Perubahan
-                                </button>
-                            </div>
-                        </form>
+                            )}
+                        </div>
+                    </div>
+                    <div className="modal-footer bg-light border-0 justify-content-end py-2">
+                        <button className="btn btn-outline-success" onClick={onClose}>
+                            Tutup
+                        </button>
                     </div>
                 </div>
             </div>
-        </>
-    )
+        </div>
+    );
 }
 
-// --- Modal Tambah RW ---
+/* ===========================
+   Modal RW
+=========================== */
 export function AddRwModal({ form, handleChange, handleAdd, onClose }) {
     return (
-        <div className="modal fade show"
-            style={{ display: "block", backgroundColor: "rgba(0,0,0,0.5)" }}>
+        <div
+            className="modal fade show"
+            style={{ display: "block", backgroundColor: "rgba(0,0,0,0.5)" }}
+        >
             <div className="modal-dialog modal-dialog-centered">
                 <div className="modal-content modal-custom">
                     <form onSubmit={handleAdd}>
                         <div className="modal-header">
                             <h5>Tambah RW</h5>
-                            <button type="button" className="btn-close" onClick={onClose} />
+                            <button
+                                type="button"
+                                className="btn-close"
+                                onClick={onClose}
+                            />
                         </div>
                         <div className="modal-body">
                             <div className="form-group">
                                 <label>NIK</label>
-                                <input type="text" name="nik" value={form.nik} onChange={handleChange} />
+                                <input
+                                    type="text"
+                                    name="nik"
+                                    value={form.nik}
+                                    onChange={handleChange}
+                                />
                             </div>
                             <div className="form-group">
                                 <label>Nomor RW</label>
-                                <input type="text" name="nomor_rw" value={form.nomor_rw} onChange={handleChange} />
+                                <input
+                                    type="text"
+                                    name="nomor_rw"
+                                    value={form.nomor_rw}
+                                    onChange={handleChange}
+                                />
                             </div>
                             <div className="form-group">
                                 <label>Nama Ketua RW</label>
-                                <input type="text" name="nama_ketua_rw" value={form.nama_ketua_rw} onChange={handleChange} />
+                                <input
+                                    type="text"
+                                    name="nama_ketua_rw"
+                                    value={form.nama_ketua_rw}
+                                    onChange={handleChange}
+                                />
                             </div>
                             <div className="form-group">
                                 <label>Mulai Menjabat</label>
-                                <input type="date" name="mulai_menjabat" value={form.mulai_menjabat} onChange={handleChange} />
+                                <input
+                                    type="date"
+                                    name="mulai_menjabat"
+                                    value={form.mulai_menjabat}
+                                    onChange={handleChange}
+                                />
                             </div>
                             <div className="form-group">
                                 <label>Akhir Jabatan</label>
-                                <input type="date" name="akhir_jabatan" value={form.akhir_jabatan} onChange={handleChange} />
+                                <input
+                                    type="date"
+                                    name="akhir_jabatan"
+                                    value={form.akhir_jabatan}
+                                    onChange={handleChange}
+                                />
                             </div>
                         </div>
                         <div className="modal-footer">
-                            <button type="button" className="btn-custom btn-secondary" onClick={onClose}>Batal</button>
-                            <button type="submit" className="btn-custom btn-primary">Simpan</button>
+                            <button
+                                type="button"
+                                className="btn-custom btn-secondary"
+                                onClick={onClose}
+                            >
+                                Batal
+                            </button>
+                            <button type="submit" className="btn-custom btn-primary">
+                                Simpan
+                            </button>
                         </div>
                     </form>
                 </div>
             </div>
         </div>
-    )
+    );
 }
 
-// --- Modal Edit RW ---
 export function EditRwModal({ form, handleChange, handleEdit, onClose }) {
     return (
-        <div className="modal fade show"
-            style={{ display: "block", backgroundColor: "rgba(0,0,0,0.5)" }}>
+        <div
+            className="modal fade show"
+            style={{ display: "block", backgroundColor: "rgba(0,0,0,0.5)" }}
+        >
             <div className="modal-dialog modal-dialog-centered">
                 <div className="modal-content modal-custom">
                     <form onSubmit={handleEdit}>
                         <div className="modal-header">
                             <h5>Edit RW</h5>
-                            <button type="button" className="btn-close" onClick={onClose} />
+                            <button
+                                type="button"
+                                className="btn-close"
+                                onClick={onClose}
+                            />
                         </div>
                         <div className="modal-body">
                             <div className="form-group">
                                 <label>NIK</label>
-                                <input type="text" name="nik" value={form.nik} onChange={handleChange} />
+                                <input
+                                    type="text"
+                                    name="nik"
+                                    value={form.nik}
+                                    onChange={handleChange}
+                                />
                             </div>
                             <div className="form-group">
                                 <label>Nomor RW</label>
-                                <input type="text" name="nomor_rw" value={form.nomor_rw} onChange={handleChange} />
+                                <input
+                                    type="text"
+                                    name="nomor_rw"
+                                    value={form.nomor_rw}
+                                    onChange={handleChange}
+                                />
                             </div>
                             <div className="form-group">
                                 <label>Nama Ketua RW</label>
-                                <input type="text" name="nama_ketua_rw" value={form.nama_ketua_rw} onChange={handleChange} />
+                                <input
+                                    type="text"
+                                    name="nama_ketua_rw"
+                                    value={form.nama_ketua_rw}
+                                    onChange={handleChange}
+                                />
                             </div>
                             <div className="form-group">
                                 <label>Mulai Menjabat</label>
-                                <input type="date" name="mulai_menjabat" value={form.mulai_menjabat} onChange={handleChange} />
+                                <input
+                                    type="date"
+                                    name="mulai_menjabat"
+                                    value={form.mulai_menjabat}
+                                    onChange={handleChange}
+                                />
                             </div>
                             <div className="form-group">
                                 <label>Akhir Jabatan</label>
-                                <input type="date" name="akhir_jabatan" value={form.akhir_jabatan} onChange={handleChange} />
+                                <input
+                                    type="date"
+                                    name="akhir_jabatan"
+                                    value={form.akhir_jabatan}
+                                    onChange={handleChange}
+                                />
                             </div>
                         </div>
                         <div className="modal-footer">
-                            <button type="button" className="btn-custom btn-secondary" onClick={onClose}>Batal</button>
-                            <button type="submit" className="btn-custom btn-primary">Update</button>
+                            <button
+                                type="button"
+                                className="btn-custom btn-secondary"
+                                onClick={onClose}
+                            >
+                                Batal
+                            </button>
+                            <button type="submit" className="btn-custom btn-primary">
+                                Update
+                            </button>
                         </div>
                     </form>
                 </div>
             </div>
         </div>
-    )
+    );
+}
+
+/* ===========================
+   Modal RT
+export function AddRtModal({ form, handleChange, handleAdd, onClose }) {
+    return (
+        <div
+            className="modal fade show"
+            style={{ display: "block", backgroundColor: "rgba(0,0,0,0.5)" }}
+        >
+            <div className="modal-dialog modal-dialog-centered">
+                <div className="modal-content modal-custom">
+                    <form onSubmit={handleAdd}>
+                        <div className="modal-header">
+                            <h5>Tambah RT</h5>
+                            <button
+                                type="button"
+                                className="btn-close"
+                                onClick={onClose}
+                            />
+                        </div>
+                        <div className="modal-body">
+                            <div className="form-group">
+                                <label>NIK</label>
+                                <input
+                                    type="text"
+                                    name="nik"
+                                    value={form.nik || ""}
+                                    onChange={handleChange}
+                                />
+                            </div>
+                            <div className="form-group">
+                                <label>Nomor RT</label>
+                                <input
+                                    type="text"
+                                    name="nomor_rt"
+                                    value={form.nomor_rt || ""}
+                                    onChange={handleChange}
+                                />
+                            </div>
+                            <div className="form-group">
+                                <label>Nama Ketua RT</label>
+                                <input
+                                    type="text"
+                                    name="nama_ketua_rt"
+                                    value={form.nama_ketua_rt || ""}
+                                    onChange={handleChange}
+                                />
+                            </div>
+                            <div className="form-group">
+                                <label>Mulai Menjabat</label>
+                                <input
+                                    type="date"
+                                    name="mulai_menjabat"
+                                    value={form.mulai_menjabat || ""}
+                                    onChange={handleChange}
+                                />
+                            </div>
+                            <div className="form-group">
+                                <label>Akhir Jabatan</label>
+                                <input
+                                    type="date"
+                                    name="akhir_jabatan"
+                                    value={form.akhir_jabatan || ""}
+                                    onChange={handleChange}
+                                />
+                            </div>
+                        </div>
+                        <div className="modal-footer">
+                            <button
+                                type="button"
+                                className="btn-custom btn-secondary"
+                                onClick={onClose}
+                            >
+                                Batal
+                            </button>
+                            <button type="submit" className="btn-custom btn-primary">
+                                Simpan
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+
+export function EditRtModal({ form, handleChange, handleEdit, onClose }) {
+    return (
+        <div
+            className="modal fade show"
+            style={{ display: "block", backgroundColor: "rgba(0,0,0,0.5)" }}
+        >
+            <div className="modal-dialog modal-dialog-centered">
+                <div className="modal-content modal-custom">
+                    <form onSubmit={handleEdit}>
+                        <div className="modal-header">
+                            <h5>Edit RT</h5>
+                            <button
+                                type="button"
+                                className="btn-close"
+                                onClick={onClose}
+                            />
+                        </div>
+                        <div className="modal-body">
+                            <div className="form-group">
+                                <label>NIK</label>
+                                <input
+                                    type="text"
+                                    name="nik"
+                                    value={form.nik || ""}
+                                    onChange={handleChange}
+                                />
+                            </div>
+                            <div className="form-group">
+                                <label>Nomor RT</label>
+                                <input
+                                    type="text"
+                                    name="nomor_rt"
+                                    value={form.nomor_rt || ""}
+                                    onChange={handleChange}
+                                />
+                            </div>
+                            <div className="form-group">
+                                <label>Nama Ketua RT</label>
+                                <input
+                                    type="text"
+                                    name="nama_ketua_rt"
+                                    value={form.nama_ketua_rt || ""}
+                                    onChange={handleChange}
+                                />
+                            </div>
+                            <div className="form-group">
+                                <label>Mulai Menjabat</label>
+                                <input
+                                    type="date"
+                                    name="mulai_menjabat"
+                                    value={form.mulai_menjabat || ""}
+                                    onChange={handleChange}
+                                />
+                            </div>
+                            <div className="form-group">
+                                <label>Akhir Jabatan</label>
+                                <input
+                                    type="date"
+                                    name="akhir_jabatan"
+                                    value={form.akhir_jabatan || ""}
+                                    onChange={handleChange}
+                                />
+                            </div>
+                        </div>
+                        <div className="modal-footer">
+                            <button
+                                type="button"
+                                className="btn-custom btn-secondary"
+                                onClick={onClose}
+                            >
+                                Batal
+                            </button>
+                            <button type="submit" className="btn-custom btn-primary">
+                                Update
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    );
+}
+// ---------------------------
+// Modal Tambah Kategori Golongan
+// ---------------------------
+export function AddKategoriGolonganModal({ form, handleChange, handleAdd, onClose }) {
+    return (
+        <div
+            className="modal fade show"
+            style={{ display: "block", backgroundColor: "rgba(0,0,0,0.5)" }}
+        >
+            <div className="modal-dialog modal-dialog-centered">
+                <div className="modal-content modal-custom">
+                    <form onSubmit={handleAdd}>
+                        <div className="modal-header">
+                            <h5>Tambah Kategori Golongan</h5>
+                            <button type="button" className="btn-close" onClick={onClose} />
+                        </div>
+                        <div className="modal-body">
+                            <div className="form-group">
+                                <label>Jenis</label>
+                                <input
+                                    type="text"
+                                    name="jenis"
+                                    value={form.jenis}
+                                    onChange={handleChange}
+                                    className="form-control"
+                                    placeholder="Masukkan nama kategori"
+                                />
+                            </div>
+                        </div>
+                        <div className="modal-footer">
+                            <button
+                                type="button"
+                                className="btn-custom btn-secondary"
+                                onClick={onClose}
+                            >
+                                Batal
+                            </button>
+                            <button type="submit" className="btn-custom btn-primary">
+                                Simpan
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+// ---------------------------
+// Modal Edit Kategori Golongan
+// ---------------------------
+export function EditKategoriGolonganModal({ form, handleChange, handleEdit, onClose }) {
+    return (
+        <div
+            className="modal fade show"
+            style={{ display: "block", backgroundColor: "rgba(0,0,0,0.5)" }}
+        >
+            <div className="modal-dialog modal-dialog-centered">
+                <div className="modal-content modal-custom">
+                    <form onSubmit={handleEdit}>
+                        <div className="modal-header">
+                            <h5>Edit Kategori Golongan</h5>
+                            <button type="button" className="btn-close" onClick={onClose} />
+                        </div>
+                        <div className="modal-body">
+                            <div className="form-group">
+                                <label>Jenis</label>
+                                <input
+                                    type="text"
+                                    name="jenis"
+                                    value={form.jenis}
+                                    onChange={handleChange}
+                                    className="form-control"
+                                    placeholder="Masukkan nama kategori"
+                                />
+                            </div>
+                        </div>
+                        <div className="modal-footer">
+                            <button
+                                type="button"
+                                className="btn-custom btn-secondary"
+                                onClick={onClose}
+                            >
+                                Batal
+                            </button>
+                            <button type="submit" className="btn-custom btn-primary">
+                                Update
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+// ---------------------------
+// Modal Tambah Role
+// ---------------------------
+export function AddRoleModal({ form, setForm, handleAdd, onClose }) {
+    return (
+        <div
+            className="modal fade show"
+            style={{ display: "block", backgroundColor: "rgba(0,0,0,0.5)" }}
+        >
+            <div className="modal-dialog modal-dialog-centered">
+                <div className="modal-content modal-custom">
+                    <form onSubmit={handleAdd}>
+                        <div className="modal-header">
+                            <h5>Tambah Role</h5>
+                            <button type="button" className="btn-close" onClick={onClose} />
+                        </div>
+                        <div className="modal-body">
+                            <div className="form-group">
+                                <label>Nama Role</label>
+                                <input
+                                    type="text"
+                                    name="name"
+                                    value={form.name}
+                                    onChange={(e) => setForm("name", e.target.value)}
+                                    className="form-control"
+                                    placeholder="Masukkan nama role"
+                                />
+                            </div>
+                        </div>
+                        <div className="modal-footer">
+                            <button type="button" className="btn btn-secondary" onClick={onClose}>
+                                Batal
+                            </button>
+                            <button type="submit" className="btn btn-primary">
+                                Simpan
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+// ---------------------------
+// Modal Edit Role
+// ---------------------------
+export function EditRoleModal({ form, setForm, handleEdit, onClose }) {
+    return (
+        <div
+            className="modal fade show"
+            style={{ display: "block", backgroundColor: "rgba(0,0,0,0.5)" }}
+        >
+            <div className="modal-dialog modal-dialog-centered">
+                <div className="modal-content modal-custom">
+                    <form onSubmit={handleEdit}>
+                        <div className="modal-header">
+                            <h5>Edit Role</h5>
+                            <button type="button" className="btn-close" onClick={onClose} />
+                        </div>
+                        <div className="modal-body">
+                            <div className="form-group">
+                                <label>Nama Role</label>
+                                <input
+                                    type="text"
+                                    name="name"
+                                    value={form.name}
+                                    onChange={(e) =>
+                                        setForm({ ...form, name: e.target.value })
+                                    }
+                                    className="form-control"
+                                    placeholder="Masukkan nama role"
+                                />
+                            </div>
+                        </div>
+                        <div className="modal-footer">
+                            <button type="button" className="btn btn-secondary" onClick={onClose}>
+                                Batal
+                            </button>
+                            <button type="submit" className="btn btn-primary">
+                                Simpan Perubahan
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+// ---------------------------
+// Modal Edit Permissions
+// ---------------------------
+export function EditPermissionModal({
+    role,
+    permissions,
+    selectedPerms,
+    togglePermission,
+    handleSave,
+    onClose,
+}) {
+    return (
+        <div
+            className="modal fade show"
+            style={{ display: "block", backgroundColor: "rgba(0,0,0,0.5)" }}
+        >
+            <div className="modal-dialog modal-lg modal-dialog-centered">
+                <div className="modal-content modal-custom">
+                    <div className="modal-header">
+                        <h5>Edit Permissions: {role.name}</h5>
+                        <button type="button" className="btn-close" onClick={onClose} />
+                    </div>
+                    <div className="modal-body">
+                        <div className="row">
+                            {permissions.map((perm) => (
+                                <div key={perm.id} className="col-md-4 mb-2">
+                                    <label className="d-flex align-items-center">
+                                        <input
+                                            type="checkbox"
+                                            checked={selectedPerms.includes(perm.name)}
+                                            onChange={() => togglePermission(perm.name)}
+                                            className="form-check-input me-2"
+                                        />
+                                        {perm.name}
+                                    </label>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                    <div className="modal-footer">
+                        <button type="button" className="btn btn-secondary" onClick={onClose}>
+                            Batal
+                        </button>
+                        <button type="button" className="btn btn-primary" onClick={handleSave}>
+                            Simpan Permissions
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
 }
 
 export function DetailPengumuman({ selectedData, detailShow, onClose }) {

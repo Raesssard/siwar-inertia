@@ -1,4 +1,5 @@
 <?php
+
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -9,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('kategori_golongan', function (Blueprint $table) {
             $table->id();
-            $table->enum('jenis', ['kampung','kavling','kost','kantor','kontrakan','umkm']);
+            $table->string('jenis')->unique(); // ubah dari enum ke string agar bisa bebas
             $table->timestamps();
         });
     }

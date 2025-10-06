@@ -13,8 +13,8 @@ class Rt extends Model
     protected $fillable = [
         'nik',
         'no_kk',
-        'rt',
-        'nama',
+        'nomor_rt',
+        'nama_ketua_rt',
         'mulai_menjabat',
         'akhir_jabatan',
         'id_rw',
