@@ -768,3 +768,146 @@ export function EditKategoriGolonganModal({ form, handleChange, handleEdit, onCl
         </div>
     );
 }
+
+// ---------------------------
+// Modal Tambah Role
+// ---------------------------
+export function AddRoleModal({ form, setForm, handleAdd, onClose }) {
+    return (
+        <div
+            className="modal fade show"
+            style={{ display: "block", backgroundColor: "rgba(0,0,0,0.5)" }}
+        >
+            <div className="modal-dialog modal-dialog-centered">
+                <div className="modal-content modal-custom">
+                    <form onSubmit={handleAdd}>
+                        <div className="modal-header">
+                            <h5>Tambah Role</h5>
+                            <button type="button" className="btn-close" onClick={onClose} />
+                        </div>
+                        <div className="modal-body">
+                            <div className="form-group">
+                                <label>Nama Role</label>
+                                <input
+                                    type="text"
+                                    name="name"
+                                    value={form.name}
+                                    onChange={(e) => setForm("name", e.target.value)}
+                                    className="form-control"
+                                    placeholder="Masukkan nama role"
+                                />
+                            </div>
+                        </div>
+                        <div className="modal-footer">
+                            <button type="button" className="btn btn-secondary" onClick={onClose}>
+                                Batal
+                            </button>
+                            <button type="submit" className="btn btn-primary">
+                                Simpan
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+// ---------------------------
+// Modal Edit Role
+// ---------------------------
+export function EditRoleModal({ form, setForm, handleEdit, onClose }) {
+    return (
+        <div
+            className="modal fade show"
+            style={{ display: "block", backgroundColor: "rgba(0,0,0,0.5)" }}
+        >
+            <div className="modal-dialog modal-dialog-centered">
+                <div className="modal-content modal-custom">
+                    <form onSubmit={handleEdit}>
+                        <div className="modal-header">
+                            <h5>Edit Role</h5>
+                            <button type="button" className="btn-close" onClick={onClose} />
+                        </div>
+                        <div className="modal-body">
+                            <div className="form-group">
+                                <label>Nama Role</label>
+                                <input
+                                    type="text"
+                                    name="name"
+                                    value={form.name}
+                                    onChange={(e) =>
+                                        setForm({ ...form, name: e.target.value })
+                                    }
+                                    className="form-control"
+                                    placeholder="Masukkan nama role"
+                                />
+                            </div>
+                        </div>
+                        <div className="modal-footer">
+                            <button type="button" className="btn btn-secondary" onClick={onClose}>
+                                Batal
+                            </button>
+                            <button type="submit" className="btn btn-primary">
+                                Simpan Perubahan
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+// ---------------------------
+// Modal Edit Permissions
+// ---------------------------
+export function EditPermissionModal({
+    role,
+    permissions,
+    selectedPerms,
+    togglePermission,
+    handleSave,
+    onClose,
+}) {
+    return (
+        <div
+            className="modal fade show"
+            style={{ display: "block", backgroundColor: "rgba(0,0,0,0.5)" }}
+        >
+            <div className="modal-dialog modal-lg modal-dialog-centered">
+                <div className="modal-content modal-custom">
+                    <div className="modal-header">
+                        <h5>Edit Permissions: {role.name}</h5>
+                        <button type="button" className="btn-close" onClick={onClose} />
+                    </div>
+                    <div className="modal-body">
+                        <div className="row">
+                            {permissions.map((perm) => (
+                                <div key={perm.id} className="col-md-4 mb-2">
+                                    <label className="d-flex align-items-center">
+                                        <input
+                                            type="checkbox"
+                                            checked={selectedPerms.includes(perm.name)}
+                                            onChange={() => togglePermission(perm.name)}
+                                            className="form-check-input me-2"
+                                        />
+                                        {perm.name}
+                                    </label>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                    <div className="modal-footer">
+                        <button type="button" className="btn btn-secondary" onClick={onClose}>
+                            Batal
+                        </button>
+                        <button type="button" className="btn btn-primary" onClick={handleSave}>
+                            Simpan Permissions
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+}

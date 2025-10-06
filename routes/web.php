@@ -6,6 +6,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Admin\AdminRwController;
 use App\Http\Controllers\Admin\AdminRtController;
 use App\Http\Controllers\Admin\AdminKategoriGolonganController;
+use App\Http\Controllers\Admin\AdminRoleController;
 use Inertia\Inertia;
 
 Route::get('/', function () {
@@ -29,5 +30,7 @@ Route::middleware(['auth'])->group(function () {
         Route::resource('rw', AdminRwController::class)->except(['create', 'edit', 'show']);
         Route::resource('rt', AdminRtController::class)->except(['create', 'edit', 'show']);
         Route::resource('kategori-golongan', AdminKategoriGolonganController::class)->except(['create', 'edit', 'show']);
+        Route::resource('roles', AdminRoleController::class)->except(['create', 'edit', 'show']);
+        Route::put('roles/{id}/permissions', [AdminRoleController::class, 'updatePermissions'])->name('roles.permissions.update');
     });
 });

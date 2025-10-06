@@ -13,20 +13,16 @@ class AdminKategoriGolonganController extends Controller
     {
         $query = Kategori_golongan::query();
 
-        // 🔍 Filter by jenis dari database
+        // 🔍 Pencarian teks (LIKE)
         if ($request->filled('jenis')) {
-            $query->where('jenis', $request->jenis);
+            $query->where('jenis', 'like', '%' . $request->jenis . '%');
         }
 
-        $kategori = $query->paginate(5)->withQueryString();
-
-        // 🔹 Ambil distinct jenis langsung dari tabel
-        $jenisList = Kategori_golongan::select('jenis')->distinct()->pluck('jenis');
+        $kategori = $query->orderBy('id', 'desc')->paginate(5)->withQueryString();
 
         return Inertia::render('Admin/KategoriGolongan', [
             'kategori' => $kategori,
             'filters'  => $request->only(['jenis']),
-            'jenisList' => $jenisList,
         ]);
     }
 
@@ -44,14 +40,13 @@ class AdminKategoriGolonganController extends Controller
             ->with('success', 'Kategori golongan berhasil ditambahkan.');
     }
 
-    public function update(Request $request, string $id)
+    public function update(Request $request, Kategori_golongan $kategori_golongan)
     {
         $request->validate([
-            'jenis' => 'required|string|unique:kategori_golongan,jenis,' . $id,
+            'jenis' => 'required|string|unique:kategori_golongan,jenis,' . $kategori_golongan->id,
         ]);
 
-        $kategori = Kategori_golongan::findOrFail($id);
-        $kategori->update([
+        $kategori_golongan->update([
             'jenis' => $request->jenis,
         ]);
 
@@ -59,15 +54,10 @@ class AdminKategoriGolonganController extends Controller
             ->with('success', 'Kategori golongan berhasil diperbarui.');
     }
 
-    public function destroy(string $id)
+    public function destroy(Kategori_golongan $kategori_golongan)
     {
-        try {
-            $kategori = Kategori_golongan::findOrFail($id);
-            $kategori->delete();
+        $kategori_golongan->delete();
 
-            return redirect()->back()->with('success', 'Kategori golongan berhasil dihapus.');
-        } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
-        }
+        return redirect()->back()->with('success', 'Kategori golongan berhasil dihapus.');
     }
 }
