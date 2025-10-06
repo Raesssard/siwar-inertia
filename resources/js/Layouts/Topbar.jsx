@@ -39,14 +39,14 @@ export default function Topbar({ modalShow }) {
             case "kk":
                 judulHalaman = "Data Kartu Keluarga"
                 break
-            case "warga":
+            case "dashboard":
                 judulHalaman = "Dashboard"
                 break
             case "pengumuman":
                 judulHalaman = "Pengumuman"
                 break
             case "tagihan":
-                judulHalaman = "Tagihan Saya"
+                judulHalaman = "Tagihan"
                 break
             case "iuran":
                 judulHalaman = "Iuran"
@@ -55,7 +55,7 @@ export default function Topbar({ modalShow }) {
                 judulHalaman = "Transaksi"
                 break
             case "pengaduan":
-                judulHalaman = "Pengaduan Saya"
+                judulHalaman = "Pengaduan"
                 break
             default:
                 judulHalaman =

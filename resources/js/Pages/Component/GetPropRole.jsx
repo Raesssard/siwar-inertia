@@ -1,7 +1,4 @@
 import React from "react";
-import Layout from "@/Layouts/Layout";
-import { StatCard } from "./Card";
-import { Head, usePage } from "@inertiajs/react";
 
 export function getWargaCards({ ...rest }) {
     const formatRupiah = (angka, withDecimals = false) => {
@@ -33,35 +30,35 @@ export function getWargaCards({ ...rest }) {
             icon: "paper-plane",
         },
         {
-            href: window.location.pathname,
+            href: "/warga/tagihan",
             color: rest.jumlah_tagihan < 1 ? 'success' : 'danger',
             title: "Tagihan",
             value: rest.jumlah_tagihan,
             icon: "money-check-alt",
         },
         {
-            href: window.location.pathname,
+            href: "/warga/tagihan",
             color: rest.total_tagihan < 1 ? 'success' : 'danger',
             title: "Total Tagihan",
             value: formatRupiah(rest.total_tagihan),
             icon: "hand-holding-usd",
         },
         {
-            href: window.location.pathname,
+            href: "/warga/transaksi",
             color: "primary",
             title: "Transaksi",
             value: rest.jumlah_transaksi,
             icon: "money-bill-wave",
         },
         {
-            href: window.location.pathname,
+            href: "/warga/transaksi",
             color: "primary",
             title: "Total Transaksi",
             value: formatRupiah(rest.total_transaksi),
             icon: "wallet",
         },
         {
-            href: window.location.pathname,
+            href: "/warga/transaksi",
             color: "primary",
             title: "Total Saldo",
             value: formatRupiah(rest.total_saldo_akhir),

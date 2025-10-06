@@ -9,8 +9,6 @@ export default function KartuKeluarga() {
     const role = props.auth?.currentRole
     const user = props.auth?.user
 
-    console.log(window.location.pathname)
-
     if (!kartuKeluarga) {
         return (
             <Layout>
@@ -41,7 +39,7 @@ export default function KartuKeluarga() {
             <Head title={`${title} ${role.length <= 2
                 ? role.toUpperCase()
                 : role.charAt(0).toUpperCase() + role.slice(1)}`} />
-            <div className="card shadow border-0 mb-3 py-0 mx-3" style={{width: '100%'}}>
+            <div className="card shadow border-0 mb-3 py-0 mx-3" style={{ width: '100%' }}>
                 <div className="card-header bg-success text-white py-2">
                     <h6 className="m-0 font-weight-bold text-white small">
                         Informasi Kartu Keluarga & Anggota
@@ -74,8 +72,9 @@ export default function KartuKeluarga() {
                                 <p className="mb-1 text-left"><strong>Kepala Keluarga</strong> : {kepala.nama ?? '-'}
                                 </p>
                                 <p className="mb-1 text-left"><strong>Alamat</strong> : {kartuKeluarga.alamat ?? '-'}</p>
-                                <p className="mb-1 text-left"><strong>RT/RW</strong> :
-                                    {kartuKeluarga.rukun_tetangga.rt ?? '-'}/{kartuKeluarga.rw.nomor_rw ?? '-'}
+                                <p className="mb-1 text-left"><strong>
+                                    RT {kartuKeluarga.rukun_tetangga.rt ?? '-'}/RW {kartuKeluarga.rw.nomor_rw ?? '-'}
+                                </strong>
                                 </p>
                                 <p className="mb-1 text-left"><strong>Desa/Kelurahan</strong> :
                                     {kartuKeluarga.kelurahan ?? '-'}</p>
@@ -270,12 +269,9 @@ export default function KartuKeluarga() {
                                 )}
                             </div>
                         </div>
-
                     </div>
-
                 </div>
             </div>
-
-        </Layout >
+        </Layout>
     )
 }

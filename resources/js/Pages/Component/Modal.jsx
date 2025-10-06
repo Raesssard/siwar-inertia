@@ -1,16 +1,37 @@
 import React, { useEffect, useRef, useState } from "react"
 import { Link, useForm, usePage } from "@inertiajs/react"
 import logo from '../../../../public/img/logo.png'
-import { Inertia } from "@inertiajs/inertia"
 import axios from "axios"
 import { FormatWaktu } from "../Warga/Pengaduan"
+import { SidebarLink } from "./SidebarLink"
+import { getAdminLinks, getWargaLinks } from "./GetPropRole"
 
-// Modal sidebar buat mobile mah nanti aja
 export function ModalSidebar({ modalIsOpen, modalShow }) {
     const { url } = usePage()
+    const { props } = usePage()
+    const role = props.auth?.currentRole
 
     const isActive = (url, pattern) => {
         return url.startsWith(pattern)
+    }
+
+    let statLinks = [];
+
+    switch (role) {
+        case "admin":
+            statLinks = getAdminLinks();
+            break;
+        case "rw":
+            statLinks = getRwLinks();
+            break;
+        case "rt":
+            statLinks = getRtLinks();
+            break;
+        case "warga":
+            statLinks = getWargaLinks();
+            break;
+        default:
+            statLinks = [];
     }
 
     return (
@@ -32,49 +53,12 @@ export function ModalSidebar({ modalIsOpen, modalShow }) {
                                     ×
                                 </button>
                             </div>
-                            <div className="modal-body p-0 m-0">
+                            <div className="modal-body p-0 m-0 d-block" style={{ overflowY: "hidden" }}>
                                 <ul className="navbar-nav sidebar sidebar-dark accordion">
                                     <hr className="sidebar-divider my-0" />
-                                    <li className={`nav-item ${isActive(url, '/warga') ? 'active' : ''}`}>
-                                        <Link className="nav-link" href="/warga">
-                                            <i className="fas fa-fw fa-tachometer-alt mr-2"></i>
-                                            <span>Dashboard</span>
-                                        </Link>
-                                    </li>
-
-
-                                    <li className={`nav-item ${isActive(url, '/warga/pengumuman') ? 'active' : ''}`}>
-                                        <Link className="nav-link" href="/warga/pengumuman">
-                                            <i className="fas fa-bullhorn mr-2"></i>
-                                            <span>Pengumuman</span>
-                                        </Link>
-                                    </li>
-
-                                    <li className={`nav-item ${isActive(url, '/warga/pengaduan') ? 'active' : ''}`}>
-                                        <Link className="nav-link" href="/warga/pengaduan">
-                                            <i className="fas fa-paper-plane mr-2"></i>
-                                            <span>Pengaduan</span>
-                                        </Link>
-                                    </li>
-
-                                    <li className={`nav-item ${isActive(url, '/warga/kk') ? 'active' : ''}`}>
-                                        <Link className="nav-link" href="/warga/kk">
-                                            <i className="fas fa-id-card mr-2"></i>
-                                            <span>Lihat KK</span>
-                                        </Link>
-                                    </li>
-                                    <li className={`nav-item ${isActive(url, '/warga/tagihan') ? 'active' : ''}`}>
-                                        <Link className="nav-link" href="/warga/tagihan">
-                                            <i className="fas fa-hand-holding-usd mr-2"></i>
-                                            <span>Lihat Tagihan</span>
-                                        </Link>
-                                    </li>
-                                    <li className={`nav-item ${isActive(url, '/warga/transaksi') ? 'active' : ''}`}>
-                                        <Link className="nav-link" href="/warga/transaksi">
-                                            <i className="fas fa-money-bill-wave mr-2"></i>
-                                            <span>Lihat Transaksi</span>
-                                        </Link>
-                                    </li>
+                                    {statLinks.map((link, index) => (
+                                        <SidebarLink key={index} {...link} />
+                                    ))}
                                     <hr className="sidebar-divider d-none d-md-block" />
                                 </ul>
                             </div>
@@ -173,7 +157,6 @@ export function PasswordModal({ show }) {
     )
 }
 
-// --- Modal Tambah RW ---
 export function AddRwModal({ form, handleChange, handleAdd, onClose }) {
     return (
         <div className="modal fade show"
@@ -218,7 +201,6 @@ export function AddRwModal({ form, handleChange, handleAdd, onClose }) {
     )
 }
 
-// --- Modal Edit RW ---
 export function EditRwModal({ form, handleChange, handleEdit, onClose }) {
     return (
         <div className="modal fade show"

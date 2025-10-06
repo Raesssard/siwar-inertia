@@ -7,6 +7,8 @@ use App\Http\Controllers\Admin\AdminRwController;
 use App\Http\Controllers\Warga\LihatKKController;
 use App\Http\Controllers\Warga\PengaduanController;
 use App\Http\Controllers\Warga\PengumumanWargaController;
+use App\Http\Controllers\Warga\WargatagihanController;
+use App\Http\Controllers\Warga\WargatransaksiController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -35,5 +37,7 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/pengumuman/{id}/komentar', [PengumumanWargaController::class, 'komen'])
             ->name('pengumuman.komentar.komen');
         Route::get('kk', [LihatKKController::class, 'index'])->name('kk');
+        Route::get('tagihan', [WargatagihanController::class, 'index'])->name('tagihan');
+        Route::get('transaksi', [WargatransaksiController::class, 'index'])->name('transaksi');
     });
 });
