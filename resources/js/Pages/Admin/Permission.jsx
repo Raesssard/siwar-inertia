@@ -3,19 +3,17 @@ import { Inertia } from "@inertiajs/inertia";
 import Layout from "@/Layouts/Layout";
 import { route } from "ziggy-js";
 import { router } from "@inertiajs/react";
-import { AddRoleModal as AddPermissionModal, EditRoleModal as EditPermissionModal } from "@/Pages/Component/Modal";
+import {
+    AddPermissionModal,
+    EditPermissionModal,
+} from "@/Pages/Component/Modal";
 
 export default function Permission({ permissions, filters }) {
     const [showAdd, setShowAdd] = useState(false);
     const [showEdit, setShowEdit] = useState(null);
 
-    const [form, setForm] = useState({
-        name: "",
-    });
-
-    const [search, setSearch] = useState({
-        keyword: filters?.keyword || "",
-    });
+    const [form, setForm] = useState({ name: "" });
+    const [search, setSearch] = useState({ keyword: filters?.keyword || "" });
 
     // -------------------------------
     // CRUD Handler

@@ -212,9 +212,8 @@ export default function Roles({ roles, permissions, filters }) {
                                 return (
                                     <li
                                         key={index}
-                                        className={`page-item ${link.active ? "active" : ""} ${
-                                            !link.url ? "disabled" : ""
-                                        }`}
+                                        className={`page-item ${link.active ? "active" : ""} ${!link.url ? "disabled" : ""
+                                            }`}
                                     >
                                         <a
                                             href={link.url || "#"}
@@ -232,7 +231,7 @@ export default function Roles({ roles, permissions, filters }) {
             {showAdd && (
                 <AddRoleModal
                     form={form}
-                    handleChange={handleChange}
+                    setForm={setForm}
                     handleAdd={handleAdd}
                     onClose={() => setShowAdd(false)}
                 />
@@ -242,7 +241,7 @@ export default function Roles({ roles, permissions, filters }) {
             {showEdit && (
                 <EditRoleModal
                     form={form}
-                    handleChange={handleChange}
+                    setForm={setForm}
                     handleEdit={handleEdit}
                     onClose={() => setShowEdit(null)}
                 />
