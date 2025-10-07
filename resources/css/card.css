@@ -78,11 +78,14 @@
 /* === Dashboard Card Layout === */
 .dashboard-cards {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); /* 🔹 Lebih lebar tiap card */
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    /* 🔹 Lebih lebar tiap card */
     gap: 1.5rem;
     margin: 2rem auto;
-    max-width: 1700px; /* 🔹 Lebar container diperbesar */
-    padding: 0 2rem; /* 🔹 Lebih kecil padding sampingnya */
+    max-width: 1200px;
+    /* 🔹 Lebar container diperbesar */
+    padding: 0 2rem;
+    /* 🔹 Lebih kecil padding sampingnya */
 }
 
 div.card.dashboard {
@@ -97,7 +100,7 @@ div.card-body.dashboard {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    padding: 1rem 1.5rem;
+    padding: 1rem 0.6rem;
 }
 
 /* ================================================================== */

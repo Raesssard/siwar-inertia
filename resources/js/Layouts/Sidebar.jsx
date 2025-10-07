@@ -45,40 +45,41 @@ export default function Sidebar({ toggleKeParent }) {
     }
 
     return (
-        <ul
-            className={`navbar-nav bg-gradient-primary sidebar sidebar-dark accordion d-none d-md-block ${toggle}`}
-            id="accordionSidebar"
-        >
-            {/* Logo */}
-            <Link className="sidebar-brand" href="/dashboard">
-                <div className="sidebar-brand-icon">
-                    <img
-                        src={logo}
-                        alt="SiWar Logo"
-                        className="sidebar-brand-icon-logo"
-                    />
+        <>
+            <ul
+                className={`navbar-nav bg-gradient-primary sidebar sidebar-dark accordion d-none d-md-block ${toggle}`}
+                id="accordionSidebar"
+            >
+                <Link className="sidebar-brand" href="/dashboard">
+                    <div className="sidebar-brand-icon">
+                        <img
+                            src={logo}
+                            alt="SiWar Logo"
+                            className="sidebar-brand-icon-logo"
+                        />
+                    </div>
+                </Link>
+
+                <hr className="sidebar-divider my-0" />
+
+                {statLinks.map((link, index) => (
+                    <SidebarLink key={index} {...link} />
+                ))}
+
+                <hr className="sidebar-divider d-none d-md-block" />
+
+                <div className="text-center">
+                    <button
+                        className="rounded-circle border-0"
+                        onClick={toggleSidebar}
+                        id="sidebarToggle"
+                    >
+                        <i
+                            className={`fas fa-chevron-${rotation} arrow-toggle`}
+                        ></i>
+                    </button>
                 </div>
-            </Link>
-
-            <hr className="sidebar-divider my-0" />
-
-            {/* Dynamic links by role */}
-            {statLinks.map((link, index) => (
-                <SidebarLink key={index} {...link} />
-            ))}
-
-            <hr className="sidebar-divider d-none d-md-block" />
-
-            {/* Toggle Button */}
-            <div className="text-center">
-                <button
-                    className="rounded-circle border-0"
-                    onClick={toggleSidebar}
-                    id="sidebarToggle"
-                >
-                    <i className={`fas fa-chevron-${rotation} arrow-toggle`}></i>
-                </button>
-            </div>
-        </ul>
+            </ul>
+        </>
     )
 }

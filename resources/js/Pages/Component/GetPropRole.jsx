@@ -1,8 +1,5 @@
 import React from "react";
 
-// =====================================================
-// 🔹 Fungsi untuk Format Uang (Rupiah)
-// =====================================================
 const formatRupiah = (angka, withDecimals = false) => {
     return "Rp. " + Number(angka).toLocaleString("id-ID", {
         minimumFractionDigits: withDecimals ? 2 : 0,
@@ -10,9 +7,6 @@ const formatRupiah = (angka, withDecimals = false) => {
     });
 };
 
-// =====================================================
-// 🔹 Kartu Statistik untuk Warga
-// =====================================================
 export function getWargaCards({ ...rest }) {
     return [
         {
@@ -74,9 +68,6 @@ export function getWargaCards({ ...rest }) {
     ];
 }
 
-// =====================================================
-// 🔹 Link Sidebar untuk Warga
-// =====================================================
 export function getWargaLinks() {
     return [
         {
@@ -112,9 +103,6 @@ export function getWargaLinks() {
     ];
 }
 
-// =====================================================
-// 🔹 Kartu Statistik untuk Admin
-// =====================================================
 export function getAdminCards({ ...rest }) {
     return [
         {
@@ -155,9 +143,6 @@ export function getAdminCards({ ...rest }) {
     ];
 }
 
-// =====================================================
-// 🔹 Link Sidebar untuk Admin
-// =====================================================
 export function getAdminLinks() {
     return [
         {
@@ -193,9 +178,6 @@ export function getAdminLinks() {
     ];
 }
 
-// =====================================================
-// 🔹 Link Sidebar untuk RW
-// =====================================================
 export function getRwLinks() {
     return [
         {
@@ -231,9 +213,6 @@ export function getRwLinks() {
     ];
 }
 
-// =====================================================
-// 🔹 Link Sidebar untuk RT
-// =====================================================
 export function getRtLinks() {
     return [
         {

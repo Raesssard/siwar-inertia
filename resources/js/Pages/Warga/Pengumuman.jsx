@@ -148,7 +148,7 @@ export default function Pengumuman() {
                                             judul={item.dokumen_name}
                                             displayStyle={imgStyle} />
                                         <h2 className="font-semibold text-lg mb-2 text-left mx-3">{item.judul}</h2>
-                                        <div className="text-sm text-gray-500 mb-2 mx-3 flex justify-between">
+                                        <div className="text-sm text-gray-500 mb-2 d-flex gap-3">
                                             <span><i className="fas fa-user mr-1"></i>{item.rukun_tetangga ? item.rukun_tetangga.nama : item.rw.nama_ketua_rw}</span>
                                             <span><i className="fas fa-clock mr-1"></i>{new Date(item.created_at).toLocaleDateString("id-ID", {
                                                 day: "2-digit",

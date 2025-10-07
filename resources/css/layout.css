@@ -303,6 +303,7 @@ ul.navbar-nav.sidebar#accordionSidebar {
 div.modal-komen {
     min-height: 700px;
     max-height: 700px !important;
+    width: 100%;
 }
 
 .modal-dialog.modal-komen {
