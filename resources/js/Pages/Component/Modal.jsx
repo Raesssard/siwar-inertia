@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from "react"
 import { Link, useForm, usePage } from "@inertiajs/react"
 import logo from '../../../../public/img/logo.png'
-import { Inertia } from "@inertiajs/inertia"
 import axios from "axios"
 import { FormatWaktu } from "../Warga/Pengaduan"
 import { SidebarLink } from "./SidebarLink"
@@ -14,6 +13,25 @@ export function ModalSidebar({ modalIsOpen, modalShow }) {
 
     const isActive = (url, pattern) => {
         return url.startsWith(pattern)
+    }
+
+    let statLinks = [];
+
+    switch (role) {
+        case "admin":
+            statLinks = getAdminLinks();
+            break;
+        case "rw":
+            statLinks = getRwLinks();
+            break;
+        case "rt":
+            statLinks = getRtLinks();
+            break;
+        case "warga":
+            statLinks = getWargaLinks();
+            break;
+        default:
+            statLinks = [];
     }
 
     let statLinks = [];
@@ -54,7 +72,7 @@ export function ModalSidebar({ modalIsOpen, modalShow }) {
                                     ×
                                 </button>
                             </div>
-                            <div className="modal-body">
+                            <div className="modal-body p-0 m-0 d-block" style={{ overflowY: "hidden" }}>
                                 <ul className="navbar-nav sidebar sidebar-dark accordion">
                                     <hr className="sidebar-divider my-0" />
                                     {statLinks.map((link, index) => (
@@ -158,9 +176,6 @@ export function PasswordModal({ show }) {
     )
 }
 
-/* ===========================
-   Modal RW
-=========================== */
 export function AddRwModal({ form, handleChange, handleAdd, onClose }) {
     return (
         <div
@@ -329,7 +344,7 @@ export function EditRwModal({ form, handleChange, handleEdit, onClose }) {
 
 /* ===========================
    Modal RT
-=========================== */
+/* ===========================
 export function AddRtModal({ form, handleChange, handleAdd, onClose }) {
     return (
         <div
@@ -413,7 +428,6 @@ export function AddRtModal({ form, handleChange, handleAdd, onClose }) {
     );
 }
 
-
 export function EditRtModal({ form, handleChange, handleEdit, onClose }) {
     return (
         <div
@@ -496,9 +510,7 @@ export function EditRtModal({ form, handleChange, handleEdit, onClose }) {
         </div>
     );
 }
-// ---------------------------
-// Modal Tambah Kategori Golongan
-// ---------------------------
+
 export function AddKategoriGolonganModal({ form, handleChange, handleAdd, onClose }) {
     return (
         <div
@@ -544,9 +556,6 @@ export function AddKategoriGolonganModal({ form, handleChange, handleAdd, onClos
     );
 }
 
-// ---------------------------
-// Modal Edit Kategori Golongan
-// ---------------------------
 export function EditKategoriGolonganModal({ form, handleChange, handleEdit, onClose }) {
     return (
         <div
@@ -592,9 +601,6 @@ export function EditKategoriGolonganModal({ form, handleChange, handleEdit, onCl
     );
 }
 
-// ---------------------------
-// Modal Tambah Role
-// ---------------------------
 export function AddRoleModal({ form, setForm, handleAdd, onClose }) {
     return (
         <div
@@ -636,9 +642,6 @@ export function AddRoleModal({ form, setForm, handleAdd, onClose }) {
     );
 }
 
-// ---------------------------
-// Modal Edit Role
-// ---------------------------
 export function EditRoleModal({ form, setForm, handleEdit, onClose }) {
     return (
         <div
@@ -682,9 +685,6 @@ export function EditRoleModal({ form, setForm, handleEdit, onClose }) {
     );
 }
 
-// ---------------------------
-// Modal Edit Permissions
-// ---------------------------
 export function EditPermissionModal({
     role,
     permissions,
@@ -886,22 +886,24 @@ export function DetailPengumuman({ selectedData, detailShow, onClose }) {
                                                 year: "numeric",
                                             })} */}
                                             • <FormatWaktu createdAt={selectedData.created_at} />
-                                        </small>
-                                        <p
-                                            ref={textRef}
-                                            className={`mt-2 isi-pengumuman ${captionExpanded ? "expanded" : "clamped"}`}
-                                        >
-                                            {selectedData.isi}
-                                        </p>
-                                        {isOverflowing && (
-                                            <button
-                                                className="btn btn-link p-0 mt-1 text-decoration-none"
-                                                onClick={() => setCaptionExpanded(!captionExpanded)}
-                                            >
-                                                {captionExpanded ? "lebih sedikit" : "selengkapnya"}
-                                            </button>
-                                        )}
-                                    </div>
+                                        </small >
+    <p
+        ref={textRef}
+        className={`mt-2 isi-pengumuman ${captionExpanded ? "expanded" : "clamped"}`}
+    >
+        {selectedData.isi}
+    </p>
+{
+    isOverflowing && (
+        <button
+            className="btn btn-link p-0 mt-1 text-decoration-none"
+            onClick={() => setCaptionExpanded(!captionExpanded)}
+        >
+            {captionExpanded ? "lebih sedikit" : "selengkapnya"}
+        </button>
+    )
+}
+                                    </div >
                                     <div className="flex-grow-1 overflow-auto p-3 komen-section" ref={komenRef}>
                                         {komentar.length > 0 ? (
                                             komentar.map((komen, i) => (
@@ -951,12 +953,12 @@ export function DetailPengumuman({ selectedData, detailShow, onClose }) {
                                             </button>
                                         </div>
                                     </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+                                </div >
+                            </div >
+                        </div >
+                    </div >
+                </div >
+            </div >
         </>
     )
 }
