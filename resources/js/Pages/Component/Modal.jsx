@@ -11,7 +11,6 @@ export function ModalSidebar({ modalIsOpen, modalShow }) {
     const { props } = usePage()
     const role = props.auth?.currentRole
 
-
     let statLinks = [];
 
     switch (role) {
