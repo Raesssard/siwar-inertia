@@ -11,7 +11,28 @@ export function ModalSidebar({ modalIsOpen, modalShow }) {
     const { props } = usePage()
     const role = props.auth?.currentRole
 
-    if (!modalIsOpen) return null;
+    const isActive = (url, pattern) => {
+        return url.startsWith(pattern)
+    }
+
+    let statLinks = [];
+
+    switch (role) {
+        case "admin":
+            statLinks = getAdminLinks();
+            break;
+        case "rw":
+            statLinks = getRwLinks();
+            break;
+        case "rt":
+            statLinks = getRtLinks();
+            break;
+        case "warga":
+            statLinks = getWargaLinks();
+            break;
+        default:
+            statLinks = [];
+    }
 
     let statLinks = [];
 
@@ -64,6 +85,93 @@ export function ModalSidebar({ modalIsOpen, modalShow }) {
                     </div>
                 </div>
             )}
+        </>
+    )
+}
+
+export function PasswordModal({ show }) {
+    return (
+        <>
+            <div
+                className="modal fade show"
+                style={{ display: "block", backgroundColor: "rgba(0,0,0,0.5)" }}
+                tabIndex="-1"
+            >
+                <div className="modal-dialog modal-dialog-centered">
+                    <div className="modal-content">
+                        <form onSubmit={() => show(false)}>
+                            <div className="modal-header">
+                                <h5 className="modal-title">
+                                    <i className="fas fa-key text-primary me-1"></i>{" "}
+                                    Ubah Password
+                                </h5>
+                                <button
+                                    type="button"
+                                    className="btn-close"
+                                    onClick={() => show(false)}
+                                />
+                            </div>
+                            <div className="modal-body">
+                                <div className="form-floating mb-3 position-relative">
+                                    <input
+                                        type="password"
+                                        name="current_password"
+                                        className="form-control"
+                                        id="current_password"
+                                        placeholder="Password Lama"
+                                        required
+                                    />
+                                    <label htmlFor="current_password">
+                                        <i className="fas fa-lock me-2"></i>
+                                        Password Lama
+                                    </label>
+                                </div>
+                                <div className="form-floating mb-3 position-relative">
+                                    <input
+                                        type="password"
+                                        name="password"
+                                        className="form-control"
+                                        id="password"
+                                        placeholder="Password Baru"
+                                        required
+                                        minLength="6"
+                                    />
+                                    <label htmlFor="password">
+                                        <i className="fas fa-lock me-2"></i>
+                                        Password Baru
+                                    </label>
+                                </div>
+                                <div className="form-floating mb-3 position-relative">
+                                    <input
+                                        type="password"
+                                        name="password_confirmation"
+                                        className="form-control"
+                                        id="password_confirmation"
+                                        placeholder="Konfirmasi Password Baru"
+                                        required
+                                    />
+                                    <label htmlFor="password_confirmation">
+                                        <i className="fas fa-lock me-2"></i>
+                                        Konfirmasi Password
+                                    </label>
+                                </div>
+                            </div>
+                            <div className="modal-footer">
+                                <button
+                                    type="button"
+                                    className="btn btn-secondary"
+                                    onClick={() => show(false)}
+                                >
+                                    Batal
+                                </button>
+                                <button type="submit" className="btn btn-primary">
+                                    Simpan Perubahan
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
         </>
     )
 }
@@ -234,6 +342,9 @@ export function EditRwModal({ form, handleChange, handleEdit, onClose }) {
     );
 }
 
+/* ===========================
+   Modal RT
+/* ===========================
 export function AddRtModal({ form, handleChange, handleAdd, onClose }) {
     return (
         <div
@@ -1312,7 +1423,7 @@ export function EditPengaduan({ toggle, onUpdated, onDeleted, pengaduan }) {
                                 id="fileInput"
                                 name="file"
                                 className="d-none"
-                                accept="image/*,video/*,.pdf,.doc,.docx"
+                                accept="image/,video/,.pdf,.doc,.docx"
                                 onChange={handleFileChange}
                             />
                             <button
@@ -1422,7 +1533,7 @@ export function TambahPengaduan({ tambahShow, onClose, onAdded }) {
         formData.append('level', data.level)
         if (data.file) formData.append('file', data.file)
 
-        axios.post(`/warga/pengaduan`, formData)
+        axios.post('/warga/pengaduan', formData)
             .then(res => {
                 if (onAdded) {
                     onAdded(res.data)
@@ -1554,7 +1665,7 @@ export function TambahPengaduan({ tambahShow, onClose, onAdded }) {
                                                     id="fileInput"
                                                     name="file"
                                                     className="d-none"
-                                                    accept="image/*,video/*,.pdf,.doc,.docx"
+                                                    accept="image/,video/,.pdf,.doc,.docx"
                                                     onChange={handleFileChange}
                                                 />
                                                 <button
@@ -1589,6 +1700,6 @@ export function TambahPengaduan({ tambahShow, onClose, onAdded }) {
                     </div>
                 </div>
             </div>
-        </>
-    )
+        </>
+    )
 }
