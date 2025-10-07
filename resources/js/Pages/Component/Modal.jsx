@@ -11,7 +11,6 @@ export function ModalSidebar({ modalIsOpen, modalShow }) {
     const { props } = usePage()
     const role = props.auth?.currentRole
 
-    if (!modalIsOpen) return null;
 
     let statLinks = [];
 
@@ -64,6 +63,107 @@ export function ModalSidebar({ modalIsOpen, modalShow }) {
                     </div>
                 </div>
             )}
+        </>
+    )
+}
+
+export function PasswordModal({ show }) {
+    useEffect(() => {
+        const handleEsc = (e) => {
+            if (e.key === "Escape") show(false)
+        }
+        document.addEventListener("keydown", handleEsc)
+        return () => document.removeEventListener("keydown", handleEsc)
+    }, [show])
+    return (
+        <>
+            <div
+                className="modal fade show"
+                tabIndex="-1"
+                style={{
+                    display: "block",
+                    backgroundColor: "rgba(0,0,0,0.5)",
+                }}
+                onClick={() => show(false)}
+            >
+                <div
+                    className="modal-dialog modal-dialog-centered"
+                    onClick={(e) => e.stopPropagation()}
+                >
+                    <div className="modal-content">
+                        <form onSubmit={() => show(false)}>
+                            <div className="modal-header">
+                                <h5 className="modal-title">
+                                    <i className="fas fa-key text-primary me-1"></i>{" "}
+                                    Ubah Password
+                                </h5>
+                                <button
+                                    type="button"
+                                    className="btn-close"
+                                    onClick={() => show(false)}
+                                />
+                            </div>
+                            <div className="modal-body">
+                                <div className="form-floating mb-3 position-relative">
+                                    <input
+                                        type="password"
+                                        name="current_password"
+                                        className="form-control py-2 px-4"
+                                        id="current_password"
+                                        placeholder="Password Lama"
+                                        required
+                                    />
+                                    <label htmlFor="current_password">
+                                        <i className="fas fa-lock me-2"></i>
+                                        Password Lama
+                                    </label>
+                                </div>
+                                <div className="form-floating mb-3 position-relative">
+                                    <input
+                                        type="password"
+                                        name="password"
+                                        className="form-control py-2 px-4"
+                                        id="password"
+                                        placeholder="Password Baru"
+                                        required
+                                        minLength="6"
+                                    />
+                                    <label htmlFor="password">
+                                        <i className="fas fa-lock me-2"></i>
+                                        Password Baru
+                                    </label>
+                                </div>
+                                <div className="form-floating mb-3 position-relative">
+                                    <input
+                                        type="password"
+                                        name="password_confirmation"
+                                        className="form-control py-2 px-4"
+                                        id="password_confirmation"
+                                        placeholder="Konfirmasi Password Baru"
+                                        required
+                                    />
+                                    <label htmlFor="password_confirmation">
+                                        <i className="fas fa-lock me-2"></i>
+                                        Konfirmasi Password
+                                    </label>
+                                </div>
+                            </div>
+                            <div className="modal-footer">
+                                <button
+                                    type="button"
+                                    className="btn btn-secondary"
+                                    onClick={() => show(false)}
+                                >
+                                    Batal
+                                </button>
+                                <button type="submit" className="btn btn-primary">
+                                    Simpan Perubahan
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
         </>
     )
 }
@@ -632,6 +732,8 @@ export function DetailPengumuman({ selectedData, detailShow, onClose }) {
     const [isOverflowing, setIsOverflowing] = useState(false)
     const textRef = useRef(null)
     const komenRef = useRef(null)
+    const { props } = usePage()
+    const currentRole = props.auth?.currentRole
 
     const toggleExpand = (id) => {
         setCommentExpanded((prev) => ({
@@ -658,7 +760,7 @@ export function DetailPengumuman({ selectedData, detailShow, onClose }) {
     const handleSubmit = () => {
         if (!newKomentar.trim()) return
         // nanti rutenya bakal diganti sesuai role
-        axios.post(`/warga/pengumuman/${selectedData.id}/komentar`, {
+        axios.post(`/${currentRole}/pengumuman/${selectedData.id}/komentar`, {
             isi_komentar: newKomentar
         })
             .then(res => {
@@ -762,12 +864,12 @@ export function DetailPengumuman({ selectedData, detailShow, onClose }) {
                                         <h5 className="fw-bold mb-1 mt-2">{selectedData.judul}</h5>
                                         <small className="text-muted">
                                             <strong>
-                                                {selectedData.rukun_tetangga ? selectedData.rukun_tetangga.nama : selectedData.rw.nama_ketua_rw}
+                                                {selectedData.rukun_tetangga ? selectedData.rukun_tetangga.nama_ketua_rt : selectedData.rw.nama_ketua_rw}
                                             </strong> • {" "}
-                                            {selectedData.rukun_tetangga
+                                            {/* {selectedData.rukun_tetangga
                                                 ? `${selectedData.rukun_tetangga.jabatan.nama_jabatan.charAt(0).toUpperCase()}${selectedData.rukun_tetangga.jabatan.nama_jabatan.slice(1)} RT`
-                                                : `${selectedData.rw.jabatan.nama_jabatan.charAt(0).toUpperCase()}${selectedData.rw.jabatan.nama_jabatan.slice(1)} RW`} •
-                                            RT {selectedData.rukun_tetangga?.rt}/{""}
+                                                : `${selectedData.rw.jabatan.nama_jabatan.charAt(0).toUpperCase()}${selectedData.rw.jabatan.nama_jabatan.slice(1)} RW`} • */}
+                                            RT {selectedData.rukun_tetangga?.nomor_rt}/{""}
                                             RW {selectedData.rw?.nomor_rw}{" "}
                                             {/* • {new Date(selectedData.created_at).toLocaleDateString("id-ID", {
                                                 day: "2-digit",
@@ -776,22 +878,22 @@ export function DetailPengumuman({ selectedData, detailShow, onClose }) {
                                             })} */}
                                             • <FormatWaktu createdAt={selectedData.created_at} />
                                         </small >
-    <p
-        ref={textRef}
-        className={`mt-2 isi-pengumuman ${captionExpanded ? "expanded" : "clamped"}`}
-    >
-        {selectedData.isi}
-    </p>
-{
-    isOverflowing && (
-        <button
-            className="btn btn-link p-0 mt-1 text-decoration-none"
-            onClick={() => setCaptionExpanded(!captionExpanded)}
-        >
-            {captionExpanded ? "lebih sedikit" : "selengkapnya"}
-        </button>
-    )
-}
+                                        <p
+                                            ref={textRef}
+                                            className={`mt-2 isi-pengumuman ${captionExpanded ? "expanded" : "clamped"}`}
+                                        >
+                                            {selectedData.isi}
+                                        </p>
+                                        {
+                                            isOverflowing && (
+                                                <button
+                                                    className="btn btn-link p-0 mt-1 text-decoration-none"
+                                                    onClick={() => setCaptionExpanded(!captionExpanded)}
+                                                >
+                                                    {captionExpanded ? "lebih sedikit" : "selengkapnya"}
+                                                </button>
+                                            )
+                                        }
                                     </div >
                                     <div className="flex-grow-1 overflow-auto p-3 komen-section" ref={komenRef}>
                                         {komentar.length > 0 ? (
@@ -807,6 +909,7 @@ export function DetailPengumuman({ selectedData, detailShow, onClose }) {
                                                             ? "line-clamp-none"
                                                             : "line-clamp-3"
                                                             }`}
+                                                            style={{ fontSize: "0.85rem" }}
                                                     >
                                                         {komen.isi_komentar}
                                                     </p>
@@ -861,6 +964,8 @@ export function DetailPengaduan({ selectedData, detailShow, onClose, onUpdated, 
     const [isEdit, setIsEdit] = useState(false)
     const textRef = useRef(null)
     const komenRef = useRef(null)
+    const { props } = usePage()
+    const currentRole = props.auth?.currentRole
 
     const toggleEdit = () => {
         setIsEdit(!isEdit)
@@ -901,7 +1006,7 @@ export function DetailPengaduan({ selectedData, detailShow, onClose, onUpdated, 
     const handleSubmit = () => {
         if (!newKomentar.trim()) return
         // nanti rutenya bakal diganti sesuai role
-        axios.post(`/warga/pengaduan/${selectedData.id}/komentar`, {
+        axios.post(`/${currentRole}/pengaduan/${selectedData.id}/komentar`, {
             isi_komentar: newKomentar
         })
             .then(res => {
@@ -1022,7 +1127,7 @@ export function DetailPengaduan({ selectedData, detailShow, onClose, onUpdated, 
                                                 <strong>
                                                     {selectedData.warga?.nama}
                                                 </strong>{" "}
-                                                • RT {selectedData.warga?.kartu_keluarga?.rukun_tetangga?.rt}/RW{" "}
+                                                • RT {selectedData.warga?.kartu_keluarga?.rukun_tetangga?.nomor_rt}/RW{" "}
                                                 {selectedData.warga?.kartu_keluarga?.rw?.nomor_rw}{" "}
                                                 {/* • {new Date(selectedData.created_at).toLocaleDateString("id-ID", {
                                                     day: "2-digit",
@@ -1060,6 +1165,7 @@ export function DetailPengaduan({ selectedData, detailShow, onClose, onUpdated, 
                                                                 ? "line-clamp-none"
                                                                 : "line-clamp-3"
                                                                 }`}
+                                                            style={{ fontSize: "0.85rem" }}
                                                         >
                                                             {komen.isi_komentar}
                                                         </p>
@@ -1312,7 +1418,7 @@ export function EditPengaduan({ toggle, onUpdated, onDeleted, pengaduan }) {
                                 id="fileInput"
                                 name="file"
                                 className="d-none"
-                                accept="image/*,video/*,.pdf,.doc,.docx"
+                                accept="image/,video/,.pdf,.doc,.docx"
                                 onChange={handleFileChange}
                             />
                             <button
@@ -1323,7 +1429,7 @@ export function EditPengaduan({ toggle, onUpdated, onDeleted, pengaduan }) {
                             >
                                 <i className="fas fa-upload mr-2"></i>
                                 <small>
-                                    Upload File
+                                    Ganti File
                                 </small>
                             </button>
                             {pengaduan?.file_name && !data.file && (
@@ -1422,7 +1528,7 @@ export function TambahPengaduan({ tambahShow, onClose, onAdded }) {
         formData.append('level', data.level)
         if (data.file) formData.append('file', data.file)
 
-        axios.post(`/warga/pengaduan`, formData)
+        axios.post('/warga/pengaduan', formData)
             .then(res => {
                 if (onAdded) {
                     onAdded(res.data)
@@ -1507,7 +1613,7 @@ export function TambahPengaduan({ tambahShow, onClose, onAdded }) {
                                     ""
                                 )}
                                 <div className="flex-fill d-flex flex-column" style={previewUrl ? { maxWidth: "50%" } : { maxWidth: "100%" }}>
-                                    <div className="p-3" style={{ height: "100%" }}>
+                                    <div className="p-3 h-100 w-100">
                                         <form onSubmit={handleSubmit}>
                                             <div className="mb-3">
                                                 <label className="form-label">Judul</label>
@@ -1554,7 +1660,7 @@ export function TambahPengaduan({ tambahShow, onClose, onAdded }) {
                                                     id="fileInput"
                                                     name="file"
                                                     className="d-none"
-                                                    accept="image/*,video/*,.pdf,.doc,.docx"
+                                                    accept="image/,video/,.pdf,.doc,.docx"
                                                     onChange={handleFileChange}
                                                 />
                                                 <button
@@ -1589,6 +1695,6 @@ export function TambahPengaduan({ tambahShow, onClose, onAdded }) {
                     </div>
                 </div>
             </div>
-        </>
-    )
+        </>
+    )
 }

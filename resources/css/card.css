@@ -4,30 +4,26 @@
 .card {
     width: 100%;
     height: auto;
+    border: none;
 }
 
 .card-clickable {
-    border-radius: 0.35rem;
-    /* biar rounded */
+    border-radius: 0.5rem;
     transition: transform 0.15s ease-out, box-shadow 0.15s ease-out;
     cursor: pointer;
+    background: #fff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
 }
 
 .card-clickable:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 0.6rem 1rem rgba(0, 0, 0, .2);
+    transform: translateY(-4px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
 }
 
 .card-clickable:active {
-    transform: translateY(1px);
-    box-shadow: 0 0.2rem 0.5rem rgba(0, 0, 0, .1);
-}
-
-.card-clickable .text-decoration-none {
-    display: block;
-    /* link cover seluruh card */
-    color: inherit;
-    /* biar nggak berubah warna */
+    transform: translateY(0);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
 }
 
 .text-gray-800 {
@@ -44,19 +40,24 @@
 .card-body {
     margin: 0;
     width: 100%;
+    padding: 1rem 1.25rem;
 }
 
 .card-body .text-xs {
     text-align: left;
-    font-size: 0.75rem;
-    letter-spacing: 0.05em;
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: #6c757d;
+    margin-bottom: 0.25rem;
 }
 
 .card-body .h4 {
     text-align: left;
-    font-size: 1.5rem;
+    font-size: 1.6rem;
     font-weight: 700;
-    margin-bottom: 0.25rem;
+    margin-bottom: 0;
+    color: #333;
 }
 
 /* ================================================================== */
@@ -71,68 +72,90 @@
 .card-body .fa-3x,
 .card-body .bi {
     font-size: 2rem;
-    opacity: 0.75;
+    opacity: 0.8;
+}
+
+/* === Dashboard Card Layout === */
+.dashboard-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    /* 🔹 Lebih lebar tiap card */
+    gap: 1.5rem;
+    margin: 2rem auto;
+    max-width: 1200px;
+    /* 🔹 Lebar container diperbesar */
+    padding: 0 2rem;
+    /* 🔹 Lebih kecil padding sampingnya */
+}
+
+div.card.dashboard {
+    min-height: 150px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+div.card-body.dashboard {
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 1rem 0.6rem;
 }
 
 /* ================================================================== */
 /* Responsive Breakpoints                                             */
 /* ================================================================== */
-@media (max-width: 767.98px) {
-    .card-body {
-        margin: 0;
-        width: 100%;
+@media (max-width: 1199.98px) {
+    .dashboard-cards {
+        grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+        max-width: 1400px;
+        padding: 0 1.5rem;
+    }
+}
+
+@media (max-width: 991.98px) {
+    .dashboard-cards {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.25rem;
+        max-width: 100%;
+        padding: 0 1rem;
     }
 
     .card-body .h4 {
-        font-size: 1.2rem;
+        font-size: 1.35rem;
     }
 
     .card-body .text-xs {
-        font-size: 0.65rem;
+        font-size: 0.8rem;
     }
+}
 
-    .card-body .fa-3x,
-    .card-body .bi {
-        font-size: 1.5rem;
-    }
-
+@media (max-width: 767.98px) {
     .dashboard-cards {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 1.25rem;
-        margin: 1rem auto;
-        max-width: 1200px;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
         padding: 0 1rem;
-        overflow-x: hidden;
     }
 
     div.card.dashboard {
         min-height: 120px;
-        height: auto !important;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
     }
 
-    div.card-body.dashboard {
-        height: auto !important;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        padding: 0.75rem;
-    }
-
-    .card-body .h4,
-    .card-body .text-xs {
-        overflow-wrap: break-word;
-        word-wrap: break-word;
+    .card-body .h4 {
+        font-size: 1.25rem;
     }
 }
 
 @media (max-width: 575.98px) {
+    .dashboard-cards {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.75rem;
+        padding: 0 0.75rem;
+    }
+
     .card-body {
-        margin: 0;
-        width: 100%;
+        padding: 0.75rem 1rem;
     }
 
     .card-body .h4 {
@@ -140,73 +163,10 @@
     }
 
     .card-body .text-xs {
-        font-size: 0.55rem;
+        font-size: 0.7rem;
     }
 
-    .card-body .fa-3x,
-    .card-body .bi {
-        font-size: 1.25rem;
+    .card-body .fa-3x {
+        font-size: 1.5rem;
     }
-
-    .dashboard-cards {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 1rem;
-        margin: 1rem auto;
-        max-width: 1200px;
-        padding: 0 0.5rem;
-        overflow-x: hidden;
-    }
-
-    div.card.dashboard {
-        min-height: 100px;
-        height: auto !important;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-    }
-
-    div.card-body.dashboard {
-        height: auto !important;
-        padding: 0.75rem;
-    }
-
-    .card-body .h4 {
-        font-size: 0.9rem;
-    }
-
-    .card-body .text-xs {
-        font-size: 0.6rem;
-    }
-
-    .card-body .h4,
-    .card-body .text-xs {
-        overflow-wrap: break-word;
-        word-wrap: break-word;
-    }
-}
-
-/* === Dashboard Card Layout === */
-.dashboard-cards {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 1.25rem;
-    margin: 1rem auto;
-    max-width: 1200px;
-    padding: 0 1rem;
-}
-
-div.card.dashboard {
-    height: 120px !important;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-}
-
-div.card-body.dashboard {
-    height: 100px !important;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    padding: 0 0.75rem;
 }
