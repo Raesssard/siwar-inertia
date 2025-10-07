@@ -73,7 +73,7 @@ export default function KartuKeluarga() {
                                 </p>
                                 <p className="mb-1 text-left"><strong>Alamat</strong> : {kartuKeluarga.alamat ?? '-'}</p>
                                 <p className="mb-1 text-left"><strong>
-                                    RT {kartuKeluarga.rukun_tetangga.rt ?? '-'}/RW {kartuKeluarga.rw.nomor_rw ?? '-'}
+                                    RT {kartuKeluarga.rukun_tetangga.nomor_rt ?? '-'}/RW {kartuKeluarga.rw.nomor_rw ?? '-'}
                                 </strong>
                                 </p>
                                 <p className="mb-1 text-left"><strong>Desa/Kelurahan</strong> :

@@ -65,8 +65,8 @@ class AdminSeeder extends Seeder
         $rt = Rt::create([
             'no_kk' => $kk_rt->no_kk,
             'nik' => '0000000000000002',
-            'rt' => '01',
-            'nama' => 'Andi Kurniawan',
+            'nomor_rt' => '01',
+            'nama_ketua_rt' => 'Andi Kurniawan',
             'mulai_menjabat' => now(),
             'akhir_jabatan' => now()->addYears(3),
             'id_rw' => $rw->id,
@@ -74,7 +74,7 @@ class AdminSeeder extends Seeder
 
         $kk_rt->update(['id_rt' => $rt->id]);
 
-        $warga_rt = Warga::create([
+        Warga::create([
             'no_kk' => $kk_rt->no_kk,
             'nik' => '0000000000000002',
             'nama' => 'Andi Kurniawan',

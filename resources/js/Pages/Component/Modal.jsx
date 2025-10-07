@@ -579,6 +579,9 @@ export function EditKategoriGolonganModal({ form, handleChange, handleEdit, onCl
     );
 }
 
+/* =====================================================================
+   📘 1. Modal Tambah Role
+===================================================================== */
 export function AddRoleModal({ form, setForm, handleAdd, onClose }) {
     return (
         <div
@@ -599,14 +602,20 @@ export function AddRoleModal({ form, setForm, handleAdd, onClose }) {
                                     type="text"
                                     name="name"
                                     value={form.name}
-                                    onChange={(e) => setForm("name", e.target.value)}
+                                    onChange={(e) =>
+                                        setForm({ ...form, name: e.target.value })
+                                    }
                                     className="form-control"
                                     placeholder="Masukkan nama role"
                                 />
                             </div>
                         </div>
                         <div className="modal-footer">
-                            <button type="button" className="btn btn-secondary" onClick={onClose}>
+                            <button
+                                type="button"
+                                className="btn btn-secondary"
+                                onClick={onClose}
+                            >
                                 Batal
                             </button>
                             <button type="submit" className="btn btn-primary">
@@ -620,6 +629,9 @@ export function AddRoleModal({ form, setForm, handleAdd, onClose }) {
     );
 }
 
+/* =====================================================================
+   📘 2. Modal Edit Role
+===================================================================== */
 export function EditRoleModal({ form, setForm, handleEdit, onClose }) {
     return (
         <div
@@ -649,7 +661,11 @@ export function EditRoleModal({ form, setForm, handleEdit, onClose }) {
                             </div>
                         </div>
                         <div className="modal-footer">
-                            <button type="button" className="btn btn-secondary" onClick={onClose}>
+                            <button
+                                type="button"
+                                className="btn btn-secondary"
+                                onClick={onClose}
+                            >
                                 Batal
                             </button>
                             <button type="submit" className="btn btn-primary">
@@ -663,6 +679,10 @@ export function EditRoleModal({ form, setForm, handleEdit, onClose }) {
     );
 }
 
+
+/* =====================================================================
+   📘 3. Modal Edit Role Permission (Checkbox Multi)
+===================================================================== */
 export function EditRolePermissionModal({
     role,
     permissions,
@@ -672,40 +692,37 @@ export function EditRolePermissionModal({
     onClose,
 }) {
     return (
-        <div
-            className="modal fade show"
-            style={{ display: "block", backgroundColor: "rgba(0,0,0,0.5)" }}
-        >
+        <div className="modal fade show" style={{ display: "block", backgroundColor: "rgba(0,0,0,0.5)" }}>
             <div className="modal-dialog modal-lg modal-dialog-centered">
                 <div className="modal-content modal-custom">
                     <div className="modal-header">
-                        <h5>Edit Permissions: {role.name}</h5>
+                        <h5>Atur Permissions untuk Role: <strong>{role.name}</strong></h5>
                         <button type="button" className="btn-close" onClick={onClose} />
                     </div>
                     <div className="modal-body">
                         <div className="row">
-                            {permissions.map((perm) => (
-                                <div key={perm.id} className="col-md-4 mb-2">
-                                    <label className="d-flex align-items-center">
-                                        <input
-                                            type="checkbox"
-                                            checked={selectedPerms.includes(perm.name)}
-                                            onChange={() => togglePermission(perm.name)}
-                                            className="form-check-input me-2"
-                                        />
-                                        {perm.name}
-                                    </label>
-                                </div>
-                            ))}
+                            {permissions.length ? (
+                                permissions.map((perm) => (
+                                    <div key={perm.id} className="col-md-4 mb-2">
+                                        <label className="d-flex align-items-center">
+                                            <input
+                                                type="checkbox"
+                                                checked={selectedPerms.includes(perm.name)}
+                                                onChange={() => togglePermission(perm.name)}
+                                                className="form-check-input me-2"
+                                            />
+                                            {perm.name}
+                                        </label>
+                                    </div>
+                                ))
+                            ) : (
+                                <div className="text-center text-muted">Tidak ada permission tersedia.</div>
+                            )}
                         </div>
                     </div>
                     <div className="modal-footer">
-                        <button type="button" className="btn btn-secondary" onClick={onClose}>
-                            Batal
-                        </button>
-                        <button type="button" className="btn btn-primary" onClick={handleSave}>
-                            Simpan Permissions
-                        </button>
+                        <button type="button" className="btn btn-secondary" onClick={onClose}>Batal</button>
+                        <button type="button" className="btn btn-primary" onClick={handleSave}>Simpan Permissions</button>
                     </div>
                 </div>
             </div>
@@ -713,25 +730,18 @@ export function EditRolePermissionModal({
     );
 }
 
-// ---------------------------
-// Modal Tambah Permission
-// ---------------------------
+/* =====================================================================
+   📘 4. Modal Tambah Permission
+===================================================================== */
 export function AddPermissionModal({ form, setForm, handleAdd, onClose }) {
     return (
-        <div
-            className="modal fade show"
-            style={{ display: "block", backgroundColor: "rgba(0,0,0,0.5)" }}
-        >
+        <div className="modal fade show" style={{ display: "block", backgroundColor: "rgba(0,0,0,0.5)" }}>
             <div className="modal-dialog modal-dialog-centered">
                 <div className="modal-content modal-custom">
                     <form onSubmit={handleAdd}>
                         <div className="modal-header">
                             <h5>Tambah Permission</h5>
-                            <button
-                                type="button"
-                                className="btn-close"
-                                onClick={onClose}
-                            />
+                            <button type="button" className="btn-close" onClick={onClose} />
                         </div>
                         <div className="modal-body">
                             <div className="form-group">
@@ -740,9 +750,7 @@ export function AddPermissionModal({ form, setForm, handleAdd, onClose }) {
                                     type="text"
                                     name="name"
                                     value={form.name}
-                                    onChange={(e) =>
-                                        setForm("name", e.target.value)
-                                    }
+                                    onChange={(e) => setForm("name", e.target.value)}
                                     className="form-control"
                                     placeholder="Masukkan nama permission"
                                     required
@@ -750,16 +758,8 @@ export function AddPermissionModal({ form, setForm, handleAdd, onClose }) {
                             </div>
                         </div>
                         <div className="modal-footer">
-                            <button
-                                type="button"
-                                className="btn-custom btn-secondary"
-                                onClick={onClose}
-                            >
-                                Batal
-                            </button>
-                            <button type="submit" className="btn-custom btn-primary">
-                                Simpan
-                            </button>
+                            <button type="button" className="btn btn-secondary" onClick={onClose}>Batal</button>
+                            <button type="submit" className="btn btn-primary">Simpan</button>
                         </div>
                     </form>
                 </div>
@@ -768,25 +768,18 @@ export function AddPermissionModal({ form, setForm, handleAdd, onClose }) {
     );
 }
 
-// ---------------------------
-// Modal Edit Permission
-// ---------------------------
+/* =====================================================================
+   📘 5. Modal Edit Permission (Rename Permission)
+===================================================================== */
 export function EditPermissionModal({ form, setForm, handleEdit, onClose }) {
     return (
-        <div
-            className="modal fade show"
-            style={{ display: "block", backgroundColor: "rgba(0,0,0,0.5)" }}
-        >
+        <div className="modal fade show" style={{ display: "block", backgroundColor: "rgba(0,0,0,0.5)" }}>
             <div className="modal-dialog modal-dialog-centered">
                 <div className="modal-content modal-custom">
                     <form onSubmit={handleEdit}>
                         <div className="modal-header">
                             <h5>Edit Permission</h5>
-                            <button
-                                type="button"
-                                className="btn-close"
-                                onClick={onClose}
-                            />
+                            <button type="button" className="btn-close" onClick={onClose} />
                         </div>
                         <div className="modal-body">
                             <div className="form-group">
@@ -795,26 +788,16 @@ export function EditPermissionModal({ form, setForm, handleEdit, onClose }) {
                                     type="text"
                                     name="name"
                                     value={form.name}
-                                    onChange={(e) =>
-                                        setForm("name", e.target.value)
-                                    }
+                                    onChange={(e) => setForm("name", e.target.value)}
                                     className="form-control"
-                                    placeholder="Masukkan nama permission"
+                                    placeholder="Masukkan nama permission baru"
                                     required
                                 />
                             </div>
                         </div>
                         <div className="modal-footer">
-                            <button
-                                type="button"
-                                className="btn-custom btn-secondary"
-                                onClick={onClose}
-                            >
-                                Batal
-                            </button>
-                            <button type="submit" className="btn-custom btn-primary">
-                                Update
-                            </button>
+                            <button type="button" className="btn btn-secondary" onClick={onClose}>Batal</button>
+                            <button type="submit" className="btn btn-primary">Update</button>
                         </div>
                     </form>
                 </div>
