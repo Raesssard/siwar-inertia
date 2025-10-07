@@ -34,25 +34,6 @@ export function ModalSidebar({ modalIsOpen, modalShow }) {
             statLinks = [];
     }
 
-    let statLinks = [];
-
-    switch (role) {
-        case "admin":
-            statLinks = getAdminLinks();
-            break;
-        case "rw":
-            statLinks = getRwLinks();
-            break;
-        case "rt":
-            statLinks = getRtLinks();
-            break;
-        case "warga":
-            statLinks = getWargaLinks();
-            break;
-        default:
-            statLinks = [];
-    }
-
     return (
         <>
             {modalIsOpen && (
@@ -342,9 +323,6 @@ export function EditRwModal({ form, handleChange, handleEdit, onClose }) {
     );
 }
 
-/* ===========================
-   Modal RT
-/* ===========================
 export function AddRtModal({ form, handleChange, handleAdd, onClose }) {
     return (
         <div
@@ -685,7 +663,7 @@ export function EditRoleModal({ form, setForm, handleEdit, onClose }) {
     );
 }
 
-export function EditPermissionModal({
+export function EditRolePermissionModal({
     role,
     permissions,
     selectedPerms,
@@ -734,6 +712,117 @@ export function EditPermissionModal({
         </div>
     );
 }
+
+// ---------------------------
+// Modal Tambah Permission
+// ---------------------------
+export function AddPermissionModal({ form, setForm, handleAdd, onClose }) {
+    return (
+        <div
+            className="modal fade show"
+            style={{ display: "block", backgroundColor: "rgba(0,0,0,0.5)" }}
+        >
+            <div className="modal-dialog modal-dialog-centered">
+                <div className="modal-content modal-custom">
+                    <form onSubmit={handleAdd}>
+                        <div className="modal-header">
+                            <h5>Tambah Permission</h5>
+                            <button
+                                type="button"
+                                className="btn-close"
+                                onClick={onClose}
+                            />
+                        </div>
+                        <div className="modal-body">
+                            <div className="form-group">
+                                <label>Nama Permission</label>
+                                <input
+                                    type="text"
+                                    name="name"
+                                    value={form.name}
+                                    onChange={(e) =>
+                                        setForm("name", e.target.value)
+                                    }
+                                    className="form-control"
+                                    placeholder="Masukkan nama permission"
+                                    required
+                                />
+                            </div>
+                        </div>
+                        <div className="modal-footer">
+                            <button
+                                type="button"
+                                className="btn-custom btn-secondary"
+                                onClick={onClose}
+                            >
+                                Batal
+                            </button>
+                            <button type="submit" className="btn-custom btn-primary">
+                                Simpan
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+// ---------------------------
+// Modal Edit Permission
+// ---------------------------
+export function EditPermissionModal({ form, setForm, handleEdit, onClose }) {
+    return (
+        <div
+            className="modal fade show"
+            style={{ display: "block", backgroundColor: "rgba(0,0,0,0.5)" }}
+        >
+            <div className="modal-dialog modal-dialog-centered">
+                <div className="modal-content modal-custom">
+                    <form onSubmit={handleEdit}>
+                        <div className="modal-header">
+                            <h5>Edit Permission</h5>
+                            <button
+                                type="button"
+                                className="btn-close"
+                                onClick={onClose}
+                            />
+                        </div>
+                        <div className="modal-body">
+                            <div className="form-group">
+                                <label>Nama Permission</label>
+                                <input
+                                    type="text"
+                                    name="name"
+                                    value={form.name}
+                                    onChange={(e) =>
+                                        setForm("name", e.target.value)
+                                    }
+                                    className="form-control"
+                                    placeholder="Masukkan nama permission"
+                                    required
+                                />
+                            </div>
+                        </div>
+                        <div className="modal-footer">
+                            <button
+                                type="button"
+                                className="btn-custom btn-secondary"
+                                onClick={onClose}
+                            >
+                                Batal
+                            </button>
+                            <button type="submit" className="btn-custom btn-primary">
+                                Update
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    );
+}
+
 
 export function DetailPengumuman({ selectedData, detailShow, onClose }) {
     const [komentar, setKomentar] = useState([])
