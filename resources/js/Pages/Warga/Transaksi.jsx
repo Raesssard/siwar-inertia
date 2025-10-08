@@ -34,6 +34,7 @@ export default function Transaksi() {
                 setData={setData}
                 filter={filter}
                 resetFilter={resetFilter}
+                role={role}
             />
             <div className="table-container">
                 <div className="table-header">
@@ -59,9 +60,9 @@ export default function Transaksi() {
                                     <td>{formatTanggal(item.tanggal)}</td>
                                     <td>
                                         {item.jenis === 'pemasukan' ? (
-                                            <span class="badge bg-success">Pemasukan</span>
+                                            <span className="badge bg-success">Pemasukan</span>
                                         ) : (
-                                            <span class="badge bg-danger">Pengeluaran</span>
+                                            <span className="badge bg-danger">Pengeluaran</span>
                                         )}
                                     </td>
                                     <td>{item.nama_transaksi}</td>

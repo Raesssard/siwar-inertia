@@ -1,7 +1,7 @@
 import React from "react"
 import { Link } from "@inertiajs/react"
 
-export function FilterPengaduan({ data, setData, list_tahun, list_bulan, list_level, filter, resetFilter, tambahShow }) {
+export function FilterPengaduan({ data, setData, list_tahun, list_bulan, list_level, filter, resetFilter, tambahShow, role }) {
     return (
         <form onSubmit={filter} className="form-filter row g-2 pl-3 pb-2 mb-2 w-100">
             <div className="col-md-5 col-12">
@@ -64,7 +64,7 @@ export function FilterPengaduan({ data, setData, list_tahun, list_bulan, list_le
                     <i className="fas fa-filter"></i>
                 </button>
                 <Link
-                    href="/warga/pengaduan"
+                    href={`/${role}/pengaduan`}
                     preserveScroll
                     className="btn-input btn btn-secondary btn-sm flex-fill my-auto"
                     title="Reset"
@@ -82,7 +82,7 @@ export function FilterPengaduan({ data, setData, list_tahun, list_bulan, list_le
     )
 }
 
-export function FilterPengumuman({ data, setData, daftar_tahun, list_bulan, daftar_kategori, filter, resetFilter, }) {
+export function FilterPengumuman({ data, setData, daftar_tahun, list_bulan, daftar_kategori, filter, resetFilter, role }) {
     return (
         <form onSubmit={filter} className="form-filter row g-2 pl-3 pb-2 mb-2 w-100">
             <div className="col-md-5 col-12 pr-1">
@@ -158,7 +158,7 @@ export function FilterPengumuman({ data, setData, daftar_tahun, list_bulan, daft
                 <button type="submit" className="btn-input btn btn-sm btn-primary flex-fill p-0" title="Filter Pengumuman">
                     <i className="fas fa-filter"></i>
                 </button>
-                <Link href="/warga/pengumuman" onClick={resetFilter} className="btn-input btn btn-secondary btn-sm flex-fill p-0" title="Reset">
+                <Link href={`/${role}/pengumuman`} onClick={resetFilter} className="btn-input btn btn-secondary btn-sm flex-fill p-0" title="Reset">
                     <i className="fas fa-undo"></i>
                 </Link>
             </div>
@@ -166,7 +166,7 @@ export function FilterPengumuman({ data, setData, daftar_tahun, list_bulan, daft
     )
 }
 
-export function FilterTransaksi({ data, setData, filter, resetFilter, }) {
+export function FilterTransaksi({ data, setData, filter, resetFilter, role }) {
     return (
         <form onSubmit={filter} className="form-filter d-flex px-0 g-2 pb-2 mb-2 w-100">
             <div className="col-md-5 col-12 pr-2">
@@ -177,7 +177,7 @@ export function FilterTransaksi({ data, setData, filter, resetFilter, }) {
                         value={data.search}
                         onChange={(e) => setData('search', e.target.value)}
                         className="form-control"
-                        placeholder="Cari Nama/Keterangan Transaksi..."
+                        placeholder="Cari Nama..."
                     />
                     <button className="btn-filter btn btn-primary" type="submit">
                         <i className="fas fa-search"></i>
@@ -185,14 +185,14 @@ export function FilterTransaksi({ data, setData, filter, resetFilter, }) {
                 </div>
             </div>
 
-            <Link href="/warga/transaksi" onClick={resetFilter} className="btn-input btn btn-secondary btn-sm flex-fill p-0 mx-0" title="Reset" style={{ maxWidth: "3rem" }}>
+            <Link href={`/${role}/transaksi`} onClick={resetFilter} className="btn-input btn btn-secondary btn-sm flex-fill p-0 mx-0" title="Reset" style={{ maxWidth: "3rem" }}>
                 <i className="fas fa-undo"></i>
             </Link>
         </form>
     )
 }
 
-export function FIlterTagihan({ data, setData, filter, resetFilter, }) {
+export function FilterTagihan({ data, setData, filter, resetFilter, role }) {
     return (
         <form onSubmit={filter} className="form-filter d-flex px-0 g-2 pb-2 mb-2 w-100">
             <div className="col-md-5 col-12 pr-2">
@@ -203,7 +203,7 @@ export function FIlterTagihan({ data, setData, filter, resetFilter, }) {
                         value={data.search}
                         onChange={(e) => setData('search', e.target.value)}
                         className="form-control"
-                        placeholder="Cari Nama/Keterangan Transaksi..."
+                        placeholder="Cari Nama..."
                     />
                     <button className="btn-filter btn btn-primary" type="submit">
                         <i className="fas fa-search"></i>
@@ -211,9 +211,50 @@ export function FIlterTagihan({ data, setData, filter, resetFilter, }) {
                 </div>
             </div>
 
-            <Link href="/warga/transaksi" onClick={resetFilter} className="btn-input btn btn-secondary btn-sm flex-fill p-0 mx-0" title="Reset" style={{ maxWidth: "3rem" }}>
+            <Link href={`/${role}/tagihan`} onClick={resetFilter} className="btn-input btn btn-secondary btn-sm flex-fill p-0 mx-0" title="Reset" style={{ maxWidth: "3rem" }}>
                 <i className="fas fa-undo"></i>
             </Link>
+        </form>
+    )
+}
+
+export function FilterWarga({ data, setData, filter, resetFilter, role }) {
+    return (
+        <form onSubmit={filter} className="form-filter d-flex px-0 g-2 pb-2 mb-2 w-100">
+            <div className="col-md-5 col-12 pr-2">
+                <div className="input-group input-group-sm">
+                    <input
+                        type="text"
+                        name="search"
+                        value={data.search}
+                        onChange={(e) => setData('search', e.target.value)}
+                        className="form-control"
+                        placeholder="Cari Nama..."
+                    />
+                    <button className="btn-filter btn btn-primary" type="submit">
+                        <i className="fas fa-search"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div className="d-flex flex-wrap gap-2 pl-1" style={{width: "20%"}}>
+                <select
+                    name="jenis_kelamin"
+                    value={data.jenis_kelamin}
+                    onChange={(e) => setData('jenis_kelamin', e.target.value)}
+                    className="form-select form-select-sm w-auto flex-fill my-2"
+                >
+                    <option value="">Jenis Kelamin</option>
+                    <option value="laki-laki">Laki-laki</option>
+                    <option value="perempuan">Perempuan</option>
+                </select>
+                <button type="submit" className="btn-input btn btn-sm btn-primary flex-fill p-0" title="Filter Pengumuman">
+                    <i className="fas fa-filter"></i>
+                </button>
+                <Link href={`/${role}/warga`} onClick={resetFilter} className="btn-input btn btn-secondary btn-sm flex-fill p-0 mx-0" title="Reset" style={{ maxWidth: "3rem" }}>
+                    <i className="fas fa-undo"></i>
+                </Link>
+            </div>
         </form>
     )
 }
