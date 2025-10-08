@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { Inertia } from "@inertiajs/inertia";
 import Layout from "@/Layouts/Layout";
 import { route } from "ziggy-js";
-import { router } from '@inertiajs/react';
+import { Link, router } from '@inertiajs/react';
 import { AddRwModal, EditRwModal } from "@/Pages/Component/Modal";
 
 export default function Rw({ rw, filters, nomorRwList }) {
@@ -206,7 +206,7 @@ export default function Rw({ rw, filters, nomorRwList }) {
                                             !link.url ? "disabled" : ""
                                         }`}
                                     >
-                                        <a
+                                        <Link
                                             href={link.url || "#"}
                                             dangerouslySetInnerHTML={{
                                                 __html: label,

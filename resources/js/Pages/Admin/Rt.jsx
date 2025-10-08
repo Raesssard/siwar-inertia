@@ -1,6 +1,6 @@
 // resources/js/Pages/Admin/Rt.jsx
 import React, { useState } from "react";
-import { router } from "@inertiajs/react";
+import { Link, router } from "@inertiajs/react";
 import { route } from "ziggy-js";
 import Layout from "@/Layouts/Layout";
 import { AddRtModal, EditRtModal } from "@/Pages/Component/Modal";
@@ -204,7 +204,7 @@ export default function Rt({ rukun_tetangga, filters, nomorRtList }) {
                                             !link.url ? "disabled" : ""
                                         }`}
                                     >
-                                        <a
+                                        <Link
                                             href={link.url || "#"}
                                             dangerouslySetInnerHTML={{
                                                 __html: label,

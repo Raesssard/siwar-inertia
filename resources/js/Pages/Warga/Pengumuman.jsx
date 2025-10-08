@@ -32,7 +32,6 @@ export default function Pengumuman() {
     })
 
     const role = props.auth?.currentRole
-    const user = props.auth?.user
 
     const modalDetail = (item) => {
         setSelected(item)
@@ -92,7 +91,7 @@ export default function Pengumuman() {
 
     const filter = (e) => {
         e.preventDefault()
-        get('/warga/pengumuman', { preserveState: true, preserveScroll: true })
+        get(`/${role}/pengumuman`, { preserveState: true, preserveScroll: true })
     }
 
     const resetFilter = () => {
@@ -123,7 +122,7 @@ export default function Pengumuman() {
                 <div className="d-flex align-items-center gap-1">
                     <i className="fas fa-bullhorn me-2 text-primary"></i>
                     <span className="fw-semibold text-dark">
-                        {total ?? 0} Pengumuman
+                        {totalFiltered ?? 0} Pengumuman
                     </span>
                 </div>
 

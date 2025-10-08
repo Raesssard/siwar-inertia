@@ -2,12 +2,12 @@ import React from "react"
 import Layout from "@/Layouts/Layout"
 import { Head, usePage } from "@inertiajs/react"
 import '../../../css/kartu-keluarga.css'
+import { formatTanggal } from "../Component/GetPropRole"
 
 export default function KartuKeluarga() {
     const { title, kartuKeluarga } = usePage().props
     const { props } = usePage()
     const role = props.auth?.currentRole
-    const user = props.auth?.user
 
     if (!kartuKeluarga) {
         return (
@@ -23,16 +23,6 @@ export default function KartuKeluarga() {
         (w) =>
             w.status_hubungan_dalam_keluarga?.toLowerCase() === "kepala keluarga"
     )
-
-    const formatTanggal = (tanggal) => {
-        if (!tanggal) return "-"
-        const date = new Date(tanggal)
-        return date.toLocaleDateString("id-ID", {
-            day: "2-digit",
-            month: "long",
-            year: "numeric",
-        })
-    }
 
     return (
         <Layout>

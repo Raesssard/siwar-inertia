@@ -3,6 +3,10 @@ import Layout from "@/Layouts/Layout";
 import { StatCard } from "../Component/Card";
 import { Head, usePage } from "@inertiajs/react";
 
+// ni file udah gk kepake lagi, 
+// pakenya Dashboard.jsx doang,
+// DashboardControllernya juga cuma render halaman Dashboard.jsx,
+// gk render ni halaman
 export default function DashboardAdmin({ role, title, ...rest }) {
     const statCards = [
         {
