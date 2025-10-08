@@ -174,6 +174,7 @@ export default function Pengaduan() {
                 filter={filter}
                 resetFilter={resetFilter}
                 tambahShow={() => setShowModalTambah(true)}
+                role={role}
             />
             <div className="d-flex justify-content-between align-items-center mb-3 mx-4 w-100">
                 <div className="d-flex align-items-center gap-1">

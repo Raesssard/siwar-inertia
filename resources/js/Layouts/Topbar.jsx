@@ -32,38 +32,74 @@ export default function Topbar({ modalShow }) {
     const segment = url.split("/").pop()
 
     let judulHalaman
-    if (!segment && (url === "/" || url === "/dashboard-main")) {
-        judulHalaman = "Dashboard"
-    } else {
-        switch (segment) {
-            case "kk":
-                judulHalaman = "Data Kartu Keluarga"
-                break
-            case "dashboard":
-                judulHalaman = "Dashboard"
-                break
-            case "pengumuman":
-                judulHalaman = "Pengumuman"
-                break
-            case "tagihan":
-                judulHalaman = "Tagihan"
-                break
-            case "iuran":
-                judulHalaman = "Iuran"
-                break
-            case "transaksi":
-                judulHalaman = "Transaksi"
-                break
-            case "pengaduan":
-                judulHalaman = "Pengaduan"
-                break
-            default:
-                judulHalaman =
-                    segment.charAt(0).toUpperCase() +
-                    segment.slice(1).replace(/-/g, " ")
+
+    if (currentRole === 'warga') {
+        if (!segment && (url === "/" || url === "/dashboard-main")) {
+            judulHalaman = "Dashboard"
+        } else {
+            switch (segment) {
+                case "kk":
+                    judulHalaman = "Data Kartu Keluarga"
+                    break
+                case "dashboard":
+                    judulHalaman = "Dashboard"
+                    break
+                case "pengumuman":
+                    judulHalaman = "Pengumuman"
+                    break
+                case "tagihan":
+                    judulHalaman = "Tagihan"
+                    break
+                case "iuran":
+                    judulHalaman = "Iuran"
+                    break
+                case "transaksi":
+                    judulHalaman = "Transaksi"
+                    break
+                case "pengaduan":
+                    judulHalaman = "Pengaduan"
+                    break
+                default:
+                    judulHalaman =
+                        segment.charAt(0).toUpperCase() +
+                        segment.slice(1).replace(/-/g, " ")
+            }
         }
     }
 
+    if (currentRole === 'rt') {
+        if (!segment && (url === "/" || url === "/dashboard-main")) {
+            judulHalaman = "Dashboard"
+        } else {
+            switch (segment) {
+                case "kartu_keluarga":
+                    judulHalaman = "Data Kartu Keluarga"
+                    break
+                case "dashboard":
+                    judulHalaman = "Dashboard"
+                    break
+                case "pengumuman":
+                    judulHalaman = "Pengumuman"
+                    break
+                case "tagihan":
+                    judulHalaman = "Tagihan"
+                    break
+                case "iuran":
+                    judulHalaman = "Iuran"
+                    break
+                case "transaksi":
+                    judulHalaman = "Transaksi"
+                    break
+                case "pengaduan":
+                    judulHalaman = "Pengaduan"
+                    break
+                default:
+                    judulHalaman =
+                        segment.charAt(0).toUpperCase() +
+                        segment.slice(1).replace(/-/g, " ")
+            }
+        }
+    }
     return (
         <nav className="navbar nav-top navbar-expand navbar-light bg-white topbar mb-4 sticky-top shadow">
             {/* tombol sidebar mobile */}

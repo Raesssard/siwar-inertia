@@ -61,9 +61,10 @@ Route::middleware(['auth'])->group(function () {
         Route::get('tagihan', [WargatagihanController::class, 'index'])->name('tagihan');
         Route::get('transaksi', [WargatransaksiController::class, 'index'])->name('transaksi');
     });
+
     Route::prefix('rt')->as('rt.')->group(function () {
         Route::resource('warga', Rt_wargaController::class);
-        Route::resource('kartu_keluarga', Rt_kartu_keluargaController::class);
+        Route::resource('kartu_keluarga', Rt_kartu_keluargaController::class)->only('index');
         Route::resource('pengumuman', Rt_pengumumanController::class);
         Route::get('/pengumuman/{id}/export-pdf', [Rt_pengumumanController::class, 'exportPDF'])
             ->name('pengumuman.export.pdf');
