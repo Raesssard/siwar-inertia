@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { router } from "@inertiajs/react";
+import { Link, router } from "@inertiajs/react";
 import { route } from "ziggy-js";
 import Layout from "@/Layouts/Layout";
 import {
@@ -178,7 +178,7 @@ export default function KategoriGolongan({ kategori, filters }) {
                                             !link.url ? "disabled" : ""
                                         }`}
                                     >
-                                        <a
+                                        <Link
                                             href={link.url || "#"}
                                             dangerouslySetInnerHTML={{ __html: label }}
                                         />
