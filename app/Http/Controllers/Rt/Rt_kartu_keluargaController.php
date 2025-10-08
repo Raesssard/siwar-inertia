@@ -39,7 +39,7 @@ class Rt_kartu_keluargaController extends Controller
         }
         $total_kk = Kartu_keluarga::where('id_rt', $rt_id_from_nomor)->count();
 
-        $kartu_keluarga = Kartu_keluarga::with(['warga', 'rukunTetangga'])
+        $kartu_keluarga = Kartu_keluarga::with(['warga', 'rukunTetangga', 'rw', 'kategoriGolongan'])
             ->where('id_rt', $rt_id_from_nomor)
             ->when($search, function ($query) use ($search) {
                 $query->where('alamat', 'like', '%' . $search . '%')
