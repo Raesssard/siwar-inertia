@@ -11,10 +11,12 @@ use App\Models\Kategori_golongan; // sesuaikan nama model jika beda
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
 use App\Http\Controllers\Controller;
+use App\Models\Kartu_keluarga;
 use App\Models\Pengaduan;
 use App\Models\Pengumuman;
 use App\Models\Tagihan;
 use App\Models\Transaksi;
+use App\Models\Warga;
 
 class DashboardController extends Controller
 {
@@ -111,6 +113,62 @@ class DashboardController extends Controller
                 ]
             );
         }
+
+        if ($role === 'rt') {
+            $rt_user_login_id = Auth::user()->rukunTetangga->id;
+            $rwId = Auth::user()->rukunTetangga->id_rw;
+
+            $kk_nomor_list = Kartu_keluarga::where('id_rt', $rt_user_login_id)->pluck('no_kk');
+
+            $jumlah_warga = Warga::whereIn('no_kk', $kk_nomor_list)->count();
+
+            $jumlah_kk = Kartu_keluarga::where('id_rt', $rt_user_login_id)->count();
+
+
+            $jumlah_pengumuman = Pengumuman::where(function ($q) use ($rt_user_login_id, $rwId) {
+                $q->where('id_rt', $rt_user_login_id)
+                    ->orWhere(function ($q2) use ($rwId) {
+                        $q2->whereNull('id_rt')
+                            ->where('id_rw', $rwId);
+                    });
+            })->count();
+
+            $user = Auth::user();
+
+            $pengaduan_rt = $user->rukunTetangga->nomor_rt;
+
+            $pengaduan_rt_saya = Pengaduan::WhereHas('warga.kartuKeluarga.rukunTetangga', function ($aduan) use ($pengaduan_rt) {
+                $aduan->where('level', 'rt')->where('nomor_rt', $pengaduan_rt);
+            })->count();
+
+            $jumlah_warga_penduduk = Warga::where('status_warga', 'penduduk')
+                ->whereIn('no_kk', $kk_nomor_list)
+                ->count();
+
+            $jumlah_warga_pendatang = Warga::where('status_warga', 'pendatang')
+                ->whereIn('no_kk', $kk_nomor_list)
+                ->count();
+            $rt = Transaksi::where('rt', Auth::user()->rukunTetangga->rt);
+            $total_pemasukan = (clone $rt)->where('jenis', 'pemasukan')->sum('nominal');
+            $pengeluaran = (clone $rt)->where('jenis', 'pengeluaran')->sum('nominal');
+            $total_saldo_akhir = $total_pemasukan - $pengeluaran;
+
+            $data = array_merge(
+                $data,
+                [
+                    'jumlah_warga' => $jumlah_warga,
+                    'jumlah_warga_penduduk' => $jumlah_warga_penduduk,
+                    'jumlah_warga_pendatang' => $jumlah_warga_pendatang,
+                    'jumlah_kk' => $jumlah_kk,
+                    'jumlah_pengumuman' => $jumlah_pengumuman,
+                    'pengaduan_rt_saya' => $pengaduan_rt_saya,
+                    'total_pemasukan' => $total_pemasukan,
+                    'pengeluaran' => $pengeluaran,
+                    'total_saldo_akhir' => $total_saldo_akhir,
+                ]
+            );
+        }
+
         return Inertia::render('Dashboard', $data);
     }
 }

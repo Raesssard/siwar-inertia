@@ -13,6 +13,14 @@ use App\Http\Controllers\Admin\AdminRtController;
 use App\Http\Controllers\Admin\AdminKategoriGolonganController;
 use App\Http\Controllers\Admin\AdminPermissionController;
 use App\Http\Controllers\Admin\AdminRoleController;
+use App\Http\Controllers\Rt\ExportController;
+use App\Http\Controllers\Rt\Rt_kartu_keluargaController;
+use App\Http\Controllers\Rt\Rt_PengaduanController;
+use App\Http\Controllers\Rt\Rt_pengumumanController;
+use App\Http\Controllers\Rt\Rt_tagihanController;
+use App\Http\Controllers\Rt\Rt_transaksiController;
+use App\Http\Controllers\Rt\Rt_wargaController;
+use App\Http\Controllers\Rt\RtIuranController;
 use Inertia\Inertia;
 
 
@@ -52,5 +60,31 @@ Route::middleware(['auth'])->group(function () {
         Route::get('kk', [LihatKKController::class, 'index'])->name('kk');
         Route::get('tagihan', [WargatagihanController::class, 'index'])->name('tagihan');
         Route::get('transaksi', [WargatransaksiController::class, 'index'])->name('transaksi');
+    });
+    Route::prefix('rt')->as('rt.')->group(function () {
+        Route::resource('warga', Rt_wargaController::class);
+        Route::resource('kartu_keluarga', Rt_kartu_keluargaController::class);
+        Route::resource('pengumuman', Rt_pengumumanController::class);
+        Route::get('/pengumuman/{id}/export-pdf', [Rt_pengumumanController::class, 'exportPDF'])
+            ->name('pengumuman.export.pdf');
+        Route::resource('iuran', RtIuranController::class);
+        Route::get('/export/iuran', [ExportController::class, 'exportIuran'])
+            ->name('iuran.export');
+        Route::resource('tagihan', Rt_tagihanController::class);
+        Route::get('/export/tagihan', [ExportController::class, 'exportTagihan'])
+            ->name('tagihan.export');
+        Route::resource('transaksi', Rt_transaksiController::class);
+        Route::get('/export/transaksi', [ExportController::class, 'exportTransaksi'])
+            ->name('transaksi.export');
+        Route::resource('pengaduan', Rt_PengaduanController::class)
+            ->only('index');
+        Route::patch('pengaduan/{id}/baca', [Rt_PengaduanController::class, 'show'])
+            ->name('pengaduan.baca');
+        Route::put('kartu_keluarga/{rt_kartu_keluarga}/upload-foto', [Rt_kartu_keluargaController::class, 'uploadFoto'])
+            ->name('kartu_keluarga.upload_foto');
+        Route::delete('kartu_keluarga/{rt_kartu_keluarga}/delete-foto', [Rt_kartu_keluargaController::class, 'deleteFoto'])
+            ->name('kartu_keluarga.delete_foto');
+        Route::get('kartu_keluarga/{rt_kartu_keluarga}/upload-form', [Rt_kartu_keluargaController::class, 'uploadForm'])
+            ->name('kartu_keluarga.upload_form');
     });
 });

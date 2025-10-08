@@ -1,11 +1,22 @@
 import React from "react";
 
-const formatRupiah = (angka, withDecimals = false) => {
+export function formatRupiah(angka, withDecimals = false) {
+    if (angka == null || isNaN(angka)) return "Rp. 0";
     return "Rp. " + Number(angka).toLocaleString("id-ID", {
         minimumFractionDigits: withDecimals ? 2 : 0,
         maximumFractionDigits: withDecimals ? 2 : 0,
     });
-};
+}
+
+export function formatTanggal(tanggal) {
+    if (!tanggal) return "-"
+    const date = new Date(tanggal)
+    return date.toLocaleDateString("id-ID", {
+        day: "2-digit",
+        month: "long",
+        year: "numeric",
+    })
+}
 
 export function getWargaCards({ ...rest }) {
     return [
@@ -213,6 +224,74 @@ export function getRwLinks() {
     ];
 }
 
+export function getRtCards({ ...rest }) {
+    return [
+        {
+            href: "/rt/warga",
+            color: "primary",
+            title: "Jumlah Warga",
+            value: rest.jumlah_warga,
+            icon: "users",
+        },
+        {
+            href: "/rt/warga",
+            color: "primary",
+            title: "Jumlah Warga Penduduk",
+            value: rest.jumlah_warga_penduduk,
+            icon: "home",
+        },
+        {
+            href: "/rt/warga",
+            color: "primary",
+            title: "Jumlah Warga Pendatang",
+            value: rest.jumlah_warga_pendatang,
+            icon: "walking",
+        },
+        {
+            href: "/rt/kartu_keluarga",
+            color: "info",
+            title: "Jumlah Kartu Keluarga",
+            value: rest.jumlah_kk,
+            icon: "clipboard-list",
+        },
+        {
+            href: "/rt/pengumuman",
+            color: "warning",
+            title: "Jumlah Pengumuman",
+            value: rest.jumlah_pengumuman,
+            icon: "comments",
+        },
+        {
+            href: "/rt/pengaduan",
+            color: "warning",
+            title: "Jumlah Pengaduan",
+            value: rest.pengaduan_rt_saya,
+            icon: "comment-dots",
+        },
+        {
+            href: "/rt/transaksi",
+            color: rest.total_pemasukan > 0 ? "success" : "warning",
+            title: "Total Pemasukkan",
+            value: formatRupiah(rest.total_pemasukan),
+            icon: "dollar-sign",
+        },
+        {
+            href: "/rt/transaksi",
+            color: rest.pengeluaran > 0 ? "danger" : "success",
+            title: "Total Pengeluaran",
+            value: formatRupiah(rest.pengeluaran),
+            icon: "donate",
+        },
+        {
+            href: "/rt/transaksi",
+            color: rest.total_saldo_akhir === 0 ? "warning" : rest.total_saldo_akhir > 0 ? "success" : "danger",
+            title: "Total Saldo Akhir",
+            value: formatRupiah(rest.total_saldo_akhir),
+            icon: "wallet",
+        },
+    ]
+}
+
 export function getRtLinks() {
     return [
         {
@@ -226,23 +305,33 @@ export function getRtLinks() {
             icon: "users",
         },
         {
+            href: "/rt/kartu_keluarga",
+            text: "Data Kartu Keluarga",
+            icon: "id-card",
+        },
+        {
             href: "/rt/pengumuman",
             text: "Pengumuman",
-            icon: "bullhorn",
+            icon: "comments",
         },
         {
             href: "/rt/pengaduan",
             text: "Pengaduan",
-            icon: "paper-plane",
+            icon: "comment-dots",
         },
         {
-            href: "/rt/tagihan",
-            text: "Tagihan RT",
+            href: "/rt/iuran",
+            text: "Iuran",
             icon: "file-invoice-dollar",
         },
         {
+            href: "/rt/tagihan",
+            text: "Tagihan",
+            icon: "hand-holding-usd",
+        },
+        {
             href: "/rt/transaksi",
-            text: "Transaksi RT",
+            text: "Transaksi",
             icon: "money-bill-wave",
         },
     ];

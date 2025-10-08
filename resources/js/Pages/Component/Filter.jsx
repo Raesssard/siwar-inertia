@@ -165,3 +165,55 @@ export function FilterPengumuman({ data, setData, daftar_tahun, list_bulan, daft
         </form>
     )
 }
+
+export function FilterTransaksi({ data, setData, filter, resetFilter, }) {
+    return (
+        <form onSubmit={filter} className="form-filter d-flex px-0 g-2 pb-2 mb-2 w-100">
+            <div className="col-md-5 col-12 pr-2">
+                <div className="input-group input-group-sm">
+                    <input
+                        type="text"
+                        name="search"
+                        value={data.search}
+                        onChange={(e) => setData('search', e.target.value)}
+                        className="form-control"
+                        placeholder="Cari Nama/Keterangan Transaksi..."
+                    />
+                    <button className="btn-filter btn btn-primary" type="submit">
+                        <i className="fas fa-search"></i>
+                    </button>
+                </div>
+            </div>
+
+            <Link href="/warga/transaksi" onClick={resetFilter} className="btn-input btn btn-secondary btn-sm flex-fill p-0 mx-0" title="Reset" style={{ maxWidth: "3rem" }}>
+                <i className="fas fa-undo"></i>
+            </Link>
+        </form>
+    )
+}
+
+export function FIlterTagihan({ data, setData, filter, resetFilter, }) {
+    return (
+        <form onSubmit={filter} className="form-filter d-flex px-0 g-2 pb-2 mb-2 w-100">
+            <div className="col-md-5 col-12 pr-2">
+                <div className="input-group input-group-sm">
+                    <input
+                        type="text"
+                        name="search"
+                        value={data.search}
+                        onChange={(e) => setData('search', e.target.value)}
+                        className="form-control"
+                        placeholder="Cari Nama/Keterangan Transaksi..."
+                    />
+                    <button className="btn-filter btn btn-primary" type="submit">
+                        <i className="fas fa-search"></i>
+                    </button>
+                </div>
+            </div>
+
+            <Link href="/warga/transaksi" onClick={resetFilter} className="btn-input btn btn-secondary btn-sm flex-fill p-0 mx-0" title="Reset" style={{ maxWidth: "3rem" }}>
+                <i className="fas fa-undo"></i>
+            </Link>
+        </form>
+    )
+}

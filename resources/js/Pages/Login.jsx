@@ -1,25 +1,19 @@
 import React, { useState } from "react"
 import "../../css/login.css"
 import { Inertia } from "@inertiajs/inertia"
-import { Head, usePage } from "@inertiajs/react"
+import { Head, useForm, usePage } from "@inertiajs/react"
 import FloatingInput from './Component/FloatingInput'
 import logo from '../../../public/img/logo.png'
 
 export default function Login() {
-    const { errors } = usePage().props;
-    const [nik, setNik] = useState("")
-    const [password, setPassword] = useState("")
-    const [loading, setLoading] = useState(false)
+    const { data, setData, post, processing, errors } = useForm({
+        nik: '',
+        password: '',
+    })
 
     const handleSubmit = async (e) => {
         e.preventDefault()
-        setLoading(true)
-
-        Inertia.post(
-            "/login",
-            { nik, password },
-            { onFinish: () => setLoading(false) }
-        )
+        post('/login')
     }
 
     return (
@@ -40,16 +34,16 @@ export default function Login() {
                         <form onSubmit={handleSubmit} className="needs-validation" noValidate>
                             <FloatingInput
                                 label="NIK"
-                                value={nik}
-                                onChange={(e) => setNik(e.target.value)}
+                                value={data.nik}
+                                onChange={(e) => setData('nik', e.target.value)}
                                 icon="bi-person-badge"
                             />
 
                             <FloatingInput
                                 label="Kata Sandi"
                                 type="password"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
+                                value={data.password}
+                                onChange={(e) => setData('password', e.target.value)}
                                 icon="bi-lock"
                                 toggleable
                             />
@@ -65,7 +59,8 @@ export default function Login() {
 
 
                             <button type="submit" className="btn-login btn-primary">
-                                <i className="bi bi-box-arrow-in-right me-2"></i> {loading ? "Proses..." : "Masuk"}
+                                <i className="bi bi-box-arrow-in-right me-2"></i>
+                                {processing ? "Proses..." : "Masuk"}
                             </button>
                         </form>
                     </div>

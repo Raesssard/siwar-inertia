@@ -119,19 +119,28 @@ export default function Pengaduan() {
         display: "block",
     }
 
-    const statusLabel = (status) => {
+    const statusLabel = (status, konfirmasi) => {
         switch (status) {
-            case "belum": return "Belum dibaca"
-            case "sudah": return "Sudah dibaca"
-            case "selesai": return "Selesai"
-            default: return "Status tidak diketahui"
+            case "belum":
+                return "Belum dibaca"
+            case "diproses":
+                if (konfirmasi === "sudah") return "Sudah dikonfirmasi"
+                if (konfirmasi === "menunggu") return "Menunggu konfirmasi RW"
+                return "Sedang diproses"
+            case "selesai":
+                return "Selesai"
+            default:
+                return "Status tidak diketahui"
         }
     }
 
-    const statusColor = (status) => {
+    const statusColor = (status, konfirmasi) => {
         switch (status) {
-            case "belum": return "yellow"
-            case "sudah": return "blue"
+            case "belum": return "gray"
+            case "diproses":
+                if (konfirmasi === "sudah") return "cyan"
+                if (konfirmasi === "menunggu") return "blue"
+                return "yellow"
             case "selesai": return "green"
             default: return "gray"
         }
@@ -139,7 +148,7 @@ export default function Pengaduan() {
 
     const filter = (e) => {
         e.preventDefault()
-        get('/warga/pengaduan', { preserveState: true, preserveScroll: true })
+        get(`/${role}/pengaduan`, { preserveState: true, preserveScroll: true })
     }
 
     const resetFilter = () => {
@@ -170,7 +179,7 @@ export default function Pengaduan() {
                 <div className="d-flex align-items-center gap-1">
                     <i className="fas fa-paper-plane me-2 text-primary"></i>
                     <span className="fw-semibold text-dark">
-                        {total ?? 0} Pengaduan
+                        {totalFiltered ?? 0} Pengaduan
                     </span>
                 </div>
 
@@ -208,7 +217,7 @@ export default function Pengaduan() {
                                             {item.isi.length > 100 ? item.isi.slice(0, 100) + "..." : item.isi}
                                         </p>
                                         {item.warga?.nik === user.nik ?
-                                            <span className={`px-2 py-1 rounded text-xs font-semibold bg-${statusColor(item.status)}-200 text-${statusColor(item.status)}-800`}>
+                                            <span className={`px-2 py-1 rounded font-semibold bg-${statusColor(item.status, item.konfirmasi_rw)}-200 text-${statusColor(item.status, item.konfirmasi_rw)}-800`} style={{ fontSize: "0.85rem" }}>
                                                 {statusLabel(item.status)}
                                             </span>
                                             :
