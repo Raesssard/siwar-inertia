@@ -4,7 +4,7 @@ import { Head, usePage } from "@inertiajs/react";
 import '../../css/card.css'
 import Layout from "@/Layouts/Layout";
 import { StatCard } from "./Component/Card";
-import { getAdminCards, getRtCards, getWargaCards } from "./Component/GetPropRole"
+import { getAdminCards, getRtCards, getWargaCards, getRwCards } from "./Component/GetPropRole"
 
 export default function Dashboard() {
   const { role, title, ...rest } = usePage().props

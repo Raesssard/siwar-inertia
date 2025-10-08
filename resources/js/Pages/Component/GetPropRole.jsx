@@ -189,6 +189,95 @@ export function getAdminLinks() {
     ];
 }
 
+export function getRwCards({ ...rest }) {
+    return [
+        {
+            href: "/rw/rukun_tetangga",
+            color: "info",
+            title: "Jumlah RT",
+            value: rest.jumlah_rt,
+            icon: "house-user",
+        },
+        {
+            href: "/rw/kartu_keluarga",
+            color: "info",
+            title: "Jumlah KK",
+            value: rest.jumlah_kk,
+            icon: "clipboard-list",
+        },
+        {
+            href: "/rw/warga",
+            color: "primary",
+            title: "Jumlah Warga",
+            value: rest.jumlah_warga,
+            icon: "people-fill",
+        },
+        {
+            href: "/rw/pengaduan",
+            color: "warning",
+            title: "Pengaduan",
+            value: rest.pengaduan,
+            icon: "paper-plane",
+        },
+        {
+            href: "/rw/pengumuman",
+            color: "warning",
+            title: "Pengumuman RW",
+            value: rest.pengumuman_rw,
+            icon: "comments",
+        },
+        {
+            href: "/rw/pengumuman-rt",
+            color: "warning",
+            title: "Pengumuman RT",
+            value: rest.pengumuman_rt,
+            icon: "clipboard-list",
+        },
+        {
+            href: "/rw/warga",
+            color: "primary",
+            title: "Jumlah Warga Sebagai Penduduk",
+            value: rest.jumlah_warga_penduduk,
+            icon: "home",
+        },
+        {
+            href: "/rw/warga",
+            color: "primary",
+            title: "Jumlah Warga Sebagai Pendatang",
+            value: rest.jumlah_warga_pendatang,
+            icon: "walking",
+        },
+        {
+            href: "/rw/iuran",
+            color: "success",
+            title: "Total Iuran Masuk Bulan Ini",
+            value: rest.total_iuran_bulan_ini,
+            icon: "dollar-sign",
+        },
+        {
+            href: "/rw/transaksi",
+            color: "success",
+            title: "Total Pemasukan",
+            value: rest.total_pemasukan,
+            icon: "dollar-sign",
+        },
+        {
+            href: "/rw/transaksi",
+            color: "danger",
+            title: "Total Pengeluaran",
+            value: rest.total_pengeluaran,
+            icon: "money-bill-wave",
+        },
+        {
+            href: "/rw/transaksi",
+            color: "primary",
+            title: "Saldo Akhir",
+            value: rest.total_saldo_akhir,
+            icon: "wallet",
+        },
+    ];
+}
+
 export function getRwLinks() {
     return [
         {
@@ -197,9 +286,19 @@ export function getRwLinks() {
             icon: "tachometer-alt",
         },
         {
+            href: "/rw/rt",
+            text: "Data RT",
+            icon: "users",
+        },
+        {
             href: "/rw/warga",
             text: "Data Warga",
             icon: "users",
+        },
+        {
+            href: "/rw/kartu_keluarga",
+            text: "Data Kartu Keluarga",
+            icon: "id-card",
         },
         {
             href: "/rw/pengumuman",
@@ -210,6 +309,11 @@ export function getRwLinks() {
             href: "/rw/pengaduan",
             text: "Pengaduan",
             icon: "paper-plane",
+        },
+        {
+            href: "/rw/iuran",
+            text: "Iuran Warga",
+            icon: "file-invoice-dollar",
         },
         {
             href: "/rw/tagihan",

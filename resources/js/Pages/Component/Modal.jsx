@@ -4,7 +4,7 @@ import logo from '../../../../public/img/logo.png'
 import axios from "axios"
 import { FormatWaktu } from "../Warga/Pengaduan"
 import { SidebarLink } from "./SidebarLink"
-import { getAdminLinks, getRtLinks, getWargaLinks } from "./GetPropRole"
+import { getAdminLinks, getRtLinks, getWargaLinks, getRwLinks } from "./GetPropRole"
 
 export function ModalSidebar({ modalIsOpen, modalShow }) {
     const { url } = usePage()
@@ -742,9 +742,9 @@ export function DetailPengumuman({ selectedData, detailShow, onClose }) {
                                                     <div className="p-3 text-center text-white">
                                                         <i className="bi bi-file-earmark-text fs-1"></i>
                                                         <p className="mb-1">Dokumen Terlampir: {selectedData.dokumen_name}</p>
-                                                        <Link href={`/storage/${selectedData.dokumen_path}`} target="_blank" className="btn btn-primary btn-sm">
+                                                        <a href={`/storage/${selectedData.dokumen_path}`} target="_blank" className="btn btn-primary btn-sm">
                                                             <i className="bi bi-download"></i> Unduh
-                                                        </Link>
+                                                        </a>
                                                     </div>
                                                 )}
                                             </>
@@ -991,9 +991,9 @@ export function DetailPengaduan({ selectedData, detailShow, onClose, onUpdated, 
                                                         <div className="p-3 text-center text-white">
                                                             <i className="bi bi-file-earmark-text fs-1"></i>
                                                             <p className="mb-1">Dokumen Terlampir: {selectedData.file_name}</p>
-                                                            <Link href={`/storage/${selectedData.file_path}`} target="_blank" className="btn btn-primary btn-sm">
+                                                            <a href={`/storage/${selectedData.file_path}`} target="_blank" className="btn btn-primary btn-sm">
                                                                 <i className="bi bi-download"></i> Unduh
-                                                            </Link>
+                                                            </a>
                                                         </div>
                                                     )}
                                                 </>
