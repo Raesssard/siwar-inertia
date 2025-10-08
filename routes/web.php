@@ -11,6 +11,7 @@ use App\Http\Controllers\Warga\WargatagihanController;
 use App\Http\Controllers\Warga\WargatransaksiController;
 use App\Http\Controllers\Admin\AdminRtController;
 use App\Http\Controllers\Admin\AdminKategoriGolonganController;
+use App\Http\Controllers\Admin\AdminPermissionController;
 use App\Http\Controllers\Admin\AdminRoleController;
 use App\Http\Controllers\Rt\ExportController;
 use App\Http\Controllers\Rt\Rt_kartu_keluargaController;
@@ -46,6 +47,7 @@ Route::middleware(['auth'])->group(function () {
         Route::resource('kategori-golongan', AdminKategoriGolonganController::class)->except(['create', 'edit', 'show']);
         Route::resource('roles', AdminRoleController::class)->except(['create', 'edit', 'show']);
         Route::put('roles/{id}/permissions', [AdminRoleController::class, 'updatePermissions'])->name('roles.permissions.update');
+        Route::resource('permissions', AdminPermissionController::class)->except(['create', 'edit', 'show']);
     });
 
     Route::prefix('warga')->as('warga.')->group(function () {

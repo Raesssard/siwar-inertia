@@ -11,6 +11,10 @@ export function ModalSidebar({ modalIsOpen, modalShow }) {
     const { props } = usePage()
     const role = props.auth?.currentRole
 
+    const isActive = (url, pattern) => {
+        return url.startsWith(pattern)
+    }
+
     let statLinks = [];
 
     switch (role) {
@@ -67,28 +71,14 @@ export function ModalSidebar({ modalIsOpen, modalShow }) {
 }
 
 export function PasswordModal({ show }) {
-    useEffect(() => {
-        const handleEsc = (e) => {
-            if (e.key === "Escape") show(false)
-        }
-        document.addEventListener("keydown", handleEsc)
-        return () => document.removeEventListener("keydown", handleEsc)
-    }, [show])
     return (
         <>
             <div
                 className="modal fade show"
+                style={{ display: "block", backgroundColor: "rgba(0,0,0,0.5)" }}
                 tabIndex="-1"
-                style={{
-                    display: "block",
-                    backgroundColor: "rgba(0,0,0,0.5)",
-                }}
-                onClick={() => show(false)}
             >
-                <div
-                    className="modal-dialog modal-dialog-centered"
-                    onClick={(e) => e.stopPropagation()}
-                >
+                <div className="modal-dialog modal-dialog-centered">
                     <div className="modal-content">
                         <form onSubmit={() => show(false)}>
                             <div className="modal-header">
@@ -107,7 +97,7 @@ export function PasswordModal({ show }) {
                                     <input
                                         type="password"
                                         name="current_password"
-                                        className="form-control py-2 px-4"
+                                        className="form-control"
                                         id="current_password"
                                         placeholder="Password Lama"
                                         required
@@ -121,7 +111,7 @@ export function PasswordModal({ show }) {
                                     <input
                                         type="password"
                                         name="password"
-                                        className="form-control py-2 px-4"
+                                        className="form-control"
                                         id="password"
                                         placeholder="Password Baru"
                                         required
@@ -136,7 +126,7 @@ export function PasswordModal({ show }) {
                                     <input
                                         type="password"
                                         name="password_confirmation"
-                                        className="form-control py-2 px-4"
+                                        className="form-control"
                                         id="password_confirmation"
                                         placeholder="Konfirmasi Password Baru"
                                         required
@@ -589,6 +579,9 @@ export function EditKategoriGolonganModal({ form, handleChange, handleEdit, onCl
     );
 }
 
+/* =====================================================================
+   📘 1. Modal Tambah Role
+===================================================================== */
 export function AddRoleModal({ form, setForm, handleAdd, onClose }) {
     return (
         <div
@@ -609,14 +602,20 @@ export function AddRoleModal({ form, setForm, handleAdd, onClose }) {
                                     type="text"
                                     name="name"
                                     value={form.name}
-                                    onChange={(e) => setForm("name", e.target.value)}
+                                    onChange={(e) =>
+                                        setForm({ ...form, name: e.target.value })
+                                    }
                                     className="form-control"
                                     placeholder="Masukkan nama role"
                                 />
                             </div>
                         </div>
                         <div className="modal-footer">
-                            <button type="button" className="btn btn-secondary" onClick={onClose}>
+                            <button
+                                type="button"
+                                className="btn btn-secondary"
+                                onClick={onClose}
+                            >
                                 Batal
                             </button>
                             <button type="submit" className="btn btn-primary">
@@ -630,6 +629,9 @@ export function AddRoleModal({ form, setForm, handleAdd, onClose }) {
     );
 }
 
+/* =====================================================================
+   📘 2. Modal Edit Role
+===================================================================== */
 export function EditRoleModal({ form, setForm, handleEdit, onClose }) {
     return (
         <div
@@ -659,7 +661,11 @@ export function EditRoleModal({ form, setForm, handleEdit, onClose }) {
                             </div>
                         </div>
                         <div className="modal-footer">
-                            <button type="button" className="btn btn-secondary" onClick={onClose}>
+                            <button
+                                type="button"
+                                className="btn btn-secondary"
+                                onClick={onClose}
+                            >
                                 Batal
                             </button>
                             <button type="submit" className="btn btn-primary">
@@ -673,7 +679,11 @@ export function EditRoleModal({ form, setForm, handleEdit, onClose }) {
     );
 }
 
-export function EditPermissionModal({
+
+/* =====================================================================
+   📘 3. Modal Edit Role Permission (Checkbox Multi)
+===================================================================== */
+export function EditRolePermissionModal({
     role,
     permissions,
     selectedPerms,
@@ -682,46 +692,120 @@ export function EditPermissionModal({
     onClose,
 }) {
     return (
-        <div
-            className="modal fade show"
-            style={{ display: "block", backgroundColor: "rgba(0,0,0,0.5)" }}
-        >
+        <div className="modal fade show" style={{ display: "block", backgroundColor: "rgba(0,0,0,0.5)" }}>
             <div className="modal-dialog modal-lg modal-dialog-centered">
                 <div className="modal-content modal-custom">
                     <div className="modal-header">
-                        <h5>Edit Permissions: {role.name}</h5>
+                        <h5>Atur Permissions untuk Role: <strong>{role.name}</strong></h5>
                         <button type="button" className="btn-close" onClick={onClose} />
                     </div>
                     <div className="modal-body">
                         <div className="row">
-                            {permissions.map((perm) => (
-                                <div key={perm.id} className="col-md-4 mb-2">
-                                    <label className="d-flex align-items-center">
-                                        <input
-                                            type="checkbox"
-                                            checked={selectedPerms.includes(perm.name)}
-                                            onChange={() => togglePermission(perm.name)}
-                                            className="form-check-input me-2"
-                                        />
-                                        {perm.name}
-                                    </label>
-                                </div>
-                            ))}
+                            {permissions.length ? (
+                                permissions.map((perm) => (
+                                    <div key={perm.id} className="col-md-4 mb-2">
+                                        <label className="d-flex align-items-center">
+                                            <input
+                                                type="checkbox"
+                                                checked={selectedPerms.includes(perm.name)}
+                                                onChange={() => togglePermission(perm.name)}
+                                                className="form-check-input me-2"
+                                            />
+                                            {perm.name}
+                                        </label>
+                                    </div>
+                                ))
+                            ) : (
+                                <div className="text-center text-muted">Tidak ada permission tersedia.</div>
+                            )}
                         </div>
                     </div>
                     <div className="modal-footer">
-                        <button type="button" className="btn btn-secondary" onClick={onClose}>
-                            Batal
-                        </button>
-                        <button type="button" className="btn btn-primary" onClick={handleSave}>
-                            Simpan Permissions
-                        </button>
+                        <button type="button" className="btn btn-secondary" onClick={onClose}>Batal</button>
+                        <button type="button" className="btn btn-primary" onClick={handleSave}>Simpan Permissions</button>
                     </div>
                 </div>
             </div>
         </div>
     );
 }
+
+/* =====================================================================
+   📘 4. Modal Tambah Permission
+===================================================================== */
+export function AddPermissionModal({ form, setForm, handleAdd, onClose }) {
+    return (
+        <div className="modal fade show" style={{ display: "block", backgroundColor: "rgba(0,0,0,0.5)" }}>
+            <div className="modal-dialog modal-dialog-centered">
+                <div className="modal-content modal-custom">
+                    <form onSubmit={handleAdd}>
+                        <div className="modal-header">
+                            <h5>Tambah Permission</h5>
+                            <button type="button" className="btn-close" onClick={onClose} />
+                        </div>
+                        <div className="modal-body">
+                            <div className="form-group">
+                                <label>Nama Permission</label>
+                                <input
+                                    type="text"
+                                    name="name"
+                                    value={form.name}
+                                    onChange={(e) => setForm("name", e.target.value)}
+                                    className="form-control"
+                                    placeholder="Masukkan nama permission"
+                                    required
+                                />
+                            </div>
+                        </div>
+                        <div className="modal-footer">
+                            <button type="button" className="btn btn-secondary" onClick={onClose}>Batal</button>
+                            <button type="submit" className="btn btn-primary">Simpan</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+/* =====================================================================
+   📘 5. Modal Edit Permission (Rename Permission)
+===================================================================== */
+export function EditPermissionModal({ form, setForm, handleEdit, onClose }) {
+    return (
+        <div className="modal fade show" style={{ display: "block", backgroundColor: "rgba(0,0,0,0.5)" }}>
+            <div className="modal-dialog modal-dialog-centered">
+                <div className="modal-content modal-custom">
+                    <form onSubmit={handleEdit}>
+                        <div className="modal-header">
+                            <h5>Edit Permission</h5>
+                            <button type="button" className="btn-close" onClick={onClose} />
+                        </div>
+                        <div className="modal-body">
+                            <div className="form-group">
+                                <label>Nama Permission</label>
+                                <input
+                                    type="text"
+                                    name="name"
+                                    value={form.name}
+                                    onChange={(e) => setForm("name", e.target.value)}
+                                    className="form-control"
+                                    placeholder="Masukkan nama permission baru"
+                                    required
+                                />
+                            </div>
+                        </div>
+                        <div className="modal-footer">
+                            <button type="button" className="btn btn-secondary" onClick={onClose}>Batal</button>
+                            <button type="submit" className="btn btn-primary">Update</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    );
+}
+
 
 export function DetailPengumuman({ selectedData, detailShow, onClose }) {
     const [komentar, setKomentar] = useState([])
@@ -731,8 +815,6 @@ export function DetailPengumuman({ selectedData, detailShow, onClose }) {
     const [isOverflowing, setIsOverflowing] = useState(false)
     const textRef = useRef(null)
     const komenRef = useRef(null)
-    const { props } = usePage()
-    const currentRole = props.auth?.currentRole
 
     const toggleExpand = (id) => {
         setCommentExpanded((prev) => ({
@@ -759,7 +841,7 @@ export function DetailPengumuman({ selectedData, detailShow, onClose }) {
     const handleSubmit = () => {
         if (!newKomentar.trim()) return
         // nanti rutenya bakal diganti sesuai role
-        axios.post(`/${currentRole}/pengumuman/${selectedData.id}/komentar`, {
+        axios.post(`/warga/pengumuman/${selectedData.id}/komentar`, {
             isi_komentar: newKomentar
         })
             .then(res => {
@@ -863,12 +945,12 @@ export function DetailPengumuman({ selectedData, detailShow, onClose }) {
                                         <h5 className="fw-bold mb-1 mt-2">{selectedData.judul}</h5>
                                         <small className="text-muted">
                                             <strong>
-                                                {selectedData.rukun_tetangga ? selectedData.rukun_tetangga.nama_ketua_rt : selectedData.rw.nama_ketua_rw}
+                                                {selectedData.rukun_tetangga ? selectedData.rukun_tetangga.nama : selectedData.rw.nama_ketua_rw}
                                             </strong> • {" "}
-                                            {/* {selectedData.rukun_tetangga
+                                            {selectedData.rukun_tetangga
                                                 ? `${selectedData.rukun_tetangga.jabatan.nama_jabatan.charAt(0).toUpperCase()}${selectedData.rukun_tetangga.jabatan.nama_jabatan.slice(1)} RT`
-                                                : `${selectedData.rw.jabatan.nama_jabatan.charAt(0).toUpperCase()}${selectedData.rw.jabatan.nama_jabatan.slice(1)} RW`} • */}
-                                            RT {selectedData.rukun_tetangga?.nomor_rt}/{""}
+                                                : `${selectedData.rw.jabatan.nama_jabatan.charAt(0).toUpperCase()}${selectedData.rw.jabatan.nama_jabatan.slice(1)} RW`} •
+                                            RT {selectedData.rukun_tetangga?.rt}/{""}
                                             RW {selectedData.rw?.nomor_rw}{" "}
                                             {/* • {new Date(selectedData.created_at).toLocaleDateString("id-ID", {
                                                 day: "2-digit",
@@ -877,22 +959,22 @@ export function DetailPengumuman({ selectedData, detailShow, onClose }) {
                                             })} */}
                                             • <FormatWaktu createdAt={selectedData.created_at} />
                                         </small >
-                                        <p
-                                            ref={textRef}
-                                            className={`mt-2 isi-pengumuman ${captionExpanded ? "expanded" : "clamped"}`}
-                                        >
-                                            {selectedData.isi}
-                                        </p>
-                                        {
-                                            isOverflowing && (
-                                                <button
-                                                    className="btn btn-link p-0 mt-1 text-decoration-none"
-                                                    onClick={() => setCaptionExpanded(!captionExpanded)}
-                                                >
-                                                    {captionExpanded ? "lebih sedikit" : "selengkapnya"}
-                                                </button>
-                                            )
-                                        }
+    <p
+        ref={textRef}
+        className={`mt-2 isi-pengumuman ${captionExpanded ? "expanded" : "clamped"}`}
+    >
+        {selectedData.isi}
+    </p>
+{
+    isOverflowing && (
+        <button
+            className="btn btn-link p-0 mt-1 text-decoration-none"
+            onClick={() => setCaptionExpanded(!captionExpanded)}
+        >
+            {captionExpanded ? "lebih sedikit" : "selengkapnya"}
+        </button>
+    )
+}
                                     </div >
                                     <div className="flex-grow-1 overflow-auto p-3 komen-section" ref={komenRef}>
                                         {komentar.length > 0 ? (
@@ -908,7 +990,6 @@ export function DetailPengumuman({ selectedData, detailShow, onClose }) {
                                                             ? "line-clamp-none"
                                                             : "line-clamp-3"
                                                             }`}
-                                                            style={{ fontSize: "0.85rem" }}
                                                     >
                                                         {komen.isi_komentar}
                                                     </p>
@@ -963,8 +1044,6 @@ export function DetailPengaduan({ selectedData, detailShow, onClose, onUpdated, 
     const [isEdit, setIsEdit] = useState(false)
     const textRef = useRef(null)
     const komenRef = useRef(null)
-    const { props } = usePage()
-    const currentRole = props.auth?.currentRole
 
     const toggleEdit = () => {
         setIsEdit(!isEdit)
@@ -1005,7 +1084,7 @@ export function DetailPengaduan({ selectedData, detailShow, onClose, onUpdated, 
     const handleSubmit = () => {
         if (!newKomentar.trim()) return
         // nanti rutenya bakal diganti sesuai role
-        axios.post(`/${currentRole}/pengaduan/${selectedData.id}/komentar`, {
+        axios.post(`/warga/pengaduan/${selectedData.id}/komentar`, {
             isi_komentar: newKomentar
         })
             .then(res => {
@@ -1126,7 +1205,7 @@ export function DetailPengaduan({ selectedData, detailShow, onClose, onUpdated, 
                                                 <strong>
                                                     {selectedData.warga?.nama}
                                                 </strong>{" "}
-                                                • RT {selectedData.warga?.kartu_keluarga?.rukun_tetangga?.nomor_rt}/RW{" "}
+                                                • RT {selectedData.warga?.kartu_keluarga?.rukun_tetangga?.rt}/RW{" "}
                                                 {selectedData.warga?.kartu_keluarga?.rw?.nomor_rw}{" "}
                                                 {/* • {new Date(selectedData.created_at).toLocaleDateString("id-ID", {
                                                     day: "2-digit",
@@ -1164,7 +1243,6 @@ export function DetailPengaduan({ selectedData, detailShow, onClose, onUpdated, 
                                                                 ? "line-clamp-none"
                                                                 : "line-clamp-3"
                                                                 }`}
-                                                            style={{ fontSize: "0.85rem" }}
                                                         >
                                                             {komen.isi_komentar}
                                                         </p>
@@ -1428,7 +1506,7 @@ export function EditPengaduan({ toggle, onUpdated, onDeleted, pengaduan }) {
                             >
                                 <i className="fas fa-upload mr-2"></i>
                                 <small>
-                                    Ganti File
+                                    Upload File
                                 </small>
                             </button>
                             {pengaduan?.file_name && !data.file && (
@@ -1612,7 +1690,7 @@ export function TambahPengaduan({ tambahShow, onClose, onAdded }) {
                                     ""
                                 )}
                                 <div className="flex-fill d-flex flex-column" style={previewUrl ? { maxWidth: "50%" } : { maxWidth: "100%" }}>
-                                    <div className="p-3 h-100 w-100">
+                                    <div className="p-3" style={{ height: "100%" }}>
                                         <form onSubmit={handleSubmit}>
                                             <div className="mb-3">
                                                 <label className="form-label">Judul</label>

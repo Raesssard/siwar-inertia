@@ -5,7 +5,7 @@ import Layout from "@/Layouts/Layout";
 import {
     AddRoleModal,
     EditRoleModal,
-    EditPermissionModal,
+    EditRolePermissionModal,
 } from "@/Pages/Component/Modal";
 
 export default function Roles({ roles, permissions, filters }) {
@@ -250,7 +250,7 @@ export default function Roles({ roles, permissions, filters }) {
 
             {/* ⚙️ Modal Permissions */}
             {showPermission && (
-                <EditPermissionModal
+                <EditRolePermissionModal
                     role={showPermission}
                     permissions={permissions}
                     selectedPerms={selectedPerms}
