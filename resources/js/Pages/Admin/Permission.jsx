@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { Inertia } from "@inertiajs/inertia";
 import Layout from "@/Layouts/Layout";
 import { route } from "ziggy-js";
 import { router } from "@inertiajs/react";
@@ -24,7 +23,7 @@ export default function Permission({ permissions, filters }) {
 
     const handleAdd = (e) => {
         e.preventDefault();
-        Inertia.post(route("admin.permissions.store"), form, {
+        router.post(route("admin.permissions.store"), form, {
             onSuccess: () => {
                 setShowAdd(false);
                 setForm({ name: "" });
@@ -34,14 +33,14 @@ export default function Permission({ permissions, filters }) {
 
     const handleEdit = (e) => {
         e.preventDefault();
-        Inertia.put(route("admin.permissions.update", showEdit.id), form, {
+        router.put(route("admin.permissions.update", showEdit.id), form, {
             onSuccess: () => setShowEdit(null),
         });
     };
 
     const handleDelete = (id) => {
         if (confirm("Yakin ingin menghapus permission ini?")) {
-            Inertia.delete(route("admin.permissions.destroy", id));
+            router.delete(route("admin.permissions.destroy", id));
         }
     };
 

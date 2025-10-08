@@ -152,52 +152,50 @@ export default function Roles({ roles, permissions, filters }) {
                             <th>Aksi</th>
                         </tr>
                     </thead>
-                    <tbody>
+                        <tbody>
                         {roles.data.length > 0 ? (
                             roles.data.map((role, index) => (
-                                <tr key={role.id}>
-                                    <td>{roles.from + index}</td>
-                                    <td>{role.name}</td>
-                                    <td>
-                                        {role.permissions.length
-                                            ? role.permissions.map((p) => p.name).join(", ")
-                                            : "-"}
-                                    </td>
-                                    <td>
-                                        <button
-                                            className="btn-custom btn-warning me-1"
-                                            onClick={() => openEdit(role)}
-                                        >
-                                            Edit
-                                        </button>
-                                        <button
-                                            className="btn-custom btn-secondary me-1"
-                                            onClick={() => {
-                                                setShowPermission(role);
-                                                setSelectedPerms(
-                                                    role.permissions.map((p) => p.name)
-                                                );
-                                            }}
-                                        >
-                                            Permissions
-                                        </button>
-                                        <button
-                                            className="btn-custom btn-danger"
-                                            onClick={() => handleDelete(role.id)}
-                                        >
-                                            Hapus
-                                        </button>
-                                    </td>
-                                </tr>
+                            <tr key={role.id}>
+                                <td>{roles.from + index}</td>
+                                <td>{role.name}</td>
+                                <td>
+                                {role.permissions.length > 0
+                                    ? `${role.permissions.length} ${role.permissions.length > 1 ? "permissions" : "permission"}`
+                                    : "Tidak ada permission"}
+                                </td>
+                                <td>
+                                <button
+                                    className="btn-custom btn-warning me-1"
+                                    onClick={() => openEdit(role)}
+                                >
+                                    Edit
+                                </button>
+                                <button
+                                    className="btn-custom btn-secondary me-1"
+                                    onClick={() => {
+                                    setShowPermission(role);
+                                    setSelectedPerms(role.permissions.map((p) => p.name));
+                                    }}
+                                >
+                                    Permissions
+                                </button>
+                                <button
+                                    className="btn-custom btn-danger"
+                                    onClick={() => handleDelete(role.id)}
+                                >
+                                    Hapus
+                                </button>
+                                </td>
+                            </tr>
                             ))
                         ) : (
                             <tr>
-                                <td colSpan="4" className="text-center py-3">
-                                    Tidak ada data
-                                </td>
+                            <td colSpan="4" className="text-center py-3">
+                                Tidak ada data
+                            </td>
                             </tr>
                         )}
-                    </tbody>
+                        </tbody>
                 </table>
 
                 {/* 🔸 Pagination */}
