@@ -159,7 +159,7 @@ export function PasswordModal({ show }) {
 
 export function AddRwModal({ form, handleChange, handleAdd, onClose }) {
     return (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 ">
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 fade-in">
             <div className="bg-white rounded-2xl shadow-lg w-full max-w-md animate-scaleIn">
                 <form onSubmit={handleAdd} className="p-6 space-y-4">
                     <div className="flex justify-between items-center border-b pb-2">
@@ -200,7 +200,7 @@ export function AddRwModal({ form, handleChange, handleAdd, onClose }) {
 
 export function EditRwModal({ form, handleChange, handleEdit, onClose }) {
     return (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 ">
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 fade-in">
             <div className="bg-white rounded-2xl shadow-lg w-full max-w-md animate-scaleIn">
                 <form onSubmit={handleEdit} className="p-6 space-y-4">
                     <div className="flex justify-between items-center border-b pb-2">
@@ -241,7 +241,7 @@ export function EditRwModal({ form, handleChange, handleEdit, onClose }) {
 
 export function AddRtModal({ form, handleChange, handleAdd, onClose }) {
     return (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 ">
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 fade-in">
             <div className="bg-white rounded-2xl shadow-lg w-full max-w-md animate-scaleIn">
                 <form onSubmit={handleAdd} className="p-6 space-y-4">
                     <div className="flex justify-between items-center border-b pb-2">
@@ -282,7 +282,7 @@ export function AddRtModal({ form, handleChange, handleAdd, onClose }) {
 
 export function EditRtModal({ form, handleChange, handleEdit, onClose }) {
     return (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 ">
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 fade-in">
             <div className="bg-white rounded-2xl shadow-lg w-full max-w-md animate-scaleIn">
                 <form onSubmit={handleEdit} className="p-6 space-y-4">
                     <div className="flex justify-between items-center border-b pb-2">
