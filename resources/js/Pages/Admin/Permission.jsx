@@ -1,21 +1,18 @@
 import React, { useState } from "react";
-import { Inertia } from "@inertiajs/inertia";
 import Layout from "@/Layouts/Layout";
 import { route } from "ziggy-js";
 import { router } from "@inertiajs/react";
-import { AddRoleModal as AddPermissionModal, EditRoleModal as EditPermissionModal } from "@/Pages/Component/Modal";
+import {
+    AddPermissionModal,
+    EditPermissionModal,
+} from "@/Pages/Component/Modal";
 
 export default function Permission({ permissions, filters }) {
     const [showAdd, setShowAdd] = useState(false);
     const [showEdit, setShowEdit] = useState(null);
 
-    const [form, setForm] = useState({
-        name: "",
-    });
-
-    const [search, setSearch] = useState({
-        keyword: filters?.keyword || "",
-    });
+    const [form, setForm] = useState({ name: "" });
+    const [search, setSearch] = useState({ keyword: filters?.keyword || "" });
 
     // -------------------------------
     // CRUD Handler
@@ -26,7 +23,7 @@ export default function Permission({ permissions, filters }) {
 
     const handleAdd = (e) => {
         e.preventDefault();
-        Inertia.post(route("admin.permissions.store"), form, {
+        router.post(route("admin.permissions.store"), form, {
             onSuccess: () => {
                 setShowAdd(false);
                 setForm({ name: "" });
@@ -36,14 +33,14 @@ export default function Permission({ permissions, filters }) {
 
     const handleEdit = (e) => {
         e.preventDefault();
-        Inertia.put(route("admin.permissions.update", showEdit.id), form, {
+        router.put(route("admin.permissions.update", showEdit.id), form, {
             onSuccess: () => setShowEdit(null),
         });
     };
 
     const handleDelete = (id) => {
         if (confirm("Yakin ingin menghapus permission ini?")) {
-            Inertia.delete(route("admin.permissions.destroy", id));
+            router.delete(route("admin.permissions.destroy", id));
         }
     };
 
