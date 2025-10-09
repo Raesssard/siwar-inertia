@@ -4,7 +4,7 @@ import logo from '../../../../public/img/logo.png'
 import axios from "axios"
 import { FormatWaktu } from "../Warga/Pengaduan"
 import { SidebarLink } from "./SidebarLink"
-import { formatTanggal, getAdminLinks, getRtLinks, getWargaLinks } from "./GetPropRole"
+import { formatTanggal, getAdminLinks, getRtLinks, getWargaLinks, getRwLinks } from "./GetPropRole"
 import Role from "./Role"
 
 export function ModalSidebar({ modalIsOpen, modalShow }) {
@@ -160,82 +160,40 @@ export function PasswordModal({ show }) {
 
 export function AddRwModal({ form, handleChange, handleAdd, onClose }) {
     return (
-        <div
-            className="modal fade show"
-            style={{ display: "block", backgroundColor: "rgba(0,0,0,0.5)" }}
-        >
-            <div className="modal-dialog modal-dialog-centered">
-                <div className="modal-content modal-custom">
-                    <form onSubmit={handleAdd}>
-                        <div className="modal-header">
-                            <h5>Tambah RW</h5>
-                            <button
-                                type="button"
-                                className="btn-close"
-                                onClick={onClose}
-                            />
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 fade-in">
+            <div className="bg-white rounded-2xl shadow-lg w-full max-w-md animate-scaleIn">
+                <form onSubmit={handleAdd} className="p-6 space-y-4">
+                    <div className="flex justify-between items-center border-b pb-2">
+                        <h5 className="text-lg font-semibold">Tambah RW</h5>
+                        <button type="button" onClick={onClose} className="text-gray-500 hover:text-gray-700">✕</button>
+                    </div>
+                    <div className="space-y-3">
+                        <div>
+                            <label className="block text-sm font-medium">NIK</label>
+                            <input type="text" name="nik" value={form.nik || ""} onChange={handleChange} className="w-full border rounded-md p-2"/>
                         </div>
-                        <div className="modal-body">
-                            <div className="form-group">
-                                <label>NIK</label>
-                                <input
-                                    type="text"
-                                    name="nik"
-                                    value={form.nik}
-                                    onChange={handleChange}
-                                />
-                            </div>
-                            <div className="form-group">
-                                <label>Nomor RW</label>
-                                <input
-                                    type="text"
-                                    name="nomor_rw"
-                                    value={form.nomor_rw}
-                                    onChange={handleChange}
-                                />
-                            </div>
-                            <div className="form-group">
-                                <label>Nama Ketua RW</label>
-                                <input
-                                    type="text"
-                                    name="nama_ketua_rw"
-                                    value={form.nama_ketua_rw}
-                                    onChange={handleChange}
-                                />
-                            </div>
-                            <div className="form-group">
-                                <label>Mulai Menjabat</label>
-                                <input
-                                    type="date"
-                                    name="mulai_menjabat"
-                                    value={form.mulai_menjabat}
-                                    onChange={handleChange}
-                                />
-                            </div>
-                            <div className="form-group">
-                                <label>Akhir Jabatan</label>
-                                <input
-                                    type="date"
-                                    name="akhir_jabatan"
-                                    value={form.akhir_jabatan}
-                                    onChange={handleChange}
-                                />
-                            </div>
+                        <div>
+                            <label className="block text-sm font-medium">Nomor RW</label>
+                            <input type="text" name="nomor_rw" value={form.nomor_rw || ""} onChange={handleChange} className="w-full border rounded-md p-2"/>
                         </div>
-                        <div className="modal-footer">
-                            <button
-                                type="button"
-                                className="btn-custom btn-secondary"
-                                onClick={onClose}
-                            >
-                                Batal
-                            </button>
-                            <button type="submit" className="btn-custom btn-primary">
-                                Simpan
-                            </button>
+                        <div>
+                            <label className="block text-sm font-medium">Nama Ketua RW</label>
+                            <input type="text" name="nama_ketua_rw" value={form.nama_ketua_rw || ""} onChange={handleChange} className="w-full border rounded-md p-2"/>
                         </div>
-                    </form>
-                </div>
+                        <div>
+                            <label className="block text-sm font-medium">Mulai Menjabat</label>
+                            <input type="date" name="mulai_menjabat" value={form.mulai_menjabat || ""} onChange={handleChange} className="w-full border rounded-md p-2"/>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium">Akhir Jabatan</label>
+                            <input type="date" name="akhir_jabatan" value={form.akhir_jabatan || ""} onChange={handleChange} className="w-full border rounded-md p-2"/>
+                        </div>
+                    </div>
+                    <div className="flex justify-end gap-3 pt-4 border-t">
+                        <button type="button" onClick={onClose} className="px-4 py-2 bg-gray-200 rounded-md hover:bg-gray-300">Batal</button>
+                        <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Simpan</button>
+                    </div>
+                </form>
             </div>
         </div>
     )
@@ -243,82 +201,40 @@ export function AddRwModal({ form, handleChange, handleAdd, onClose }) {
 
 export function EditRwModal({ form, handleChange, handleEdit, onClose }) {
     return (
-        <div
-            className="modal fade show"
-            style={{ display: "block", backgroundColor: "rgba(0,0,0,0.5)" }}
-        >
-            <div className="modal-dialog modal-dialog-centered">
-                <div className="modal-content modal-custom">
-                    <form onSubmit={handleEdit}>
-                        <div className="modal-header">
-                            <h5>Edit RW</h5>
-                            <button
-                                type="button"
-                                className="btn-close"
-                                onClick={onClose}
-                            />
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 fade-in">
+            <div className="bg-white rounded-2xl shadow-lg w-full max-w-md animate-scaleIn">
+                <form onSubmit={handleEdit} className="p-6 space-y-4">
+                    <div className="flex justify-between items-center border-b pb-2">
+                        <h5 className="text-lg font-semibold">Edit RW</h5>
+                        <button type="button" onClick={onClose} className="text-gray-500 hover:text-gray-700">✕</button>
+                    </div>
+                    <div className="space-y-3">
+                        <div>
+                            <label className="block text-sm font-medium">NIK</label>
+                            <input type="text" name="nik" value={form.nik || ""} onChange={handleChange} className="w-full border rounded-md p-2"/>
                         </div>
-                        <div className="modal-body">
-                            <div className="form-group">
-                                <label>NIK</label>
-                                <input
-                                    type="text"
-                                    name="nik"
-                                    value={form.nik}
-                                    onChange={handleChange}
-                                />
-                            </div>
-                            <div className="form-group">
-                                <label>Nomor RW</label>
-                                <input
-                                    type="text"
-                                    name="nomor_rw"
-                                    value={form.nomor_rw}
-                                    onChange={handleChange}
-                                />
-                            </div>
-                            <div className="form-group">
-                                <label>Nama Ketua RW</label>
-                                <input
-                                    type="text"
-                                    name="nama_ketua_rw"
-                                    value={form.nama_ketua_rw}
-                                    onChange={handleChange}
-                                />
-                            </div>
-                            <div className="form-group">
-                                <label>Mulai Menjabat</label>
-                                <input
-                                    type="date"
-                                    name="mulai_menjabat"
-                                    value={form.mulai_menjabat}
-                                    onChange={handleChange}
-                                />
-                            </div>
-                            <div className="form-group">
-                                <label>Akhir Jabatan</label>
-                                <input
-                                    type="date"
-                                    name="akhir_jabatan"
-                                    value={form.akhir_jabatan}
-                                    onChange={handleChange}
-                                />
-                            </div>
+                        <div>
+                            <label className="block text-sm font-medium">Nomor RW</label>
+                            <input type="text" name="nomor_rw" value={form.nomor_rw || ""} onChange={handleChange} className="w-full border rounded-md p-2"/>
                         </div>
-                        <div className="modal-footer">
-                            <button
-                                type="button"
-                                className="btn-custom btn-secondary"
-                                onClick={onClose}
-                            >
-                                Batal
-                            </button>
-                            <button type="submit" className="btn-custom btn-primary">
-                                Update
-                            </button>
+                        <div>
+                            <label className="block text-sm font-medium">Nama Ketua RW</label>
+                            <input type="text" name="nama_ketua_rw" value={form.nama_ketua_rw || ""} onChange={handleChange} className="w-full border rounded-md p-2"/>
                         </div>
-                    </form>
-                </div>
+                        <div>
+                            <label className="block text-sm font-medium">Mulai Menjabat</label>
+                            <input type="date" name="mulai_menjabat" value={form.mulai_menjabat || ""} onChange={handleChange} className="w-full border rounded-md p-2"/>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium">Akhir Jabatan</label>
+                            <input type="date" name="akhir_jabatan" value={form.akhir_jabatan || ""} onChange={handleChange} className="w-full border rounded-md p-2"/>
+                        </div>
+                    </div>
+                    <div className="flex justify-end gap-3 pt-4 border-t">
+                        <button type="button" onClick={onClose} className="px-4 py-2 bg-gray-200 rounded-md hover:bg-gray-300">Batal</button>
+                        <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Update</button>
+                    </div>
+                </form>
             </div>
         </div>
     )
@@ -326,82 +242,40 @@ export function EditRwModal({ form, handleChange, handleEdit, onClose }) {
 
 export function AddRtModal({ form, handleChange, handleAdd, onClose }) {
     return (
-        <div
-            className="modal fade show"
-            style={{ display: "block", backgroundColor: "rgba(0,0,0,0.5)" }}
-        >
-            <div className="modal-dialog modal-dialog-centered">
-                <div className="modal-content modal-custom">
-                    <form onSubmit={handleAdd}>
-                        <div className="modal-header">
-                            <h5>Tambah RT</h5>
-                            <button
-                                type="button"
-                                className="btn-close"
-                                onClick={onClose}
-                            />
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 fade-in">
+            <div className="bg-white rounded-2xl shadow-lg w-full max-w-md animate-scaleIn">
+                <form onSubmit={handleAdd} className="p-6 space-y-4">
+                    <div className="flex justify-between items-center border-b pb-2">
+                        <h5 className="text-lg font-semibold">Tambah RT</h5>
+                        <button type="button" onClick={onClose} className="text-gray-500 hover:text-gray-700">✕</button>
+                    </div>
+                    <div className="space-y-3">
+                        <div>
+                            <label className="block text-sm font-medium">NIK</label>
+                            <input type="text" name="nik" value={form.nik || ""} onChange={handleChange} className="w-full border rounded-md p-2"/>
                         </div>
-                        <div className="modal-body">
-                            <div className="form-group">
-                                <label>NIK</label>
-                                <input
-                                    type="text"
-                                    name="nik"
-                                    value={form.nik || ""}
-                                    onChange={handleChange}
-                                />
-                            </div>
-                            <div className="form-group">
-                                <label>Nomor RT</label>
-                                <input
-                                    type="text"
-                                    name="nomor_rt"
-                                    value={form.nomor_rt || ""}
-                                    onChange={handleChange}
-                                />
-                            </div>
-                            <div className="form-group">
-                                <label>Nama Ketua RT</label>
-                                <input
-                                    type="text"
-                                    name="nama_ketua_rt"
-                                    value={form.nama_ketua_rt || ""}
-                                    onChange={handleChange}
-                                />
-                            </div>
-                            <div className="form-group">
-                                <label>Mulai Menjabat</label>
-                                <input
-                                    type="date"
-                                    name="mulai_menjabat"
-                                    value={form.mulai_menjabat || ""}
-                                    onChange={handleChange}
-                                />
-                            </div>
-                            <div className="form-group">
-                                <label>Akhir Jabatan</label>
-                                <input
-                                    type="date"
-                                    name="akhir_jabatan"
-                                    value={form.akhir_jabatan || ""}
-                                    onChange={handleChange}
-                                />
-                            </div>
+                        <div>
+                            <label className="block text-sm font-medium">Nomor RT</label>
+                            <input type="text" name="nomor_rt" value={form.nomor_rt || ""} onChange={handleChange} className="w-full border rounded-md p-2"/>
                         </div>
-                        <div className="modal-footer">
-                            <button
-                                type="button"
-                                className="btn-custom btn-secondary"
-                                onClick={onClose}
-                            >
-                                Batal
-                            </button>
-                            <button type="submit" className="btn-custom btn-primary">
-                                Simpan
-                            </button>
+                        <div>
+                            <label className="block text-sm font-medium">Nama Ketua RT</label>
+                            <input type="text" name="nama_ketua_rt" value={form.nama_ketua_rt || ""} onChange={handleChange} className="w-full border rounded-md p-2"/>
                         </div>
-                    </form>
-                </div>
+                        <div>
+                            <label className="block text-sm font-medium">Mulai Menjabat</label>
+                            <input type="date" name="mulai_menjabat" value={form.mulai_menjabat || ""} onChange={handleChange} className="w-full border rounded-md p-2"/>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium">Akhir Jabatan</label>
+                            <input type="date" name="akhir_jabatan" value={form.akhir_jabatan || ""} onChange={handleChange} className="w-full border rounded-md p-2"/>
+                        </div>
+                    </div>
+                    <div className="flex justify-end gap-3 pt-4 border-t">
+                        <button type="button" onClick={onClose} className="px-4 py-2 bg-gray-200 rounded-md hover:bg-gray-300">Batal</button>
+                        <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Simpan</button>
+                    </div>
+                </form>
             </div>
         </div>
     )
@@ -409,82 +283,40 @@ export function AddRtModal({ form, handleChange, handleAdd, onClose }) {
 
 export function EditRtModal({ form, handleChange, handleEdit, onClose }) {
     return (
-        <div
-            className="modal fade show"
-            style={{ display: "block", backgroundColor: "rgba(0,0,0,0.5)" }}
-        >
-            <div className="modal-dialog modal-dialog-centered">
-                <div className="modal-content modal-custom">
-                    <form onSubmit={handleEdit}>
-                        <div className="modal-header">
-                            <h5>Edit RT</h5>
-                            <button
-                                type="button"
-                                className="btn-close"
-                                onClick={onClose}
-                            />
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 fade-in">
+            <div className="bg-white rounded-2xl shadow-lg w-full max-w-md animate-scaleIn">
+                <form onSubmit={handleEdit} className="p-6 space-y-4">
+                    <div className="flex justify-between items-center border-b pb-2">
+                        <h5 className="text-lg font-semibold">Edit RT</h5>
+                        <button type="button" onClick={onClose} className="text-gray-500 hover:text-gray-700">✕</button>
+                    </div>
+                    <div className="space-y-3">
+                        <div>
+                            <label className="block text-sm font-medium">NIK</label>
+                            <input type="text" name="nik" value={form.nik || ""} onChange={handleChange} className="w-full border rounded-md p-2"/>
                         </div>
-                        <div className="modal-body">
-                            <div className="form-group">
-                                <label>NIK</label>
-                                <input
-                                    type="text"
-                                    name="nik"
-                                    value={form.nik || ""}
-                                    onChange={handleChange}
-                                />
-                            </div>
-                            <div className="form-group">
-                                <label>Nomor RT</label>
-                                <input
-                                    type="text"
-                                    name="nomor_rt"
-                                    value={form.nomor_rt || ""}
-                                    onChange={handleChange}
-                                />
-                            </div>
-                            <div className="form-group">
-                                <label>Nama Ketua RT</label>
-                                <input
-                                    type="text"
-                                    name="nama_ketua_rt"
-                                    value={form.nama_ketua_rt || ""}
-                                    onChange={handleChange}
-                                />
-                            </div>
-                            <div className="form-group">
-                                <label>Mulai Menjabat</label>
-                                <input
-                                    type="date"
-                                    name="mulai_menjabat"
-                                    value={form.mulai_menjabat || ""}
-                                    onChange={handleChange}
-                                />
-                            </div>
-                            <div className="form-group">
-                                <label>Akhir Jabatan</label>
-                                <input
-                                    type="date"
-                                    name="akhir_jabatan"
-                                    value={form.akhir_jabatan || ""}
-                                    onChange={handleChange}
-                                />
-                            </div>
+                        <div>
+                            <label className="block text-sm font-medium">Nomor RT</label>
+                            <input type="text" name="nomor_rt" value={form.nomor_rt || ""} onChange={handleChange} className="w-full border rounded-md p-2"/>
                         </div>
-                        <div className="modal-footer">
-                            <button
-                                type="button"
-                                className="btn-custom btn-secondary"
-                                onClick={onClose}
-                            >
-                                Batal
-                            </button>
-                            <button type="submit" className="btn-custom btn-primary">
-                                Update
-                            </button>
+                        <div>
+                            <label className="block text-sm font-medium">Nama Ketua RT</label>
+                            <input type="text" name="nama_ketua_rt" value={form.nama_ketua_rt || ""} onChange={handleChange} className="w-full border rounded-md p-2"/>
                         </div>
-                    </form>
-                </div>
+                        <div>
+                            <label className="block text-sm font-medium">Mulai Menjabat</label>
+                            <input type="date" name="mulai_menjabat" value={form.mulai_menjabat || ""} onChange={handleChange} className="w-full border rounded-md p-2"/>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium">Akhir Jabatan</label>
+                            <input type="date" name="akhir_jabatan" value={form.akhir_jabatan || ""} onChange={handleChange} className="w-full border rounded-md p-2"/>
+                        </div>
+                    </div>
+                    <div className="flex justify-end gap-3 pt-4 border-t">
+                        <button type="button" onClick={onClose} className="px-4 py-2 bg-gray-200 rounded-md hover:bg-gray-300">Batal</button>
+                        <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Update</button>
+                    </div>
+                </form>
             </div>
         </div>
     )
@@ -580,9 +412,6 @@ export function EditKategoriGolonganModal({ form, handleChange, handleEdit, onCl
     )
 }
 
-/* =====================================================================
-   📘 1. Modal Tambah Role
-===================================================================== */
 export function AddRoleModal({ form, setForm, handleAdd, onClose }) {
     return (
         <div
@@ -630,9 +459,6 @@ export function AddRoleModal({ form, setForm, handleAdd, onClose }) {
     )
 }
 
-/* =====================================================================
-   📘 2. Modal Edit Role
-===================================================================== */
 export function EditRoleModal({ form, setForm, handleEdit, onClose }) {
     return (
         <div
@@ -680,10 +506,6 @@ export function EditRoleModal({ form, setForm, handleEdit, onClose }) {
     )
 }
 
-
-/* =====================================================================
-   📘 3. Modal Edit Role Permission (Checkbox Multi)
-===================================================================== */
 export function EditRolePermissionModal({
     role,
     permissions,
@@ -731,9 +553,6 @@ export function EditRolePermissionModal({
     )
 }
 
-/* =====================================================================
-   📘 4. Modal Tambah Permission
-===================================================================== */
 export function AddPermissionModal({ form, setForm, handleAdd, onClose }) {
     return (
         <div className="modal fade show" style={{ display: "block", backgroundColor: "rgba(0,0,0,0.5)" }}>
@@ -769,9 +588,6 @@ export function AddPermissionModal({ form, setForm, handleAdd, onClose }) {
     )
 }
 
-/* =====================================================================
-   📘 5. Modal Edit Permission (Rename Permission)
-===================================================================== */
 export function EditPermissionModal({ form, setForm, handleEdit, onClose }) {
     return (
         <div className="modal fade show" style={{ display: "block", backgroundColor: "rgba(0,0,0,0.5)" }}>
@@ -1684,9 +1500,9 @@ export function DetailPengaduan({ selectedData, detailShow, onClose, onUpdated, 
                                                         <div className="p-3 text-center text-white">
                                                             <i className="bi bi-file-earmark-text fs-1"></i>
                                                             <p className="mb-1">Dokumen Terlampir: {selectedData.file_name}</p>
-                                                            <Link href={`/storage/${selectedData.file_path}`} target="_blank" className="btn btn-primary btn-sm">
+                                                            <a href={`/storage/${selectedData.file_path}`} target="_blank" className="btn btn-primary btn-sm">
                                                                 <i className="bi bi-download"></i> Unduh
-                                                            </Link>
+                                                            </a>
                                                         </div>
                                                     )}
                                                 </>
