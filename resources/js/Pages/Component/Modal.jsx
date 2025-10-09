@@ -5,6 +5,7 @@ import axios from "axios"
 import { FormatWaktu } from "../Warga/Pengaduan"
 import { SidebarLink } from "./SidebarLink"
 import { getAdminLinks, getRtLinks, getWargaLinks, getRwLinks } from "./GetPropRole"
+import Role from "./Role"
 
 export function ModalSidebar({ modalIsOpen, modalShow }) {
     const { url } = usePage()
@@ -957,22 +958,22 @@ export function DetailPengumuman({ selectedData, detailShow, onClose }) {
                                             })} */}
                                             • <FormatWaktu createdAt={selectedData.created_at} />
                                         </small >
-    <p
-        ref={textRef}
-        className={`mt-2 isi-pengumuman ${captionExpanded ? "expanded" : "clamped"}`}
-    >
-        {selectedData.isi}
-    </p>
-{
-    isOverflowing && (
-        <button
-            className="btn btn-link p-0 mt-1 text-decoration-none"
-            onClick={() => setCaptionExpanded(!captionExpanded)}
-        >
-            {captionExpanded ? "lebih sedikit" : "selengkapnya"}
-        </button>
-    )
-}
+                                        <p
+                                            ref={textRef}
+                                            className={`mt-2 isi-pengumuman ${captionExpanded ? "expanded" : "clamped"}`}
+                                        >
+                                            {selectedData.isi}
+                                        </p>
+                                        {
+                                            isOverflowing && (
+                                                <button
+                                                    className="btn btn-link p-0 mt-1 text-decoration-none"
+                                                    onClick={() => setCaptionExpanded(!captionExpanded)}
+                                                >
+                                                    {captionExpanded ? "lebih sedikit" : "selengkapnya"}
+                                                </button>
+                                            )
+                                        }
                                     </div >
                                     <div className="flex-grow-1 overflow-auto p-3 komen-section" ref={komenRef}>
                                         {komentar.length > 0 ? (
@@ -1192,9 +1193,11 @@ export function DetailPengaduan({ selectedData, detailShow, onClose, onUpdated, 
                                             {userData.nik === selectedData.nik_warga ? (
                                                 <div className="d-flex justify-between">
                                                     <h5 className="fw-bold mb-1 mt-2">{selectedData.judul}</h5>
-                                                    <button onClick={toggleEdit} title="Edit Pengaduan">
-                                                        <i className="far fa-edit"></i>
-                                                    </button>
+                                                    <Role role="warga">
+                                                        <button onClick={toggleEdit} title="Edit Pengaduan">
+                                                            <i className="far fa-edit"></i>
+                                                        </button>
+                                                    </Role>
                                                 </div>
                                             ) : (
                                                 <h5 className="fw-bold mb-1 mt-2">{selectedData.judul}</h5>
@@ -1282,7 +1285,7 @@ export function DetailPengaduan({ selectedData, detailShow, onClose, onUpdated, 
                         </div>
                     </div>
                 </div>
-            </div>
+            </div >
         </>
     )
 }
@@ -1770,6 +1773,14 @@ export function TambahPengaduan({ tambahShow, onClose, onAdded }) {
                     </div>
                 </div>
             </div>
-        </>
-    )
+        </>
+    )
+}
+
+export function DetailKK({ selectedData, detailShow, onClose }) {
+    return (
+        <>
+            {/* nanti dilanjut */}
+        </>
+    )
 }

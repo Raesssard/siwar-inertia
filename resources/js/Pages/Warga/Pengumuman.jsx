@@ -117,6 +117,7 @@ export default function Pengumuman() {
                 daftar_kategori={daftar_kategori}
                 filter={filter}
                 resetFilter={resetFilter}
+                role={role}
             />
             <div className="d-flex justify-content-between align-items-center mb-3 mx-4 w-100">
                 <div className="d-flex align-items-center gap-1">

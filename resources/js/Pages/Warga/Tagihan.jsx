@@ -1,13 +1,15 @@
 import Layout from "@/Layouts/Layout"
-import { Head, Link, useForm, usePage } from "@inertiajs/react";
-import React from "react";
-import { FIlterTagihan } from "../Component/Filter";
-import { formatRupiah, formatTanggal } from "../Component/GetPropRole";
+import { Head, Link, useForm, usePage } from "@inertiajs/react"
+import React from "react"
+import { FilterTagihan } from "../Component/Filter"
+import { formatRupiah, formatTanggal } from "../Component/GetPropRole"
 
 export default function Tagihan() {
-    const { title,
+    const {
+        title,
         tagihanManual,
-        tagihanOtomatis } = usePage().props
+        tagihanOtomatis
+    } = usePage().props
     const { props } = usePage()
     const { get, data, setData } = useForm({
         search: '',
@@ -31,11 +33,12 @@ export default function Tagihan() {
             <Head title={`${title} ${role.length <= 2
                 ? role.toUpperCase()
                 : role.charAt(0).toUpperCase() + role.slice(1)}`} />
-            <FIlterTagihan
+            <FilterTagihan
                 data={data}
                 setData={setData}
                 filter={filter}
                 resetFilter={resetFilter}
+                role={role}
             />
             <div className="table-container">
                 <div className="table-header">
@@ -66,9 +69,9 @@ export default function Tagihan() {
                                     <td>{formatTanggal(item.tgl_tempo)}</td>
                                     <td>
                                         {item.status_bayar === 'sudah_bayar' ? (
-                                            <span class="badge bg-success">Sudah Bayar</span>
+                                            <span className="badge bg-success">Sudah Bayar</span>
                                         ) : (
-                                            <span class="badge bg-warning">Belum Bayar</span>
+                                            <span className="badge bg-warning">Belum Bayar</span>
                                         )}
                                     </td>
                                     <td>{item.tgl_bayar ? formatTanggal(item.tgl_bayar) : "-"}</td>
@@ -147,9 +150,9 @@ export default function Tagihan() {
                                     <td>{formatTanggal(item.tgl_tempo)}</td>
                                     <td>
                                         {item.status_bayar === 'sudah_bayar' ? (
-                                            <span class="badge bg-success">Sudah Bayar</span>
+                                            <span className="badge bg-success">Sudah Bayar</span>
                                         ) : (
-                                            <span class="badge bg-warning">Belum Bayar</span>
+                                            <span className="badge bg-warning">Belum Bayar</span>
                                         )}
                                     </td>
                                     <td>{item.tgl_bayar ? formatTanggal(item.tgl_bayar) : "-"}</td>

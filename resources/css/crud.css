@@ -8,7 +8,7 @@
     background: #fff;
     border: 1px solid #e5e7eb;
     border-radius: 8px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
 }
 
 .filter-form input {
@@ -24,7 +24,7 @@
 
 .filter-form input:focus {
     border-color: #4e73df;
-    box-shadow: 0 0 0 3px rgba(78,115,223,0.2);
+    box-shadow: 0 0 0 3px rgba(78, 115, 223, 0.2);
 }
 
 /* ====== TABLE WRAPPER ====== */
@@ -33,8 +33,9 @@
     background: #fff;
     border-radius: 8px;
     padding: 20px;
-    margin-top: 30px; /* biar ga mepet */
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    margin-top: 30px;
+    /* biar ga mepet */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
     overflow-x: auto;
 }
 
@@ -79,6 +80,15 @@
 
 .table-custom tbody tr:hover {
     background: #f9fafb;
+}
+
+.table-scroll {
+    overflow-x: auto;
+    width: 100%;
+}
+
+.table-scroll::-webkit-scrollbar {
+    display: none;
 }
 
 /* ====== BUTTONS ====== */
@@ -175,7 +185,8 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(15, 23, 42, 0.6); /* gelap transparan */
+    background: rgba(15, 23, 42, 0.6);
+    /* gelap transparan */
     display: flex;
     justify-content: center;
     align-items: center;
@@ -188,7 +199,7 @@
     border-radius: 10px;
     width: 500px;
     max-width: 90%;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
     animation: fadeInUp 0.3s ease;
 }
 
@@ -197,6 +208,7 @@
         opacity: 0;
         transform: translateY(40px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -238,7 +250,7 @@
 
 .form-group input:focus {
     border-color: #4e73df;
-    box-shadow: 0 0 0 3px rgba(78,115,223,0.2);
+    box-shadow: 0 0 0 3px rgba(78, 115, 223, 0.2);
 }
 
 .modal-footer {
@@ -256,7 +268,8 @@
     outline: none;
     background: #fff;
     transition: all 0.2s;
-    appearance: none; /* buang default arrow */
+    appearance: none;
+    /* buang default arrow */
     background-image: url("data:image/svg+xml,%3Csvg fill='none' stroke='%236b7280' stroke-width='2' viewBox='0 0 24 24' %3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: right 10px center;
@@ -265,5 +278,5 @@
 
 .filter-form select:focus {
     border-color: #4e73df;
-    box-shadow: 0 0 0 3px rgba(78,115,223,0.2);
+    box-shadow: 0 0 0 3px rgba(78, 115, 223, 0.2);
 }
