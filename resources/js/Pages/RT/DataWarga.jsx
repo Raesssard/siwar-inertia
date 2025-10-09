@@ -15,6 +15,7 @@ export default function DataWarga() {
     const role = props.auth?.currentRole
     const { get, data, setData } = useForm({
         search: '',
+        jenis_kelamin: ''
     })
 
     const filter = (e) => {
@@ -75,25 +76,25 @@ export default function DataWarga() {
                         <tbody>
                             {warga.data.length > 0 ? (
                                 warga.data.map((item, index) => (
-                                    <tr key={item.id}>{console.log(item)}
+                                    <tr key={item.id}>
                                         <td className="text-center">{index + 1}</td>
-                                        <td className="text-center">{item.nik}</td>
-                                        <td className="text-center">{item.no_kk}</td>
-                                        <td className="text-center">{item.nama}</td>
-                                        <td className="text-center">{item.jenis_kelamin.charAt(0).toUpperCase() + item.jenis_kelamin.slice(1)}</td>
-                                        <td className="text-center">{item.tempat_lahir}</td>
-                                        <td className="text-center">{formatTanggal(item.tanggal_lahir)}</td>
-                                        <td className="text-center">{item.agama}</td>
-                                        <td className="text-center">{item.pendidikan}</td>
-                                        <td className="text-center">{item.pekerjaan}</td>
-                                        <td className="text-center">{item.golongan_darah}</td>
-                                        <td className="text-center">{item.status_perkawinan.charAt(0).toUpperCase() + item.status_perkawinan.slice(1)}</td>
-                                        <td className="text-center">{item.status_hubungan_dalam_keluarga.charAt(0).toUpperCase() + item.status_hubungan_dalam_keluarga.slice(1)}</td>
-                                        <td className="text-center">{item.kewarganegaraan}</td>
+                                        <td className="text-center">{item.nik ?? '-'}</td>
+                                        <td className="text-center">{item.no_kk ?? '-'}</td>
+                                        <td className="text-center">{item.nama ?? '-'}</td>
+                                        <td className="text-center">{item.jenis_kelamin.charAt(0).toUpperCase() + item.jenis_kelamin.slice(1) ?? '-'}</td>
+                                        <td className="text-center">{item.tempat_lahir ?? '-'}</td>
+                                        <td className="text-center">{formatTanggal(item.tanggal_lahir) ?? '-'}</td>
+                                        <td className="text-center">{item.agama ?? '-'}</td>
+                                        <td className="text-center">{item.pendidikan ?? '-'}</td>
+                                        <td className="text-center">{item.pekerjaan ?? '-'}</td>
+                                        <td className="text-center">{item.golongan_darah ?? '-'}</td>
+                                        <td className="text-center">{item.status_perkawinan.charAt(0).toUpperCase() + item.status_perkawinan.slice(1) ?? '-'}</td>
+                                        <td className="text-center">{item.status_hubungan_dalam_keluarga.charAt(0).toUpperCase() + item.status_hubungan_dalam_keluarga.slice(1) ?? '-'}</td>
+                                        <td className="text-center">{item.kewarganegaraan ?? '-'}</td>
                                         <td className="text-center">{item.no_paspor ?? "-"}</td>
                                         <td className="text-center">{item.no_kitas ?? "-"}/{item.no_kitap ?? "-"}</td>
-                                        <td className="text-center">{item.nama_ayah}</td>
-                                        <td className="text-center">{item.nama_ibu}</td>
+                                        <td className="text-center">{item.nama_ayah ?? '-'}</td>
+                                        <td className="text-center">{item.nama_ibu ?? '-'}</td>
                                         <td className="text-center">
                                             {item.status_warga === 'penduduk' ? (
                                                 <span className="badge bg-success text-white">Penduduk</span>
