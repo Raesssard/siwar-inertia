@@ -259,6 +259,7 @@ export default function Pengaduan() {
                         setShowModalDetail(false)
                     }}
                     userData={user}
+                    role={role}
                 />
                 <TambahPengaduan
                     tambahShow={showModalTambah}

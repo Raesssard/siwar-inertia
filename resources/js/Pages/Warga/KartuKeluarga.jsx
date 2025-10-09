@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useState } from "react"
 import Layout from "@/Layouts/Layout"
 import { Head, usePage } from "@inertiajs/react"
 import '../../../css/kartu-keluarga.css'
@@ -8,6 +8,7 @@ export default function KartuKeluarga() {
     const { title, kartuKeluarga } = usePage().props
     const { props } = usePage()
     const role = props.auth?.currentRole
+    const [viewDoc, setViewDoc] = useState(null)
 
     if (!kartuKeluarga) {
         return (
@@ -57,7 +58,7 @@ export default function KartuKeluarga() {
                             </div>
                         </div>
 
-                        <div className="kk-info-grid row row-cols-1 row-cols-md-2 g-3 mb-4 small">
+                        <div className="kk-info-grid col g-3 mb-4 small">
                             <div className="col">
                                 <p className="mb-1 text-left"><strong>Kepala Keluarga</strong> : {kepala.nama ?? '-'}
                                 </p>
@@ -132,26 +133,26 @@ export default function KartuKeluarga() {
                                                 .map((data, index) => (
                                                     <tr key={index}>
                                                         <td className="text-center">{index + 1}</td>
-                                                        <td>{data.nama ?? '-'}</td>
-                                                        <td>{data.nik ?? '-'}</td>
+                                                        <td className="text-center">{data.nama ?? '-'}</td>
+                                                        <td className="text-center">{data.nik ?? '-'}</td>
                                                         <td className="text-center">{data.jenis_kelamin ?? '-'}</td>
-                                                        <td>{data.tempat_lahir ?? '-'}</td>
+                                                        <td className="text-center">{data.tempat_lahir ?? '-'}</td>
                                                         <td className="text-center">
                                                             {formatTanggal(data.tanggal_lahir)}
                                                         </td>
-                                                        <td>{data.agama ?? '-'}</td>
-                                                        <td>{data.pendidikan ?? '-'}</td>
-                                                        <td>{data.pekerjaan ?? '-'}</td>
+                                                        <td className="text-center">{data.agama ?? '-'}</td>
+                                                        <td className="text-center">{data.pendidikan ?? '-'}</td>
+                                                        <td className="text-center">{data.pekerjaan ?? '-'}</td>
                                                         <td className="text-center">{data.golongan_darah ?? '-'}</td>
                                                         <td className="text-center">{data.status_perkawinan ?? '-'}</td>
-                                                        <td>{data.status_hubungan_dalam_keluarga ?? '-'}</td>
+                                                        <td className="text-center">{data.status_hubungan_dalam_keluarga ?? '-'}</td>
                                                         <td className="text-center">{data.kewarganegaraan ?? 'WNI'}</td>
                                                         <td className="text-center">{data.no_paspor ?? '-'}</td>
                                                         <td className="text-center">
                                                             {`${data.no_kitas ?? '-'} / ${data.no_kitap ?? '-'}`}
                                                         </td>
-                                                        <td>{data.nama_ayah ?? '-'}</td>
-                                                        <td>{data.nama_ibu ?? '-'}</td>
+                                                        <td className="text-center">{data.nama_ayah ?? '-'}</td>
+                                                        <td className="text-center">{data.nama_ibu ?? '-'}</td>
                                                         <td className="text-center">{data.status_warga ?? '-'}</td>
                                                     </tr>
                                                 ))
@@ -204,7 +205,7 @@ export default function KartuKeluarga() {
                         <hr className="my-4" style={{ borderTop: "2px solid #e0e0e0" }} />
 
                         <div className="kk-document-section mt-4 border rounded p-3 bg-light">
-                            <div className="kk-document-display text-center">
+                            <div className="kk-document-display text-center w-100" style={{ maxHeight: "100px" }}>
                                 {kartuKeluarga?.foto_kk ? (
                                     (() => {
                                         const fileExtension = kartuKeluarga.foto_kk.split(".").pop().toLowerCase()
@@ -213,14 +214,19 @@ export default function KartuKeluarga() {
 
                                         return (
                                             <>
-                                                <h6 className="fw-bold mb-3 small text-muted">Dokumen KK Terunggah:</h6>
-                                                <div className="document-preview-wrapper mx-auto text-center position-relative">
+                                                <h6 className="fw-bold mb-0 small text-muted mr-4">Dokumen KK Terunggah:</h6>
+                                                <div className="document-preview-wrapper text-center position-relative" style={{ height: "5rem" }}>
                                                     {isPdf ? (
                                                         <div
-                                                            className="pdf-thumbnail-container cursor-pointer"
-                                                            onClick={() => openDocumentModal(filePath, true)}
+                                                            className="pdf-thumbnail-container d-block cursor-pointer p-0 h-100"
+                                                            onClick={() =>
+                                                                setViewDoc(
+                                                                    `/storage/${kartuKeluarga.foto_kk}`
+                                                                )
+                                                            }
+                                                            style={{ height: "5rem" }}
                                                         >
-                                                            <i className="far fa-file-pdf pdf-icon-lg"></i>
+                                                            <i className="far fa-file-pdf mt-3"></i>
                                                             <p className="pdf-filename mt-2">Lihat Dokumen PDF</p>
                                                         </div>
                                                     ) : (
@@ -262,6 +268,50 @@ export default function KartuKeluarga() {
                     </div>
                 </div>
             </div>
+            {viewDoc && (
+                <div
+                    className="modal fade show"
+                    style={{
+                        display: "block",
+                        backgroundColor: "rgba(0,0,0,0.8)",
+                    }}
+                    onClick={() => setViewDoc(null)}
+                >
+                    <div
+                        className="modal-dialog modal-xl modal-dialog-centered"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <div className="modal-content bg-dark border-0">
+                            <div className="modal-body text-center">
+                                {viewDoc.endsWith(".pdf") ? (
+                                    <iframe
+                                        src={viewDoc}
+                                        style={{ width: "100%", height: "80vh" }}
+                                    />
+                                ) : (
+                                    <img
+                                        src={viewDoc}
+                                        alt="Dokumen KK"
+                                        style={{
+                                            maxWidth: "100%",
+                                            maxHeight: "80vh",
+                                            borderRadius: "10px",
+                                        }}
+                                    />
+                                )}
+                            </div>
+                            <div className="modal-footer border-0 justify-content-center">
+                                <button
+                                    className="btn btn-light"
+                                    onClick={() => setViewDoc(null)}
+                                >
+                                    Tutup
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </Layout>
     )
 }

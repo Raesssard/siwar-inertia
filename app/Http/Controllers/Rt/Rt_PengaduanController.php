@@ -7,6 +7,7 @@ use App\Models\Pengaduan;
 use App\Models\PengaduanKomentar;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Inertia\Inertia;
 
 class Rt_PengaduanController extends Controller
 {
@@ -14,12 +15,21 @@ class Rt_PengaduanController extends Controller
     {
         $title = ' Daftar Pengaduan Warga';
         $user = Auth::user();
+        $tahun = $request->input('tahun');
+        $bulan = $request->input('bulan');
+        $pengaduan_rt = $user->rukunTetangga->nomor_rt;
 
-        $pengaduan_rt = $user->rukunTetangga->rt;
-
-        $pengaduan_rt_saya = Pengaduan::WhereHas('warga.kartuKeluarga.rukunTetangga', function ($aduan) use ($pengaduan_rt) {
-            $aduan->where('level', 'rt')->where('rt', $pengaduan_rt);
-        });
+        $pengaduan_rt_saya = Pengaduan::query()
+            ->WhereHas('warga.kartuKeluarga.rukunTetangga', function ($aduan) use ($pengaduan_rt) {
+                $aduan->where('level', 'rt')->where('nomor_rt', $pengaduan_rt);
+            })->with([
+                'warga',
+                'komentar.user',
+                'warga.kartuKeluarga.rukunTetangga',
+                'warga.kartuKeluarga.rw'
+            ])
+            ->when($tahun, fn($q) => $q->whereYear('created_at', $tahun))
+            ->when($bulan, fn($q) => $q->whereMonth('created_at', $bulan));;
 
         if ($request->filled('search')) {
             $hasil = $request->input('search');
@@ -28,12 +38,56 @@ class Rt_PengaduanController extends Controller
             });
         }
 
-        $rt_pengaduan = $pengaduan_rt_saya->orderBy('created_at', 'desc')
-            ->paginate(10);
+        if ($request->filled('kategori')) {
+            $pengaduan_rt_saya->where('level', $request->kategori);
+        }
 
-        $total_pengaduan_rt = $rt_pengaduan->count();
+        $rt_pengaduan = $pengaduan_rt_saya->orderBy('created_at', 'desc')->get();
 
-        return view('rt.pengaduan.pengaduan', compact('title', 'rt_pengaduan', 'total_pengaduan_rt'));
+        $total_pengaduan_rt = Pengaduan::WhereHas(
+            'warga.kartuKeluarga.rukunTetangga',
+            function ($aduan) use ($pengaduan_rt) {
+                $aduan->where('level', 'rt')->where('nomor_rt', $pengaduan_rt);
+            }
+        );
+        $total_pengaduan_rt_filtered = $rt_pengaduan->count();
+
+        $list_bulan = [
+            'januari',
+            'februari',
+            'maret',
+            'april',
+            'mei',
+            'juni',
+            'juli',
+            'agustus',
+            'september',
+            'oktober',
+            'november',
+            'desember'
+        ];
+
+        $list_tahun = Pengaduan::query()
+            ->selectRaw('YEAR(created_at) as tahun')
+            ->groupBy('tahun')
+            ->orderByDesc('tahun')
+            ->pluck('tahun');
+
+        $list_level = Pengaduan::query()
+            ->select('level')
+            ->whereNotNull('level')
+            ->distinct()
+            ->pluck('level');
+
+        return Inertia::render('RT/Pengaduan', [
+            'title' => $title,
+            'rt_pengaduan' => $rt_pengaduan,
+            'total_pengaduan_rt' => $total_pengaduan_rt,
+            'total_pengaduan_rt_filtered' => $total_pengaduan_rt_filtered,
+            'list_bulan' => $list_bulan,
+            'list_tahun' => $list_tahun,
+            'list_level' => $list_level,
+        ]);
     }
 
 

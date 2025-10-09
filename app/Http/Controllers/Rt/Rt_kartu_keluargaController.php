@@ -73,26 +73,34 @@ class Rt_kartu_keluargaController extends Controller
 
     public function uploadFoto(Request $request, $no_kk)
     {
-        $kartuKeluarga = Kartu_keluarga::where('no_kk', $no_kk)->firstOrFail();
-        $request->validate([
-            'kk_file' => 'required|file|mimes:jpeg,png,jpg,pdf|max:5120',
-        ]);
+        try {
+            $kartuKeluarga = Kartu_keluarga::where('no_kk', $no_kk)->firstOrFail();
 
-        $file = $request->file('kk_file');
-        $originalExtension = $file->getClientOriginalExtension();
-        $fileName = time() . '_' . Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)) . '.' . $originalExtension;
+            $request->validate([
+                'kk_file' => 'required|file|mimes:jpeg,png,jpg,pdf|max:5120',
+            ]);
 
-        if ($kartuKeluarga->foto_kk) {
+            $file = $request->file('kk_file');
+            $originalExtension = $file->getClientOriginalExtension();
+            $fileName = time() . '_' . Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)) . '.' . $originalExtension;
 
-            Storage::disk('public')->delete($kartuKeluarga->foto_kk);
+            if ($kartuKeluarga->foto_kk) {
+                Storage::disk('public')->delete($kartuKeluarga->foto_kk);
+            }
+
+            $path = $file->storeAs('kartu_keluarga', $fileName, 'public');
+
+            $kartuKeluarga->foto_kk = $path;
+            $kartuKeluarga->save();
+
+            return response()->json([
+                'message' => 'Dokumen Kartu Keluarga berhasil diunggah!',
+                'path' => asset('storage/' . $path)
+            ]);
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Upload KK error: ' . $e->getMessage());
+            return response()->json(['error' => 'Upload gagal', 'detail' => $e->getMessage()], 500);
         }
-
-        $path = $file->storeAs('kartu_keluarga', $fileName, 'public');
-
-        $kartuKeluarga->foto_kk = $path;
-        $kartuKeluarga->save();
-
-        return redirect()->back()->with('success', 'Dokumen Kartu Keluarga berhasil diunggah!');
     }
 
     public function deleteFoto($no_kk)
