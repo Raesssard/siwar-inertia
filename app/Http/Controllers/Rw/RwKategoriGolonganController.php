@@ -7,7 +7,7 @@ use App\Models\Kategori_golongan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
-class Kategori_golonganController extends Controller
+class RwKategoriGolonganController extends Controller
 {
     /**
      * Display a listing of the resource.

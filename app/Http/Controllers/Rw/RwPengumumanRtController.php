@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Barryvdh\DomPDF\Facade\Pdf;
 
-class PengumumanRtController extends Controller
+class RwPengumumanRtController extends Controller
 {
     /**
      * Display a listing of the resource.

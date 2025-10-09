@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Rw;
 
 use App\Http\Controllers\Controller;
 use App\Models\Kartu_keluarga;
-use App\Models\Rukun_tetangga;
+use App\Models\Rt;
 use App\Models\User;
 use App\Models\Warga;
 use App\Models\HistoryWarga;
@@ -14,7 +14,7 @@ use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
 
-class WargaController extends Controller
+class RwWargaController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -29,7 +29,7 @@ class WargaController extends Controller
         $id_rw = Auth::user()->id_rw; // Dapatkan id_rw dari user yang sedang login
 
         // Dapatkan daftar RT yang relevan untuk dropdown filter
-        $rukun_tetangga_filter = Rukun_tetangga::whereHas('jabatan', function ($q) {
+        $rukun_tetangga_filter = Rt::whereHas('jabatan', function ($q) {
                 $q->where('nama_jabatan', 'ketua');
             })
             ->where('id_rw', $id_rw)
@@ -69,7 +69,7 @@ class WargaController extends Controller
 
         // Variabel-variabel ini mungkin tidak perlu di-pass ke view jika hanya digunakan untuk dropdown filter atau tujuan lain yang sudah dicakup.
         // Namun, jika view memang membutuhkannya, biarkan saja. Saya akan biarkan untuk menjaga kompatibilitas.
-        $rukun_tetangga = Rukun_tetangga::all(); // Ini mungkin digunakan untuk dropdown RT keseluruhan
+        $rukun_tetangga = Rt::all(); // Ini mungkin digunakan untuk dropdown RT keseluruhan
         $kartu_keluarga = Kartu_keluarga::all(); // Ini mungkin digunakan untuk dropdown No KK keseluruhan
 
         return view('rw.warga.warga', compact(

@@ -61,6 +61,11 @@ Route::middleware(['auth'])->group(function () {
         Route::get('tagihan', [WargatagihanController::class, 'index'])->name('tagihan');
         Route::get('transaksi', [WargatransaksiController::class, 'index'])->name('transaksi');
     });
+
+    Route::prefix('rw')->as('rw.')->group(function () {
+        
+    });
+
     Route::prefix('rt')->as('rt.')->group(function () {
         Route::resource('warga', Rt_wargaController::class);
         Route::resource('kartu_keluarga', Rt_kartu_keluargaController::class);

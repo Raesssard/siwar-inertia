@@ -4,13 +4,13 @@ namespace App\Http\Controllers\Rw;
 use App\Http\Controllers\Controller;
 
 use App\Models\Pengumuman;
-use App\Models\Rukun_tetangga;
+use App\Models\Rt;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Barryvdh\DomPDF\Facade\Pdf;
 
-class PengumumanController extends Controller
+class RwPengumumanController extends Controller
 {
     /**
      * Display a listing of the resource.

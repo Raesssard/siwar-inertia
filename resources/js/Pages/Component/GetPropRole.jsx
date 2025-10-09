@@ -210,7 +210,7 @@ export function getRwCards({ ...rest }) {
             color: "primary",
             title: "Jumlah Warga",
             value: rest.jumlah_warga,
-            icon: "people-fill",
+            icon: "users",
         },
         {
             href: "/rw/pengaduan",

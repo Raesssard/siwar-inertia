@@ -1,9 +1,8 @@
 // resources/js/Pages/Admin/Rw.jsx
 import React, { useState } from "react";
-import { Inertia } from "@inertiajs/inertia";
 import Layout from "@/Layouts/Layout";
 import { route } from "ziggy-js";
-import { Link, router } from '@inertiajs/react';
+import { Link, router } from "@inertiajs/react";
 import { AddRwModal, EditRwModal } from "@/Pages/Component/Modal";
 
 export default function Rw({ rw, filters, nomorRwList }) {
@@ -16,6 +15,7 @@ export default function Rw({ rw, filters, nomorRwList }) {
         nama_ketua_rw: "",
         mulai_menjabat: "",
         akhir_jabatan: "",
+        status: "aktif",
     });
 
     const [search, setSearch] = useState({
@@ -30,7 +30,7 @@ export default function Rw({ rw, filters, nomorRwList }) {
 
     const handleAdd = (e) => {
         e.preventDefault();
-        Inertia.post(route("admin.rw.store"), form, {
+        router.post(route("admin.rw.store"), form, {
             onSuccess: () => {
                 setShowAdd(false);
                 setForm({
@@ -39,6 +39,7 @@ export default function Rw({ rw, filters, nomorRwList }) {
                     nama_ketua_rw: "",
                     mulai_menjabat: "",
                     akhir_jabatan: "",
+                    status: "aktif",
                 });
             },
         });
@@ -46,14 +47,14 @@ export default function Rw({ rw, filters, nomorRwList }) {
 
     const handleEdit = (e) => {
         e.preventDefault();
-        Inertia.put(route("admin.rw.update", showEdit.id), form, {
+        router.put(route("admin.rw.update", showEdit.id), form, {
             onSuccess: () => setShowEdit(null),
         });
     };
 
     const handleDelete = (id) => {
         if (confirm("Yakin ingin menghapus data RW ini?")) {
-            Inertia.delete(route("admin.rw.destroy", id));
+            router.delete(route("admin.rw.destroy", id));
         }
     };
 
@@ -64,6 +65,7 @@ export default function Rw({ rw, filters, nomorRwList }) {
             nama_ketua_rw: rwItem.nama_ketua_rw || "",
             mulai_menjabat: rwItem.mulai_menjabat || "",
             akhir_jabatan: rwItem.akhir_jabatan || "",
+            status: rwItem.status || "aktif",
         });
         setShowEdit(rwItem);
     };
@@ -104,7 +106,6 @@ export default function Rw({ rw, filters, nomorRwList }) {
                     onChange={handleSearchChange}
                 />
 
-                {/* Dropdown nomor RW */}
                 <select
                     name="nomor_rw"
                     value={search.nomor_rw}
@@ -130,6 +131,7 @@ export default function Rw({ rw, filters, nomorRwList }) {
                     Reset
                 </button>
             </form>
+
             {/* Table */}
             <div className="table-container">
                 <div className="table-header">
@@ -151,6 +153,7 @@ export default function Rw({ rw, filters, nomorRwList }) {
                             <th>Nama Ketua RW</th>
                             <th>Mulai Menjabat</th>
                             <th>Akhir Jabatan</th>
+                            <th>Status</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
@@ -164,6 +167,17 @@ export default function Rw({ rw, filters, nomorRwList }) {
                                     <td>{item.nama_ketua_rw}</td>
                                     <td>{item.mulai_menjabat}</td>
                                     <td>{item.akhir_jabatan}</td>
+                                    <td>
+                                        <span
+                                            className={`px-2 py-1 rounded text-sm font-medium ${
+                                                item.status === "aktif"
+                                                    ? "bg-green-100 text-green-700"
+                                                    : "bg-red-100 text-red-700"
+                                            }`}
+                                        >
+                                            {item.status || "-"}
+                                        </span>
+                                    </td>
                                     <td>
                                         <button
                                             className="btn-custom btn-warning me-1"
@@ -182,7 +196,7 @@ export default function Rw({ rw, filters, nomorRwList }) {
                             ))
                         ) : (
                             <tr>
-                                <td colSpan="7" className="text-center">
+                                <td colSpan="8" className="text-center">
                                     Tidak ada data
                                 </td>
                             </tr>

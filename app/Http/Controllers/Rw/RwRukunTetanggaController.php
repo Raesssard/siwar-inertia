@@ -4,10 +4,9 @@ namespace App\Http\Controllers\Rw;
 
 use App\Http\Controllers\Controller;
 use App\Models\Kartu_keluarga;
-use App\Models\Rukun_tetangga;
+use App\Models\Rt;
 use App\Models\User;
 use App\Models\Warga;
-use App\Models\Jabatan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -16,7 +15,7 @@ use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 
-class Rukun_tetanggaController extends Controller
+class RwRukunTetanggaController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -27,7 +26,7 @@ class Rukun_tetanggaController extends Controller
         $id_rw = Auth::user()->id_rw; // Dapatkan id_rw dari user yang sedang login
 
         // Ambil daftar RT untuk dropdown filter (hanya Ketua, unik, sesuai RW yang sama)
-        $rukun_tetangga_filter = Rukun_tetangga::whereHas('jabatan', function ($q) {
+        $rukun_tetangga_filter = Rt::whereHas('jabatan', function ($q) {
                 $q->where('nama_jabatan', 'ketua');
             })
             ->where('id_rw', $id_rw)
@@ -45,7 +44,7 @@ class Rukun_tetanggaController extends Controller
         $title = 'Rukun Tetangga';
 
         // Query dasar
-        $query = Rukun_tetangga::with(['rw', 'jabatan'])->where('id_rw', $id_rw);
+        $query = Rt::with(['rw', 'jabatan'])->where('id_rw', $id_rw);
 
         // --- Filter ---
 
@@ -78,7 +77,7 @@ class Rukun_tetanggaController extends Controller
             ->paginate(10)
             ->withQueryString();
 
-        $total_rt_di_rw = Rukun_tetangga::where('id_rw', $id_rw)->count();
+        $total_rt_di_rw = Rt::where('id_rw', $id_rw)->count();
 
         return view('rw.data-rt.rukun_tetangga', compact(
             'rukun_tetangga',
@@ -146,7 +145,7 @@ public function store(Request $request)
         // ✅ Cek apakah jabatan inti (ketua, sekretaris, bendahara) sudah ada di RT yang sama
         $jabatan = Jabatan::find($request->jabatan_id);
         if (in_array(strtolower($jabatan->nama_jabatan), ['ketua', 'bendahara', 'sekretaris'])) {
-            $exists = Rukun_tetangga::where('rt', $request->rt)
+            $exists = Rt::where('rt', $request->rt)
                         ->where('id_rw', $id_rw)
                         ->whereHas('jabatan', function ($q) use ($jabatan) {
                             $q->where('nama_jabatan', $jabatan->nama_jabatan);
@@ -162,7 +161,7 @@ public function store(Request $request)
             }
         }
 
-        $rt = Rukun_tetangga::create([
+        $rt = Rt::create([
             'no_kk' => $request->no_kk,
             'nik' => $request->nik,
             'rt' => $request->rt,
@@ -216,7 +215,7 @@ public function store(Request $request)
  */
 public function show(string $id)
 {
-    $rukun_tetangga = Rukun_tetangga::with('jabatan')->findOrFail($id);
+    $rukun_tetangga = Rt::with('jabatan')->findOrFail($id);
     return view('rw.rukun_tetangga.show', compact('rukun_tetangga'));
 }
 
@@ -225,7 +224,7 @@ public function show(string $id)
  */
 public function edit(string $id)
 {
-    $rukun_tetangga = Rukun_tetangga::with('jabatan')->findOrFail($id);
+    $rukun_tetangga = Rt::with('jabatan')->findOrFail($id);
     return view('rw.rukun_tetangga.edit', compact('rukun_tetangga'));
 }
 
@@ -234,7 +233,7 @@ public function edit(string $id)
  */
 public function update(Request $request, string $id)
 {
-    $rukunTetangga = Rukun_tetangga::findOrFail($id);
+    $rukunTetangga = Rt::findOrFail($id);
 
     $userAuth = Auth::user();
     if (!$userAuth || !isset($userAuth->id_rw)) {
@@ -266,7 +265,7 @@ public function update(Request $request, string $id)
         // ✅ Cek apakah jabatan sudah ada di RT yang sama (kecuali record ini sendiri)
         $jabatan = Jabatan::find($request->jabatan_id);
         if (in_array(strtolower($jabatan->nama_jabatan), ['ketua', 'bendahara', 'sekretaris'])) {
-            $exists = Rukun_tetangga::where('rt', $request->rt)
+            $exists = Rt::where('rt', $request->rt)
                         ->where('id_rw', $id_rw)
                         ->where('jabatan_id', $request->jabatan_id)
                         ->where('id', '!=', $rukunTetangga->id)
@@ -317,7 +316,7 @@ public function update(Request $request, string $id)
     public function destroy(string $id)
     {
         try {
-            $rt = Rukun_tetangga::findOrFail($id);
+            $rt = Rt::findOrFail($id);
 
             // Cari user terkait RT
             $user = User::where('id_rt', $rt->id)->first();

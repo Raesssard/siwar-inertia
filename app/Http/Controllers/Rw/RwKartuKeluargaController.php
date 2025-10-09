@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Rw;
 use App\Http\Controllers\Controller;
 use App\Models\Kartu_keluarga;
 use App\Models\Kategori_golongan;
-use App\Models\Rukun_tetangga;
+use App\Models\Rt;
 use App\Models\Warga;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Str;
 
-class Kartu_keluargaController extends Controller
+class RwKartuKeluargaController extends Controller
 {
     public function index(Request $request)
     {
@@ -45,13 +45,13 @@ class Kartu_keluargaController extends Controller
 
         $kartu_keluarga = $kartu_keluarga_query->paginate(5)->withQueryString();
 
-        $rukun_tetangga = Rukun_tetangga::where('id_rw', $userRwId)
+        $rukun_tetangga = Rt::where('id_rw', $userRwId)
             ->select('rt')
             ->distinct()
             ->orderBy('rt')
             ->get();
 
-        $all_rukun_tetangga = Rukun_tetangga::where('id_rw', $userRwId)
+        $all_rukun_tetangga = Rt::where('id_rw', $userRwId)
             ->orderBy('rt')
             ->get(['id', 'rt']);
 
@@ -167,7 +167,7 @@ class Kartu_keluargaController extends Controller
 public function edit(string $id)
 {
     $kartu_keluarga = Kartu_keluarga::findOrFail($id);
-    $rukun_tetangga = Rukun_tetangga::where('id_rw', Auth::user()->id_rw)
+    $rukun_tetangga = Rt::where('id_rw', Auth::user()->id_rw)
         ->select('id', 'rt')
         ->orderBy('rt')
         ->get();

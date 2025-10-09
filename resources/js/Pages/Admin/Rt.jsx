@@ -1,11 +1,10 @@
-// resources/js/Pages/Admin/Rt.jsx
 import React, { useState } from "react";
 import { Link, router } from "@inertiajs/react";
 import { route } from "ziggy-js";
 import Layout from "@/Layouts/Layout";
 import { AddRtModal, EditRtModal } from "@/Pages/Component/Modal";
 
-export default function Rt({ rukun_tetangga, filters, nomorRtList }) {
+export default function Rt({ rukun_tetangga, filters, nomorRtList, rwList }) {
     const [showAdd, setShowAdd] = useState(false);
     const [showEdit, setShowEdit] = useState(null);
 
@@ -15,6 +14,7 @@ export default function Rt({ rukun_tetangga, filters, nomorRtList }) {
         nama_ketua_rt: "",
         mulai_menjabat: "",
         akhir_jabatan: "",
+        status: "aktif", // default aktif
     });
 
     const [search, setSearch] = useState({
@@ -38,6 +38,7 @@ export default function Rt({ rukun_tetangga, filters, nomorRtList }) {
                     nama_ketua_rt: "",
                     mulai_menjabat: "",
                     akhir_jabatan: "",
+                    status: "aktif",
                 });
             },
         });
@@ -63,6 +64,7 @@ export default function Rt({ rukun_tetangga, filters, nomorRtList }) {
             nama_ketua_rt: rtItem.nama_ketua_rt || "",
             mulai_menjabat: rtItem.mulai_menjabat || "",
             akhir_jabatan: rtItem.akhir_jabatan || "",
+            status: rtItem.status || "aktif",
         });
         setShowEdit(rtItem);
     };
@@ -81,14 +83,8 @@ export default function Rt({ rukun_tetangga, filters, nomorRtList }) {
     };
 
     const resetFilter = () => {
-        setSearch({
-            keyword: "",
-            nomor_rt: "",
-        });
-        router.get(route("admin.rt.index"), {}, {
-            replace: true,
-            preserveScroll: true,
-        });
+        setSearch({ keyword: "", nomor_rt: "" });
+        router.get(route("admin.rt.index"), {}, { replace: true, preserveScroll: true });
     };
 
     return (
@@ -149,6 +145,7 @@ export default function Rt({ rukun_tetangga, filters, nomorRtList }) {
                             <th>Nama Ketua RT</th>
                             <th>Mulai Menjabat</th>
                             <th>Akhir Jabatan</th>
+                            <th>Status</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
@@ -162,6 +159,17 @@ export default function Rt({ rukun_tetangga, filters, nomorRtList }) {
                                     <td>{item.nama_ketua_rt}</td>
                                     <td>{item.mulai_menjabat}</td>
                                     <td>{item.akhir_jabatan}</td>
+                                    <td>
+                                        <span
+                                            className={`px-2 py-1 rounded text-white text-sm ${
+                                                item.status === "aktif"
+                                                    ? "bg-green-500"
+                                                    : "bg-gray-500"
+                                            }`}
+                                        >
+                                            {item.status}
+                                        </span>
+                                    </td>
                                     <td>
                                         <button
                                             className="btn-custom btn-warning me-1"
@@ -180,7 +188,7 @@ export default function Rt({ rukun_tetangga, filters, nomorRtList }) {
                             ))
                         ) : (
                             <tr>
-                                <td colSpan="7" className="text-center">
+                                <td colSpan="8" className="text-center">
                                     Tidak ada data
                                 </td>
                             </tr>
@@ -206,9 +214,7 @@ export default function Rt({ rukun_tetangga, filters, nomorRtList }) {
                                     >
                                         <Link
                                             href={link.url || "#"}
-                                            dangerouslySetInnerHTML={{
-                                                __html: label,
-                                            }}
+                                            dangerouslySetInnerHTML={{ __html: label }}
                                         />
                                     </li>
                                 );
@@ -225,6 +231,7 @@ export default function Rt({ rukun_tetangga, filters, nomorRtList }) {
                     handleChange={handleChange}
                     handleAdd={handleAdd}
                     onClose={() => setShowAdd(false)}
+                    rwList={rwList} // ✅ ditambahkan
                 />
             )}
 
@@ -235,6 +242,7 @@ export default function Rt({ rukun_tetangga, filters, nomorRtList }) {
                     handleChange={handleChange}
                     handleEdit={handleEdit}
                     onClose={() => setShowEdit(null)}
+                    rwList={rwList} // ✅ ditambahkan
                 />
             )}
         </Layout>
