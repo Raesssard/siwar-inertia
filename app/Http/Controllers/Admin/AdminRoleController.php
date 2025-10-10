@@ -12,6 +12,7 @@ class AdminRoleController extends Controller
 {
     public function index(Request $request)
     {
+        $title = 'Roles';
         // 🔹 Filter nama role
         $filterName = $request->input('name');
 
@@ -28,6 +29,7 @@ class AdminRoleController extends Controller
             'roles' => $roles,
             'permissions' => $permissions,
             'filters' => ['name' => $filterName],
+            'title' => $title
         ]);
     }
 

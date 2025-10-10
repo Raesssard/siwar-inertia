@@ -2,10 +2,12 @@
 import React, { useState } from "react";
 import Layout from "@/Layouts/Layout";
 import { route } from "ziggy-js";
-import { Link, router } from "@inertiajs/react";
+import { Head, Link, router, usePage } from "@inertiajs/react";
 import { AddRwModal, EditRwModal } from "@/Pages/Component/Modal";
 
-export default function Rw({ rw, filters, nomorRwList }) {
+export default function Rw({ rw, filters, nomorRwList, title }) {
+    const { props } = usePage()
+    const role = props.auth?.currentRole
     const [showAdd, setShowAdd] = useState(false);
     const [showEdit, setShowEdit] = useState(null);
 
@@ -105,6 +107,9 @@ export default function Rw({ rw, filters, nomorRwList }) {
 
     return (
         <Layout title="Data RW">
+            <Head title={`${title} - ${role.length <= 2
+                ? role.toUpperCase()
+                : role.charAt(0).toUpperCase() + role.slice(1)}`} />
             {/* Filter */}
             <form onSubmit={applyFilter} className="filter-form">
                 <input

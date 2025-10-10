@@ -12,6 +12,7 @@ use App\Models\Tagihan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth; // Tetap diperlukan jika ada filter iuran per RT
 use Illuminate\Support\Facades\Log;
+use Inertia\Inertia;
 
 class RtIuranController extends Controller
 {
@@ -47,7 +48,11 @@ class RtIuranController extends Controller
         $golongan_list = Kategori_golongan::all();
         $title = 'Iuran';
 
-        return view('rt.iuran.iuran', compact('iuran', 'golongan_list', 'title'));
+        return Inertia::render('RT/Iuran', [
+            'iuran' => $iuran,
+            'golongan_list' => $golongan_list,
+            'title' => $title,
+        ]);
     }
 
     public function store(Request $request)
