@@ -4,13 +4,15 @@ namespace App\Http\Controllers\Rt;
 
 use App\Http\Controllers\Controller;
 use App\Models\Pengumuman;
+use App\Models\Rt;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Rukun_tetangga;
 use Dompdf\Dompdf;
 use Dompdf\Options;
-use Illuminate\Support\Facades\Storage; // <-- Tambahkan baris ini!
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\View;
+use Inertia\Inertia;
 
 class Rt_pengumumanController extends Controller
 {
@@ -19,114 +21,132 @@ class Rt_pengumumanController extends Controller
      */
     public function index(Request $request)
     {
-        $title = 'Pengumuman RT'; // Judul yang lebih spesifik
-
         $search = $request->input('search');
         $tahun = $request->input('tahun');
         $bulan = $request->input('bulan');
         $kategori = $request->input('kategori');
+        $level = $request->input('level');
 
-        // Pastikan user RT memiliki data di tabel rukun_tetangga
-        $userRtData = Auth::user()->rukunTetangga; // Mengambil data rukun_tetangga terkait user
-        if (!$userRtData) {
-            // Handle jika user tidak terhubung dengan data RT
-            // Ini bisa terjadi jika id_rt di tabel users tidak valid
-            return redirect()->back()->with('error', 'Data Rukun Tetangga Anda tidak ditemukan. Mohon hubungi administrator.');
-        }
+        $userRtId = Auth::user()->warga->kartuKeluarga->rukunTetangga->id ?? null;
+        $userRwId = Auth::user()->warga->kartuKeluarga->rw->id ?? null;
 
-        // --- Ambil NOMOR RT dan ID RW dari data user RT yang login ---
-        // Ini adalah kunci perbaikan
-        $nomorRtUser = $userRtData->rt; // Nomor RT (misal: '01')
-        $idRwUser = $userRtData->id_rw; // ID RW yang terkait dengan RT ini
+        $baseQuery = Pengumuman::query()->with([
+            'rukunTetangga',
+            'rw',
+            'komen',
+            'komen.user',
+        ]);
 
-        // Query dasar untuk pengumuman:
-        // 1. Pengumuman yang dibuat oleh RT dengan nomor yang sama (dari RW yang sama)
-        // 2. ATAU Pengumuman yang dibuat oleh RW dari RT ini (yang tidak memiliki id_rt)
-        $query = Pengumuman::where(function ($q) use ($nomorRtUser, $idRwUser) {
-            // Pengumuman yang dibuat oleh RT dengan nomor yang sama (dari RW yang sama)
-            // Kita perlu join ke tabel rukun_tetangga untuk memfilter berdasarkan 'rt'
-            $q->whereHas('rukunTetangga', function ($q2) use ($nomorRtUser, $idRwUser) {
-                $q2->where('rt', $nomorRtUser)
-                    ->where('id_rw', $idRwUser);
-            })
-                // ATAU Pengumuman yang dibuat oleh RW dari RT ini (yang tidak memiliki id_rt)
-                ->orWhere(function ($q2) use ($idRwUser) {
-                    $q2->whereNull('id_rt')
-                        ->where('id_rw', $idRwUser);
+        $baseQuery->where(function ($query) use ($userRtId, $userRwId) {
+            if ($userRtId) {
+                $query->where('id_rt', $userRtId);
+            }
+            if ($userRwId) {
+                $query->orWhere(function ($subQuery) use ($userRwId) {
+                    $subQuery->where('id_rw', $userRwId)
+                        ->whereNull('id_rt');
                 });
+            }
+            $query->orWhere(function ($subQuery) {
+                $subQuery->whereNull('id_rt')
+                    ->whereNull('id_rw');
+            });
         });
 
-        // Hitung total pengumuman berdasarkan logika di atas
-        $total_pengumuman = (clone $query)->count();
+        $total_pengumuman = Pengumuman::where('id_rw', $userRwId)->count();
+        $total_pengumuman_filtered = (clone $baseQuery)->count();
 
-        // Data list: daftar tahun & kategori unik berdasarkan filter yang sama
-        // Pastikan dropdown juga memfilter berdasarkan NOMOR RT dan ID RW
-        $daftar_tahun = Pengumuman::whereHas('rukunTetangga', function ($q) use ($nomorRtUser, $idRwUser) {
-            $q->where('rt', $nomorRtUser)
-                ->where('id_rw', $idRwUser);
-        })
-            ->orWhere(function ($q) use ($idRwUser) {
-                $q->whereNull('id_rt')
-                    ->where('id_rw', $idRwUser);
+        $pengumuman = (clone $baseQuery)
+            ->when($search, function ($query) use ($search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('judul', 'like', "%$search%")
+                        ->orWhere('isi', 'like', "%$search%");
+                    $searchLower = strtolower($search);
+                    $hariList = ['senin', 'selasa', 'rabu', 'kamis', 'jumat', 'sabtu', 'minggu'];
+                    if (in_array($searchLower, $hariList)) {
+                        $q->orWhereRaw("DAYNAME(tanggal) = ?", [$this->indoToEnglishDay($searchLower)]);
+                    }
+                    $bulanList = [
+                        'januari',
+                        'februari',
+                        'maret',
+                        'april',
+                        'mei',
+                        'juni',
+                        'juli',
+                        'agustus',
+                        'september',
+                        'oktober',
+                        'november',
+                        'desember'
+                    ];
+                    if (in_array($searchLower, $bulanList)) {
+                        $bulanAngka = array_search($searchLower, $bulanList) + 1;
+                        $q->orWhereMonth('tanggal', $bulanAngka);
+                    }
+                });
             })
+            ->when($tahun, fn($q) => $q->whereYear('tanggal', $tahun))
+            ->when($bulan, fn($q) => $q->whereMonth('tanggal', $bulan))
+            ->when($kategori, fn($q) => $q->where('kategori', $kategori))
+            ->when($level, function ($q) use ($request) {
+                if ($request->level === 'rt') {
+                    $q->whereNotNull('id_rt');
+                } else {
+                    $q->whereNull('id_rt');
+                }
+            })
+            ->orderByDesc('tanggal')
+            ->get();
+
+        $daftar_tahun = (clone $baseQuery)
             ->selectRaw('YEAR(tanggal) as tahun')
             ->distinct()
             ->orderByDesc('tahun')
             ->pluck('tahun');
 
-        $daftar_kategori = Pengumuman::whereHas('rukunTetangga', function ($q) use ($nomorRtUser, $idRwUser) {
-            $q->where('rt', $nomorRtUser)
-                ->where('id_rw', $idRwUser);
-        })
-            ->orWhere(function ($q) use ($idRwUser) {
-                $q->whereNull('id_rt')
-                    ->where('id_rw', $idRwUser);
-            })
+        $daftar_kategori = (clone $baseQuery)
             ->select('kategori')
             ->distinct()
             ->pluck('kategori');
 
-        $daftar_bulan = range(1, 12);
+        $list_bulan = [
+            'januari',
+            'februari',
+            'maret',
+            'april',
+            'mei',
+            'juni',
+            'juli',
+            'agustus',
+            'september',
+            'oktober',
+            'november',
+            'desember'
+        ];
 
-        // Apply search and other filters
-        $pengumuman = $query->when($search, function ($q) use ($search) {
-            $q->where(function ($q2) use ($search) {
-                $q2->where('judul', 'like', "%$search%")
-                    ->orWhere('isi', 'like', "%$search%");
-            });
-        })
-            ->when($tahun, fn($q) => $q->whereYear('tanggal', $tahun))
-            ->when($bulan, fn($q) => $q->whereMonth('tanggal', $bulan))
-            ->when($kategori, fn($q) => $q->where('kategori', $kategori))
-            ->orderByDesc('created_at')
-            ->paginate(10)
-            ->withQueryString();
+        $rukun_tetangga = $userRtId ? Rt::find($userRtId) : null;
+        $title = 'Pengumuman';
 
-        $daftar_penngumuman = Pengumuman::whereHas('rukunTetangga');
-
-        return view('rt.pengumuman.pengumuman', compact(
-            'pengumuman',
-            'title',
-            'daftar_tahun',
-            'daftar_bulan',
-            'daftar_kategori',
-            'tahun',
-            'bulan',
-            'kategori',
-            'search',
-            'total_pengumuman'
-        ));
+        return Inertia::render('RT/Pengumuman', [
+            'pengumuman' => $pengumuman,
+            'rukun_tetangga' => $rukun_tetangga,
+            'title' => $title,
+            'daftar_tahun' => $daftar_tahun,
+            'daftar_kategori' => $daftar_kategori,
+            'total_pengumuman' => $total_pengumuman,
+            'total_pengumuman_filtered' => $total_pengumuman_filtered,
+            'list_bulan' => $list_bulan,
+        ]);
     }
 
-    // ... di dalam public function store(Request $request)
     public function store(Request $request)
     {
         $request->validate([
             'judul' => 'required',
             'isi' => 'required',
             'kategori' => 'required',
-            'tanggal' => 'required|date',
-            'dokumen' => 'nullable|file|mimes:jpg,jpeg,png,gif,mp4,mov,avi,mkv,doc,docx,pdf|max:20480', // <-- Tambahkan validasi ini
+            'dokumen' => 'nullable|file|mimes:jpg,jpeg,png,gif,mp4,mov,avi,mkv,doc,docx,pdf|max:20480',
         ]);
 
         $dokumenPath = null;
@@ -135,101 +155,52 @@ class Rt_pengumumanController extends Controller
         if ($request->hasFile('dokumen')) {
             $file = $request->file('dokumen');
             $dokumenName = time() . '_' . $file->getClientOriginalName();
-            // Simpan ke folder 'documents/pengumuman-rt' di disk 'public'
+
             $dokumenPath = $file->storeAs('documents/pengumuman-rt', $dokumenName, 'public');
         }
 
         $id_rt_user = Auth::user()->id_rt;
         $id_rw_user = Auth::user()->rukunTetangga->id_rw;
 
-        Pengumuman::create([
+        $pengumuman = Pengumuman::create([
             'judul' => $request->judul,
             'isi' => $request->isi,
             'kategori' => $request->kategori,
-            'tanggal' => $request->tanggal,
+            'tanggal' => now(),
             'id_rt' => $id_rt_user,
             'id_rw' => $id_rw_user,
-            'dokumen_path' => $dokumenPath, // <-- Tambahkan ini
-            'dokumen_name' => $dokumenName, // <-- Tambahkan ini
+            'dokumen_path' => $dokumenPath,
+            'dokumen_name' => $dokumenName,
         ]);
 
-        return back()->with('success', 'Pengumuman RT berhasil dibuat.');
-    }
+        $pengumuman->load([
+            'rukunTetangga',
+            'rw',
+            'komen',
+            'komen.user',
+        ]);
 
-    /**
-     * Tampilkan detail pengumuman.
-     */
-    public function show($id)
-    {
-        // Pastikan hanya pengumuman yang relevan dengan RT ini yang bisa dilihat
-        $userRtData = Auth::user()->rukunTetangga;
-        if (!$userRtData) {
-            return redirect()->back()->with('error', 'Data Rukun Tetangga Anda tidak ditemukan.');
+        if ($request->wantsJson()) {
+            return response()->json($pengumuman);
         }
-        $nomorRtUser = $userRtData->rt;
-        $idRwUser = $userRtData->id_rw;
 
-        $pengumuman = Pengumuman::where(function ($q) use ($nomorRtUser, $idRwUser) {
-            $q->whereHas('rukunTetangga', function ($q2) use ($nomorRtUser, $idRwUser) {
-                $q2->where('rt', $nomorRtUser)
-                    ->where('id_rw', $idRwUser);
-            })
-                ->orWhere(function ($q2) use ($idRwUser) {
-                    $q2->whereNull('id_rt')
-                        ->where('id_rw', $idRwUser);
-                });
-        })->findOrFail($id);
-
-        return view('rt.pengumuman.show', compact('pengumuman'));
+        return back()->with('success', 'Pengaduan berhasil dibuat.');
     }
 
-    /**
-     * Tampilkan form edit.
-     */
-    public function edit($id)
-    {
-        // Pastikan hanya pengumuman yang relevan dengan RT ini yang bisa diedit
-        $userRtData = Auth::user()->rukunTetangga;
-        if (!$userRtData) {
-            return redirect()->back()->with('error', 'Data Rukun Tetangga Anda tidak ditemukan.');
-        }
-        $nomorRtUser = $userRtData->rt;
-        $idRwUser = $userRtData->id_rw;
-
-        $pengumuman = Pengumuman::where(function ($q) use ($nomorRtUser, $idRwUser) {
-            $q->whereHas('rukunTetangga', function ($q2) use ($nomorRtUser, $idRwUser) {
-                $q2->where('rt', $nomorRtUser)
-                    ->where('id_rw', $idRwUser);
-            })
-                ->orWhere(function ($q2) use ($idRwUser) {
-                    $q2->whereNull('id_rt')
-                        ->where('id_rw', $idRwUser);
-                });
-        })->findOrFail($id);
-
-        return view('rt.pengumuman.edit', compact('pengumuman'));
-    }
-
-    /**
-     * Update pengumuman.
-     */
-
-
-    // ... di dalam public function update(Request $request, $id)
     public function update(Request $request, $id)
     {
-        // ... (kode otorisasi dan findOrFail) ...
-        // Pastikan hanya pengumuman yang relevan dengan RT ini yang bisa diupdate
         $userRtData = Auth::user()->rukunTetangga;
+
         if (!$userRtData) {
             return redirect()->back()->with('error', 'Data Rukun Tetangga Anda tidak ditemukan.');
         }
-        $nomorRtUser = $userRtData->rt;
+
+        $nomorRtUser = $userRtData->nomor_rt;
         $idRwUser = $userRtData->id_rw;
 
         $pengumuman = Pengumuman::where(function ($q) use ($nomorRtUser, $idRwUser) {
             $q->whereHas('rukunTetangga', function ($q2) use ($nomorRtUser, $idRwUser) {
-                $q2->where('rt', $nomorRtUser)
+                $q2->where('nomor_rt', $nomorRtUser)
                     ->where('id_rw', $idRwUser);
             })
                 ->orWhere(function ($q2) use ($idRwUser) {
@@ -242,31 +213,30 @@ class Rt_pengumumanController extends Controller
             'judul' => 'required|string|max:255',
             'kategori' => 'required|string|max:255',
             'isi' => 'required|string',
-            'tanggal' => 'required|date',
-            'dokumen' => 'nullable|file|mimes:jpg,jpeg,png,gif,mp4,mov,avi,mkv,doc,docx,pdf|max:20480', // <-- Tambahkan validasi ini
-            'hapus_dokumen_lama' => 'nullable|boolean', // <-- Tambahkan validasi ini untuk checkbox hapus
+            'dokumen' => 'nullable|file|mimes:jpg,jpeg,png,gif,mp4,mov,avi,mkv,doc,docx,pdf|max:20480',
+            'hapus_dokumen_lama' => 'nullable|boolean',
         ]);
 
         $dataToUpdate = [
             'judul' => $request->judul,
             'kategori' => $request->kategori,
             'isi' => $request->isi,
-            'tanggal' => $request->tanggal,
+            'tanggal' => now(),
         ];
 
         if ($request->hasFile('dokumen')) {
-            // Hapus dokumen lama jika ada
+
             if ($pengumuman->dokumen_path && Storage::disk('public')->exists($pengumuman->dokumen_path)) {
                 Storage::disk('public')->delete($pengumuman->dokumen_path);
             }
-            // Simpan dokumen baru
+
             $file = $request->file('dokumen');
             $dokumenName = time() . '_' . $file->getClientOriginalName();
             $dokumenPath = $file->storeAs('documents/pengumuman-rt', $dokumenName, 'public');
             $dataToUpdate['dokumen_path'] = $dokumenPath;
             $dataToUpdate['dokumen_name'] = $dokumenName;
         } elseif ($request->boolean('hapus_dokumen_lama')) {
-            // Jika checkbox hapus dicentang dan tidak ada file baru
+
             if ($pengumuman->dokumen_path && Storage::disk('public')->exists($pengumuman->dokumen_path)) {
                 Storage::disk('public')->delete($pengumuman->dokumen_path);
             }
@@ -275,6 +245,17 @@ class Rt_pengumumanController extends Controller
         }
 
         $pengumuman->update($dataToUpdate);
+
+        if ($request->wantsJson()) {
+            return response()->json(
+                $pengumuman->fresh([
+                    'rukunTetangga',
+                    'rw',
+                    'komen',
+                    'komen.user',
+                ])
+            );
+        }
 
         return redirect()->route('rt.pengumuman.index')
             ->with('success', 'Pengumuman berhasil diperbarui.');
@@ -285,17 +266,17 @@ class Rt_pengumumanController extends Controller
      */
     public function destroy($id)
     {
-        // Pastikan hanya pengumuman yang relevan dengan RT ini yang bisa dihapus
+
         $userRtData = Auth::user()->rukunTetangga;
         if (!$userRtData) {
             return redirect()->back()->with('error', 'Data Rukun Tetangga Anda tidak ditemukan.');
         }
-        $nomorRtUser = $userRtData->rt;
+        $nomorRtUser = $userRtData->nomor_rt;
         $idRwUser = $userRtData->id_rw;
 
         $pengumuman = Pengumuman::where(function ($q) use ($nomorRtUser, $idRwUser) {
             $q->whereHas('rukunTetangga', function ($q2) use ($nomorRtUser, $idRwUser) {
-                $q2->where('rt', $nomorRtUser)
+                $q2->where('nomor_rt', $nomorRtUser)
                     ->where('id_rw', $idRwUser);
             })
                 ->orWhere(function ($q2) use ($idRwUser) {
@@ -304,14 +285,16 @@ class Rt_pengumumanController extends Controller
                 });
         })->findOrFail($id);
 
-        // ... di dalam public function destroy($id)(kode otorisasi dan findOrFail) ...
-
-        // Hapus file dokumen terkait jika ada
         if ($pengumuman->dokumen_path && Storage::disk('public')->exists($pengumuman->dokumen_path)) {
             Storage::disk('public')->delete($pengumuman->dokumen_path);
         }
 
         $pengumuman->delete();
+
+        return response()->json([
+            'message' => 'Pengumuman berhasil dihapus',
+            'id' => $id,
+        ]);
 
         return redirect()->route('rt.pengumuman.index')
             ->with('success', 'Pengumuman berhasil dihapus.');
@@ -321,10 +304,10 @@ class Rt_pengumumanController extends Controller
     {
         $pengumuman = Pengumuman::findOrFail($id);
 
-        // Render blade ke HTML
+
         $html = View::make('rt.pengumuman.komponen.export_pengumuman', compact('pengumuman'))->render();
 
-        // Konfigurasi dompdf
+
         $options = new Options();
         $options->set('isHtml5ParserEnabled', true);
         $options->set('isRemoteEnabled', true);
@@ -334,11 +317,25 @@ class Rt_pengumumanController extends Controller
         $dompdf->setPaper('A4', 'portrait');
         $dompdf->render();
 
-        // Nama file sesuai judul pengumuman
+
         $filename = 'Pengumuman ' . $pengumuman->judul . '.pdf';
 
         return response($dompdf->output(), 200)
             ->header('Content-Type', 'application/pdf')
             ->header('Content-Disposition', "attachment; filename=\"{$filename}\"");
+    }
+
+    protected function indoToEnglishDay(string $indoDay): ?string
+    {
+        $map = [
+            'senin' => 'Monday',
+            'selasa' => 'Tuesday',
+            'rabu' => 'Wednesday',
+            'kamis' => 'Thursday',
+            'jumat' => 'Friday',
+            'sabtu' => 'Saturday',
+            'minggu' => 'Sunday',
+        ];
+        return $map[strtolower($indoDay)] ?? null;
     }
 }
