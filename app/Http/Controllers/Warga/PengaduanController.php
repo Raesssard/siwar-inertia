@@ -282,7 +282,7 @@ class PengaduanController extends Controller
             'isi_komentar' => $request->isi_komentar
         ]);
 
-        $komentar->load('user'); // biar ada nama user
+        $komentar->load('user');
 
         return response()->json($komentar);
     }

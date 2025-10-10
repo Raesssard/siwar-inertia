@@ -37,6 +37,35 @@ class PengaduanRwController extends Controller
         return view('rw.pengaduan.pengaduan', compact('title', 'rw_pengaduan', 'total_pengaduan_rw'));
     }
 
+    // cek dulu ada gk rute updatenya di php artisan route:list,
+    // klo belum tambah dulu di web.php
+    public function update(Request $request, $id)
+    {
+        $status = $request->input('status');
+
+        $pengaduan = Pengaduan::findOrFail($id);
+
+        $dataYangDiUpdate = [
+            'status' => $status,
+        ];
+
+        $pengaduan->update($dataYangDiUpdate);
+
+        if ($request->wantsJson()) {
+            return response()->json(
+                $pengaduan->fresh([
+                    'warga',
+                    'komentar.user',
+                    'warga.kartuKeluarga.rukunTetangga',
+                    'warga.kartuKeluarga.rw'
+                ])
+            );
+        }
+
+        return redirect()->route('rt.pengaduan.index')
+            ->with('success', 'Pengaduan berhasil diperbarui.');
+    }
+
     public function baca(Request $request, $id)
     {
 

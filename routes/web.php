@@ -68,6 +68,8 @@ Route::middleware(['auth'])->group(function () {
         Route::resource('pengumuman', Rt_pengumumanController::class);
         Route::get('/pengumuman/{id}/export-pdf', [Rt_pengumumanController::class, 'exportPDF'])
             ->name('pengumuman.export.pdf');
+        Route::post('/pengumuman/{id}/komentar', [Rt_pengumumanController::class, 'komen'])
+            ->name('pengumuman.komentar.komen');
         Route::resource('iuran', RtIuranController::class);
         Route::get('/export/iuran', [ExportController::class, 'exportIuran'])
             ->name('iuran.export');
@@ -78,9 +80,11 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/export/transaksi', [ExportController::class, 'exportTransaksi'])
             ->name('transaksi.export');
         Route::resource('pengaduan', Rt_PengaduanController::class)
-            ->only('index');
+            ->only(['index', 'update']);
         Route::patch('pengaduan/{id}/baca', [Rt_PengaduanController::class, 'show'])
             ->name('pengaduan.baca');
+        Route::post('/pengaduan/{id}/komentar', [Rt_PengaduanController::class, 'komen'])
+            ->name('pengaduan.komentar.komen');
         Route::put('kartu_keluarga/{rt_kartu_keluarga}/upload-foto', [Rt_kartu_keluargaController::class, 'uploadFoto'])
             ->name('kartu_keluarga.upload_foto');
         Route::delete('kartu_keluarga/{rt_kartu_keluarga}/delete-foto', [Rt_kartu_keluargaController::class, 'deleteFoto'])

@@ -13,7 +13,7 @@ class Rt_PengaduanController extends Controller
 {
     public function index(Request $request)
     {
-        $title = ' Daftar Pengaduan Warga';
+        $title = ' Pengaduan';
         $user = Auth::user();
         $tahun = $request->input('tahun');
         $bulan = $request->input('bulan');
@@ -44,12 +44,14 @@ class Rt_PengaduanController extends Controller
 
         $rt_pengaduan = $pengaduan_rt_saya->orderBy('created_at', 'desc')->get();
 
-        $total_pengaduan_rt = Pengaduan::WhereHas(
+        $total_pengaduan_rt = Pengaduan::whereHas(
             'warga.kartuKeluarga.rukunTetangga',
             function ($aduan) use ($pengaduan_rt) {
-                $aduan->where('level', 'rt')->where('nomor_rt', $pengaduan_rt);
+                $aduan->where('level', 'rt')
+                    ->where('nomor_rt', $pengaduan_rt);
             }
-        );
+        )->count();
+
         $total_pengaduan_rt_filtered = $rt_pengaduan->count();
 
         $list_bulan = [
@@ -90,6 +92,32 @@ class Rt_PengaduanController extends Controller
         ]);
     }
 
+    public function update(Request $request, $id)
+    {
+        $status = $request->input('status');
+
+        $pengaduan = Pengaduan::findOrFail($id);
+
+        $dataYangDiUpdate = [
+            'status' => $status,
+        ];
+
+        $pengaduan->update($dataYangDiUpdate);
+
+        if ($request->wantsJson()) {
+            return response()->json(
+                $pengaduan->fresh([
+                    'warga',
+                    'komentar.user',
+                    'warga.kartuKeluarga.rukunTetangga',
+                    'warga.kartuKeluarga.rw'
+                ])
+            );
+        }
+
+        return redirect()->route('rt.pengaduan.index')
+            ->with('success', 'Pengaduan berhasil diperbarui.');
+    }
 
     public function show(Request $request, $id)
     {
@@ -163,5 +191,23 @@ class Rt_PengaduanController extends Controller
 
 
         // return view('rt.pengaduan.komponen.detail_pengaduan', compact('title', 'pengaduan'));
+    }
+
+    public function komen(Request $request, $id)
+    {
+        $request->validate([
+            'isi_komentar' => 'required|string|max:255'
+        ]);
+
+        $pengaduan = Pengaduan::findOrFail($id);
+
+        $komentar = $pengaduan->komentar()->create([
+            'user_id' => Auth::id(),
+            'isi_komentar' => $request->isi_komentar
+        ]);
+
+        $komentar->load('user');
+
+        return response()->json($komentar);
     }
 }

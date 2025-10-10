@@ -170,23 +170,23 @@ export function AddRwModal({ form, handleChange, handleAdd, onClose }) {
                     <div className="space-y-3">
                         <div>
                             <label className="block text-sm font-medium">NIK</label>
-                            <input type="text" name="nik" value={form.nik || ""} onChange={handleChange} className="w-full border rounded-md p-2"/>
+                            <input type="text" name="nik" value={form.nik || ""} onChange={handleChange} className="w-full border rounded-md p-2" />
                         </div>
                         <div>
                             <label className="block text-sm font-medium">Nomor RW</label>
-                            <input type="text" name="nomor_rw" value={form.nomor_rw || ""} onChange={handleChange} className="w-full border rounded-md p-2"/>
+                            <input type="text" name="nomor_rw" value={form.nomor_rw || ""} onChange={handleChange} className="w-full border rounded-md p-2" />
                         </div>
                         <div>
                             <label className="block text-sm font-medium">Nama Ketua RW</label>
-                            <input type="text" name="nama_ketua_rw" value={form.nama_ketua_rw || ""} onChange={handleChange} className="w-full border rounded-md p-2"/>
+                            <input type="text" name="nama_ketua_rw" value={form.nama_ketua_rw || ""} onChange={handleChange} className="w-full border rounded-md p-2" />
                         </div>
                         <div>
                             <label className="block text-sm font-medium">Mulai Menjabat</label>
-                            <input type="date" name="mulai_menjabat" value={form.mulai_menjabat || ""} onChange={handleChange} className="w-full border rounded-md p-2"/>
+                            <input type="date" name="mulai_menjabat" value={form.mulai_menjabat || ""} onChange={handleChange} className="w-full border rounded-md p-2" />
                         </div>
                         <div>
                             <label className="block text-sm font-medium">Akhir Jabatan</label>
-                            <input type="date" name="akhir_jabatan" value={form.akhir_jabatan || ""} onChange={handleChange} className="w-full border rounded-md p-2"/>
+                            <input type="date" name="akhir_jabatan" value={form.akhir_jabatan || ""} onChange={handleChange} className="w-full border rounded-md p-2" />
                         </div>
                     </div>
                     <div className="flex justify-end gap-3 pt-4 border-t">
@@ -211,23 +211,23 @@ export function EditRwModal({ form, handleChange, handleEdit, onClose }) {
                     <div className="space-y-3">
                         <div>
                             <label className="block text-sm font-medium">NIK</label>
-                            <input type="text" name="nik" value={form.nik || ""} onChange={handleChange} className="w-full border rounded-md p-2"/>
+                            <input type="text" name="nik" value={form.nik || ""} onChange={handleChange} className="w-full border rounded-md p-2" />
                         </div>
                         <div>
                             <label className="block text-sm font-medium">Nomor RW</label>
-                            <input type="text" name="nomor_rw" value={form.nomor_rw || ""} onChange={handleChange} className="w-full border rounded-md p-2"/>
+                            <input type="text" name="nomor_rw" value={form.nomor_rw || ""} onChange={handleChange} className="w-full border rounded-md p-2" />
                         </div>
                         <div>
                             <label className="block text-sm font-medium">Nama Ketua RW</label>
-                            <input type="text" name="nama_ketua_rw" value={form.nama_ketua_rw || ""} onChange={handleChange} className="w-full border rounded-md p-2"/>
+                            <input type="text" name="nama_ketua_rw" value={form.nama_ketua_rw || ""} onChange={handleChange} className="w-full border rounded-md p-2" />
                         </div>
                         <div>
                             <label className="block text-sm font-medium">Mulai Menjabat</label>
-                            <input type="date" name="mulai_menjabat" value={form.mulai_menjabat || ""} onChange={handleChange} className="w-full border rounded-md p-2"/>
+                            <input type="date" name="mulai_menjabat" value={form.mulai_menjabat || ""} onChange={handleChange} className="w-full border rounded-md p-2" />
                         </div>
                         <div>
                             <label className="block text-sm font-medium">Akhir Jabatan</label>
-                            <input type="date" name="akhir_jabatan" value={form.akhir_jabatan || ""} onChange={handleChange} className="w-full border rounded-md p-2"/>
+                            <input type="date" name="akhir_jabatan" value={form.akhir_jabatan || ""} onChange={handleChange} className="w-full border rounded-md p-2" />
                         </div>
                     </div>
                     <div className="flex justify-end gap-3 pt-4 border-t">
@@ -252,23 +252,23 @@ export function AddRtModal({ form, handleChange, handleAdd, onClose }) {
                     <div className="space-y-3">
                         <div>
                             <label className="block text-sm font-medium">NIK</label>
-                            <input type="text" name="nik" value={form.nik || ""} onChange={handleChange} className="w-full border rounded-md p-2"/>
+                            <input type="text" name="nik" value={form.nik || ""} onChange={handleChange} className="w-full border rounded-md p-2" />
                         </div>
                         <div>
                             <label className="block text-sm font-medium">Nomor RT</label>
-                            <input type="text" name="nomor_rt" value={form.nomor_rt || ""} onChange={handleChange} className="w-full border rounded-md p-2"/>
+                            <input type="text" name="nomor_rt" value={form.nomor_rt || ""} onChange={handleChange} className="w-full border rounded-md p-2" />
                         </div>
                         <div>
                             <label className="block text-sm font-medium">Nama Ketua RT</label>
-                            <input type="text" name="nama_ketua_rt" value={form.nama_ketua_rt || ""} onChange={handleChange} className="w-full border rounded-md p-2"/>
+                            <input type="text" name="nama_ketua_rt" value={form.nama_ketua_rt || ""} onChange={handleChange} className="w-full border rounded-md p-2" />
                         </div>
                         <div>
                             <label className="block text-sm font-medium">Mulai Menjabat</label>
-                            <input type="date" name="mulai_menjabat" value={form.mulai_menjabat || ""} onChange={handleChange} className="w-full border rounded-md p-2"/>
+                            <input type="date" name="mulai_menjabat" value={form.mulai_menjabat || ""} onChange={handleChange} className="w-full border rounded-md p-2" />
                         </div>
                         <div>
                             <label className="block text-sm font-medium">Akhir Jabatan</label>
-                            <input type="date" name="akhir_jabatan" value={form.akhir_jabatan || ""} onChange={handleChange} className="w-full border rounded-md p-2"/>
+                            <input type="date" name="akhir_jabatan" value={form.akhir_jabatan || ""} onChange={handleChange} className="w-full border rounded-md p-2" />
                         </div>
                     </div>
                     <div className="flex justify-end gap-3 pt-4 border-t">
@@ -293,23 +293,23 @@ export function EditRtModal({ form, handleChange, handleEdit, onClose }) {
                     <div className="space-y-3">
                         <div>
                             <label className="block text-sm font-medium">NIK</label>
-                            <input type="text" name="nik" value={form.nik || ""} onChange={handleChange} className="w-full border rounded-md p-2"/>
+                            <input type="text" name="nik" value={form.nik || ""} onChange={handleChange} className="w-full border rounded-md p-2" />
                         </div>
                         <div>
                             <label className="block text-sm font-medium">Nomor RT</label>
-                            <input type="text" name="nomor_rt" value={form.nomor_rt || ""} onChange={handleChange} className="w-full border rounded-md p-2"/>
+                            <input type="text" name="nomor_rt" value={form.nomor_rt || ""} onChange={handleChange} className="w-full border rounded-md p-2" />
                         </div>
                         <div>
                             <label className="block text-sm font-medium">Nama Ketua RT</label>
-                            <input type="text" name="nama_ketua_rt" value={form.nama_ketua_rt || ""} onChange={handleChange} className="w-full border rounded-md p-2"/>
+                            <input type="text" name="nama_ketua_rt" value={form.nama_ketua_rt || ""} onChange={handleChange} className="w-full border rounded-md p-2" />
                         </div>
                         <div>
                             <label className="block text-sm font-medium">Mulai Menjabat</label>
-                            <input type="date" name="mulai_menjabat" value={form.mulai_menjabat || ""} onChange={handleChange} className="w-full border rounded-md p-2"/>
+                            <input type="date" name="mulai_menjabat" value={form.mulai_menjabat || ""} onChange={handleChange} className="w-full border rounded-md p-2" />
                         </div>
                         <div>
                             <label className="block text-sm font-medium">Akhir Jabatan</label>
-                            <input type="date" name="akhir_jabatan" value={form.akhir_jabatan || ""} onChange={handleChange} className="w-full border rounded-md p-2"/>
+                            <input type="date" name="akhir_jabatan" value={form.akhir_jabatan || ""} onChange={handleChange} className="w-full border rounded-md p-2" />
                         </div>
                     </div>
                     <div className="flex justify-end gap-3 pt-4 border-t">
@@ -662,7 +662,6 @@ export function DetailPengumuman({ selectedData, detailShow, onClose, onUpdated,
 
     const handleSubmit = () => {
         if (!newKomentar.trim()) return
-        // nanti rutenya bakal diganti sesuai role
         axios.post(`/${role}/pengumuman/${selectedData.id}/komentar`, {
             isi_komentar: newKomentar
         })
@@ -893,8 +892,8 @@ export function EditPengumuman({ toggle, onUpdated, onDeleted, pengumuman, role 
     const confirmDelete = (e) => {
         e.preventDefault()
         setShowAlert(false)
-console.log("role:", role)
-console.log("delete URL:", `/${role}/pengumuman/${pengumuman.id}`)
+        console.log("role:", role)
+        console.log("delete URL:", `/${role}/pengumuman/${pengumuman.id}`)
 
         axios.delete(`/${role}/pengumuman/${pengumuman.id}`)
             .then(res => {
@@ -1407,7 +1406,6 @@ export function DetailPengaduan({ selectedData, detailShow, onClose, onUpdated, 
 
     const handleSubmit = () => {
         if (!newKomentar.trim()) return
-        // nanti rutenya bakal diganti sesuai role
         axios.post(`/${role}/pengaduan/${selectedData.id}/komentar`, {
             isi_komentar: newKomentar
         })
@@ -1435,6 +1433,21 @@ export function DetailPengaduan({ selectedData, detailShow, onClose, onUpdated, 
     if (!detailShow || !selectedData) return null
 
     const fileName = selectedData.file_name?.toLowerCase() || ""
+
+    const handleCheckboxChange = (checked) => {
+        const newStatus = checked ? 'selesai' : 'dproses';
+
+        axios.put(`/${role}/pengaduan/${selectedData.id}`, { status: newStatus })
+            .then(res => {
+                console.log("Status diperbarui:", res.data);
+                if (onUpdated) {
+                    onUpdated({ ...selectedData, status: newStatus });
+                }
+            })
+            .catch(err => {
+                console.error("Gagal ubah status:", err.response?.data || err);
+            });
+    };
 
     return (
         <>
@@ -1515,13 +1528,27 @@ export function DetailPengaduan({ selectedData, detailShow, onClose, onUpdated, 
                                     )}
                                     <div className="flex-fill d-flex flex-column" style={selectedData?.file_path ? { maxWidth: "50%" } : { maxWidth: "100%" }}>
                                         <div className="p-3 border-bottom caption-section">
-                                            {userData.nik === selectedData.nik_warga ? (
+                                            {(userData.nik === selectedData.nik_warga && role === 'warga') ? (
                                                 <div className="d-flex justify-between">
                                                     <h5 className="fw-bold mb-1 mt-2">{selectedData.judul}</h5>
                                                     <Role role="warga">
                                                         <button onClick={toggleEdit} title="Edit Pengaduan">
                                                             <i className="far fa-edit"></i>
                                                         </button>
+                                                    </Role>
+                                                </div>
+                                            ) : (role.includes('rt') || role.includes('rw')) ? (
+                                                <div className="d-flex justify-between">
+                                                    <h5 className="fw-bold mb-1 mt-2">{selectedData.judul}</h5>
+                                                    <Role role={selectedData.level === 'rt' ? "rt" : "rw"}>
+                                                        {(selectedData.konfirmasi_rw === 'sudah') && (
+                                                            <input type="checkbox"
+                                                                name="selesai"
+                                                                title="Selesai"
+                                                                checked={selectedData.status === 'selesai'}
+                                                                onChange={(e) => handleCheckboxChange(e.target.checked)}
+                                                            />
+                                                        )}
                                                     </Role>
                                                 </div>
                                             ) : (
