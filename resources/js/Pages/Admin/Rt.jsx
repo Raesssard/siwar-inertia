@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { Head, Link, router, usePage } from "@inertiajs/react";
 import { route } from "ziggy-js";
 import Layout from "@/Layouts/Layout";
-import { Link, router } from "@inertiajs/react";
 import { AddRtModal, EditRtModal } from "@/Pages/Component/Modal";
 
 export default function Rt({ rukun_tetangga, filters, nomorRtList, rwList, title }) {
