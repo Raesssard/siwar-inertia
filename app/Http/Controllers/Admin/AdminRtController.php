@@ -14,13 +14,14 @@ class AdminRtController extends Controller
 {
     public function index(Request $request)
     {
+        $title = 'Rukun Tetangga';
         $query = Rt::query();
 
         // Filter keyword
         if ($request->filled('keyword')) {
             $query->where(function ($q) use ($request) {
                 $q->where('nik', 'like', "%{$request->keyword}%")
-                  ->orWhere('nama_ketua_rt', 'like', "%{$request->keyword}%");
+                    ->orWhere('nama_ketua_rt', 'like', "%{$request->keyword}%");
             });
         }
 
@@ -41,6 +42,7 @@ class AdminRtController extends Controller
             'rukun_tetangga' => $rukun_tetangga,
             'filters'        => $request->only(['keyword', 'nomor_rt']),
             'nomorRtList'    => $nomorRtList,
+            'title'    => $title,
         ]);
     }
 
@@ -89,7 +91,7 @@ class AdminRtController extends Controller
         }
 
         return redirect()->route('admin.rt.index')
-                         ->with('success', 'RT berhasil ditambahkan.');
+            ->with('success', 'RT berhasil ditambahkan.');
     }
 
     public function update(Request $request, string $id)
@@ -137,7 +139,7 @@ class AdminRtController extends Controller
         }
 
         return redirect()->route('admin.rt.index')
-                         ->with('success', 'RT berhasil diperbarui.');
+            ->with('success', 'RT berhasil diperbarui.');
     }
 
     public function destroy(string $id)

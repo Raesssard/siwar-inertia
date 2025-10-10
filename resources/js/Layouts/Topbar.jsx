@@ -100,6 +100,38 @@ export default function Topbar({ modalShow }) {
             }
         }
     }
+
+    if (currentRole === 'admin') {
+        if (!segment && (url === "/" || url === "/dashboard-main")) {
+            judulHalaman = "Dashboard"
+        } else {
+            switch (segment) {
+                case "rw":
+                    judulHalaman = "Rukun Warga"
+                    break
+                case "dashboard":
+                    judulHalaman = "Dashboard"
+                    break
+                case "rt":
+                    judulHalaman = "Rukun Tetangga"
+                    break
+                case "kategori-golongan":
+                    judulHalaman = "Kategori Golongan"
+                    break
+                case "roles":
+                    judulHalaman = "Roles"
+                    break
+                case "permissions":
+                    judulHalaman = "Permissions"
+                    break
+                default:
+                    judulHalaman =
+                        segment.charAt(0).toUpperCase() +
+                        segment.slice(1).replace(/-/g, " ")
+            }
+        }
+    }
+
     return (
         <nav className="navbar nav-top navbar-expand navbar-light bg-white topbar mb-4 sticky-top shadow">
             {/* tombol sidebar mobile */}

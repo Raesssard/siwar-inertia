@@ -27,7 +27,7 @@ export default function KartuKeluarga() {
 
     return (
         <Layout>
-            <Head title={`${title} ${role.length <= 2
+            <Head title={`${title} - ${role.length <= 2
                 ? role.toUpperCase()
                 : role.charAt(0).toUpperCase() + role.slice(1)}`} />
             <div className="card shadow border-0 mb-3 py-0 mx-3" style={{ width: '100%' }}>

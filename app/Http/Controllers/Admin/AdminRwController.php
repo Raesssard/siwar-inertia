@@ -17,13 +17,14 @@ class AdminRwController extends Controller
      */
     public function index(Request $request)
     {
+        $title = 'Rukun Warga';
         $query = Rw::query();
 
         // Search NIK atau Nama Ketua RW
         if ($request->filled('keyword')) {
-            $query->where(function($q) use ($request) {
+            $query->where(function ($q) use ($request) {
                 $q->where('nik', 'like', '%' . $request->keyword . '%')
-                  ->orWhere('nama_ketua_rw', 'like', '%' . $request->keyword . '%');
+                    ->orWhere('nama_ketua_rw', 'like', '%' . $request->keyword . '%');
             });
         }
 
@@ -41,6 +42,7 @@ class AdminRwController extends Controller
             'rw' => $rw,
             'filters' => $request->only(['keyword', 'nomor_rw']),
             'nomorRwList' => $nomorRwList,
+            'title' => $title
         ]);
     }
 
@@ -53,12 +55,16 @@ class AdminRwController extends Controller
             'nik' => 'required|unique:rw,nik',
             'nomor_rw' => 'required|string',
             'nama_ketua_rw' => 'required|string|max:255',
-            'mulai_menjabat'=> 'required|date',
+            'mulai_menjabat' => 'required|date',
             'akhir_jabatan' => 'required|date',
         ]);
 
         $rw = Rw::create($request->only([
-            'nik','nomor_rw','nama_ketua_rw','mulai_menjabat','akhir_jabatan'
+            'nik',
+            'nomor_rw',
+            'nama_ketua_rw',
+            'mulai_menjabat',
+            'akhir_jabatan'
         ]));
 
         $user = User::create([
@@ -102,7 +108,11 @@ class AdminRwController extends Controller
         $oldNik = $rw->nik;
 
         $rw->update($request->only([
-            'nik','nomor_rw','nama_ketua_rw','mulai_menjabat','akhir_jabatan'
+            'nik',
+            'nomor_rw',
+            'nama_ketua_rw',
+            'mulai_menjabat',
+            'akhir_jabatan'
         ]));
 
         $user = User::where('id_rw', $rw->id)->first();

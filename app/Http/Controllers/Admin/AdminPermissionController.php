@@ -11,6 +11,7 @@ class AdminPermissionController extends Controller
 {
     public function index(Request $request)
     {
+        $title = 'Permission Role';
         $query = Permission::query();
 
         if ($request->keyword) {
@@ -22,6 +23,7 @@ class AdminPermissionController extends Controller
         return Inertia::render('Admin/Permission', [
             'permissions' => $permissions,
             'filters' => $request->only('keyword'),
+            'title' => $title
         ]);
     }
 

@@ -1,11 +1,13 @@
 // resources/js/Pages/Admin/Rt.jsx
 import React, { useState } from "react";
-import { Link, router } from "@inertiajs/react";
+import { Head, Link, router, usePage } from "@inertiajs/react";
 import { route } from "ziggy-js";
 import Layout from "@/Layouts/Layout";
 import { AddRtModal, EditRtModal } from "@/Pages/Component/Modal";
 
-export default function Rt({ rukun_tetangga, filters, nomorRtList }) {
+export default function Rt({ rukun_tetangga, filters, nomorRtList, title }) {
+    const { props } = usePage()
+    const role = props.auth?.currentRole
     const [showAdd, setShowAdd] = useState(false);
     const [showEdit, setShowEdit] = useState(null);
 
@@ -93,6 +95,9 @@ export default function Rt({ rukun_tetangga, filters, nomorRtList }) {
 
     return (
         <Layout title="Data RT">
+            <Head title={`${title} - ${role.length <= 2
+                ? role.toUpperCase()
+                : role.charAt(0).toUpperCase() + role.slice(1)}`} />
             {/* Filter */}
             <form onSubmit={applyFilter} className="filter-form">
                 <input

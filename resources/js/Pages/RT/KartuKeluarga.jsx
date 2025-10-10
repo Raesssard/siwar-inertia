@@ -40,10 +40,9 @@ export default function KartuKeluarga() {
 
     return (
         <Layout>
-            <Head title={`${title} ${role.length <= 2
+            <Head title={`${title} - ${role.length <= 2
                 ? role.toUpperCase()
-                : role.charAt(0).toUpperCase() + role.slice(1)}`}
-            />
+                : role.charAt(0).toUpperCase() + role.slice(1)}`} />
             <FilterKK
                 data={data}
                 setData={setData}

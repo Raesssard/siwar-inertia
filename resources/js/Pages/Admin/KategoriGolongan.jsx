@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link, router } from "@inertiajs/react";
+import { Head, Link, router, usePage } from "@inertiajs/react";
 import { route } from "ziggy-js";
 import Layout from "@/Layouts/Layout";
 import {
@@ -7,7 +7,9 @@ import {
     EditKategoriGolonganModal,
 } from "@/Pages/Component/Modal";
 
-export default function KategoriGolongan({ kategori, filters }) {
+export default function KategoriGolongan({ kategori, filters, title }) {
+    const { props } = usePage()
+    const role = props.auth?.currentRole
     const [showAdd, setShowAdd] = useState(false);
     const [showEdit, setShowEdit] = useState(null);
 
@@ -88,6 +90,9 @@ export default function KategoriGolongan({ kategori, filters }) {
 
     return (
         <Layout title="Kategori Golongan">
+            <Head title={`${title} - ${role.length <= 2
+                ? role.toUpperCase()
+                : role.charAt(0).toUpperCase() + role.slice(1)}`} />
             {/* 🔍 Filter pencarian */}
             <form onSubmit={applyFilter} className="filter-form mb-3 flex gap-2">
                 <input

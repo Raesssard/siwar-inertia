@@ -162,7 +162,7 @@ export default function Pengaduan() {
 
     return (
         <Layout>
-            <Head title={`${title} ${role.length <= 2
+            <Head title={`${title} - ${role.length <= 2
                 ? role.toUpperCase()
                 : role.charAt(0).toUpperCase() + role.slice(1)}`} />
             <FilterPengaduan
