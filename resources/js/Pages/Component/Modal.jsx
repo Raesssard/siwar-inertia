@@ -171,23 +171,23 @@ export function AddRwModal({ form, handleChange, handleAdd, onClose }) {
                     <div className="space-y-3">
                         <div>
                             <label className="block text-sm font-medium">NIK</label>
-                            <input type="text" name="nik" value={form.nik || ""} onChange={handleChange} className="w-full border rounded-md p-2" />
+                            <input type="text" name="nik" value={form.nik || ""} onChange={handleChange} className="w-full border rounded-md p-2"  />
                         </div>
                         <div>
                             <label className="block text-sm font-medium">Nomor RW</label>
-                            <input type="text" name="nomor_rw" value={form.nomor_rw || ""} onChange={handleChange} className="w-full border rounded-md p-2" />
+                            <input type="text" name="nomor_rw" value={form.nomor_rw || ""} onChange={handleChange} className="w-full border rounded-md p-2"  />
                         </div>
                         <div>
                             <label className="block text-sm font-medium">Nama Ketua RW</label>
-                            <input type="text" name="nama_ketua_rw" value={form.nama_ketua_rw || ""} onChange={handleChange} className="w-full border rounded-md p-2" />
+                            <input type="text" name="nama_ketua_rw" value={form.nama_ketua_rw || ""} onChange={handleChange} className="w-full border rounded-md p-2"  />
                         </div>
                         <div>
                             <label className="block text-sm font-medium">Mulai Menjabat</label>
-                            <input type="date" name="mulai_menjabat" value={form.mulai_menjabat || ""} onChange={handleChange} className="w-full border rounded-md p-2" />
+                            <input type="date" name="mulai_menjabat" value={form.mulai_menjabat || ""} onChange={handleChange} className="w-full border rounded-md p-2"  />
                         </div>
                         <div>
                             <label className="block text-sm font-medium">Akhir Jabatan</label>
-                            <input type="date" name="akhir_jabatan" value={form.akhir_jabatan || ""} onChange={handleChange} className="w-full border rounded-md p-2" />
+                            <input type="date" name="akhir_jabatan" value={form.akhir_jabatan || ""} onChange={handleChange} className="w-full border rounded-md p-2"  />
                         </div>
 
                         {/* 🔹 Tambahan Jabatan */}
@@ -235,23 +235,23 @@ export function EditRwModal({ form, handleChange, handleEdit, onClose }) {
                     <div className="space-y-3">
                         <div>
                             <label className="block text-sm font-medium">NIK</label>
-                            <input type="text" name="nik" value={form.nik || ""} onChange={handleChange} className="w-full border rounded-md p-2" />
+                            <input type="text" name="nik" value={form.nik || ""} onChange={handleChange} className="w-full border rounded-md p-2"  />
                         </div>
                         <div>
                             <label className="block text-sm font-medium">Nomor RW</label>
-                            <input type="text" name="nomor_rw" value={form.nomor_rw || ""} onChange={handleChange} className="w-full border rounded-md p-2" />
+                            <input type="text" name="nomor_rw" value={form.nomor_rw || ""} onChange={handleChange} className="w-full border rounded-md p-2"  />
                         </div>
                         <div>
                             <label className="block text-sm font-medium">Nama Ketua RW</label>
-                            <input type="text" name="nama_ketua_rw" value={form.nama_ketua_rw || ""} onChange={handleChange} className="w-full border rounded-md p-2" />
+                            <input type="text" name="nama_ketua_rw" value={form.nama_ketua_rw || ""} onChange={handleChange} className="w-full border rounded-md p-2"  />
                         </div>
                         <div>
                             <label className="block text-sm font-medium">Mulai Menjabat</label>
-                            <input type="date" name="mulai_menjabat" value={form.mulai_menjabat || ""} onChange={handleChange} className="w-full border rounded-md p-2" />
+                            <input type="date" name="mulai_menjabat" value={form.mulai_menjabat || ""} onChange={handleChange} className="w-full border rounded-md p-2"  />
                         </div>
                         <div>
                             <label className="block text-sm font-medium">Akhir Jabatan</label>
-                            <input type="date" name="akhir_jabatan" value={form.akhir_jabatan || ""} onChange={handleChange} className="w-full border rounded-md p-2" />
+                            <input type="date" name="akhir_jabatan" value={form.akhir_jabatan || ""} onChange={handleChange} className="w-full border rounded-md p-2"  />
                         </div>
 
                         {/* 🔹 Tambahan Jabatan */}
@@ -295,7 +295,7 @@ export function AddRtModal({ form, handleChange, handleAdd, onClose, rwList = []
                                 name="nik"
                                 value={form.nik || ""}
                                 onChange={handleChange}
-                                className="w-full border rounded-md p-2"
+                                className="w-full border rounded-md p-2" 
                             />
                         </div>
 
@@ -307,7 +307,7 @@ export function AddRtModal({ form, handleChange, handleAdd, onClose, rwList = []
                                 name="nomor_rt"
                                 value={form.nomor_rt || ""}
                                 onChange={handleChange}
-                                className="w-full border rounded-md p-2"
+                                className="w-full border rounded-md p-2" 
                             />
                         </div>
 
@@ -319,7 +319,7 @@ export function AddRtModal({ form, handleChange, handleAdd, onClose, rwList = []
                                 name="nama_ketua_rt"
                                 value={form.nama_ketua_rt || ""}
                                 onChange={handleChange}
-                                className="w-full border rounded-md p-2"
+                                className="w-full border rounded-md p-2" 
                             />
                         </div>
 
@@ -347,7 +347,7 @@ export function AddRtModal({ form, handleChange, handleAdd, onClose, rwList = []
                                 name="mulai_menjabat"
                                 value={form.mulai_menjabat || ""}
                                 onChange={handleChange}
-                                className="w-full border rounded-md p-2"
+                                className="w-full border rounded-md p-2" 
                             />
                         </div>
 
@@ -358,7 +358,7 @@ export function AddRtModal({ form, handleChange, handleAdd, onClose, rwList = []
                                 name="akhir_jabatan"
                                 value={form.akhir_jabatan || ""}
                                 onChange={handleChange}
-                                className="w-full border rounded-md p-2"
+                                className="w-full border rounded-md p-2" 
                             />
                         </div>
 
@@ -423,17 +423,17 @@ export function EditRtModal({ form, handleChange, handleEdit, onClose, rwList = 
                     <div className="space-y-3">
                         <div>
                             <label className="block text-sm font-medium">NIK</label>
-                            <input type="text" name="nik" value={form.nik || ""} onChange={handleChange} className="w-full border rounded-md p-2" />
+                            <input type="text" name="nik" value={form.nik || ""} onChange={handleChange} className="w-full border rounded-md p-2"  />
                         </div>
 
                         <div>
                             <label className="block text-sm font-medium">Nomor RT</label>
-                            <input type="text" name="nomor_rt" value={form.nomor_rt || ""} onChange={handleChange} className="w-full border rounded-md p-2" />
+                            <input type="text" name="nomor_rt" value={form.nomor_rt || ""} onChange={handleChange} className="w-full border rounded-md p-2"  />
                         </div>
 
                         <div>
                             <label className="block text-sm font-medium">Nama Ketua RT</label>
-                            <input type="text" name="nama_ketua_rt" value={form.nama_ketua_rt || ""} onChange={handleChange} className="w-full border rounded-md p-2" />
+                            <input type="text" name="nama_ketua_rt" value={form.nama_ketua_rt || ""} onChange={handleChange} className="w-full border rounded-md p-2"  />
                         </div>
 
                         {/* 🔹 Jabatan */}
@@ -454,12 +454,12 @@ export function EditRtModal({ form, handleChange, handleEdit, onClose, rwList = 
 
                         <div>
                             <label className="block text-sm font-medium">Mulai Menjabat</label>
-                            <input type="date" name="mulai_menjabat" value={form.mulai_menjabat || ""} onChange={handleChange} className="w-full border rounded-md p-2" />
+                            <input type="date" name="mulai_menjabat" value={form.mulai_menjabat || ""} onChange={handleChange} className="w-full border rounded-md p-2"  />
                         </div>
 
                         <div>
                             <label className="block text-sm font-medium">Akhir Jabatan</label>
-                            <input type="date" name="akhir_jabatan" value={form.akhir_jabatan || ""} onChange={handleChange} className="w-full border rounded-md p-2" />
+                            <input type="date" name="akhir_jabatan" value={form.akhir_jabatan || ""} onChange={handleChange} className="w-full border rounded-md p-2"  />
                         </div>
 
                         {/* 🔹 Pilih RW */}
@@ -796,742 +796,6 @@ export function EditPermissionModal({ form, setForm, handleEdit, onClose }) {
     )
 }
 
-
-export function DetailPengumuman({ selectedData, detailShow, onClose, onUpdated, onDeleted, userData, role }) {
-    const [komentar, setKomentar] = useState([])
-    const [newKomentar, setNewKomentar] = useState("")
-    const [captionExpanded, setCaptionExpanded] = useState(false)
-    const [commentExpanded, setCommentExpanded] = useState({})
-    const [isOverflowing, setIsOverflowing] = useState(false)
-    const [isEdit, setIsEdit] = useState(false)
-    const textRef = useRef(null)
-    const komenRef = useRef(null)
-
-    const toggleEdit = () => {
-        setIsEdit(!isEdit)
-    }
-
-    const toggleExpand = (id) => {
-        setCommentExpanded((prev) => ({
-            ...prev,
-            [id]: !prev[id],
-        }))
-    }
-
-    useEffect(() => {
-        if (textRef.current) {
-            const el = textRef.current
-            setIsOverflowing(el.scrollHeight > el.clientHeight)
-        }
-    }, [selectedData])
-
-    useEffect(() => {
-        setKomentar(
-            (selectedData?.komen || []).sort(
-                (a, b) => new Date(b.created_at) - new Date(a.created_at)
-            )
-        )
-    }, [selectedData])
-
-    const handleSubmit = () => {
-        if (!newKomentar.trim()) return
-        // nanti rutenya bakal diganti sesuai role
-        axios.post(`/${role}/pengumuman/${selectedData.id}/komentar`, {
-            isi_komentar: newKomentar
-        })
-            .then(res => {
-                setKomentar(prev => [res.data, ...prev])
-                setNewKomentar("")
-                if (komenRef.current) {
-                    komenRef.current.scrollTo({
-                        top: 0,
-                        behavior: "smooth"
-                    })
-                }
-            })
-            .catch(err => console.error(err))
-    }
-
-    useEffect(() => {
-        const handleEnter = (e) => {
-            if (e.key === "Enter") handleSubmit()
-        }
-        document.addEventListener("keydown", handleEnter)
-        return () => document.removeEventListener("keydown", handleEnter)
-    }, [newKomentar, selectedData])
-
-    useEffect(() => {
-        const handleEsc = (e) => {
-            if (e.key === "Escape") onClose()
-        }
-        document.addEventListener("keydown", handleEsc)
-        return () => document.removeEventListener("keydown", handleEsc)
-    }, [onClose])
-
-    if (!detailShow || !selectedData) return null
-
-    const fileName = selectedData.dokumen_name?.toLowerCase() || ""
-
-    return (
-        <>
-            <div
-                className="modal fade show"
-                tabIndex="-1"
-                style={{
-                    display: "block",
-                    backgroundColor: "rgba(0,0,0,0.5)"
-                }}
-                onClick={() => {
-                    onClose()
-                    setIsEdit(false)
-                }}
-            >
-                <div
-                    className="modal-dialog modal-komen modal-lg modal-dialog-scrollable modal-dialog-centered"
-                    onClick={(e) => e.stopPropagation()}
-                >
-                    <div className="modal-content modal-komen shadow-lg border-0">
-                        <div className="modal-body p-0 m-0">
-                            {isEdit ? (
-                                <EditPengumuman
-                                    toggle={toggleEdit}
-                                    pengumuman={selectedData}
-                                    onUpdated={(updatedPengumuman) => {
-                                        onUpdated(updatedPengumuman)
-                                        setIsEdit(false)
-                                    }}
-                                    onDeleted={(id) => {
-                                        if (onDeleted) onDeleted(id)
-                                    }}
-                                    role={role}
-                                />
-                            ) : (
-                                <div className="d-flex flex-row modal-komen">
-                                    {selectedData?.dokumen_path ? (
-                                        <div className="flex-fill border-end bg-black d-flex align-items-center justify-content-center" style={{ maxWidth: "50%" }}>
-                                            {selectedData.dokumen_path ? (
-                                                <>
-                                                    {fileName.endsWith(".jpg") || fileName.endsWith(".jpeg") || fileName.endsWith(".png") || fileName.endsWith(".gif") ? (
-                                                        <img
-                                                            src={`/storage/${selectedData.dokumen_path}`}
-                                                            alt={selectedData.dokumen_name}
-                                                            className="img-fluid"
-                                                            style={{ maxHeight: "80vh", objectFit: "contain" }}
-                                                        />
-                                                    ) : fileName.endsWith(".mp4") || fileName.endsWith(".webm") || fileName.endsWith(".avi") ? (
-                                                        <video
-                                                            src={`/storage/${selectedData.dokumen_path}`}
-                                                            controls
-                                                            autoPlay
-                                                            loop
-                                                            style={{ maxHeight: "80vh", objectFit: "contain", width: "100%" }}
-                                                        />
-                                                    ) : fileName.endsWith(".pdf") ? (
-                                                        <embed
-                                                            src={`/storage/${selectedData.dokumen_path}`}
-                                                            type="application/pdf"
-                                                            className="pdf-preview"
-                                                        />
-                                                    ) : (
-                                                        <div className="p-3 text-center text-white">
-                                                            <i className="bi bi-file-earmark-text fs-1"></i>
-                                                            <p className="mb-1">Dokumen Terlampir: {selectedData.dokumen_name}</p>
-                                                            <Link href={`/storage/${selectedData.dokumen_path}`} target="_blank" className="btn btn-primary btn-sm">
-                                                                <i className="bi bi-download"></i> Unduh
-                                                            </Link>
-                                                        </div>
-                                                    )}
-                                                </>
-                                            ) : (
-                                                <div className="text-muted">Tidak ada media</div>
-                                            )}
-                                        </div>
-                                    ) : (
-                                        ""
-                                    )}
-                                    <div className="flex-fill d-flex flex-column" style={selectedData?.dokumen_path ? { maxWidth: "50%" } : { maxWidth: "100%" }}>
-                                        <div className="p-3 border-bottom caption-section">
-                                            {(userData.rukun_tetangga?.id === selectedData.id_rt || userData.rw?.id === selectedData.id_rw) ? (
-                                                <div className="d-flex justify-between">
-                                                    <h5 className="fw-bold mb-1 mt-2">{selectedData.judul}</h5>
-                                                    <Role role={selectedData.rukun_tetangga ? "rt" : "rw"}>
-                                                        <button onClick={toggleEdit} title="Edit Pengumuman">
-                                                            <i className="far fa-edit"></i>
-                                                        </button>
-                                                    </Role>
-                                                </div>
-                                            ) : (
-                                                <h5 className="fw-bold mb-1 mt-2">{selectedData.judul}</h5>
-                                            )}
-                                            <small className="text-muted">
-                                                <strong>
-                                                    {selectedData.rukun_tetangga ? selectedData.rukun_tetangga.nama_ketua_rt : selectedData.rw.nama_ketua_rw}
-                                                </strong> • {" "}
-                                                RT {selectedData.rukun_tetangga?.nomor_rt}/{""}
-                                                RW {selectedData.rw?.nomor_rw}{" "}
-                                                • <FormatWaktu createdAt={selectedData.created_at} />
-                                            </small>
-                                            <p
-                                                ref={textRef}
-                                                className={`mt-2 isi-pengumuman ${captionExpanded ? "expanded" : "clamped"}`}
-                                            >
-                                                {selectedData.isi}
-                                            </p>
-                                            {
-                                                isOverflowing && (
-                                                    <button
-                                                        className="btn btn-link p-0 mt-1 text-decoration-none"
-                                                        onClick={() => setCaptionExpanded(!captionExpanded)}
-                                                    >
-                                                        {captionExpanded ? "lebih sedikit" : "selengkapnya"}
-                                                    </button>
-                                                )
-                                            }
-                                        </div>
-                                        <div className="flex-grow-1 overflow-auto p-3 komen-section" ref={komenRef}>
-                                            {komentar.length > 0 ? (
-                                                komentar.map((komen, i) => (
-                                                    <div key={i} className="mb-3">
-                                                        <small className="fw-bold"><strong>{komen.user?.nama}</strong></small>{" "}
-                                                        <small className="text-muted">
-                                                            • <FormatWaktu createdAt={komen.created_at} />
-                                                        </small>
-
-                                                        <p
-                                                            className={`mb-2 komen ${commentExpanded[komen.id]
-                                                                ? "line-clamp-none"
-                                                                : "line-clamp-3"
-                                                                }`}
-                                                        >
-                                                            {komen.isi_komentar}
-                                                        </p>
-
-                                                        {komen.isi_komentar.length > 100 && (
-                                                            <button
-                                                                className="btn-expand btn btn-link p-0 text-decoration-none mt-0"
-                                                                onClick={() => toggleExpand(komen.id)}
-                                                            >
-                                                                {commentExpanded[komen.id]
-                                                                    ? "lebih sedikit"
-                                                                    : "selengkapnya"}
-                                                            </button>
-                                                        )}
-                                                        <hr className="my-0" />
-                                                    </div>
-                                                ))
-                                            ) : (
-                                                <p className="text-muted">Belum ada komentar</p>
-                                            )}
-                                        </div>
-                                        <div className="komen p-3 border-top">
-                                            <div className="input-group">
-                                                <input
-                                                    type="text"
-                                                    className="form-control komen"
-                                                    placeholder="Tambah komentar..."
-                                                    value={newKomentar}
-                                                    onChange={(e) => setNewKomentar(e.target.value)}
-                                                />
-                                                <button className="btn btn-primary my-0" type="button" onClick={handleSubmit}>
-                                                    <i className="far fa-paper-plane"></i>
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </>
-    )
-}
-
-export function EditPengumuman({ toggle, onUpdated, onDeleted, pengumuman, role }) {
-    const { data, setData, put, processing, errors } = useForm({
-        judul: pengumuman.judul || "",
-        isi: pengumuman.isi || "",
-        kategori: pengumuman.kategori || "",
-        dokumen: null,
-    }, { forceFormData: true })
-
-    const [previewUrl, setPreviewUrl] = useState(null)
-    const [showAlert, setShowAlert] = useState(false)
-
-    const deletePengumuman = () => {
-        setShowAlert(true)
-    }
-
-    const confirmDelete = (e) => {
-        e.preventDefault()
-        setShowAlert(false)
-console.log("role:", role)
-console.log("delete URL:", `/${role}/pengumuman/${pengumuman.id}`)
-
-        axios.delete(`/${role}/pengumuman/${pengumuman.id}`)
-            .then(res => {
-                console.log(res.data.message)
-                if (onDeleted) {
-                    onDeleted(pengumuman.id)
-                }
-            })
-            .catch(err => {
-                console.error("Gagal hapus:", err.response?.data || err)
-            })
-    }
-
-    const cancelDelete = (e) => {
-        e.preventDefault()
-        setShowAlert(false)
-    }
-
-    useEffect(() => {
-        if (!pengumuman?.dokumen_path) return
-
-        const fileName = pengumuman.dokumen_path.toLowerCase()
-
-        if (fileName.endsWith(".jpg") || fileName.endsWith(".jpeg") || fileName.endsWith(".png") || fileName.endsWith(".gif")) {
-            setPreviewUrl({ type: "image", src: pengumuman.dokumen_path })
-        } else if (fileName.endsWith(".mp4") || fileName.endsWith(".webm") || fileName.endsWith(".avi")) {
-            setPreviewUrl({ type: "video", src: pengumuman.dokumen_path })
-        } else if (fileName.endsWith(".pdf")) {
-            setPreviewUrl({ type: "pdf", src: pengumuman.dokumen_path })
-        } else {
-            setPreviewUrl({ type: "other", name: pengumuman.dokumen_name })
-        }
-    }, [pengumuman])
-
-    useEffect(() => {
-        const handleEsc = (e) => {
-            if (e.key === "Escape") toggle()
-        }
-        document.addEventListener("keydown", handleEsc)
-        return () => document.removeEventListener("keydown", handleEsc)
-    }, [toggle])
-
-    const handleFileChange = (e) => {
-        const selectedFile = e.target.files[0]
-
-        if (!selectedFile) {
-            setPreviewUrl(null)
-            setData("dokumen", null)
-            return
-        }
-
-        setData("dokumen", selectedFile || null)
-
-        const fileName = selectedFile.name.toLowerCase()
-
-        if (fileName.endsWith(".jpg") || fileName.endsWith(".jpeg") || fileName.endsWith(".png") || fileName.endsWith(".gif")) {
-            const reader = new FileReader()
-            reader.onload = (ev) => setPreviewUrl({ type: "image", src: ev.target.result })
-            reader.readAsDataURL(selectedFile)
-        } else if (fileName.endsWith(".mp4") || fileName.endsWith(".webm") || fileName.endsWith(".avi")) {
-            setPreviewUrl({ type: "video", src: URL.createObjectURL(selectedFile) })
-        } else if (fileName.endsWith(".pdf")) {
-            setPreviewUrl({ type: "pdf", src: URL.createObjectURL(selectedFile) })
-        } else {
-            setPreviewUrl({ type: "other", name: selectedFile.name })
-        }
-    }
-
-    const handleSubmit = (e) => {
-        e.preventDefault()
-        const formData = new FormData()
-        formData.append('judul', data.judul)
-        formData.append('isi', data.isi)
-        formData.append('kategori', data.kategori)
-        if (data.dokumen) formData.append('dokumen', data.dokumen)
-        formData.append('_method', 'PUT')
-
-        axios.post(`/${role}/pengumuman/${pengumuman.id}`, formData)
-            .then(res => {
-                if (onUpdated) {
-                    onUpdated({
-                        ...pengumuman,
-                        ...res.data
-                    })
-                }
-            })
-            .catch(err => {
-                console.error('Error:', err.response?.data || err)
-            })
-    }
-
-    const getFileUrl = (src) => {
-        if (!src) return ""
-        if (src.startsWith("data:")) return src
-        if (src.startsWith("blob:")) return src
-        return `/storage/${src}`
-    }
-
-    return (
-        <div className="d-flex flex-row modal-komen">
-            {previewUrl ? (
-                <div className="flex-fill border-end bg-black d-flex align-items-center justify-content-center" style={{ maxWidth: "50%" }}>
-                    <div id="preview">
-                        {previewUrl && previewUrl.type === "image" && (
-                            <img
-                                src={getFileUrl(previewUrl.src)}
-                                alt="Preview"
-                                style={{ maxHeight: "80vh", objectFit: "contain" }}
-                            />
-                        )}
-                        {previewUrl && previewUrl.type === "video" && (
-                            <video
-                                src={getFileUrl(previewUrl.src)}
-                                controls
-                                autoPlay
-                                loop
-                                style={{ maxHeight: "80vh", objectFit: "contain" }}
-                            />
-                        )}
-                        {previewUrl && previewUrl.type === "pdf" && (
-                            <embed
-                                src={getFileUrl(previewUrl.src)}
-                                type="application/pdf"
-                                className="pdf-preview"
-                            />
-                        )}
-                        {previewUrl && previewUrl.type === "other" && <p>File dipilih: {previewUrl.name}</p>}
-                    </div>
-                </div>
-            ) : (
-                ""
-            )}
-            <div className="flex-fill d-flex flex-column" style={previewUrl ? { maxWidth: "50%" } : { maxWidth: "100%" }}>
-                <div className="p-3" style={{ height: "100%" }}>
-                    <div className="d-flex justify-content-end w-100 mb-2">
-                        <button
-                            type="button"
-                            onClick={() => toggle()}
-                            title="Kembali"
-                        >
-                            <i className="fas fa-arrow-left"></i>
-                        </button>
-                    </div>
-
-                    <form onSubmit={handleSubmit}>
-                        <div className="mb-3">
-                            <label className="form-label">Judul</label>
-                            <input
-                                name="judul"
-                                type="text"
-                                className="edit-judul form-control"
-                                value={data.judul}
-                                onChange={(e) => setData("judul", e.target.value)}
-                                required
-                            />
-                        </div>
-
-                        <div className="mb-3">
-                            <label className="form-label">Kategori</label>
-                            <input
-                                name="kategori"
-                                type="text"
-                                className="edit-kategori form-control"
-                                value={data.kategori}
-                                onChange={(e) => setData("kategori", e.target.value)}
-                                required
-                            />
-                        </div>
-
-                        <div className="mb-3">
-                            <label className="form-label">Isi</label>
-                            <textarea
-                                name="isi"
-                                className="edit-isi form-control"
-                                rows="4"
-                                value={data.isi}
-                                onChange={(e) => setData("isi", e.target.value)}
-                                required
-                            ></textarea>
-                        </div>
-
-                        <div className="mb-3">
-                            <input
-                                type="file"
-                                id="fileInput"
-                                name="file"
-                                className="d-none"
-                                onChange={handleFileChange}
-                            />
-                            <button
-                                type="button"
-                                className="edit-file btn btn-outline-primary m-0"
-                                title="Upload File"
-                                onClick={() => document.getElementById('fileInput').click()}
-                            >
-                                <i className="fas fa-upload mr-2"></i>
-                                <small>
-                                    Upload File
-                                </small>
-                            </button>
-                            {pengumuman?.dokumen_name && !data.file && (
-                                <small className="text-muted d-block mt-2">
-                                    File lama: {pengumuman.dokumen_name}
-                                </small>
-                            )}
-                            {data.file && (
-                                <small className="text-success d-block mt-2">
-                                    File dipilih: {data.file.name}
-                                </small>
-                            )}
-                        </div>
-
-                        <div className="d-flex justify-content-between" style={{ marginTop: "auto" }}>
-                            <button
-                                type="button"
-                                onClick={deletePengumuman}
-                                className="btn btn-danger"
-                            >
-                                <i className="fas fa-trash mr-2"></i>
-                                Hapus
-                            </button>
-                            <button type="submit" className="btn btn-primary">
-                                <i className="fas fa-save mr-2"></i>
-                                Simpan
-                            </button>
-                        </div>
-                        {showAlert && (
-                            <div className="alert-popup border rounded p-3 mt-3 bg-light shadow">
-                                <p className="mb-2">Yakin mau hapus pengumuman ini?</p>
-                                <div className="d-flex gap-2">
-                                    <button type="button" onClick={confirmDelete} className="btn btn-danger">Ya, hapus</button>
-                                    <button type="button" onClick={cancelDelete} className="btn btn-secondary">Batal</button>
-                                </div>
-                            </div>
-                        )}
-                    </form>
-                </div>
-            </div>
-        </div>
-    )
-}
-
-export function TambahPengumuman({ tambahShow, onClose, onAdded, role }) {
-    const { data, setData, put, processing, errors } = useForm({
-        judul: "",
-        kategori: "",
-        isi: "",
-        dokumen: null,
-    }, { forceFormData: true })
-
-    const [previewUrl, setPreviewUrl] = useState(null)
-    const fileInputRef = useRef(null)
-
-    useEffect(() => {
-        const handleEsc = (e) => {
-            if (e.key === "Escape") onClose()
-        }
-
-        document.addEventListener("keydown", handleEsc)
-        return () => document.removeEventListener("keydown", handleEsc)
-    }, [onClose])
-
-    const handleFileChange = (e) => {
-        const selectedFile = e.target.files[0]
-
-        if (!selectedFile) {
-            setPreviewUrl(null)
-            setData("dokumen", null)
-            return
-        }
-
-        setData("dokumen", selectedFile || null)
-
-        const fileName = selectedFile.name.toLowerCase()
-
-        if (fileName.endsWith(".jpg") || fileName.endsWith(".jpeg") || fileName.endsWith(".png") || fileName.endsWith(".gif")) {
-            const reader = new FileReader()
-            reader.onload = (ev) => setPreviewUrl({ type: "image", src: ev.target.result })
-            reader.readAsDataURL(selectedFile)
-        } else if (fileName.endsWith(".mp4") || fileName.endsWith(".webm") || fileName.endsWith(".avi")) {
-            setPreviewUrl({ type: "video", src: URL.createObjectURL(selectedFile) })
-        } else if (fileName.endsWith(".pdf")) {
-            setPreviewUrl({ type: "pdf", src: URL.createObjectURL(selectedFile) })
-        } else {
-            setPreviewUrl({ type: "other", name: selectedFile.name })
-        }
-    }
-
-    const handleSubmit = (e) => {
-        e.preventDefault()
-        const formData = new FormData()
-        formData.append('judul', data.judul)
-        formData.append('isi', data.isi)
-        formData.append('kategori', data.kategori)
-        if (data.dokumen) formData.append('dokumen', data.dokumen)
-
-        axios.post(`/${role}/pengumuman`, formData)
-            .then(res => {
-                if (onAdded) {
-                    onAdded(res.data)
-                }
-                setData({
-                    judul: "",
-                    kategori: "",
-                    isi: "",
-                    dokumen: null,
-                })
-                setPreviewUrl(null)
-                if (fileInputRef.current) {
-                    fileInputRef.current.value = ""
-                }
-                onClose()
-            })
-            .catch(err => {
-                console.error('Error:', err.response?.data || err)
-            })
-
-    }
-
-    const getFileUrl = (src) => {
-        if (!src) return ""
-        if (src.startsWith("data:")) return src
-        if (src.startsWith("blob:")) return src
-        return `/storage/${src}`
-    }
-
-    if (!tambahShow) return null
-
-    return (
-        <>
-            <div
-                className="modal fade show"
-                tabIndex="-1"
-                style={{
-                    display: "block",
-                    backgroundColor: "rgba(0,0,0,0.5)"
-                }}
-                onClick={() => {
-                    onClose()
-                }}
-            >
-                <div
-                    className="modal-dialog modal-komen modal-lg modal-dialog-scrollable modal-dialog-centered"
-                    onClick={(e) => e.stopPropagation()}
-                >
-                    <div className="modal-content modal-komen shadow-lg border-0">
-                        <div className="modal-body p-0 m-0">
-                            <div className="d-flex flex-row modal-komen">
-                                {previewUrl ? (
-                                    <div className="flex-fill border-end bg-black d-flex align-items-center justify-content-center" style={{ maxWidth: "50%" }}>
-                                        <div id="preview">
-                                            {previewUrl && previewUrl.type === "image" && (
-                                                <img
-                                                    src={getFileUrl(previewUrl.src)}
-                                                    alt="Preview"
-                                                    style={{ maxHeight: "80vh", objectFit: "contain" }}
-                                                />
-                                            )}
-                                            {previewUrl && previewUrl.type === "video" && (
-                                                <video
-                                                    src={getFileUrl(previewUrl.src)}
-                                                    controls
-                                                    autoPlay
-                                                    loop
-                                                    style={{ maxHeight: "80vh", objectFit: "contain" }}
-                                                />
-                                            )}
-                                            {previewUrl && previewUrl.type === "pdf" && (
-                                                <embed
-                                                    src={getFileUrl(previewUrl.src)}
-                                                    type="application/pdf"
-                                                    className="pdf-preview"
-                                                />
-                                            )}
-                                            {previewUrl && previewUrl.type === "other" && <p>File dipilih: {previewUrl.name}</p>}
-                                        </div>
-                                    </div>
-                                ) : (
-                                    ""
-                                )}
-                                <div className="flex-fill d-flex flex-column" style={previewUrl ? { maxWidth: "50%" } : { maxWidth: "100%" }}>
-                                    <div className="p-3" style={{ height: "100%" }}>
-                                        <form onSubmit={handleSubmit}>
-                                            <div className="mb-3">
-                                                <label className="form-label">Judul</label>
-                                                <input
-                                                    name="judul"
-                                                    type="text"
-                                                    className="tambah-judul form-control"
-                                                    value={data.judul}
-                                                    onChange={(e) => setData("judul", e.target.value)}
-                                                    required
-                                                />
-                                            </div>
-
-                                            <div className="mb-3">
-                                                <label className="form-label">Kategori</label>
-                                                <input
-                                                    name="kategori"
-                                                    type="text"
-                                                    className="tambah-kategori form-control"
-                                                    value={data.kategori}
-                                                    onChange={(e) => setData("kategori", e.target.value)}
-                                                    required
-                                                />
-                                            </div>
-
-                                            <div className="mb-3">
-                                                <label className="form-label">Isi</label>
-                                                <textarea
-                                                    name="isi"
-                                                    className="edit-isi form-control"
-                                                    rows="4"
-                                                    value={data.isi}
-                                                    onChange={(e) => setData("isi", e.target.value)}
-                                                    required
-                                                ></textarea>
-                                            </div>
-
-                                            <div className="mb-3">
-                                                <input
-                                                    ref={fileInputRef}
-                                                    type="file"
-                                                    id="fileInput"
-                                                    name="dokumen"
-                                                    className="d-none"
-                                                    onChange={handleFileChange}
-                                                />
-                                                <button
-                                                    type="button"
-                                                    className="edit-file btn btn-outline-primary m-0"
-                                                    title="Upload File"
-                                                    onClick={() => document.getElementById('fileInput').click()}
-                                                >
-                                                    <i className="fas fa-upload mr-2"></i>
-                                                    <small>
-                                                        Upload File
-                                                    </small>
-                                                </button>
-                                                {data.file && (
-                                                    <small className="text-success d-block mt-2">
-                                                        File dipilih: {data.dokumen.name}
-                                                    </small>
-                                                )}
-                                            </div>
-
-                                            <div className="d-flex justify-content-end" style={{ marginTop: "auto" }}>
-                                                <button type="submit" className="btn btn-primary">
-                                                    <i className="fas fa-save mr-2"></i>
-                                                    Simpan
-                                                </button>
-                                            </div>
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </>
-    )
-}
-
 export function DetailPengaduan({ selectedData, detailShow, onClose, onUpdated, onDeleted, userData, role }) {
     const [komentar, setKomentar] = useState([])
     const [newKomentar, setNewKomentar] = useState("")
@@ -1580,7 +844,6 @@ export function DetailPengaduan({ selectedData, detailShow, onClose, onUpdated, 
 
     const handleSubmit = () => {
         if (!newKomentar.trim()) return
-        // nanti rutenya bakal diganti sesuai role
         axios.post(`/${role}/pengaduan/${selectedData.id}/komentar`, {
             isi_komentar: newKomentar
         })
@@ -1608,6 +871,21 @@ export function DetailPengaduan({ selectedData, detailShow, onClose, onUpdated, 
     if (!detailShow || !selectedData) return null
 
     const fileName = selectedData.file_name?.toLowerCase() || ""
+
+    const handleCheckboxChange = (checked) => {
+        const newStatus = checked ? 'selesai' : 'dproses';
+
+        axios.put(`/${role}/pengaduan/${selectedData.id}`, { status: newStatus })
+            .then(res => {
+                console.log("Status diperbarui:", res.data);
+                if (onUpdated) {
+                    onUpdated({ ...selectedData, status: newStatus });
+                }
+            })
+            .catch(err => {
+                console.error("Gagal ubah status:", err.response?.data || err);
+            });
+    };
 
     return (
         <>
@@ -1688,13 +966,27 @@ export function DetailPengaduan({ selectedData, detailShow, onClose, onUpdated, 
                                     )}
                                     <div className="flex-fill d-flex flex-column" style={selectedData?.file_path ? { maxWidth: "50%" } : { maxWidth: "100%" }}>
                                         <div className="p-3 border-bottom caption-section">
-                                            {userData.nik === selectedData.nik_warga ? (
+                                            {(userData.nik === selectedData.nik_warga && role === 'warga') ? (
                                                 <div className="d-flex justify-between">
                                                     <h5 className="fw-bold mb-1 mt-2">{selectedData.judul}</h5>
                                                     <Role role="warga">
                                                         <button onClick={toggleEdit} title="Edit Pengaduan">
                                                             <i className="far fa-edit"></i>
                                                         </button>
+                                                    </Role>
+                                                </div>
+                                            ) : (role.includes('rt') || role.includes('rw')) ? (
+                                                <div className="d-flex justify-between">
+                                                    <h5 className="fw-bold mb-1 mt-2">{selectedData.judul}</h5>
+                                                    <Role role={selectedData.level === 'rt' ? "rt" : "rw"}>
+                                                        {(selectedData.konfirmasi_rw === 'sudah') && (
+                                                            <input type="checkbox"
+                                                                name="selesai"
+                                                                title="Selesai"
+                                                                checked={selectedData.status === 'selesai'}
+                                                                onChange={(e) => handleCheckboxChange(e.target.checked)}
+                                                            />
+                                                        )}
                                                     </Role>
                                                 </div>
                                             ) : (
@@ -1704,7 +996,7 @@ export function DetailPengaduan({ selectedData, detailShow, onClose, onUpdated, 
                                                 <strong>
                                                     {selectedData.warga?.nama}
                                                 </strong>{" "}
-                                                • RT {selectedData.warga?.kartu_keluarga?.rukun_tetangga?.rt}/RW{" "}
+                                                • RT {selectedData.warga?.kartu_keluarga?.rukun_tetangga?.nomor_rt}/RW{" "}
                                                 {selectedData.warga?.kartu_keluarga?.rw?.nomor_rw}{" "}
                                                 • <FormatWaktu createdAt={selectedData.created_at} />
                                             </small>
@@ -2598,6 +1890,740 @@ export function DetailKK({ selectedData, detailShow, onClose, role }) {
                     </div>
                 </div>
             )}
+        </>
+    )
+}
+
+export function DetailPengumuman({ selectedData, detailShow, onClose, onUpdated, onDeleted, userData, role }) {
+    const [komentar, setKomentar] = useState([])
+    const [newKomentar, setNewKomentar] = useState("")
+    const [captionExpanded, setCaptionExpanded] = useState(false)
+    const [commentExpanded, setCommentExpanded] = useState({})
+    const [isOverflowing, setIsOverflowing] = useState(false)
+    const [isEdit, setIsEdit] = useState(false)
+    const textRef = useRef(null)
+    const komenRef = useRef(null)
+
+    const toggleEdit = () => {
+        setIsEdit(!isEdit)
+    }
+
+    const toggleExpand = (id) => {
+        setCommentExpanded((prev) => ({
+            ...prev,
+            [id]: !prev[id],
+        }))
+    }
+
+    useEffect(() => {
+        if (textRef.current) {
+            const el = textRef.current
+            setIsOverflowing(el.scrollHeight > el.clientHeight)
+        }
+    }, [selectedData])
+
+    useEffect(() => {
+        setKomentar(
+            (selectedData?.komen || []).sort(
+                (a, b) => new Date(b.created_at) - new Date(a.created_at)
+            )
+        )
+    }, [selectedData])
+
+    const handleSubmit = () => {
+        if (!newKomentar.trim()) return
+        axios.post(`/${role}/pengumuman/${selectedData.id}/komentar`, {
+            isi_komentar: newKomentar
+        })
+            .then(res => {
+                setKomentar(prev => [res.data, ...prev])
+                setNewKomentar("")
+                if (komenRef.current) {
+                    komenRef.current.scrollTo({
+                        top: 0,
+                        behavior: "smooth"
+                    })
+                }
+            })
+            .catch(err => console.error(err))
+    }
+
+    useEffect(() => {
+        const handleEnter = (e) => {
+            if (e.key === "Enter") handleSubmit()
+        }
+        document.addEventListener("keydown", handleEnter)
+        return () => document.removeEventListener("keydown", handleEnter)
+    }, [newKomentar, selectedData])
+
+    useEffect(() => {
+        const handleEsc = (e) => {
+            if (e.key === "Escape") onClose()
+        }
+        document.addEventListener("keydown", handleEsc)
+        return () => document.removeEventListener("keydown", handleEsc)
+    }, [onClose])
+
+    if (!detailShow || !selectedData) return null
+
+    const fileName = selectedData.dokumen_name?.toLowerCase() || ""
+
+    return (
+        <>
+            <div
+                className="modal fade show"
+                tabIndex="-1"
+                style={{
+                    display: "block",
+                    backgroundColor: "rgba(0,0,0,0.5)"
+                }}
+                onClick={() => {
+                    onClose()
+                    setIsEdit(false)
+                }}
+            >
+                <div
+                    className="modal-dialog modal-komen modal-lg modal-dialog-scrollable modal-dialog-centered"
+                    onClick={(e) => e.stopPropagation()}
+                >
+                    <div className="modal-content modal-komen shadow-lg border-0">
+                        <div className="modal-body p-0 m-0">
+                            {isEdit ? (
+                                <EditPengumuman
+                                    toggle={toggleEdit}
+                                    pengumuman={selectedData}
+                                    onUpdated={(updatedPengumuman) => {
+                                        onUpdated(updatedPengumuman)
+                                        setIsEdit(false)
+                                    }}
+                                    onDeleted={(id) => {
+                                        if (onDeleted) onDeleted(id)
+                                    }}
+                                    role={role}
+                                />
+                            ) : (
+                                <div className="d-flex flex-row modal-komen">
+                                    {selectedData?.dokumen_path ? (
+                                        <div className="flex-fill border-end bg-black d-flex align-items-center justify-content-center" style={{ maxWidth: "50%" }}>
+                                            {selectedData.dokumen_path ? (
+                                                <>
+                                                    {fileName.endsWith(".jpg") || fileName.endsWith(".jpeg") || fileName.endsWith(".png") || fileName.endsWith(".gif") ? (
+                                                        <img
+                                                            src={`/storage/${selectedData.dokumen_path}`}
+                                                            alt={selectedData.dokumen_name}
+                                                            className="img-fluid"
+                                                            style={{ maxHeight: "80vh", objectFit: "contain" }}
+                                                        />
+                                                    ) : fileName.endsWith(".mp4") || fileName.endsWith(".webm") || fileName.endsWith(".avi") ? (
+                                                        <video
+                                                            src={`/storage/${selectedData.dokumen_path}`}
+                                                            controls
+                                                            autoPlay
+                                                            loop
+                                                            style={{ maxHeight: "80vh", objectFit: "contain", width: "100%" }}
+                                                        />
+                                                    ) : fileName.endsWith(".pdf") ? (
+                                                        <embed
+                                                            src={`/storage/${selectedData.dokumen_path}`}
+                                                            type="application/pdf"
+                                                            className="pdf-preview"
+                                                        />
+                                                    ) : (
+                                                        <div className="p-3 text-center text-white">
+                                                            <i className="bi bi-file-earmark-text fs-1"></i>
+                                                            <p className="mb-1">Dokumen Terlampir: {selectedData.dokumen_name}</p>
+                                                            <Link href={`/storage/${selectedData.dokumen_path}`} target="_blank" className="btn btn-primary btn-sm">
+                                                                <i className="bi bi-download"></i> Unduh
+                                                            </Link>
+                                                        </div>
+                                                    )}
+                                                </>
+                                            ) : (
+                                                <div className="text-muted">Tidak ada media</div>
+                                            )}
+                                        </div>
+                                    ) : (
+                                        ""
+                                    )}
+                                    <div className="flex-fill d-flex flex-column" style={selectedData?.dokumen_path ? { maxWidth: "50%" } : { maxWidth: "100%" }}>
+                                        <div className="p-3 border-bottom caption-section">
+                                            {(userData.rukun_tetangga?.id === selectedData.id_rt || userData.rw?.id === selectedData.id_rw) ? (
+                                                <div className="d-flex justify-between">
+                                                    <h5 className="fw-bold mb-1 mt-2">{selectedData.judul}</h5>
+                                                    <Role role={selectedData.rukun_tetangga ? "rt" : "rw"}>
+                                                        <button onClick={toggleEdit} title="Edit Pengumuman">
+                                                            <i className="far fa-edit"></i>
+                                                        </button>
+                                                    </Role>
+                                                </div>
+                                            ) : (
+                                                <h5 className="fw-bold mb-1 mt-2">{selectedData.judul}</h5>
+                                            )}
+                                            <small className="text-muted">
+                                                <strong>
+                                                    {selectedData.rukun_tetangga ? selectedData.rukun_tetangga.nama_ketua_rt : selectedData.rw.nama_ketua_rw}
+                                                </strong> • {" "}
+                                                RT {selectedData.rukun_tetangga?.nomor_rt}/{""}
+                                                RW {selectedData.rw?.nomor_rw}{" "}
+                                                • <FormatWaktu createdAt={selectedData.created_at} />
+                                            </small>
+                                            <p
+                                                ref={textRef}
+                                                className={`mt-2 isi-pengumuman ${captionExpanded ? "expanded" : "clamped"}`}
+                                            >
+                                                {selectedData.isi}
+                                            </p>
+                                            {
+                                                isOverflowing && (
+                                                    <button
+                                                        className="btn btn-link p-0 mt-1 text-decoration-none"
+                                                        onClick={() => setCaptionExpanded(!captionExpanded)}
+                                                    >
+                                                        {captionExpanded ? "lebih sedikit" : "selengkapnya"}
+                                                    </button>
+                                                )
+                                            }
+                                        </div>
+                                        <div className="flex-grow-1 overflow-auto p-3 komen-section" ref={komenRef}>
+                                            {komentar.length > 0 ? (
+                                                komentar.map((komen, i) => (
+                                                    <div key={i} className="mb-3">
+                                                        <small className="fw-bold"><strong>{komen.user?.nama}</strong></small>{" "}
+                                                        <small className="text-muted">
+                                                            • <FormatWaktu createdAt={komen.created_at} />
+                                                        </small>
+
+                                                        <p
+                                                            className={`mb-2 komen ${commentExpanded[komen.id]
+                                                                ? "line-clamp-none"
+                                                                : "line-clamp-3"
+                                                                }`}
+                                                        >
+                                                            {komen.isi_komentar}
+                                                        </p>
+
+                                                        {komen.isi_komentar.length > 100 && (
+                                                            <button
+                                                                className="btn-expand btn btn-link p-0 text-decoration-none mt-0"
+                                                                onClick={() => toggleExpand(komen.id)}
+                                                            >
+                                                                {commentExpanded[komen.id]
+                                                                    ? "lebih sedikit"
+                                                                    : "selengkapnya"}
+                                                            </button>
+                                                        )}
+                                                        <hr className="my-0" />
+                                                    </div>
+                                                ))
+                                            ) : (
+                                                <p className="text-muted">Belum ada komentar</p>
+                                            )}
+                                        </div>
+                                        <div className="komen p-3 border-top">
+                                            <div className="input-group">
+                                                <input
+                                                    type="text"
+                                                    className="form-control komen"
+                                                    placeholder="Tambah komentar..."
+                                                    value={newKomentar}
+                                                    onChange={(e) => setNewKomentar(e.target.value)}
+                                                />
+                                                <button className="btn btn-primary my-0" type="button" onClick={handleSubmit}>
+                                                    <i className="far fa-paper-plane"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </>
+    )
+}
+
+export function EditPengumuman({ toggle, onUpdated, onDeleted, pengumuman, role }) {
+    const { data, setData, put, processing, errors } = useForm({
+        judul: pengumuman.judul || "",
+        isi: pengumuman.isi || "",
+        kategori: pengumuman.kategori || "",
+        dokumen: null,
+    }, { forceFormData: true })
+
+    const [previewUrl, setPreviewUrl] = useState(null)
+    const [showAlert, setShowAlert] = useState(false)
+
+    const deletePengumuman = () => {
+        setShowAlert(true)
+    }
+
+    const confirmDelete = (e) => {
+        e.preventDefault()
+        setShowAlert(false)
+        console.log("role:", role)
+        console.log("delete URL:", `/${role}/pengumuman/${pengumuman.id}`)
+
+        axios.delete(`/${role}/pengumuman/${pengumuman.id}`)
+            .then(res => {
+                console.log(res.data.message)
+                if (onDeleted) {
+                    onDeleted(pengumuman.id)
+                }
+            })
+            .catch(err => {
+                console.error("Gagal hapus:", err.response?.data || err)
+            })
+    }
+
+    const cancelDelete = (e) => {
+        e.preventDefault()
+        setShowAlert(false)
+    }
+
+    useEffect(() => {
+        if (!pengumuman?.dokumen_path) return
+
+        const fileName = pengumuman.dokumen_path.toLowerCase()
+
+        if (fileName.endsWith(".jpg") || fileName.endsWith(".jpeg") || fileName.endsWith(".png") || fileName.endsWith(".gif")) {
+            setPreviewUrl({ type: "image", src: pengumuman.dokumen_path })
+        } else if (fileName.endsWith(".mp4") || fileName.endsWith(".webm") || fileName.endsWith(".avi")) {
+            setPreviewUrl({ type: "video", src: pengumuman.dokumen_path })
+        } else if (fileName.endsWith(".pdf")) {
+            setPreviewUrl({ type: "pdf", src: pengumuman.dokumen_path })
+        } else {
+            setPreviewUrl({ type: "other", name: pengumuman.dokumen_name })
+        }
+    }, [pengumuman])
+
+    useEffect(() => {
+        const handleEsc = (e) => {
+            if (e.key === "Escape") toggle()
+        }
+        document.addEventListener("keydown", handleEsc)
+        return () => document.removeEventListener("keydown", handleEsc)
+    }, [toggle])
+
+    const handleFileChange = (e) => {
+        const selectedFile = e.target.files[0]
+
+        if (!selectedFile) {
+            setPreviewUrl(null)
+            setData("dokumen", null)
+            return
+        }
+
+        setData("dokumen", selectedFile || null)
+
+        const fileName = selectedFile.name.toLowerCase()
+
+        if (fileName.endsWith(".jpg") || fileName.endsWith(".jpeg") || fileName.endsWith(".png") || fileName.endsWith(".gif")) {
+            const reader = new FileReader()
+            reader.onload = (ev) => setPreviewUrl({ type: "image", src: ev.target.result })
+            reader.readAsDataURL(selectedFile)
+        } else if (fileName.endsWith(".mp4") || fileName.endsWith(".webm") || fileName.endsWith(".avi")) {
+            setPreviewUrl({ type: "video", src: URL.createObjectURL(selectedFile) })
+        } else if (fileName.endsWith(".pdf")) {
+            setPreviewUrl({ type: "pdf", src: URL.createObjectURL(selectedFile) })
+        } else {
+            setPreviewUrl({ type: "other", name: selectedFile.name })
+        }
+    }
+
+    const handleSubmit = (e) => {
+        e.preventDefault()
+        const formData = new FormData()
+        formData.append('judul', data.judul)
+        formData.append('isi', data.isi)
+        formData.append('kategori', data.kategori)
+        if (data.dokumen) formData.append('dokumen', data.dokumen)
+        formData.append('_method', 'PUT')
+
+        axios.post(`/${role}/pengumuman/${pengumuman.id}`, formData)
+            .then(res => {
+                if (onUpdated) {
+                    onUpdated({
+                        ...pengumuman,
+                        ...res.data
+                    })
+                }
+            })
+            .catch(err => {
+                console.error('Error:', err.response?.data || err)
+            })
+    }
+
+    const getFileUrl = (src) => {
+        if (!src) return ""
+        if (src.startsWith("data:")) return src
+        if (src.startsWith("blob:")) return src
+        return `/storage/${src}`
+    }
+
+    return (
+        <div className="d-flex flex-row modal-komen">
+            {previewUrl ? (
+                <div className="flex-fill border-end bg-black d-flex align-items-center justify-content-center" style={{ maxWidth: "50%" }}>
+                    <div id="preview">
+                        {previewUrl && previewUrl.type === "image" && (
+                            <img
+                                src={getFileUrl(previewUrl.src)}
+                                alt="Preview"
+                                style={{ maxHeight: "80vh", objectFit: "contain" }}
+                            />
+                        )}
+                        {previewUrl && previewUrl.type === "video" && (
+                            <video
+                                src={getFileUrl(previewUrl.src)}
+                                controls
+                                autoPlay
+                                loop
+                                style={{ maxHeight: "80vh", objectFit: "contain" }}
+                            />
+                        )}
+                        {previewUrl && previewUrl.type === "pdf" && (
+                            <embed
+                                src={getFileUrl(previewUrl.src)}
+                                type="application/pdf"
+                                className="pdf-preview"
+                            />
+                        )}
+                        {previewUrl && previewUrl.type === "other" && <p>File dipilih: {previewUrl.name}</p>}
+                    </div>
+                </div>
+            ) : (
+                ""
+            )}
+            <div className="flex-fill d-flex flex-column" style={previewUrl ? { maxWidth: "50%" } : { maxWidth: "100%" }}>
+                <div className="p-3" style={{ height: "100%" }}>
+                    <div className="d-flex justify-content-end w-100 mb-2">
+                        <button
+                            type="button"
+                            onClick={() => toggle()}
+                            title="Kembali"
+                        >
+                            <i className="fas fa-arrow-left"></i>
+                        </button>
+                    </div>
+
+                    <form onSubmit={handleSubmit}>
+                        <div className="mb-3">
+                            <label className="form-label">Judul</label>
+                            <input
+                                name="judul"
+                                type="text"
+                                className="edit-judul form-control"
+                                value={data.judul}
+                                onChange={(e) => setData("judul", e.target.value)}
+                                required
+                            />
+                        </div>
+
+                        <div className="mb-3">
+                            <label className="form-label">Kategori</label>
+                            <input
+                                name="kategori"
+                                type="text"
+                                className="edit-kategori form-control"
+                                value={data.kategori}
+                                onChange={(e) => setData("kategori", e.target.value)}
+                                required
+                            />
+                        </div>
+
+                        <div className="mb-3">
+                            <label className="form-label">Isi</label>
+                            <textarea
+                                name="isi"
+                                className="edit-isi form-control"
+                                rows="4"
+                                value={data.isi}
+                                onChange={(e) => setData("isi", e.target.value)}
+                                required
+                            ></textarea>
+                        </div>
+
+                        <div className="mb-3">
+                            <input
+                                type="file"
+                                id="fileInput"
+                                name="file"
+                                className="d-none"
+                                onChange={handleFileChange}
+                            />
+                            <button
+                                type="button"
+                                className="edit-file btn btn-outline-primary m-0"
+                                title="Upload File"
+                                onClick={() => document.getElementById('fileInput').click()}
+                            >
+                                <i className="fas fa-upload mr-2"></i>
+                                <small>
+                                    Upload File
+                                </small>
+                            </button>
+                            {pengumuman?.dokumen_name && !data.file && (
+                                <small className="text-muted d-block mt-2">
+                                    File lama: {pengumuman.dokumen_name}
+                                </small>
+                            )}
+                            {data.file && (
+                                <small className="text-success d-block mt-2">
+                                    File dipilih: {data.file.name}
+                                </small>
+                            )}
+                        </div>
+
+                        <div className="d-flex justify-content-between" style={{ marginTop: "auto" }}>
+                            <button
+                                type="button"
+                                onClick={deletePengumuman}
+                                className="btn btn-danger"
+                            >
+                                <i className="fas fa-trash mr-2"></i>
+                                Hapus
+                            </button>
+                            <button type="submit" className="btn btn-primary">
+                                <i className="fas fa-save mr-2"></i>
+                                Simpan
+                            </button>
+                        </div>
+                        {showAlert && (
+                            <div className="alert-popup border rounded p-3 mt-3 bg-light shadow">
+                                <p className="mb-2">Yakin mau hapus pengumuman ini?</p>
+                                <div className="d-flex gap-2">
+                                    <button type="button" onClick={confirmDelete} className="btn btn-danger">Ya, hapus</button>
+                                    <button type="button" onClick={cancelDelete} className="btn btn-secondary">Batal</button>
+                                </div>
+                            </div>
+                        )}
+                    </form>
+                </div>
+            </div>
+        </div>
+    )
+}
+
+export function TambahPengumuman({ tambahShow, onClose, onAdded, role }) {
+    const { data, setData, put, processing, errors } = useForm({
+        judul: "",
+        kategori: "",
+        isi: "",
+        dokumen: null,
+    }, { forceFormData: true })
+
+    const [previewUrl, setPreviewUrl] = useState(null)
+    const fileInputRef = useRef(null)
+
+    useEffect(() => {
+        const handleEsc = (e) => {
+            if (e.key === "Escape") onClose()
+        }
+
+        document.addEventListener("keydown", handleEsc)
+        return () => document.removeEventListener("keydown", handleEsc)
+    }, [onClose])
+
+    const handleFileChange = (e) => {
+        const selectedFile = e.target.files[0]
+
+        if (!selectedFile) {
+            setPreviewUrl(null)
+            setData("dokumen", null)
+            return
+        }
+
+        setData("dokumen", selectedFile || null)
+
+        const fileName = selectedFile.name.toLowerCase()
+
+        if (fileName.endsWith(".jpg") || fileName.endsWith(".jpeg") || fileName.endsWith(".png") || fileName.endsWith(".gif")) {
+            const reader = new FileReader()
+            reader.onload = (ev) => setPreviewUrl({ type: "image", src: ev.target.result })
+            reader.readAsDataURL(selectedFile)
+        } else if (fileName.endsWith(".mp4") || fileName.endsWith(".webm") || fileName.endsWith(".avi")) {
+            setPreviewUrl({ type: "video", src: URL.createObjectURL(selectedFile) })
+        } else if (fileName.endsWith(".pdf")) {
+            setPreviewUrl({ type: "pdf", src: URL.createObjectURL(selectedFile) })
+        } else {
+            setPreviewUrl({ type: "other", name: selectedFile.name })
+        }
+    }
+
+    const handleSubmit = (e) => {
+        e.preventDefault()
+        const formData = new FormData()
+        formData.append('judul', data.judul)
+        formData.append('isi', data.isi)
+        formData.append('kategori', data.kategori)
+        if (data.dokumen) formData.append('dokumen', data.dokumen)
+
+        axios.post(`/${role}/pengumuman`, formData)
+            .then(res => {
+                if (onAdded) {
+                    onAdded(res.data)
+                }
+                setData({
+                    judul: "",
+                    kategori: "",
+                    isi: "",
+                    dokumen: null,
+                })
+                setPreviewUrl(null)
+                if (fileInputRef.current) {
+                    fileInputRef.current.value = ""
+                }
+                onClose()
+            })
+            .catch(err => {
+                console.error('Error:', err.response?.data || err)
+            })
+
+    }
+
+    const getFileUrl = (src) => {
+        if (!src) return ""
+        if (src.startsWith("data:")) return src
+        if (src.startsWith("blob:")) return src
+        return `/storage/${src}`
+    }
+
+    if (!tambahShow) return null
+
+    return (
+        <>
+            <div
+                className="modal fade show"
+                tabIndex="-1"
+                style={{
+                    display: "block",
+                    backgroundColor: "rgba(0,0,0,0.5)"
+                }}
+                onClick={() => {
+                    onClose()
+                }}
+            >
+                <div
+                    className="modal-dialog modal-komen modal-lg modal-dialog-scrollable modal-dialog-centered"
+                    onClick={(e) => e.stopPropagation()}
+                >
+                    <div className="modal-content modal-komen shadow-lg border-0">
+                        <div className="modal-body p-0 m-0">
+                            <div className="d-flex flex-row modal-komen">
+                                {previewUrl ? (
+                                    <div className="flex-fill border-end bg-black d-flex align-items-center justify-content-center" style={{ maxWidth: "50%" }}>
+                                        <div id="preview">
+                                            {previewUrl && previewUrl.type === "image" && (
+                                                <img
+                                                    src={getFileUrl(previewUrl.src)}
+                                                    alt="Preview"
+                                                    style={{ maxHeight: "80vh", objectFit: "contain" }}
+                                                />
+                                            )}
+                                            {previewUrl && previewUrl.type === "video" && (
+                                                <video
+                                                    src={getFileUrl(previewUrl.src)}
+                                                    controls
+                                                    autoPlay
+                                                    loop
+                                                    style={{ maxHeight: "80vh", objectFit: "contain" }}
+                                                />
+                                            )}
+                                            {previewUrl && previewUrl.type === "pdf" && (
+                                                <embed
+                                                    src={getFileUrl(previewUrl.src)}
+                                                    type="application/pdf"
+                                                    className="pdf-preview"
+                                                />
+                                            )}
+                                            {previewUrl && previewUrl.type === "other" && <p>File dipilih: {previewUrl.name}</p>}
+                                        </div>
+                                    </div>
+                                ) : (
+                                    ""
+                                )}
+                                <div className="flex-fill d-flex flex-column" style={previewUrl ? { maxWidth: "50%" } : { maxWidth: "100%" }}>
+                                    <div className="p-3" style={{ height: "100%" }}>
+                                        <form onSubmit={handleSubmit}>
+                                            <div className="mb-3">
+                                                <label className="form-label">Judul</label>
+                                                <input
+                                                    name="judul"
+                                                    type="text"
+                                                    className="tambah-judul form-control"
+                                                    value={data.judul}
+                                                    onChange={(e) => setData("judul", e.target.value)}
+                                                    required
+                                                />
+                                            </div>
+
+                                            <div className="mb-3">
+                                                <label className="form-label">Kategori</label>
+                                                <input
+                                                    name="kategori"
+                                                    type="text"
+                                                    className="tambah-kategori form-control"
+                                                    value={data.kategori}
+                                                    onChange={(e) => setData("kategori", e.target.value)}
+                                                    required
+                                                />
+                                            </div>
+
+                                            <div className="mb-3">
+                                                <label className="form-label">Isi</label>
+                                                <textarea
+                                                    name="isi"
+                                                    className="edit-isi form-control"
+                                                    rows="4"
+                                                    value={data.isi}
+                                                    onChange={(e) => setData("isi", e.target.value)}
+                                                    required
+                                                ></textarea>
+                                            </div>
+
+                                            <div className="mb-3">
+                                                <input
+                                                    ref={fileInputRef}
+                                                    type="file"
+                                                    id="fileInput"
+                                                    name="dokumen"
+                                                    className="d-none"
+                                                    onChange={handleFileChange}
+                                                />
+                                                <button
+                                                    type="button"
+                                                    className="edit-file btn btn-outline-primary m-0"
+                                                    title="Upload File"
+                                                    onClick={() => document.getElementById('fileInput').click()}
+                                                >
+                                                    <i className="fas fa-upload mr-2"></i>
+                                                    <small>
+                                                        Upload File
+                                                    </small>
+                                                </button>
+                                                {data.file && (
+                                                    <small className="text-success d-block mt-2">
+                                                        File dipilih: {data.dokumen.name}
+                                                    </small>
+                                                )}
+                                            </div>
+
+                                            <div className="d-flex justify-content-end" style={{ marginTop: "auto" }}>
+                                                <button type="submit" className="btn btn-primary">
+                                                    <i className="fas fa-save mr-2"></i>
+                                                    Simpan
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </>
     )
 }

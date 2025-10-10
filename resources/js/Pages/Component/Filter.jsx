@@ -55,7 +55,9 @@ export function FilterPengaduan({ data, setData, list_tahun, list_bulan, list_le
                     className="form-select form-select-sm w-auto flex-fill my-2"
                 >
                     <option value="">Semua Pengaduan</option>
-                    <option value="saya">Pengaduan Saya</option>
+                    <Role role='warga'>
+                        <option value="saya">Pengaduan Saya</option>
+                    </Role>
                     {list_level.map((level, index) => (
                         <option key={index} value={level}>Pengaduan {level.toUpperCase()}</option>
                     ))}

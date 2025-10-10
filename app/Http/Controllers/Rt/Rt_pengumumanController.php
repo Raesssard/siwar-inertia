@@ -338,4 +338,22 @@ class Rt_pengumumanController extends Controller
         ];
         return $map[strtolower($indoDay)] ?? null;
     }
+
+    public function komen(Request $request, $id)
+    {
+        $request->validate([
+            'isi_komentar' => 'required|string|max:255'
+        ]);
+
+        $pengaduan = Pengumuman::findOrFail($id);
+
+        $komentar = $pengaduan->komen()->create([
+            'user_id' => Auth::id(),
+            'isi_komentar' => $request->isi_komentar
+        ]);
+
+        $komentar->load('user');
+
+        return response()->json($komentar);
+    }
 }

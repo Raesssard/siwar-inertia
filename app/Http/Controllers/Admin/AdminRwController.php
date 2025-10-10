@@ -17,6 +17,7 @@ class AdminRwController extends Controller
      */
     public function index(Request $request)
     {
+        $title = 'Rukun Warga';
         $query = Rw::query();
 
         // 🔍 Pencarian berdasarkan NIK atau Nama Ketua RW
@@ -39,6 +40,7 @@ class AdminRwController extends Controller
             'rw' => $rw,
             'filters' => $request->only(['keyword', 'nomor_rw']),
             'nomorRwList' => $nomorRwList,
+            'title' => $title
         ]);
     }
 

@@ -1,13 +1,15 @@
 import React, { useState } from "react";
 import Layout from "@/Layouts/Layout";
 import { route } from "ziggy-js";
-import { router } from "@inertiajs/react";
+import { Head, router, usePage } from "@inertiajs/react";
 import {
     AddPermissionModal,
     EditPermissionModal,
 } from "@/Pages/Component/Modal";
 
-export default function Permission({ permissions, filters }) {
+export default function Permission({ permissions, filters, title }) {
+    const { props } = usePage()
+    const role = props.auth?.currentRole
     const [showAdd, setShowAdd] = useState(false);
     const [showEdit, setShowEdit] = useState(null);
 
@@ -77,6 +79,9 @@ export default function Permission({ permissions, filters }) {
     // -------------------------------
     return (
         <Layout title="Data Permissions">
+            <Head title={`${title} - ${role.length <= 2
+                ? role.toUpperCase()
+                : role.charAt(0).toUpperCase() + role.slice(1)}`} />
             {/* Filter */}
             <form onSubmit={applyFilter} className="filter-form">
                 <input

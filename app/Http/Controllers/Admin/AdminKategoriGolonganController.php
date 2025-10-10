@@ -11,6 +11,8 @@ class AdminKategoriGolonganController extends Controller
 {
     public function index(Request $request)
     {
+
+        $title = 'Kategori Golongan';
         $query = Kategori_golongan::query();
 
         // 🔍 Pencarian teks (LIKE)
@@ -23,6 +25,7 @@ class AdminKategoriGolonganController extends Controller
         return Inertia::render('Admin/KategoriGolongan', [
             'kategori' => $kategori,
             'filters'  => $request->only(['jenis']),
+            'title' => $title
         ]);
     }
 
