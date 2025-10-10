@@ -45,7 +45,11 @@ Route::middleware(['auth'])->group(function () {
         Route::resource('rw', AdminRwController::class)->except(['create', 'edit', 'show']);
         Route::put('rw/{id}/toggle-status', [AdminRwController::class, 'toggleStatus'])
             ->name('rw.toggleStatus');
+
         Route::resource('rt', AdminRtController::class)->except(['create', 'edit', 'show']);
+        Route::put('rt/{id}/toggle-status', [AdminRtController::class, 'toggleStatus'])
+            ->name('rt.toggleStatus'); // ✅ Tambahkan ini
+
         Route::resource('kategori-golongan', AdminKategoriGolonganController::class)->except(['create', 'edit', 'show']);
         Route::resource('roles', AdminRoleController::class)->except(['create', 'edit', 'show']);
         Route::put('roles/{id}/permissions', [AdminRoleController::class, 'updatePermissions'])->name('roles.permissions.update');

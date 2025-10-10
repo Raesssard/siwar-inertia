@@ -232,4 +232,32 @@ class AdminRtController extends Controller
             return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
     }
+
+    public function toggleStatus($id)
+    {
+        $rt = Rt::findOrFail($id);
+
+        // Jika aktif, ubah ke nonaktif
+        if ($rt->status === 'aktif') {
+            $rt->status = 'nonaktif';
+            $message = "RT {$rt->nomor_rt} berhasil dinonaktifkan.";
+        } else {
+            // 🚫 Cegah lebih dari satu RT aktif dalam RW yang sama
+            $existingActive = Rt::where('id_rw', $rt->id_rw)
+                ->where('status', 'aktif')
+                ->where('id', '!=', $id)
+                ->exists();
+
+            if ($existingActive) {
+                return redirect()->back()->with('error', "Masih ada RT aktif di RW ini. Nonaktifkan yang lain dulu!");
+            }
+
+            $rt->status = 'aktif';
+            $message = "RT {$rt->nomor_rt} berhasil diaktifkan.";
+        }
+
+        $rt->save();
+
+        return redirect()->back()->with('success', $message);
+    }
 }

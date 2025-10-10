@@ -474,15 +474,6 @@ export function EditRtModal({ form, handleChange, handleEdit, onClose, rwList = 
                                 ))}
                             </select>
                         </div>
-
-                        {/* 🔹 Status */}
-                        <div>
-                            <label className="block text-sm font-medium">Status</label>
-                            <select name="status" value={form.status || "aktif"} onChange={handleChange} className="w-full border rounded-md p-2">
-                                <option value="aktif">Aktif</option>
-                                <option value="nonaktif">Nonaktif</option>
-                            </select>
-                        </div>
                     </div>
 
                     <div className="flex justify-end gap-3 pt-4 border-t">

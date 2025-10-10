@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { Link, router } from "@inertiajs/react";
-import { route } from "ziggy-js";
 import Layout from "@/Layouts/Layout";
+import { route } from "ziggy-js";
+import { Link, router } from "@inertiajs/react";
 import { AddRtModal, EditRtModal } from "@/Pages/Component/Modal";
 
 export default function Rt({ rukun_tetangga, filters, nomorRtList, rwList }) {
@@ -14,7 +14,7 @@ export default function Rt({ rukun_tetangga, filters, nomorRtList, rwList }) {
         nama_ketua_rt: "",
         mulai_menjabat: "",
         akhir_jabatan: "",
-        status: "aktif", // default aktif
+        status: "aktif",
     });
 
     const [search, setSearch] = useState({
@@ -22,7 +22,7 @@ export default function Rt({ rukun_tetangga, filters, nomorRtList, rwList }) {
         nomor_rt: filters?.nomor_rt || "",
     });
 
-    // --- handlers form RT ---
+    // --- handler form RT ---
     const handleChange = (e) => {
         setForm({ ...form, [e.target.name]: e.target.value });
     };
@@ -57,6 +57,15 @@ export default function Rt({ rukun_tetangga, filters, nomorRtList, rwList }) {
         }
     };
 
+    // 🔹 Toggle status aktif / nonaktif
+    const handleToggleStatus = (id) => {
+        if (confirm("Yakin ingin mengubah status RT ini?")) {
+            router.put(route("admin.rt.toggleStatus", id), {}, {
+                preserveScroll: true,
+            });
+        }
+    };
+
     const openEdit = (rtItem) => {
         setForm({
             nik: rtItem.nik || "",
@@ -69,7 +78,7 @@ export default function Rt({ rukun_tetangga, filters, nomorRtList, rwList }) {
         setShowEdit(rtItem);
     };
 
-    // --- handlers filter ---
+    // --- handler filter ---
     const handleSearchChange = (e) => {
         setSearch({ ...search, [e.target.name]: e.target.value });
     };
@@ -83,8 +92,14 @@ export default function Rt({ rukun_tetangga, filters, nomorRtList, rwList }) {
     };
 
     const resetFilter = () => {
-        setSearch({ keyword: "", nomor_rt: "" });
-        router.get(route("admin.rt.index"), {}, { replace: true, preserveScroll: true });
+        setSearch({
+            keyword: "",
+            nomor_rt: "",
+        });
+        router.get(route("admin.rt.index"), {}, {
+            replace: true,
+            preserveScroll: true,
+        });
     };
 
     return (
@@ -103,22 +118,23 @@ export default function Rt({ rukun_tetangga, filters, nomorRtList, rwList }) {
                     name="nomor_rt"
                     value={search.nomor_rt}
                     onChange={handleSearchChange}
+                    className="ms-2"
                 >
                     <option value="">-- Semua Nomor RT --</option>
-                    {nomorRtList.map((rt) => (
-                        <option key={rt} value={rt}>
-                            RT {rt}
+                    {nomorRtList.map((rtItem, index) => (
+                        <option key={index} value={rtItem.nomor_rt || rtItem}>
+                            RT {rtItem.nomor_rt || rtItem}
                         </option>
                     ))}
                 </select>
 
-                <button type="submit" className="btn-custom btn-secondary me-2">
+                <button type="submit" className="btn-custom btn-secondary ms-2">
                     Filter
                 </button>
                 <button
                     type="button"
                     onClick={resetFilter}
-                    className="btn-custom btn-light bg-gray-300"
+                    className="btn-custom btn-light bg-gray-300 ms-2"
                 >
                     Reset
                 </button>
@@ -161,25 +177,43 @@ export default function Rt({ rukun_tetangga, filters, nomorRtList, rwList }) {
                                     <td>{item.akhir_jabatan}</td>
                                     <td>
                                         <span
-                                            className={`px-2 py-1 rounded text-white text-sm ${
+                                            className={`px-2 py-1 rounded text-sm font-medium ${
                                                 item.status === "aktif"
-                                                    ? "bg-green-500"
-                                                    : "bg-gray-500"
+                                                    ? "bg-green-100 text-green-700"
+                                                    : "bg-red-100 text-red-700"
                                             }`}
                                         >
-                                            {item.status}
+                                            {item.status || "-"}
                                         </span>
                                     </td>
                                     <td>
+                                        <button
+                                            className={`btn-custom ${
+                                                item.status === "aktif"
+                                                    ? "btn-secondary"
+                                                    : "btn-success"
+                                            } me-1`}
+                                            onClick={() =>
+                                                handleToggleStatus(item.id)
+                                            }
+                                        >
+                                            {item.status === "aktif"
+                                                ? "Nonaktifkan"
+                                                : "Aktifkan"}
+                                        </button>
+
                                         <button
                                             className="btn-custom btn-warning me-1"
                                             onClick={() => openEdit(item)}
                                         >
                                             Edit
                                         </button>
+
                                         <button
                                             className="btn-custom btn-danger"
-                                            onClick={() => handleDelete(item.id)}
+                                            onClick={() =>
+                                                handleDelete(item.id)
+                                            }
                                         >
                                             Hapus
                                         </button>
@@ -208,13 +242,17 @@ export default function Rt({ rukun_tetangga, filters, nomorRtList, rwList }) {
                                 return (
                                     <li
                                         key={index}
-                                        className={`page-item ${link.active ? "active" : ""} ${
+                                        className={`page-item ${
+                                            link.active ? "active" : ""
+                                        } ${
                                             !link.url ? "disabled" : ""
                                         }`}
                                     >
                                         <Link
                                             href={link.url || "#"}
-                                            dangerouslySetInnerHTML={{ __html: label }}
+                                            dangerouslySetInnerHTML={{
+                                                __html: label,
+                                            }}
                                         />
                                     </li>
                                 );
@@ -231,7 +269,7 @@ export default function Rt({ rukun_tetangga, filters, nomorRtList, rwList }) {
                     handleChange={handleChange}
                     handleAdd={handleAdd}
                     onClose={() => setShowAdd(false)}
-                    rwList={rwList} // ✅ ditambahkan
+                    rwList={rwList}
                 />
             )}
 
@@ -242,7 +280,7 @@ export default function Rt({ rukun_tetangga, filters, nomorRtList, rwList }) {
                     handleChange={handleChange}
                     handleEdit={handleEdit}
                     onClose={() => setShowEdit(null)}
-                    rwList={rwList} // ✅ ditambahkan
+                    rwList={rwList}
                 />
             )}
         </Layout>
