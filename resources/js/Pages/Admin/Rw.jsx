@@ -58,6 +58,15 @@ export default function Rw({ rw, filters, nomorRwList }) {
         }
     };
 
+    // 🔹 Toggle status aktif / nonaktif
+    const handleToggleStatus = (id) => {
+        if (confirm("Yakin ingin mengubah status RW ini?")) {
+            router.put(route("admin.rw.toggleStatus", id), {}, {
+                preserveScroll: true,
+            });
+        }
+    };
+
     const openEdit = (rwItem) => {
         setForm({
             nik: rwItem.nik || "",
@@ -180,14 +189,32 @@ export default function Rw({ rw, filters, nomorRwList }) {
                                     </td>
                                     <td>
                                         <button
+                                            className={`btn-custom ${
+                                                item.status === "aktif"
+                                                    ? "btn-secondary"
+                                                    : "btn-success"
+                                            } me-1`}
+                                            onClick={() =>
+                                                handleToggleStatus(item.id)
+                                            }
+                                        >
+                                            {item.status === "aktif"
+                                                ? "Nonaktifkan"
+                                                : "Aktifkan"}
+                                        </button>
+
+                                        <button
                                             className="btn-custom btn-warning me-1"
                                             onClick={() => openEdit(item)}
                                         >
                                             Edit
                                         </button>
+
                                         <button
                                             className="btn-custom btn-danger"
-                                            onClick={() => handleDelete(item.id)}
+                                            onClick={() =>
+                                                handleDelete(item.id)
+                                            }
                                         >
                                             Hapus
                                         </button>
@@ -216,7 +243,9 @@ export default function Rw({ rw, filters, nomorRwList }) {
                                 return (
                                     <li
                                         key={index}
-                                        className={`page-item ${link.active ? "active" : ""} ${
+                                        className={`page-item ${
+                                            link.active ? "active" : ""
+                                        } ${
                                             !link.url ? "disabled" : ""
                                         }`}
                                     >

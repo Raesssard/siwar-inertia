@@ -121,7 +121,6 @@ class AdminRwController extends Controller
             'nama_ketua_rw' => 'required|string|max:255',
             'mulai_menjabat' => 'required|date',
             'akhir_jabatan' => 'required|date|after_or_equal:mulai_menjabat',
-            'status' => ['required', Rule::in(['aktif', 'nonaktif'])],
             'jabatan' => ['required', Rule::in(['ketua', 'sekretaris', 'bendahara'])],
         ]);
 
@@ -153,7 +152,6 @@ class AdminRwController extends Controller
             'nama_ketua_rw',
             'mulai_menjabat',
             'akhir_jabatan',
-            'status',
         ]));
 
         // 🔁 Update user & role
@@ -199,4 +197,30 @@ class AdminRwController extends Controller
             return redirect()->back()->with('error', 'Tidak bisa menghapus RW karena masih digunakan.');
         }
     }
+
+    public function toggleStatus($id)
+    {
+        $rw = Rw::findOrFail($id);
+
+        // Jika sedang aktif, ubah jadi nonaktif
+        if ($rw->status === 'aktif') {
+            $rw->update(['status' => 'nonaktif']);
+            return redirect()->back()->with('success', "RW {$rw->nomor_rw} berhasil dinonaktifkan.");
+        }
+
+        // Jika ingin diaktifkan, pastikan tidak ada RW lain dengan nomor sama yang aktif
+        $existingActive = Rw::where('nomor_rw', $rw->nomor_rw)
+            ->where('status', 'aktif')
+            ->where('id', '!=', $rw->id)
+            ->exists();
+
+        if ($existingActive) {
+            return redirect()->back()->with('error', "RW {$rw->nomor_rw} lainnya sudah aktif. Nonaktifkan dulu sebelum mengaktifkan yang ini.");
+        }
+
+        $rw->update(['status' => 'aktif']);
+
+        return redirect()->back()->with('success', "RW {$rw->nomor_rw} berhasil diaktifkan.");
+    }
+
 }

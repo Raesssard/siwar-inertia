@@ -43,6 +43,8 @@ Route::middleware(['auth'])->group(function () {
     // 🔹 Admin routes
     Route::prefix('admin')->name('admin.')->group(function () {
         Route::resource('rw', AdminRwController::class)->except(['create', 'edit', 'show']);
+        Route::put('rw/{id}/toggle-status', [AdminRwController::class, 'toggleStatus'])
+            ->name('rw.toggleStatus');
         Route::resource('rt', AdminRtController::class)->except(['create', 'edit', 'show']);
         Route::resource('kategori-golongan', AdminKategoriGolonganController::class)->except(['create', 'edit', 'show']);
         Route::resource('roles', AdminRoleController::class)->except(['create', 'edit', 'show']);
