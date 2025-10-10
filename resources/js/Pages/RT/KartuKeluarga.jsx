@@ -1,7 +1,9 @@
 import Layout from "@/Layouts/Layout"
 import { Head, Link, useForm, usePage } from "@inertiajs/react"
-import React from "react"
+import React, { useState } from "react"
 import { FilterKK } from "../Component/Filter"
+import { DetailKK } from "../Component/Modal"
+import '../../../css/kk.css'
 
 export default function KartuKeluarga() {
     const {
@@ -16,6 +18,13 @@ export default function KartuKeluarga() {
     const { get, data, setData } = useForm({
         search: '',
     })
+    const [showModal, setShowModal] = useState(false)
+    const [selected, setSelected] = useState(null)
+
+    const modalDetail = (item) => {
+        setSelected(item)
+        setShowModal(true)
+    }
 
     const filter = (e) => {
         e.preventDefault()
@@ -28,8 +37,6 @@ export default function KartuKeluarga() {
             jenis_kelamin: ''
         })
     }
-
-    console.log(kartu_keluarga.data[0])
 
     return (
         <Layout>
@@ -78,7 +85,7 @@ export default function KartuKeluarga() {
                                         <td className="text-center">{item.rw?.nomor_rw ?? '-'}</td>
                                         <td className="text-center">{item.kategori_golongan?.jenis.charAt(0).toUpperCase() + item.kategori_golongan?.jenis.slice(1) ?? '-'}</td>
                                         <td className="text-center">
-                                            <button className="btn btn-success btn-sm">
+                                            <button className="btn btn-success btn-sm" onClick={() => modalDetail(item)}>
                                                 <i className="fas fa-info"></i>
                                             </button>
                                         </td>
@@ -121,6 +128,12 @@ export default function KartuKeluarga() {
                         </ul>
                     </div>
                 )}
+                <DetailKK
+                    selectedData={selected}
+                    detailShow={showModal}
+                    onClose={() => setShowModal(false)}
+                    role={role}
+                />
             </div>
         </Layout>
     )

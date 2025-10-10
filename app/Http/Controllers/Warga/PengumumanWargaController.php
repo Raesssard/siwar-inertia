@@ -33,8 +33,6 @@ class PengumumanWargaController extends Controller
             'rw',
             'komen',
             'komen.user',
-            'rukunTetangga.jabatan',
-            'rw.jabatan',
         ]);
 
         $baseQuery->where(function ($query) use ($userRtId, $userRwId) {
@@ -127,16 +125,6 @@ class PengumumanWargaController extends Controller
 
         $rukun_tetangga = $userRtId ? Rt::find($userRtId) : null;
         $title = 'Pengumuman';
-
-        // return view('warga.pengumuman.pengumuman', compact(
-        //     'pengumuman',
-        //     'rukun_tetangga',
-        //     'title',
-        //     'daftar_tahun',
-        //     'daftar_bulan',
-        //     'daftar_kategori',
-        //     'total_pengumuman'
-        // ));
 
         return Inertia::render('Warga/Pengumuman', [
             'pengumuman' => $pengumuman,

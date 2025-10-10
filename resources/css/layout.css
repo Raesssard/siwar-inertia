@@ -201,8 +201,8 @@ div.card-body div.flex.gap-4 div.card-clickable div.text-sm {
 
 div.card-body.pengaduan,
 div.card-body.pengumuman {
-    min-height: 63vh;
-    max-height: 63vh;
+    min-height: 75vh;
+    max-height: 75vh;
     overflow-y: auto;
     padding-right: 8px;
     border-top: 1px solid lightgray;
@@ -236,14 +236,20 @@ div.card-body.pengumuman button.scroll-top-btn.show {
 }
 
 div.komen input.komen,
-input.edit-judul {
+input.edit-judul,
+input.tambah-judul,
+input.tambah-kategori,
+input.edit-kategori {
     border: 0;
     border-bottom: 1px solid lightgray;
     border-radius: 0;
 }
 
 div.komen input.komen:focus,
-input.edit-judul:focus {
+input.edit-judul:focus,
+input.tambah-judul:focus,
+input.tambah-kategori:focus,
+input.edit-kategori:focus {
     border: none;
     border-bottom: 1px solid lightgray;
     border-radius: 0;
@@ -254,7 +260,10 @@ input.edit-judul:focus {
 }
 
 div.komen input.komen:focus-visible,
-input.edit-judul:focus-visible {
+input.edit-judul:focus-visible,
+input.tambah-judul:focus-visible,
+input.tambah-kategori:focus-visible,
+input.edit-kategori:focus-visible {
     border: none;
     border-bottom: 1px solid lightgray;
     border-radius: 0;

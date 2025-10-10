@@ -1,0 +1,225 @@
+.kk-container {
+    border: 1px solid #ccc;
+    padding: 25px;
+    font-family: 'Times New Roman', serif;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.kk-header {
+    text-align: center;
+    margin-bottom: 30px;
+    position: relative;
+}
+
+.kk-header-top-line {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    width: 100%;
+    margin-bottom: 5px;
+}
+
+.kk-header-left-space {
+    width: 60px;
+    height: 1px;
+}
+
+.kk-header-right-reg p {
+    text-align: right;
+    margin-bottom: 0;
+    font-size: 0.9rem;
+    font-weight: bold;
+    color: #333;
+}
+
+.kk-header-main-title {
+    text-align: center;
+    margin-top: -20px;
+}
+
+.kk-header h4 {
+    font-weight: bold;
+    margin-bottom: 5px;
+    font-size: 1.8rem;
+    color: #000000;
+}
+
+.kk-header p.no-kk-big {
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 0;
+}
+
+.kk-info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px 30px;
+    margin-bottom: 25px;
+}
+
+.kk-info-item p {
+    margin-bottom: 5px;
+    display: flex;
+}
+
+.kk-info-item strong {
+    display: inline-block;
+    min-width: 170px;
+    flex-shrink: 0;
+    margin-right: 10px;
+    color: #495057;
+}
+
+.kk-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+    font-family: 'Times New Roman', serif;
+}
+
+.kk-table th,
+.kk-table td {
+    font-size: 0.8rem;
+    padding: 6px 8px;
+    border: 1px solid #000;
+    vertical-align: top;
+    line-height: 1.2;
+    color: #000;
+}
+
+.kk-table tbody td:nth-child(1),
+.kk-table tbody td:nth-child(4),
+.kk-table tbody td:nth-child(6),
+.kk-table tbody td:nth-child(10),
+.kk-table tbody td:nth-child(11),
+.kk-table tbody td:nth-child(12),
+.kk-table tbody td:nth-child(14),
+.kk-table tbody td:nth-child(15),
+.kk-table tbody td:nth-child(16),
+.kk-table tbody td:nth-child(19) {
+    text-align: center;
+}
+
+/* Ini bisa diterapkan pada modalDetailkk juga jika Anda ingin lebih besar */
+.modal.modal-fullscreen .modal-dialog {
+    width: 100vw;
+    height: 100vh;
+    max-width: 100vw;
+    margin: 0;
+}
+
+.modal.modal-fullscreen .modal-content {
+    height: 100%;
+    border-radius: 0;
+    overflow: hidden;
+    /* Penting untuk iframe */
+}
+
+.modal.modal-fullscreen .modal-body {
+    flex: 1;
+    /* Agar mengambil sisa ruang */
+    display: flex;
+    /* Untuk memposisikan iframe */
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    /* Mencegah scroll ganda */
+}
+
+.modal.modal-fullscreen iframe {
+    width: 100%;
+    height: 100%;
+}
+
+/* --- Gaya Tampilan Dokumen KK (Thumbnail) --- */
+.kk-document-section {
+    margin-top: 2rem;
+    /* Added margin for separation */
+}
+
+.kk-document-display {
+    position: relative;
+    width: 200px;
+    height: 150px;
+    border: 1px solid #ddd;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    background-color: #f8f9fa;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 20px;
+}
+
+.kk-document-display img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+/* Gaya khusus untuk thumbnail PDF */
+.pdf-thumbnail-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    background-color: #e9ecef;
+    /* Warna latar belakang untuk thumbnail PDF */
+}
+
+.pdf-icon {
+    font-size: 3rem;
+    /* Ukuran ikon PDF */
+    color: #dc3545;
+    /* Warna ikon PDF */
+    margin-bottom: 5px;
+}
+
+.pdf-filename {
+    font-size: 0.8rem;
+    color: #6c757d;
+    text-align: center;
+    padding: 0 5px;
+    word-break: break-all;
+}
+
+/* Overlay dan teks tanpa dokumen */
+.kk-document-display .view-document-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    cursor: pointer;
+}
+
+.kk-document-display:hover .view-document-overlay {
+    opacity: 1;
+}
+
+.kk-document-display .view-document-overlay i {
+    color: white;
+    font-size: 2rem;
+}
+
+.no-document-text {
+    color: #6c757d;
+    font-style: italic;
+}
+
+div.modal-body.kk::-webkit-scrollbar {
+    display: none;
+}

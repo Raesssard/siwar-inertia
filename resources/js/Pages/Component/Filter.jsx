@@ -1,5 +1,6 @@
 import React from "react"
 import { Link } from "@inertiajs/react"
+import Role from "./Role"
 
 export function FilterPengaduan({ data, setData, list_tahun, list_bulan, list_level, filter, resetFilter, tambahShow, role }) {
     return (
@@ -72,21 +73,22 @@ export function FilterPengaduan({ data, setData, list_tahun, list_bulan, list_le
                 >
                     <i className="fas fa-undo"></i>
                 </Link>
-
-                <button type="button" onClick={() => tambahShow()} className="btn-input btn btn-sm btn-success flex-fill">
-                    <i className="fas fa-plus mr-2"></i>
-                    Buat Pengaduan
-                </button>
+                <Role role="warga">
+                    <button type="button" onClick={() => tambahShow()} className="btn-input btn btn-sm btn-success flex-fill">
+                        <i className="fas fa-plus mr-2"></i>
+                        Buat Pengaduan
+                    </button>
+                </Role>
             </div>
         </form>
     )
 }
 
-export function FilterPengumuman({ data, setData, daftar_tahun, list_bulan, daftar_kategori, filter, resetFilter, role }) {
+export function FilterPengumuman({ data, setData, daftar_tahun, list_bulan, daftar_kategori, filter, resetFilter, tambahShow, role }) {
     return (
         <form onSubmit={filter} className="form-filter row g-2 pl-3 pb-2 mb-2 w-100">
-            <div className="col-md-5 col-12 pr-1">
-                <div className="input-group input-group-sm">
+            <div className="col-md-5 col-12 pr-1 mb-auto">
+                <div className="input-group input-group-sm" style={{ height: "3.5rem" }}>
                     <input
                         type="text"
                         name="search"
@@ -95,13 +97,13 @@ export function FilterPengumuman({ data, setData, daftar_tahun, list_bulan, daft
                         className="form-control"
                         placeholder="Cari Judul/Isi/hari..."
                     />
-                    <button className="btn-filter btn btn-primary" type="submit">
+                    <button className="btn-filter btn btn-primary my-0" type="submit">
                         <i className="fas fa-search"></i>
                     </button>
                 </div>
             </div>
 
-            <div className="col-md-7 col-12 d-flex flex-wrap gap-2 pl-1">
+            <div className="col-md-7 col-12 d-flex flex-wrap gap-2">
                 <select
                     name="tahun"
                     value={data.tahun}
@@ -161,6 +163,14 @@ export function FilterPengumuman({ data, setData, daftar_tahun, list_bulan, daft
                 <Link href={`/${role}/pengumuman`} onClick={resetFilter} className="btn-input btn btn-secondary btn-sm flex-fill p-0" title="Reset">
                     <i className="fas fa-undo"></i>
                 </Link>
+                <Role role={['rt', 'rw']}>
+                    <div className="w-100 text-end">
+                        <button type="button" onClick={() => tambahShow()} className="btn-input btn btn-sm btn-success">
+                            <i className="fas fa-plus mr-2"></i>
+                            Buat Pengumuman
+                        </button>
+                    </div>
+                </Role>
             </div>
         </form>
     )
