@@ -1,12 +1,19 @@
 import React, { useState } from "react";
-import { router } from "@inertiajs/react";
+import { Head, Link, router, usePage } from "@inertiajs/react";
 import Layout from "@/Layouts/Layout";
 import { AddRtModal, EditRtModal } from "@/Pages/Component/Modal";
 
 export default function Rt({ rukun_tetangga, title, filters, rukun_tetangga_filter }) {
     const [showAdd, setShowAdd] = useState(false);
     const [showEdit, setShowEdit] = useState(false);
-    const [form, setForm] = useState({});
+    const [form, setForm] = useState({
+        nik: "",
+        nomor_rt: "",
+        nama_ketua_rt: "",
+        mulai_menjabat: "",
+        akhir_jabatan: "",
+        status: "aktif",
+    });
     const [filter, setFilter] = useState(filters || { search: "", rt: "" });
 
     const handleChange = (e) => {
@@ -47,7 +54,11 @@ export default function Rt({ rukun_tetangga, title, filters, rukun_tetangga_filt
     };
 
     const handleToggleStatus = (id) => {
-        router.post(route("rw.rt.toggleStatus", id));
+        if (confirm("Yakin ingin mengubah status RT ini?")) {
+            router.put(route("admin.rt.toggleStatus", id), {}, {
+                preserveScroll: true,
+            });
+        }
     };
 
     return (
@@ -142,16 +153,20 @@ export default function Rt({ rukun_tetangga, title, filters, rukun_tetangga_filt
                                         </td>
                                         <td className="p-3 text-center flex justify-center gap-2">
 
-                                            <button
-                                                onClick={() => handleToggleStatus(rt.id)}
-                                                className={`px-3 py-1 rounded-md text-white ${
-                                                    rt.status === "aktif"
-                                                        ? "bg-gray-500 hover:bg-gray-600"
-                                                        : "bg-green-600 hover:bg-green-700"
-                                                }`}
-                                            >
-                                                {rt.status === "aktif" ? "Nonaktifkan" : "Aktifkan"}
-                                            </button>                                            
+                                        <button
+                                            className={`btn-custom ${
+                                                rt.status === "aktif"
+                                                    ? "btn-secondary"
+                                                    : "btn-success"
+                                            } me-1`}
+                                            onClick={() =>
+                                                handleToggleStatus(rt.id)
+                                            }
+                                        >
+                                            {rt.status === "aktif"
+                                                ? "Nonaktifkan"
+                                                : "Aktifkan"}
+                                        </button>                                         
                                             <button
                                                 onClick={() => {
                                                     setForm(rt);
@@ -181,23 +196,36 @@ export default function Rt({ rukun_tetangga, title, filters, rukun_tetangga_filt
                     </table>
                 </div>
 
-                {/* 🔹 Pagination */}
-                <div className="mt-4 flex justify-center">
-                    {rukun_tetangga.links?.map((link, i) => (
-                        <button
-                            key={i}
-                            onClick={() => router.get(link.url)}
-                            disabled={!link.url}
-                            className={`px-3 py-1 mx-1 rounded-md ${
-                                link.active
-                                    ? "bg-blue-600 text-white"
-                                    : "bg-gray-200 text-gray-800 hover:bg-gray-300"
-                            }`}
-                        >
-                            {link.label.replace("&laquo;", "«").replace("&raquo;", "»")}
-                        </button>
-                    ))}
-                </div>
+                {/* Pagination */}
+                {rukun_tetangga.links && (
+                    <div className="pagination-container">
+                        <ul className="pagination-custom">
+                            {rukun_tetangga.links.map((link, index) => {
+                                let label = link.label;
+                                if (label.includes("Previous")) label = "&lt;";
+                                if (label.includes("Next")) label = "&gt;";
+
+                                return (
+                                    <li
+                                        key={index}
+                                        className={`page-item ${
+                                            link.active ? "active" : ""
+                                        } ${
+                                            !link.url ? "disabled" : ""
+                                        }`}
+                                    >
+                                        <Link
+                                            href={link.url || "#"}
+                                            dangerouslySetInnerHTML={{
+                                                __html: label,
+                                            }}
+                                        />
+                                    </li>
+                                );
+                            })}
+                        </ul>
+                    </div>
+                )}
             </div>
 
             {showAdd && (

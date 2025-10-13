@@ -177,20 +177,32 @@ class RwRukunTetanggaController extends Controller
         try {
             $rt = Rt::findOrFail($id);
 
+            // Cegah hapus RT aktif
             if ($rt->status === 'aktif') {
                 return back()->with('error', 'RT masih aktif dan tidak bisa dihapus.');
             }
 
+            // Cari user yang terkait
             $user = User::where('id_rt', $rt->id)->first();
+
             if ($user) {
-                if ($user->roles()->count() > 1) {
-                    $user->removeRole('rt');
+                $hasMultipleRoles = $user->roles()->count() > 1;
+
+                if ($hasMultipleRoles) {
+                    // 🔹 Hapus hanya role RT, jangan hapus user
+                    if ($user->hasRole('rt')) {
+                        $user->removeRole('rt');
+                    }
+
+                    // Kosongkan relasi id_rt
                     $user->update(['id_rt' => null]);
                 } else {
+                    // 🔹 Role cuma satu (RT doang) → hapus user
                     $user->delete();
                 }
             }
 
+            // Hapus RT
             $rt->delete();
 
             return back()->with('success', 'RT berhasil dihapus.');
