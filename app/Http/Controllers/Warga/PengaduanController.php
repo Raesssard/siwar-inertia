@@ -146,7 +146,6 @@ class PengaduanController extends Controller
                 'isi'         => $request->isi,
                 'file_path'   => $filePath,
                 'file_name'   => $fileName,
-                'foto_bukti'  => null,
                 'status'      => 'belum',
                 'level'       => $request->level,
                 'konfirmasi_rw' => $request->level === 'rt' ? 'belum' : 'menunggu',

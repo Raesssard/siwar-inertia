@@ -1,13 +1,7 @@
 import React from "react"
 
 export default function FilePreview({ filePath, judul, displayStyle }) {
-    // Ambil ekstensi file
     const extension = filePath.split(".").pop().toLowerCase()
-
-    const openDocumentModal = (path, isPdf) => {
-        // bikin sesuai logika modalmu
-        console.log("Open:", path, "isPdf:", isPdf)
-    }
 
     if (["pdf"].includes(extension)) {
         return (

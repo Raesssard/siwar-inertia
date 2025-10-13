@@ -15,7 +15,9 @@ return new class extends Migration
             $table->id();
             $table->foreignId('pengumuman_id')->constrained('pengumuman')->onDelete('cascade');
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-            $table->string('isi_komentar');
+            $table->string('isi_komentar')->nullable();
+            $table->string('file_path')->nullable();
+            $table->string('file_name')->nullable();
             $table->timestamps();
         });
     }
