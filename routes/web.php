@@ -21,6 +21,8 @@ use App\Http\Controllers\Rt\Rt_tagihanController;
 use App\Http\Controllers\Rt\Rt_transaksiController;
 use App\Http\Controllers\Rt\Rt_wargaController;
 use App\Http\Controllers\Rt\RtIuranController;
+use App\Http\Controllers\Rw\RwRukunTetanggaController;
+use App\Models\Rw;
 use Inertia\Inertia;
 
 
@@ -69,8 +71,14 @@ Route::middleware(['auth'])->group(function () {
     });
 
     Route::prefix('rw')->as('rw.')->group(function () {
-        
+        // 🔹 Data RT (CRUD)
+        Route::resource('rt', RwRukunTetanggaController::class)->except(['create', 'edit', 'show']);
+
+        // 🔹 Toggle status aktif / nonaktif
+        Route::put('rt/{id}/toggle-status', [RwRukunTetanggaController::class, 'toggleStatus'])
+            ->name('rt.toggleStatus'); // ✅ Tambahkan ini
     });
+
 
     Route::prefix('rt')->as('rt.')->group(function () {
         Route::resource('warga', Rt_wargaController::class);

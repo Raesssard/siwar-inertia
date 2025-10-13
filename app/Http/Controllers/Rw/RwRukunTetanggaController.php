@@ -9,338 +9,221 @@ use App\Models\User;
 use App\Models\Warga;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Validator;
 
 class RwRukunTetanggaController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-
     public function index(Request $request)
     {
-        $id_rw = Auth::user()->id_rw; // Dapatkan id_rw dari user yang sedang login
-
-        // Ambil daftar RT untuk dropdown filter (hanya Ketua, unik, sesuai RW yang sama)
-        $rukun_tetangga_filter = Rt::whereHas('jabatan', function ($q) {
-                $q->where('nama_jabatan', 'ketua');
-            })
-            ->where('id_rw', $id_rw)
-            ->select('rt')
-            ->distinct()
-            ->orderBy('rt')
-            ->get();
-
-        // Ambil daftar jabatan dari tabel jabatan (biar konsisten dengan DB)
-        $jabatan_filter = Jabatan::all()->where('level', 'rt')->pluck('nama_jabatan', 'id');
-        // Kalau mau statis: ['ketua' => 'Ketua', 'sekretaris' => 'Sekretaris', ...]
-
-        $kartu_keluarga = Kartu_keluarga::all();
+        $id_rw = Auth::user()->id_rw;
 
         $title = 'Rukun Tetangga';
+        $query = Rt::where('id_rw', $id_rw);
 
-        // Query dasar
-        $query = Rt::with(['rw', 'jabatan'])->where('id_rw', $id_rw);
-
-        // --- Filter ---
-
-        // Filter RT
+        // 🔍 Filter RT
         if ($request->filled('rt')) {
-            $query->where('rt', $request->rt);
+            $query->where('nomor_rt', $request->rt);
         }
 
-        // Filter jabatan (pakai jabatan_id)
-        if ($request->filled('jabatan_id')) {
-            $query->where('jabatan_id', $request->jabatan_id);
-        }
-
-        // Filter pencarian
+        // 🔍 Filter pencarian nama / nik
         if ($request->filled('search')) {
-            $searchTerm = $request->search;
-            $query->where(function ($q) use ($searchTerm) {
-                $q->where('no_kk', 'like', '%' . $searchTerm . '%')
-                ->orWhere('nama', 'like', '%' . $searchTerm . '%');
+            $query->where(function ($q) use ($request) {
+                $q->where('nik', 'like', "%{$request->search}%")
+                  ->orWhere('nama_ketua_rt', 'like', "%{$request->search}%");
             });
         }
 
-        // --- Urutkan & Paginate ---
-        $rukun_tetangga = $query
-            ->orderBy('rt')
-            ->orderBy(
-                Jabatan::select('nama_jabatan')
-                    ->whereColumn('jabatan.id', 'rukun_tetangga.jabatan_id')
-            )
-            ->paginate(10)
-            ->withQueryString();
+        $rukun_tetangga = $query->orderBy('nomor_rt')->paginate(10)->withQueryString();
 
-        $total_rt_di_rw = Rt::where('id_rw', $id_rw)->count();
+        // Ambil daftar RT unik
+        $rukun_tetangga_filter = Rt::where('id_rw', $id_rw)
+            ->select('nomor_rt')
+            ->distinct()
+            ->orderBy('nomor_rt')
+            ->get();
 
-        return view('rw.data-rt.rukun_tetangga', compact(
-            'rukun_tetangga',
-            'title',
-            'total_rt_di_rw',
-            'rukun_tetangga_filter',
-            'kartu_keluarga',
-            'jabatan_filter'
-        ));
+        // Jabatan tetap statis
+        $jabatan_filter = ['ketua', 'sekretaris', 'bendahara'];
+
+        return inertia('Rw/Rt', [
+            'rukun_tetangga' => $rukun_tetangga,
+            'title' => $title,
+            'filters' => $request->only(['rt', 'search']),
+            'rukun_tetangga_filter' => $rukun_tetangga_filter,
+            'jabatan_filter' => $jabatan_filter,
+        ]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function store(Request $request)
     {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-
-public function store(Request $request)
-{
-    try {
         $id_rw = Auth::user()->id_rw;
-        if (!$id_rw) {
-            return redirect()->back()
-                ->with('error', 'ID RW tidak ditemukan di akun yang login. Mohon hubungi administrator.')
-                ->withInput($request->input())
-                ->with('showModal', 'rt_tambah')
-                ->with('form_type', 'rt_tambah');
-        }
 
         $request->validate([
-            'no_kk' => ['required', 'string', 'digits:16', Rule::exists('kartu_keluarga', 'no_kk')],
             'nik' => [
-                'required',
-                'string',
-                'digits:16',
-                Rule::unique('rukun_tetangga', 'nik')->where(fn($q) => $q->where('id_rw', $id_rw)),
-                function ($attribute, $value, $fail) use ($request) {
-                    $warga = Warga::where('nik', $value)->where('no_kk', $request->no_kk)->first();
-                    if (!$warga) {
-                        $fail('NIK tidak ditemukan atau tidak terdaftar di KK.');
-                    }
-                },
+                'required', 'digits:16',
+                Rule::exists('warga', 'nik'),
+                Rule::unique('rt', 'nik')->where(fn($q) => $q->where('id_rw', $id_rw))
             ],
-            'rt' => ['required', 'string'],
-            'nama' => [
-                'required', 'string', 'max:255',
-                function ($attribute, $value, $fail) use ($request) {
-                    $warga = Warga::where('nik', $request->nik)->first();
-                    if ($warga && $warga->nama !== $value) {
-                        $fail('Nama tidak sesuai dengan NIK. Nama yang benar: ' . $warga->nama);
-                    }
-                },
-            ],
+            'nomor_rt' => ['required', 'regex:/^[0-9]{2}$/'],
+            'nama_ketua_rt' => 'required|string|max:255',
             'mulai_menjabat' => 'required|date',
             'akhir_jabatan' => 'required|date|after:mulai_menjabat',
-            'jabatan_id' => ['required', 'exists:jabatan,id'],
+            'jabatan' => ['required', Rule::in(['ketua', 'sekretaris', 'bendahara'])],
+            'status' => ['required', Rule::in(['aktif', 'nonaktif'])],
         ]);
 
-        // ✅ Cek apakah jabatan inti (ketua, sekretaris, bendahara) sudah ada di RT yang sama
-        $jabatan = Jabatan::find($request->jabatan_id);
-        if (in_array(strtolower($jabatan->nama_jabatan), ['ketua', 'bendahara', 'sekretaris'])) {
-            $exists = Rt::where('rt', $request->rt)
-                        ->where('id_rw', $id_rw)
-                        ->whereHas('jabatan', function ($q) use ($jabatan) {
-                            $q->where('nama_jabatan', $jabatan->nama_jabatan);
-                        })
-                        ->exists();
-
-            if ($exists) {
-                return redirect()->back()
-                    ->withErrors(['jabatan_id' => "RT {$request->rt} sudah punya {$jabatan->nama_jabatan}."])
-                    ->withInput()
-                    ->with('showModal', 'rt_tambah')
-                    ->with('form_type', 'rt_tambah');
-            }
+        $warga = Warga::where('nik', $request->nik)->first();
+        if (!$warga) {
+            return back()->withErrors(['nik' => 'NIK tidak ditemukan di data warga.'])->withInput();
         }
 
+        if ($warga->nama !== $request->nama_ketua_rt) {
+            return back()->withErrors(['nama_ketua_rt' => 'Nama tidak sesuai dengan NIK yang dipilih.'])->withInput();
+        }
+
+        // 🚫 Cegah jabatan aktif ganda di RT yang sama
+        $exists = Rt::where('nomor_rt', $request->nomor_rt)
+            ->where('id_rw', $id_rw)
+            ->where('status', 'aktif')
+            ->whereHas('user.roles', fn($q) => $q->where('name', $request->jabatan))
+            ->exists();
+
+        if ($exists) {
+            return back()->with('error', "RT {$request->nomor_rt} sudah memiliki {$request->jabatan} aktif!")->withInput();
+        }
+
+        // ✅ Simpan RT
         $rt = Rt::create([
-            'no_kk' => $request->no_kk,
             'nik' => $request->nik,
-            'rt' => $request->rt,
-            'nama' => $request->nama,
+            'no_kk' => $warga->no_kk,
+            'nomor_rt' => $request->nomor_rt,
+            'nama_ketua_rt' => $request->nama_ketua_rt,
             'mulai_menjabat' => $request->mulai_menjabat,
             'akhir_jabatan' => $request->akhir_jabatan,
-            'jabatan_id' => $request->jabatan_id,
-            'id_rw' => $id_rw,
+            'id_rw' => Auth::user()->id_rw,
+            'status' => $request->status,
         ]);
 
-        $user = User::where('nik', $request->nik)->first();
-        if ($user) {
-            $user->update([
-                'id_rt' => $rt->id,
-                'id_rw' => $id_rw,
-                'password' => Hash::make('password'),
-            ]);
-            if (!$user->hasRole('rt')) {
-                $user->assignRole('rt');
-            }
-        } else {
-            $user = User::create([
-                'nik' => $request->nik,
-                'nama' => $request->nama,
-                'password' => Hash::make('password'),
-                'id_rt' => $rt->id,
-                'id_rw' => $id_rw,
-            ]);
-            $user->assignRole('rt');
+        // 🧩 Buat atau update user
+        $user = User::firstOrNew(['nik' => $request->nik]);
+        $user->fill([
+            'nama' => $request->nama_ketua_rt,
+            'id_rt' => $rt->id,
+            'id_rw' => Auth::user()->id_rw,
+        ]);
+        if (!$user->exists) {
+            $user->password = Hash::make('password');
         }
+        $user->save();
 
-        return redirect()->route('rw.rukun_tetangga.index')->with('success', 'Data RT berhasil ditambahkan.');
-    } catch (\Illuminate\Validation\ValidationException $e) {
-        return redirect()->back()
-            ->withErrors($e->errors())
-            ->withInput()
-            ->with('showModal', 'rt_tambah')
-            ->with('form_type', 'rt_tambah');
-    } catch (\Exception $e) {
-        return redirect()->back()
-            ->with('error', 'Terjadi kesalahan: ' . $e->getMessage())
-            ->withInput()
-            ->with('showModal', 'rt_tambah')
-            ->with('form_type', 'rt_tambah');
-    }
-}
+        // 🧩 Assign role sesuai jabatan
+        $roles = ['rt'];
+        if ($request->jabatan === 'sekretaris') $roles[] = 'sekretaris';
+        if ($request->jabatan === 'bendahara') $roles[] = 'bendahara';
+        $user->syncRoles($roles);
 
-
-/**
- * Display the specified resource.
- */
-public function show(string $id)
-{
-    $rukun_tetangga = Rt::with('jabatan')->findOrFail($id);
-    return view('rw.rukun_tetangga.show', compact('rukun_tetangga'));
-}
-
-/**
- * Show the form for editing the specified resource.
- */
-public function edit(string $id)
-{
-    $rukun_tetangga = Rt::with('jabatan')->findOrFail($id);
-    return view('rw.rukun_tetangga.edit', compact('rukun_tetangga'));
-}
-
-/**
- * Update the specified resource in storage.
- */
-public function update(Request $request, string $id)
-{
-    $rukunTetangga = Rt::findOrFail($id);
-
-    $userAuth = Auth::user();
-    if (!$userAuth || !isset($userAuth->id_rw)) {
-        return redirect()->back()->withErrors(['auth_error' => 'Anda tidak memiliki akses.'])->withInput();
-    }
-    $id_rw = $userAuth->id_rw;
-
-    if ($rukunTetangga->id_rw !== $id_rw) {
-        return redirect()->back()->withErrors(['authorization_error' => 'Anda tidak diizinkan.'])->withInput();
+        return back()->with('success', 'RT berhasil ditambahkan.');
     }
 
-    try {
+    public function update(Request $request, string $id)
+    {
+        $id_rw = Auth::user()->id_rw;
+
         $request->validate([
-            'no_kk' => ['required', 'string', 'digits:16', Rule::exists('kartu_keluarga', 'no_kk')],
-            'nik' => [
-                'required', 'string', 'digits:16',
-                Rule::unique('rukun_tetangga', 'nik')
-                    ->ignore($rukunTetangga->id)
-                    ->where(fn($q) => $q->where('id_rw', $id_rw)),
-            ],
-            'rt' => ['required', 'string', 'max:10'],
-            'nama' => ['required', 'string', 'max:255'],
+            'nik' => ['required', 'digits:16', Rule::exists('warga', 'nik')],
+            'nomor_rt' => ['required', 'regex:/^[0-9]{2}$/'],
+            'nama_ketua_rt' => 'required|string|max:255',
             'mulai_menjabat' => 'required|date',
-            'akhir_jabatan' => 'required|date|after_or_equal:mulai_menjabat',
-            'jabatan_id' => ['required', 'exists:jabatan,id'],
+            'akhir_jabatan' => 'required|date|after:mulai_menjabat',
+            'jabatan' => ['required', Rule::in(['ketua', 'sekretaris', 'bendahara'])],
+            'status' => ['required', Rule::in(['aktif', 'nonaktif'])],
         ]);
 
-        // ✅ Cek apakah jabatan sudah ada di RT yang sama (kecuali record ini sendiri)
-        // ✅ Cek apakah jabatan sudah ada di RT yang sama (kecuali record ini sendiri)
-        $jabatan = Jabatan::find($request->jabatan_id);
-        if (in_array(strtolower($jabatan->nama_jabatan), ['ketua', 'bendahara', 'sekretaris'])) {
-            $exists = Rt::where('rt', $request->rt)
-                        ->where('id_rw', $id_rw)
-                        ->where('jabatan_id', $request->jabatan_id)
-                        ->where('id', '!=', $rukunTetangga->id)
-                        ->exists();
-            if ($exists) {
-                return redirect()->back()
-                    ->withErrors(['jabatan_id' => "RT {$request->rt} sudah punya {$jabatan->nama_jabatan}."])
-                    ->withInput()
-                    ->with('showModal', 'rt_edit_' . $rukunTetangga->id);
-            }
+        $rt = Rt::findOrFail($id);
+        if ($rt->id_rw !== $id_rw) {
+            return back()->with('error', 'Tidak diizinkan memperbarui data RT lain.');
         }
 
-        $rukunTetangga->update([
-            'no_kk' => $request->no_kk,
+        $rt->update([
             'nik' => $request->nik,
-            'rt' => $request->rt,
-            'nama' => $request->nama,
+            'nomor_rt' => $request->nomor_rt,
+            'nama_ketua_rt' => $request->nama_ketua_rt,
             'mulai_menjabat' => $request->mulai_menjabat,
             'akhir_jabatan' => $request->akhir_jabatan,
-            'jabatan_id' => $request->jabatan_id,
+            'status' => $request->status,
         ]);
 
-        $user = User::where('id_rt', $rukunTetangga->id)->first();
-        if ($user) {
-            $user->update([
-                'nik' => $request->nik,
-                'nama' => $request->nama,
-            ]);
-        }
+        $user = User::firstOrNew(['nik' => $request->nik]);
+        $user->fill([
+            'nama' => $request->nama_ketua_rt,
+            'id_rt' => $rt->id,
+            'id_rw' => Auth::user()->id_rw,
+        ]);
+        if (!$user->exists) $user->password = Hash::make('password');
+        $user->save();
 
-        return redirect()->route('rw.rukun_tetangga.index')->with('success', 'Data RT berhasil diperbarui.');
-    } catch (\Illuminate\Validation\ValidationException $e) {
-        return redirect()->back()
-            ->withErrors($e->errors())
-            ->withInput()
-            ->with('showModal', 'rt_edit_' . $rukunTetangga->id);
-    } catch (\Exception $e) {
-        return redirect()->back()
-            ->with('error', 'Terjadi kesalahan: ' . $e->getMessage())
-            ->withInput();
+        // Assign ulang role
+        $roles = ['rt'];
+        if ($request->jabatan === 'sekretaris') $roles[] = 'sekretaris';
+        if ($request->jabatan === 'bendahara') $roles[] = 'bendahara';
+        $user->syncRoles($roles);
+
+        return back()->with('success', 'Data RT berhasil diperbarui.');
     }
-}
 
-
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(string $id)
     {
         try {
             $rt = Rt::findOrFail($id);
 
-            // Cari user terkait RT
-            $user = User::where('id_rt', $rt->id)->first();
+            if ($rt->status === 'aktif') {
+                return back()->with('error', 'RT masih aktif dan tidak bisa dihapus.');
+            }
 
+            $user = User::where('id_rt', $rt->id)->first();
             if ($user) {
-                // Jika user punya lebih dari 1 role, hapus role 'rt' saja
                 if ($user->roles()->count() > 1) {
                     $user->removeRole('rt');
-                    $user->id_rt = null; // reset id_rt
-                    $user->save();
+                    $user->update(['id_rt' => null]);
                 } else {
-                    // Jika hanya punya 1 role (yaitu 'rt'), hapus user
                     $user->delete();
                 }
             }
 
-            // Hapus data RT dari tabel rukun_tetangga
             $rt->delete();
 
-            return redirect()->back()->with('success', 'RT berhasil dihapus.');
-        } catch (\Illuminate\Database\QueryException $e) {
-            return redirect()->back()->with('error', 'Tidak bisa menghapus RT karena masih digunakan.');
+            return back()->with('success', 'RT berhasil dihapus.');
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+            return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
+    }
+
+    public function toggleStatus($id)
+    {
+        $rt = Rt::findOrFail($id);
+
+        // Jika aktif, ubah ke nonaktif
+        if ($rt->status === 'aktif') {
+            $rt->status = 'nonaktif';
+            $message = "RT {$rt->nomor_rt} berhasil dinonaktifkan.";
+        } else {
+            // 🚫 Cegah lebih dari satu RT aktif dalam RW yang sama
+            $existingActive = Rt::where('id_rw', $rt->id_rw)
+                ->where('status', 'aktif')
+                ->where('id', '!=', $id)
+                ->exists();
+
+            if ($existingActive) {
+                return redirect()->back()->with('error', "Masih ada RT aktif di RW ini. Nonaktifkan yang lain dulu!");
+            }
+
+            $rt->status = 'aktif';
+            $message = "RT {$rt->nomor_rt} berhasil diaktifkan.";
+        }
+
+        $rt->save();
+
+        return redirect()->back()->with('success', $message);
     }
 }

@@ -275,6 +275,7 @@ export default function Rt({ rukun_tetangga, filters, nomorRtList, rwList, title
                     handleAdd={handleAdd}
                     onClose={() => setShowAdd(false)}
                     rwList={rwList}
+                    isRw={false}
                 />
             )}
 
@@ -286,6 +287,7 @@ export default function Rt({ rukun_tetangga, filters, nomorRtList, rwList, title
                     handleEdit={handleEdit}
                     onClose={() => setShowEdit(null)}
                     rwList={rwList}
+                    isRw={false}
                 />
             )}
         </Layout>

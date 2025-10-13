@@ -276,7 +276,7 @@ export function EditRwModal({ form, handleChange, handleEdit, onClose }) {
     )
 }
 
-export function AddRtModal({ form, handleChange, handleAdd, onClose, rwList = [] }) {
+export function AddRtModal({ form, handleChange, handleAdd, onClose, rwList = [], isRw = false }) {
     return (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 fade-in">
             <div className="bg-white rounded-2xl shadow-lg w-full max-w-md animate-scaleIn">
@@ -295,7 +295,7 @@ export function AddRtModal({ form, handleChange, handleAdd, onClose, rwList = []
                                 name="nik"
                                 value={form.nik || ""}
                                 onChange={handleChange}
-                                className="w-full border rounded-md p-2" 
+                                className="w-full border rounded-md p-2"
                             />
                         </div>
 
@@ -307,7 +307,7 @@ export function AddRtModal({ form, handleChange, handleAdd, onClose, rwList = []
                                 name="nomor_rt"
                                 value={form.nomor_rt || ""}
                                 onChange={handleChange}
-                                className="w-full border rounded-md p-2" 
+                                className="w-full border rounded-md p-2"
                             />
                         </div>
 
@@ -319,7 +319,7 @@ export function AddRtModal({ form, handleChange, handleAdd, onClose, rwList = []
                                 name="nama_ketua_rt"
                                 value={form.nama_ketua_rt || ""}
                                 onChange={handleChange}
-                                className="w-full border rounded-md p-2" 
+                                className="w-full border rounded-md p-2"
                             />
                         </div>
 
@@ -339,7 +339,7 @@ export function AddRtModal({ form, handleChange, handleAdd, onClose, rwList = []
                             </select>
                         </div>
 
-                        {/* 🔹 Mulai & Akhir Jabatan */}
+                        {/* 🔹 Tanggal Menjabat */}
                         <div>
                             <label className="block text-sm font-medium">Mulai Menjabat</label>
                             <input
@@ -347,7 +347,7 @@ export function AddRtModal({ form, handleChange, handleAdd, onClose, rwList = []
                                 name="mulai_menjabat"
                                 value={form.mulai_menjabat || ""}
                                 onChange={handleChange}
-                                className="w-full border rounded-md p-2" 
+                                className="w-full border rounded-md p-2"
                             />
                         </div>
 
@@ -358,29 +358,31 @@ export function AddRtModal({ form, handleChange, handleAdd, onClose, rwList = []
                                 name="akhir_jabatan"
                                 value={form.akhir_jabatan || ""}
                                 onChange={handleChange}
-                                className="w-full border rounded-md p-2" 
+                                className="w-full border rounded-md p-2"
                             />
                         </div>
 
-                        {/* 🔹 Pilih RW */}
-                        <div>
-                            <label className="block text-sm font-medium">Pilih RW</label>
-                            <select
-                                name="id_rw"
-                                value={form.id_rw || ""}
-                                onChange={handleChange}
-                                className="w-full border rounded-md p-2"
-                            >
-                                <option value="">-- Pilih RW --</option>
-                                {rwList.map((rw) => (
-                                    <option key={rw.id} value={rw.id}>
-                                        RW {rw.nomor_rw} - {rw.nama_ketua_rw}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
+                        {/* 🔹 Pilih RW (hanya untuk admin) */}
+                        {!isRw && (
+                            <div>
+                                <label className="block text-sm font-medium">Pilih RW</label>
+                                <select
+                                    name="id_rw"
+                                    value={form.id_rw || ""}
+                                    onChange={handleChange}
+                                    className="w-full border rounded-md p-2"
+                                >
+                                    <option value="">-- Pilih RW --</option>
+                                    {rwList.map((rw) => (
+                                        <option key={rw.id} value={rw.id}>
+                                            RW {rw.nomor_rw} - {rw.nama_ketua_rw}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                        )}
 
-                        {/* 🔹 Status */}
+                        {/* 🔹 Status (tetap muncul untuk semua) */}
                         <div>
                             <label className="block text-sm font-medium">Status</label>
                             <select
@@ -407,10 +409,10 @@ export function AddRtModal({ form, handleChange, handleAdd, onClose, rwList = []
                 </form>
             </div>
         </div>
-    )
+    );
 }
 
-export function EditRtModal({ form, handleChange, handleEdit, onClose, rwList = [] }) {
+export function EditRtModal({ form, handleChange, handleEdit, onClose, rwList = [], isRw = false }) {
     return (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 fade-in">
             <div className="bg-white rounded-2xl shadow-lg w-full max-w-md animate-scaleIn">
@@ -423,28 +425,23 @@ export function EditRtModal({ form, handleChange, handleEdit, onClose, rwList = 
                     <div className="space-y-3">
                         <div>
                             <label className="block text-sm font-medium">NIK</label>
-                            <input type="text" name="nik" value={form.nik || ""} onChange={handleChange} className="w-full border rounded-md p-2"  />
+                            <input type="text" name="nik" value={form.nik || ""} onChange={handleChange} className="w-full border rounded-md p-2" />
                         </div>
 
                         <div>
                             <label className="block text-sm font-medium">Nomor RT</label>
-                            <input type="text" name="nomor_rt" value={form.nomor_rt || ""} onChange={handleChange} className="w-full border rounded-md p-2"  />
+                            <input type="text" name="nomor_rt" value={form.nomor_rt || ""} onChange={handleChange} className="w-full border rounded-md p-2" />
                         </div>
 
                         <div>
                             <label className="block text-sm font-medium">Nama Ketua RT</label>
-                            <input type="text" name="nama_ketua_rt" value={form.nama_ketua_rt || ""} onChange={handleChange} className="w-full border rounded-md p-2"  />
+                            <input type="text" name="nama_ketua_rt" value={form.nama_ketua_rt || ""} onChange={handleChange} className="w-full border rounded-md p-2" />
                         </div>
 
                         {/* 🔹 Jabatan */}
                         <div>
                             <label className="block text-sm font-medium">Jabatan</label>
-                            <select
-                                name="jabatan"
-                                value={form.jabatan || ""}
-                                onChange={handleChange}
-                                className="w-full border rounded-md p-2"
-                            >
+                            <select name="jabatan" value={form.jabatan || ""} onChange={handleChange} className="w-full border rounded-md p-2">
                                 <option value="">-- Pilih Jabatan --</option>
                                 <option value="ketua">Ketua RT</option>
                                 <option value="sekretaris">Sekretaris</option>
@@ -454,28 +451,31 @@ export function EditRtModal({ form, handleChange, handleEdit, onClose, rwList = 
 
                         <div>
                             <label className="block text-sm font-medium">Mulai Menjabat</label>
-                            <input type="date" name="mulai_menjabat" value={form.mulai_menjabat || ""} onChange={handleChange} className="w-full border rounded-md p-2"  />
+                            <input type="date" name="mulai_menjabat" value={form.mulai_menjabat || ""} onChange={handleChange} className="w-full border rounded-md p-2" />
                         </div>
 
                         <div>
                             <label className="block text-sm font-medium">Akhir Jabatan</label>
-                            <input type="date" name="akhir_jabatan" value={form.akhir_jabatan || ""} onChange={handleChange} className="w-full border rounded-md p-2"  />
+                            <input type="date" name="akhir_jabatan" value={form.akhir_jabatan || ""} onChange={handleChange} className="w-full border rounded-md p-2" />
                         </div>
 
-                        {/* 🔹 Pilih RW */}
-                        <div>
-                            <label className="block text-sm font-medium">Pilih RW</label>
-                            <select name="id_rw" value={form.id_rw || ""} onChange={handleChange} className="w-full border rounded-md p-2">
-                                <option value="">-- Pilih RW --</option>
-                                {rwList.map((rw) => (
-                                    <option key={rw.id} value={rw.id}>
-                                        RW {rw.nomor_rw} - {rw.nama_ketua_rw}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
+                        {/* 🔹 Pilih RW (hanya untuk admin) */}
+                        {!isRw && (
+                            <div>
+                                <label className="block text-sm font-medium">Pilih RW</label>
+                                <select name="id_rw" value={form.id_rw || ""} onChange={handleChange} className="w-full border rounded-md p-2">
+                                    <option value="">-- Pilih RW --</option>
+                                    {rwList.map((rw) => (
+                                        <option key={rw.id} value={rw.id}>
+                                            RW {rw.nomor_rw} - {rw.nama_ketua_rw}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                        )}
                     </div>
 
+                    {/* 🔹 Tombol Aksi */}
                     <div className="flex justify-end gap-3 pt-4 border-t">
                         <button type="button" onClick={onClose} className="px-4 py-2 bg-gray-200 rounded-md hover:bg-gray-300">Batal</button>
                         <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Update</button>
@@ -483,7 +483,7 @@ export function EditRtModal({ form, handleChange, handleEdit, onClose, rwList = 
                 </form>
             </div>
         </div>
-    )
+    );
 }
 
 export function AddKategoriGolonganModal({ form, handleChange, handleAdd, onClose }) {
