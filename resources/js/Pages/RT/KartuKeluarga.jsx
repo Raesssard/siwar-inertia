@@ -34,7 +34,6 @@ export default function KartuKeluarga() {
     const resetFilter = () => {
         setData({
             search: '',
-            jenis_kelamin: ''
         })
     }
 

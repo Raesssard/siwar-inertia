@@ -21,7 +21,7 @@ class Rt_wargaController extends Controller
             $query->where('id_rt', $rt_id);
         })->count();
 
-        $warga = Warga::with(['kartuKeluarga', 'kartuKeluarga.rukunTetangga'])
+        $warga = Warga::with(['kartuKeluarga', 'kartuKeluarga.rukunTetangga', 'kartuKeluarga.rw'])
             ->whereHas('kartuKeluarga', function ($query) {
                 $query->where('id_rt', Auth::user()->id_rt);
             })

@@ -12,6 +12,8 @@ class PengaduanKomentar extends Model
         'pengaduan_id',
         'user_id',
         'isi_komentar',
+        'file_path',
+        'file_name',
     ];
 
     public function pengaduan(): BelongsTo

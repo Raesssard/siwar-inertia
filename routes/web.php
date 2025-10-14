@@ -98,11 +98,13 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/export/transaksi', [ExportController::class, 'exportTransaksi'])
             ->name('transaksi.export');
         Route::resource('pengaduan', Rt_PengaduanController::class)
-            ->only(['index', 'update']);
+            ->only('index');
         Route::patch('pengaduan/{id}/baca', [Rt_PengaduanController::class, 'show'])
             ->name('pengaduan.baca');
         Route::post('/pengaduan/{id}/komentar', [Rt_PengaduanController::class, 'komen'])
             ->name('pengaduan.komentar.komen');
+        Route::put('/pengaduan/{id}/status', [Rt_PengaduanController::class, 'updateStatus']);
+        Route::put('/pengaduan/{id}/konfirmasi', [Rt_PengaduanController::class, 'updateKonfirmasi']);
         Route::put('kartu_keluarga/{rt_kartu_keluarga}/upload-foto', [Rt_kartu_keluargaController::class, 'uploadFoto'])
             ->name('kartu_keluarga.upload_foto');
         Route::delete('kartu_keluarga/{rt_kartu_keluarga}/delete-foto', [Rt_kartu_keluargaController::class, 'deleteFoto'])

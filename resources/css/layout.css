@@ -135,7 +135,7 @@ div.container-fluid {
 
 
 form.form-filter {
-    width: 100%;
+    /* width: 100%; */
     align-items: center;
 }
 
@@ -201,8 +201,8 @@ div.card-body div.flex.gap-4 div.card-clickable div.text-sm {
 
 div.card-body.pengaduan,
 div.card-body.pengumuman {
-    min-height: 75vh;
-    max-height: 75vh;
+    min-height: 63vh;
+    max-height: 63vh;
     overflow-y: auto;
     padding-right: 8px;
     border-top: 1px solid lightgray;
@@ -273,7 +273,7 @@ input.edit-kategori:focus-visible {
     box-shadow: none;
 }
 
-div.komen button {
+div.komen button.komen {
     border: none;
     border-radius: 0;
     color: gray;
@@ -284,11 +284,11 @@ div.komen button {
     box-shadow: none;
 }
 
-div.komen button:focus,
-div.komen button:focus-visible,
-div.komen button:hover,
-div.komen button:disabled,
-div.komen button.btn-primary:not(:disabled):not(.disabled):active {
+div.komen button.komen:focus,
+div.komen button.komen:focus-visible,
+div.komen button.komen:hover,
+div.komen button.komen:disabled,
+div.komen button.komen.btn-primary:not(:disabled):not(.disabled):active {
     background-color: transparent;
     color: #4e73df;
     border-bottom: 1px solid lightgray;
@@ -296,7 +296,7 @@ div.komen button.btn-primary:not(:disabled):not(.disabled):active {
     box-shadow: none;
 }
 
-div.komen button:disabled {
+div.komen button.komen:disabled {
     cursor: not-allowed;
 }
 

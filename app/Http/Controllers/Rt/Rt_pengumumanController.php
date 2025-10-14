@@ -342,14 +342,26 @@ class Rt_pengumumanController extends Controller
     public function komen(Request $request, $id)
     {
         $request->validate([
-            'isi_komentar' => 'required|string|max:255'
+            'isi_komentar' => 'required_without:file|string|nullable|max:255',
+            'file' => 'required_without:isi_komentar|nullable|file|mimes:jpg,jpeg,png,gif,mp4,mov,avi,mkv,doc,docx,pdf|max:20480',
         ]);
 
         $pengaduan = Pengumuman::findOrFail($id);
 
+        $filePath = null;
+        $fileName = null;
+
+        if ($request->hasFile('file')) {
+            $file = $request->file('file');
+            $fileName = time() . '_' . $file->getClientOriginalName();
+            $filePath = $file->storeAs('file_pengumuman', $fileName, 'public');
+        }
+
         $komentar = $pengaduan->komen()->create([
             'user_id' => Auth::id(),
-            'isi_komentar' => $request->isi_komentar
+            'isi_komentar' => $request->isi_komentar,
+            'file_path' => $filePath,
+            'file_name' => $fileName,
         ]);
 
         $komentar->load('user');

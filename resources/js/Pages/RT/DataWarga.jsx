@@ -1,8 +1,9 @@
 import Layout from "@/Layouts/Layout"
 import { Head, Link, useForm, usePage } from "@inertiajs/react"
-import React from "react"
+import React, { useState } from "react"
 import { FilterWarga } from "../Component/Filter"
 import { formatRupiah, formatTanggal } from "../Component/GetPropRole"
+import { DetailWarga } from "../Component/Modal"
 
 export default function DataWarga() {
     const {
@@ -13,10 +14,18 @@ export default function DataWarga() {
     } = usePage().props
     const { props } = usePage()
     const role = props.auth?.currentRole
+    const user = props.auth?.user
     const { get, data, setData } = useForm({
         search: '',
         jenis_kelamin: ''
     })
+    const [showModal, setShowModal] = useState(false)
+    const [selected, setSelected] = useState(null)
+
+    const modalDetail = (item) => {
+        setSelected(item)
+        setShowModal(true)
+    }
 
     const filter = (e) => {
         e.preventDefault()
@@ -59,18 +68,9 @@ export default function DataWarga() {
                                 <th className="px-3 text-center" scope="col">TEMPAT LAHIR</th>
                                 <th className="px-3 text-center" scope="col">TANGGAL LAHIR</th>
                                 <th className="px-3 text-center" scope="col">AGAMA</th>
-                                <th className="px-3 text-center" scope="col">PENDIDIKAN</th>
-                                <th className="px-3 text-center" scope="col">PEKERJAAN</th>
-                                <th className="px-3 text-center" scope="col">GOLONGAN DARAH</th>
-                                <th className="px-3 text-center" scope="col">STATUS PERKAWINAN</th>
-                                <th className="px-3 text-center" scope="col">HUBUNGAN DALAM KELUARGA</th>
-                                <th className="px-3 text-center" scope="col">KEWARGANEGARAAN</th>
-                                <th className="px-3 text-center" scope="col">NO. PASPOR</th>
-                                <th className="px-3 text-center" scope="col">NO. KITAS / KITAP</th>
-                                <th className="px-3 text-center" scope="col">NAMA AYAH</th>
-                                <th className="px-3 text-center" scope="col">NAMA IBU</th>
                                 <th className="px-3 text-center" scope="col">STATUS WARGA</th>
                                 <th className="px-3 text-center" scope="col">RT</th>
+                                <th className="px-3 text-center" scope="col">DETAIL</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -85,16 +85,6 @@ export default function DataWarga() {
                                         <td className="text-center">{item.tempat_lahir ?? '-'}</td>
                                         <td className="text-center">{formatTanggal(item.tanggal_lahir) ?? '-'}</td>
                                         <td className="text-center">{item.agama ?? '-'}</td>
-                                        <td className="text-center">{item.pendidikan ?? '-'}</td>
-                                        <td className="text-center">{item.pekerjaan ?? '-'}</td>
-                                        <td className="text-center">{item.golongan_darah ?? '-'}</td>
-                                        <td className="text-center">{item.status_perkawinan.charAt(0).toUpperCase() + item.status_perkawinan.slice(1) ?? '-'}</td>
-                                        <td className="text-center">{item.status_hubungan_dalam_keluarga.charAt(0).toUpperCase() + item.status_hubungan_dalam_keluarga.slice(1) ?? '-'}</td>
-                                        <td className="text-center">{item.kewarganegaraan ?? '-'}</td>
-                                        <td className="text-center">{item.no_paspor ?? "-"}</td>
-                                        <td className="text-center">{item.no_kitas ?? "-"}/{item.no_kitap ?? "-"}</td>
-                                        <td className="text-center">{item.nama_ayah ?? '-'}</td>
-                                        <td className="text-center">{item.nama_ibu ?? '-'}</td>
                                         <td className="text-center">
                                             {item.status_warga === 'penduduk' ? (
                                                 <span className="badge bg-success text-white">Penduduk</span>
@@ -103,6 +93,11 @@ export default function DataWarga() {
                                             )}
                                         </td>
                                         <td className="text-center">{item.kartu_keluarga.rukun_tetangga.nomor_rt}</td>
+                                        <td className="text-center">
+                                            <button className="btn btn-success btn-sm" onClick={() => modalDetail(item)}>
+                                                <i className="fas fa-info"></i>
+                                            </button>
+                                        </td>
                                     </tr>
                                 ))
                             ) : (
@@ -142,6 +137,12 @@ export default function DataWarga() {
                         </ul>
                     </div>
                 )}
+                <DetailWarga
+                    selectedData={selected}
+                    detailShow={showModal}
+                    onClose={() => setShowModal(false)}
+                    userData={user}
+                />
             </div>
         </Layout>
     )

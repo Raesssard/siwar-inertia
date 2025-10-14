@@ -18,7 +18,6 @@ return new class extends Migration
             $table->string('isi');
             $table->string('file_path')->nullable();
             $table->string('file_name')->nullable();
-            $table->string('foto_bukti')->nullable();
             $table->enum('status', ['belum', 'diproses', 'selesai']);
             $table->enum('level', ['rt', 'rw']);
             $table->enum('konfirmasi_rw', ['belum', 'menunggu', 'sudah']);
