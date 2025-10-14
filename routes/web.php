@@ -21,7 +21,9 @@ use App\Http\Controllers\Rt\Rt_tagihanController;
 use App\Http\Controllers\Rt\Rt_transaksiController;
 use App\Http\Controllers\Rt\Rt_wargaController;
 use App\Http\Controllers\Rt\RtIuranController;
+use App\Http\Controllers\Rw\RwKartuKeluargaController;
 use App\Http\Controllers\Rw\RwRukunTetanggaController;
+use App\Http\Controllers\Rw\RwWargaController;
 use App\Models\Rw;
 use Inertia\Inertia;
 
@@ -73,7 +75,13 @@ Route::middleware(['auth'])->group(function () {
     Route::prefix('rw')->as('rw.')->group(function () {
         // 🔹 Data RT (CRUD)
         Route::resource('rt', RwRukunTetanggaController::class)->except(['create', 'edit', 'show']);
+        Route::resource('warga', RwWargaController::class);
+        Route::resource('kartu_keluarga', RwKartuKeluargaController::class);
 
+        Route::post('kartu_keluarga/{no_kk}/upload-foto', [RwKartuKeluargaController::class, 'uploadFoto'])
+        ->name('kartu_keluarga.upload');
+        Route::delete('kartu_keluarga/{no_kk}/delete-foto', [RwKartuKeluargaController::class, 'deleteFoto'])
+        ->name('kartu_keluarga.delete');
         // 🔹 Toggle status aktif / nonaktif
         Route::put('rt/{id}/toggle-status', [RwRukunTetanggaController::class, 'toggleStatus'])
             ->name('rt.toggleStatus'); // ✅ Tambahkan ini

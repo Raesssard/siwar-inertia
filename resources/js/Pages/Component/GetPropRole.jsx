@@ -192,7 +192,7 @@ export function getAdminLinks() {
 export function getRwCards({ ...rest }) {
     return [
         {
-            href: "/rw/rukun_tetangga",
+            href: "/rw/rt",
             color: "info",
             title: "Jumlah RT",
             value: rest.jumlah_rt,

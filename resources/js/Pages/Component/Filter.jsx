@@ -273,7 +273,7 @@ export function FilterWarga({ data, setData, filter, resetFilter, role }) {
 
 export function FilterKK({ data, setData, filter, resetFilter, role }) {
     return (
-        <form onSubmit={filter} className="filter-form form-filter justify-between px-0 pb-2 mb-2 w-50">
+        <form onSubmit={filter} className="filter-form form-filter px-0 pb-2 mb-2 w-50">
             <div className="ml-3 pr-2" style={{ width: "34.15rem" }}>
                 <div className="input-group input-group-sm">
                     <input

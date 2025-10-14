@@ -1889,6 +1889,279 @@ export function TambahPengaduan({ tambahShow, onClose, onAdded }) {
     )
 }
 
+export function TambahEditKK({ show, onClose, dataKK = null, kategoriIuran, role }) {
+  const isEdit = !!dataKK;
+
+  const { data, setData, post, put, processing, reset } = useForm({
+    no_kk: dataKK?.no_kk ?? "",
+    no_registrasi: dataKK?.no_registrasi ?? "",
+    alamat: dataKK?.alamat ?? "",
+    kelurahan: dataKK?.kelurahan ?? "",
+    kecamatan: dataKK?.kecamatan ?? "",
+    kabupaten: dataKK?.kabupaten ?? "",
+    provinsi: dataKK?.provinsi ?? "",
+    kode_pos: dataKK?.kode_pos ?? "",
+    tgl_terbit: dataKK?.tgl_terbit ?? "",
+    kategori_iuran: dataKK?.kategori_iuran ?? "",
+    instansi_penerbit: dataKK?.instansi_penerbit ?? "",
+    kabupaten_kota_penerbit: dataKK?.kabupaten_kota_penerbit ?? "",
+    nama_kepala_dukcapil: dataKK?.nama_kepala_dukcapil ?? "",
+    nip_kepala_dukcapil: dataKK?.nip_kepala_dukcapil ?? "",
+  });
+
+  useEffect(() => {
+    if (dataKK) {
+      setData({
+        no_kk: dataKK.no_kk,
+        no_registrasi: dataKK.no_registrasi,
+        alamat: dataKK.alamat,
+        kelurahan: dataKK.kelurahan,
+        kecamatan: dataKK.kecamatan,
+        kabupaten: dataKK.kabupaten,
+        provinsi: dataKK.provinsi,
+        kode_pos: dataKK.kode_pos,
+        tgl_terbit: dataKK.tgl_terbit,
+        kategori_iuran: dataKK.kategori_iuran,
+        instansi_penerbit: dataKK.instansi_penerbit,
+        kabupaten_kota_penerbit: dataKK.kabupaten_kota_penerbit,
+        nama_kepala_dukcapil: dataKK.nama_kepala_dukcapil,
+        nip_kepala_dukcapil: dataKK.nip_kepala_dukcapil,
+      });
+    } else {
+      reset();
+    }
+  }, [dataKK]);
+
+  if (!show) return null;
+
+  const submit = (e) => {
+    e.preventDefault();
+    if (isEdit) {
+      put(`/${role}/kartu_keluarga/${dataKK.id}`, { preserveScroll: true });
+    } else {
+      post(`/${role}/kartu_keluarga`, { preserveScroll: true });
+    }
+  };
+
+  return (
+    <div
+      className="modal fade show"
+      style={{
+        display: "block",
+        backgroundColor: "rgba(0,0,0,0.5)",
+        zIndex: 1050,
+      }}
+      onClick={onClose}
+    >
+      <div
+        className="modal-dialog modal-lg modal-dialog-centered"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="modal-content shadow-lg border-0">
+          <div className="modal-header bg-success text-white">
+            <h5 className="modal-title mb-0 fw-semibold">
+              {isEdit ? "Edit Kartu Keluarga" : "Tambah Kartu Keluarga"}
+            </h5>
+          </div>
+
+          <form onSubmit={submit}>
+            <div className="modal-body py-4 px-4">
+              {/* Baris 1 - No KK & No Registrasi */}
+              <div className="row g-3 mb-2">
+                <div className="col-md-6">
+                  <label className="form-label fw-medium">No KK</label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    value={data.no_kk}
+                    onChange={(e) => setData("no_kk", e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="col-md-6">
+                  <label className="form-label fw-medium">No Registrasi</label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    value={data.no_registrasi}
+                    onChange={(e) => setData("no_registrasi", e.target.value)}
+                    required
+                  />
+                </div>
+              </div>
+
+              {/* Baris 2 - Alamat */}
+              <div className="row g-3 mb-2">
+                <div className="col-12">
+                  <label className="form-label fw-medium">Alamat</label>
+                  <textarea
+                    className="form-control"
+                    rows="2"
+                    value={data.alamat}
+                    onChange={(e) => setData("alamat", e.target.value)}
+                    required
+                  ></textarea>
+                </div>
+              </div>
+
+              {/* Baris 3 - Lokasi */}
+              <div className="row g-3 mb-2">
+                <div className="col-md-6">
+                  <label className="form-label fw-medium">Kelurahan</label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    value={data.kelurahan}
+                    onChange={(e) => setData("kelurahan", e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="col-md-6">
+                  <label className="form-label fw-medium">Kecamatan</label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    value={data.kecamatan}
+                    onChange={(e) => setData("kecamatan", e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="col-md-6">
+                  <label className="form-label fw-medium">Kabupaten</label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    value={data.kabupaten}
+                    onChange={(e) => setData("kabupaten", e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="col-md-6">
+                  <label className="form-label fw-medium">Provinsi</label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    value={data.provinsi}
+                    onChange={(e) => setData("provinsi", e.target.value)}
+                    required
+                  />
+                </div>
+              </div>
+
+              {/* Baris 4 - Kode Pos, Tanggal Terbit, Kategori Iuran */}
+              <div className="row g-3 mb-2">
+                <div className="col-md-4">
+                  <label className="form-label fw-medium">Kode Pos</label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    value={data.kode_pos}
+                    onChange={(e) => setData("kode_pos", e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="col-md-4">
+                  <label className="form-label fw-medium">Tanggal Terbit</label>
+                  <input
+                    type="date"
+                    className="form-control"
+                    value={data.tgl_terbit}
+                    onChange={(e) => setData("tgl_terbit", e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="col-md-4">
+                  <label className="form-label fw-medium">Kategori Iuran</label>
+                  <select
+                    className="form-select"
+                    value={data.kategori_iuran}
+                    onChange={(e) => setData("kategori_iuran", e.target.value)}
+                    required
+                  >
+                    <option value="">-- Pilih --</option>
+                    {Object.entries(kategoriIuran).map(([id, nama]) => (
+                      <option key={id} value={id}>
+                        {nama}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              {/* Baris 5 - Info Dukcapil */}
+              <div className="row g-3 mb-2">
+                <div className="col-md-6">
+                  <label className="form-label fw-medium">Instansi Penerbit</label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    value={data.instansi_penerbit}
+                    onChange={(e) => setData("instansi_penerbit", e.target.value)}
+                  />
+                </div>
+                <div className="col-md-6">
+                  <label className="form-label fw-medium">Kabupaten/Kota Penerbit</label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    value={data.kabupaten_kota_penerbit}
+                    onChange={(e) =>
+                      setData("kabupaten_kota_penerbit", e.target.value)
+                    }
+                  />
+                </div>
+                <div className="col-md-6">
+                  <label className="form-label fw-medium">Nama Kepala Dukcapil</label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    value={data.nama_kepala_dukcapil}
+                    onChange={(e) =>
+                      setData("nama_kepala_dukcapil", e.target.value)
+                    }
+                  />
+                </div>
+                <div className="col-md-6">
+                  <label className="form-label fw-medium">NIP Kepala Dukcapil</label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    value={data.nip_kepala_dukcapil}
+                    onChange={(e) =>
+                      setData("nip_kepala_dukcapil", e.target.value)
+                    }
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="modal-footer bg-light px-4 py-3">
+              <button
+                type="button"
+                className="btn btn-secondary px-4"
+                onClick={onClose}
+              >
+                Batal
+              </button>
+              <button
+                type="submit"
+                className="btn btn-success px-4"
+                disabled={processing}
+              >
+                {processing
+                  ? "Menyimpan..."
+                  : isEdit
+                  ? "Perbarui"
+                  : "Simpan"}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function DetailKK({ selectedData, detailShow, onClose, role }) {
     if (!detailShow || !selectedData) return null
 
@@ -1967,6 +2240,10 @@ export function DetailKK({ selectedData, detailShow, onClose, role }) {
             >
                 <div
                     className="modal-dialog modal-xl modal-dialog-scrollable modal-dialog-centered"
+                    style={{
+                        maxWidth: '80%', // kasih jarak kiri kanan
+                        margin: 'auto',  // pastikan tetap di tengah
+                    }}
                     onClick={(e) => e.stopPropagation()}
                 >
                     <div className="modal-content shadow border-0">
@@ -2017,6 +2294,16 @@ export function DetailKK({ selectedData, detailShow, onClose, role }) {
                                 DAFTAR ANGGOTA KELUARGA
                             </h6>
                             <div className="table-responsive">
+                                <Role role="rw">
+                                    <div className="d-flex justify-content-end mb-3">
+                                        <button
+                                            className="btn btn-primary btn-sm"
+                                            onClick={() => alert('Fitur tambah warga nanti disambungkan')}
+                                        >
+                                            <i className="bi bi-person-plus"></i> Tambah Warga
+                                        </button>
+                                    </div>
+                                </Role>
                                 <table className="table table-bordered table-striped table-sm align-middle">
                                     <thead className="table-success text-center small">
                                         <tr>
@@ -2035,6 +2322,9 @@ export function DetailKK({ selectedData, detailShow, onClose, role }) {
                                             <th colSpan="2">Dokumen Imigrasi</th>
                                             <th colSpan="2">Nama Orang Tua</th>
                                             <th rowSpan="2">Status Warga</th>
+                                            <Role role="rw">
+                                                <th rowSpan="2">Aksi</th>
+                                            </Role>
                                         </tr>
                                         <tr>
                                             <th>Tempat Lahir</th>
@@ -2080,6 +2370,26 @@ export function DetailKK({ selectedData, detailShow, onClose, role }) {
                                                         <td className="text-center">{data.nama_ayah ?? '-'}</td>
                                                         <td className="text-center">{data.nama_ibu ?? '-'}</td>
                                                         <td className="text-center">{data.status_warga.charAt(0).toUpperCase() + data.status_warga.slice(1) ?? '-'}</td>
+                                                        <Role role="rw">
+                                                            <td className="text-center">
+                                                                <button
+                                                                    className="btn btn-warning btn-sm me-1"
+                                                                    onClick={() => alert(`Edit warga: ${data.nama}`)}
+                                                                >
+                                                                    <i className="bi bi-pencil-square"></i>
+                                                                </button>
+                                                                <button
+                                                                    className="btn btn-danger btn-sm"
+                                                                    onClick={() => {
+                                                                        if (confirm(`Hapus warga ${data.nama}?`)) {
+                                                                            alert('Fitur delete warga akan disambungkan ke backend.')
+                                                                        }
+                                                                    }}
+                                                                >
+                                                                    <i className="bi bi-trash"></i>
+                                                                </button>
+                                                            </td>
+                                                        </Role>
                                                     </tr>
                                                 ))
                                         ) : (
