@@ -88,7 +88,7 @@ export default function Pengumuman() {
         maxWidth: "350px",
         objectFit: "cover",
         marginBottom: "10px",
-        borderRadius: "8px 8px 0 0",
+        borderRadius: "0.35rem",
         display: "block",
     }
 

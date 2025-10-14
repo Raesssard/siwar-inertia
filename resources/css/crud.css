@@ -36,7 +36,8 @@
     margin-top: 30px;
     /* biar ga mepet */
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-    overflow-x: auto;
+    overflow-x: hidden;
+    overflow-y: hidden;
 }
 
 .table-header {
@@ -83,8 +84,17 @@
 }
 
 .table-scroll {
+    max-height: 13.75rem;
+    overflow-y: auto;
     overflow-x: auto;
     width: 100%;
+}
+
+.table-custom thead th {
+    position: sticky;
+    top: 0;
+    background-color: rgb(241, 245, 249);
+    z-index: 2;
 }
 
 .table-scroll::-webkit-scrollbar {

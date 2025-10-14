@@ -89,6 +89,8 @@
 }
 
 div.card.dashboard {
+    /* width buat sementara aj biar keliatan rapih*/
+    width: 100%;
     min-height: 150px;
     display: flex;
     flex-direction: column;

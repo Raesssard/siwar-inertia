@@ -44,54 +44,54 @@ export default function Tagihan() {
                 <div className="table-header">
                     <h4>Tagihan Manual</h4>
                 </div>
-
-                <table className="table-custom">
-                    <thead>
-                        <tr>
-                            <th scope="col">No.</th>
-                            <th scope="col">Tagihan</th>
-                            <th scope="col">Nominal</th>
-                            <th scope="col">Tanggal Tagih</th>
-                            <th scope="col">Tanggal Tempo</th>
-                            <th scope="col">Status</th>
-                            <th scope="col">Tanggal Bayar</th>
-                            <th scope="col">Detail</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {tagihanManual.data.length > 0 ? (
-                            tagihanManual.data.map((item, index) => (
-                                <tr key={item.id}>
-                                    <td>{index + 1}</td>
-                                    <td>{item.nama}</td>
-                                    <td>{formatRupiah(item.nominal)}</td>
-                                    <td>{formatTanggal(item.tgl_tagih)}</td>
-                                    <td>{formatTanggal(item.tgl_tempo)}</td>
-                                    <td>
-                                        {item.status_bayar === 'sudah_bayar' ? (
-                                            <span className="badge bg-success">Sudah Bayar</span>
-                                        ) : (
-                                            <span className="badge bg-warning">Belum Bayar</span>
-                                        )}
-                                    </td>
-                                    <td>{item.tgl_bayar ? formatTanggal(item.tgl_bayar) : "-"}</td>
-                                    <td>
-                                        <button className="btn btn-success btn-sm">
-                                            <i className="fas fa-info"></i>
-                                        </button>
+                <div className="table-scroll">
+                    <table className="table-custom">
+                        <thead>
+                            <tr>
+                                <th scope="col">No.</th>
+                                <th scope="col">Tagihan</th>
+                                <th scope="col">Nominal</th>
+                                <th scope="col">Tanggal Tagih</th>
+                                <th scope="col">Tanggal Tempo</th>
+                                <th scope="col">Status</th>
+                                <th scope="col">Tanggal Bayar</th>
+                                <th scope="col">Detail</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {tagihanManual.data.length > 0 ? (
+                                tagihanManual.data.map((item, index) => (
+                                    <tr key={item.id}>
+                                        <td>{index + 1}</td>
+                                        <td>{item.nama}</td>
+                                        <td>{formatRupiah(item.nominal)}</td>
+                                        <td>{formatTanggal(item.tgl_tagih)}</td>
+                                        <td>{formatTanggal(item.tgl_tempo)}</td>
+                                        <td>
+                                            {item.status_bayar === 'sudah_bayar' ? (
+                                                <span className="badge bg-success">Sudah Bayar</span>
+                                            ) : (
+                                                <span className="badge bg-warning">Belum Bayar</span>
+                                            )}
+                                        </td>
+                                        <td>{item.tgl_bayar ? formatTanggal(item.tgl_bayar) : "-"}</td>
+                                        <td>
+                                            <button className="btn btn-success btn-sm">
+                                                <i className="fas fa-info"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))
+                            ) : (
+                                <tr>
+                                    <td colSpan="8" className="text-center">
+                                        Tidak ada data
                                     </td>
                                 </tr>
-                            ))
-                        ) : (
-                            <tr>
-                                <td colSpan="8" className="text-center">
-                                    Tidak ada data
-                                </td>
-                            </tr>
-                        )}
-                    </tbody>
-                </table>
-
+                            )}
+                        </tbody>
+                    </table>
+                </div>
                 {tagihanManual.links && (
                     <div className="pagination-container">
                         <ul className="pagination-custom">
@@ -112,6 +112,7 @@ export default function Tagihan() {
                                             dangerouslySetInnerHTML={{
                                                 __html: label,
                                             }}
+                                            title={`Pergi ke halaman ${label === "&lt;" ? 'sebelumnya' : label === "&gt;" ? 'selanjutnya' : label}`}
                                         />
                                     </li>
                                 );
@@ -125,54 +126,54 @@ export default function Tagihan() {
                 <div className="table-header">
                     <h4>Tagihan Otomatis</h4>
                 </div>
-
-                <table className="table-custom">
-                    <thead>
-                        <tr>
-                            <th scope="col">No.</th>
-                            <th scope="col">Tagihan</th>
-                            <th scope="col">Nominal</th>
-                            <th scope="col">Tanggal Tagih</th>
-                            <th scope="col">Tanggal Tempo</th>
-                            <th scope="col">Status</th>
-                            <th scope="col">Tanggal Bayar</th>
-                            <th scope="col">Detail</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {tagihanOtomatis.data.length > 0 ? (
-                            tagihanOtomatis.data.map((item, index) => (
-                                <tr key={item.id}>
-                                    <td>{index + 1}</td>
-                                    <td>{item.nama}</td>
-                                    <td>{formatRupiah(item.nominal)}</td>
-                                    <td>{formatTanggal(item.tgl_tagih)}</td>
-                                    <td>{formatTanggal(item.tgl_tempo)}</td>
-                                    <td>
-                                        {item.status_bayar === 'sudah_bayar' ? (
-                                            <span className="badge bg-success">Sudah Bayar</span>
-                                        ) : (
-                                            <span className="badge bg-warning">Belum Bayar</span>
-                                        )}
-                                    </td>
-                                    <td>{item.tgl_bayar ? formatTanggal(item.tgl_bayar) : "-"}</td>
-                                    <td>
-                                        <button className="btn btn-success btn-sm">
-                                            <i className="fas fa-info"></i>
-                                        </button>
+                <div className="table-scroll">
+                    <table className="table-custom">
+                        <thead>
+                            <tr>
+                                <th scope="col">No.</th>
+                                <th scope="col">Tagihan</th>
+                                <th scope="col">Nominal</th>
+                                <th scope="col">Tanggal Tagih</th>
+                                <th scope="col">Tanggal Tempo</th>
+                                <th scope="col">Status</th>
+                                <th scope="col">Tanggal Bayar</th>
+                                <th scope="col">Detail</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {tagihanOtomatis.data.length > 0 ? (
+                                tagihanOtomatis.data.map((item, index) => (
+                                    <tr key={item.id}>
+                                        <td>{index + 1}</td>
+                                        <td>{item.nama}</td>
+                                        <td>{formatRupiah(item.nominal)}</td>
+                                        <td>{formatTanggal(item.tgl_tagih)}</td>
+                                        <td>{formatTanggal(item.tgl_tempo)}</td>
+                                        <td>
+                                            {item.status_bayar === 'sudah_bayar' ? (
+                                                <span className="badge bg-success">Sudah Bayar</span>
+                                            ) : (
+                                                <span className="badge bg-warning">Belum Bayar</span>
+                                            )}
+                                        </td>
+                                        <td>{item.tgl_bayar ? formatTanggal(item.tgl_bayar) : "-"}</td>
+                                        <td>
+                                            <button className="btn btn-success btn-sm">
+                                                <i className="fas fa-info"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))
+                            ) : (
+                                <tr>
+                                    <td colSpan="8" className="text-center">
+                                        Tidak ada data
                                     </td>
                                 </tr>
-                            ))
-                        ) : (
-                            <tr>
-                                <td colSpan="8" className="text-center">
-                                    Tidak ada data
-                                </td>
-                            </tr>
-                        )}
-                    </tbody>
-                </table>
-
+                            )}
+                        </tbody>
+                    </table>
+                </div>
                 {tagihanOtomatis.links && (
                     <div className="pagination-container">
                         <ul className="pagination-custom">
@@ -193,6 +194,7 @@ export default function Tagihan() {
                                             dangerouslySetInnerHTML={{
                                                 __html: label,
                                             }}
+                                            title={`Pergi ke halaman ${label === "&lt;" ? 'sebelumnya' : label === "&gt;" ? 'selanjutnya' : label}`}
                                         />
                                     </li>
                                 );
