@@ -115,7 +115,7 @@ export default function Pengaduan() {
         maxWidth: "350px",
         objectFit: "cover",
         marginBottom: "10px",
-        borderRadius: "8px 8px 0 0",
+        borderRadius: "0.35rem",
         display: "block",
     }
 
@@ -131,18 +131,6 @@ export default function Pengaduan() {
                 return "Selesai"
             default:
                 return "Status tidak diketahui"
-        }
-    }
-
-    const statusColor = (status, konfirmasi) => {
-        switch (status) {
-            case "belum": return "gray"
-            case "diproses":
-                if (konfirmasi === "sudah") return "cyan"
-                if (konfirmasi === "menunggu") return "blue"
-                return "yellow"
-            case "selesai": return "green"
-            default: return "gray"
         }
     }
 
@@ -197,35 +185,57 @@ export default function Pengaduan() {
                                 className="flex gap-4"
                                 columnClassName="space-y-4"
                             >
-                                {pengaduanList.map((item, index) => (
-                                    <div key={index} className="card-clickable d-flex justify-content-center align-items-center flex-column" onClick={() => modalDetail(item)}>
-                                        <FileDisplay
-                                            filePath={`/storage/${item.file_path}`}
-                                            judul={item.file_name}
-                                            displayStyle={imgStyle} />
-                                        <h2 className="font-semibold text-lg mb-2 text-left mx-3">{item.judul}</h2>
-                                        <div className="text-sm text-gray-500 mb-2 d-flex gap-3">
-                                            <span><i className="fas fa-user mr-1"></i>{item.warga.nama}</span>
-                                            <span><i className="fas fa-clock mr-1"></i><FormatWaktu createdAt={item.created_at} /></span>
-                                        </div>
-                                        {item.nik_warga !== user.nik ? (
+                                {pengaduanList.map((item, index) => {
+                                    const labelMap = {
+                                        belum: "Belum dibaca",
+                                        diproses_menunggu: "Menunggu konfirmasi RW",
+                                        diproses_sudah: "Sudah dikonfirmasi",
+                                        diproses_default: "Sedang diproses",
+                                        selesai: "Selesai"
+                                    }
+
+                                    const colorMap = {
+                                        belum: "gray",
+                                        diproses_menunggu: "blue",
+                                        diproses_sudah: "cyan",
+                                        diproses_default: "yellow",
+                                        selesai: "green"
+                                    }
+
+                                    const key = `${item.status}${item.status === "diproses" ? "_" + (item.konfirmasi_rw || "default") : ""}`
+                                    const color = colorMap[key] || "gray"
+                                    const label = labelMap[key] || "Status tidak diketahui"
+
+                                    return (
+                                        <div key={index} className="card-clickable d-flex justify-content-center align-items-center flex-column" onClick={() => modalDetail(item)}>
+                                            <FileDisplay
+                                                filePath={`/storage/${item.file_path}`}
+                                                judul={item.file_name}
+                                                displayStyle={imgStyle} />
+                                            <h2 className="font-semibold text-lg mb-2 text-left mx-3">{item.judul}</h2>
                                             <div className="text-sm text-gray-500 mb-2 d-flex gap-3">
-                                                <span><i className="fas fa-users mr-1"></i>RT {item.warga?.kartu_keluarga?.rukun_tetangga?.rt}/RW {item.warga?.kartu_keluarga?.rw?.nomor_rw}</span>
+                                                <span><i className="fas fa-user mr-1"></i>{item.warga.nama}</span>
+                                                <span><i className="fas fa-clock mr-1"></i><FormatWaktu createdAt={item.created_at} /></span>
                                             </div>
-                                        ) : ""
-                                        }
-                                        <p className="isi-pengaduan text-gray-700 text-sm mb-3 mx-3 line-clamp-3">
-                                            {item.isi.length > 100 ? item.isi.slice(0, 100) + "..." : item.isi}
-                                        </p>
-                                        {item.warga?.nik === user.nik ?
-                                            <span className={`px-2 py-1 rounded font-semibold bg-${statusColor(item.status, item.konfirmasi_rw)}-200 text-${statusColor(item.status, item.konfirmasi_rw)}-800`} style={{ fontSize: "0.85rem" }}>
-                                                {statusLabel(item.status)}
-                                            </span>
-                                            :
-                                            ""
-                                        }
-                                    </div>
-                                ))}
+                                            {item.nik_warga !== user.nik ? (
+                                                <div className="text-sm text-gray-500 mb-2 d-flex gap-3">
+                                                    <span><i className="fas fa-users mr-1"></i>RT {item.warga?.kartu_keluarga?.rukun_tetangga?.rt}/RW {item.warga?.kartu_keluarga?.rw?.nomor_rw}</span>
+                                                </div>
+                                            ) : ""
+                                            }
+                                            <p className="isi-pengaduan text-gray-700 text-sm mb-3 mx-3 line-clamp-3">
+                                                {item.isi.length > 100 ? item.isi.slice(0, 100) + "..." : item.isi}
+                                            </p>
+                                            {item.nik_warga === user.nik ?
+                                                <span className={`px-2 py-1 rounded font-semibold bg-${color}-200 text-${color}-800`} style={{ fontSize: "0.85rem" }}>
+                                                    {label}
+                                                </span>
+                                                :
+                                                ""
+                                            }
+                                        </div>
+                                    )
+                                })}
                             </Masonry>
                             {showButton && (
                                 <button

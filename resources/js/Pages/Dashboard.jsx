@@ -34,11 +34,9 @@ export default function Dashboard() {
         ? role.toUpperCase()
         : role.charAt(0).toUpperCase() + role.slice(1)}`}
       />
-      <div className="dashboard-cards">
         {statCards.map((card, index) => (
           <StatCard key={index} {...card} />
         ))}
-      </div>
     </Layout>
   )
 }

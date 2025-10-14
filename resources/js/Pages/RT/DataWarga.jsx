@@ -130,6 +130,7 @@ export default function DataWarga() {
                                             dangerouslySetInnerHTML={{
                                                 __html: label,
                                             }}
+                                            title={`Pergi ke halaman ${label === "&lt;" ? 'sebelumnya' : label === "&gt;" ? 'selanjutnya' : label}`}
                                         />
                                     </li>
                                 );

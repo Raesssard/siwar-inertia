@@ -139,7 +139,6 @@ class Rt_PengaduanController extends Controller
 
         $komentar->load('user');
 
-        if ($request->wantsJson()) {
             return response()->json([
                 'pengaduan' => $pengaduan->fresh([
                     'warga',
@@ -149,7 +148,6 @@ class Rt_PengaduanController extends Controller
                 ]),
                 'komentar' => $komentar
             ]);
-        }
 
         return redirect()->route('rt.pengaduan.index')
             ->with('success', 'Pengaduan berhasil diperbarui.');

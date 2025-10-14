@@ -1,6 +1,7 @@
 import React from "react"
 import { Link } from "@inertiajs/react"
 import Role from "./Role"
+import axios from "axios"
 
 export function FilterPengaduan({ data, setData, list_tahun, list_bulan, list_level, filter, resetFilter, tambahShow, role }) {
     return (
@@ -180,7 +181,7 @@ export function FilterPengumuman({ data, setData, daftar_tahun, list_bulan, daft
 
 export function FilterTransaksi({ data, setData, filter, resetFilter, role }) {
     return (
-        <form onSubmit={filter} className="form-filter d-flex px-0 g-2 pb-2 mb-2 w-100">
+        <form onSubmit={filter} className="filter-form form-filter d-flex px-0 g-2 pb-2 mb-2 w-100">
             <div className="col-md-5 col-12 pr-2">
                 <div className="input-group input-group-sm">
                     <input
@@ -206,7 +207,7 @@ export function FilterTransaksi({ data, setData, filter, resetFilter, role }) {
 
 export function FilterTagihan({ data, setData, filter, resetFilter, role }) {
     return (
-        <form onSubmit={filter} className="form-filter d-flex px-0 g-2 pb-2 mb-2 w-100">
+        <form onSubmit={filter} className="filter-form form-filter d-flex px-0 g-2 pb-2 mb-2 w-100">
             <div className="col-md-5 col-12 pr-2">
                 <div className="input-group input-group-sm">
                     <input
@@ -232,8 +233,8 @@ export function FilterTagihan({ data, setData, filter, resetFilter, role }) {
 
 export function FilterWarga({ data, setData, filter, resetFilter, role }) {
     return (
-        <form onSubmit={filter} className="filter-form form-filter d-flex px-0 pb-2 mb-2 w-50">
-            <div className="col-md-5 col-12 pr-2">
+        <form onSubmit={filter} className="filter-form form-filter d-flex px-0 pb-2 mb-2 w-100">
+            <div className="col-md-5 col-12 pr-0">
                 <div className="input-group input-group-sm">
                     <input
                         type="text"
@@ -249,7 +250,7 @@ export function FilterWarga({ data, setData, filter, resetFilter, role }) {
                 </div>
             </div>
 
-            <div className="d-flex flex-wrap gap-2 pl-1 w-50">
+            <div className="d-flex flex-wrap gap-2">
                 <select
                     name="jenis_kelamin"
                     value={data.jenis_kelamin}
@@ -260,7 +261,7 @@ export function FilterWarga({ data, setData, filter, resetFilter, role }) {
                     <option value="laki-laki">Laki-laki</option>
                     <option value="perempuan">Perempuan</option>
                 </select>
-                <button type="submit" className="btn-input btn btn-sm btn-primary flex-fill p-0 mx-0" title="Filter Pengumuman" style={{ maxWidth: "3rem", minWidth: "3rem" }}>
+                <button type="submit" className="btn-input btn btn-sm btn-primary flex-fill p-0 mx-0" title="Filter Warga" style={{ maxWidth: "3rem", minWidth: "3rem" }}>
                     <i className="fas fa-filter"></i>
                 </button>
                 <Link href={`/${role}/warga`} onClick={resetFilter} className="btn-input btn btn-secondary btn-sm flex-fill p-0 mx-0" title="Reset" style={{ maxWidth: "3rem", minWidth: "3rem" }}>
@@ -273,8 +274,8 @@ export function FilterWarga({ data, setData, filter, resetFilter, role }) {
 
 export function FilterKK({ data, setData, filter, resetFilter, role }) {
     return (
-        <form onSubmit={filter} className="filter-form form-filter justify-between px-0 pb-2 mb-2 w-50">
-            <div className="ml-3 pr-2" style={{ width: "34.15rem" }}>
+        <form onSubmit={filter} className="filter-form form-filter px-0 pb-2 mb-2 w-100">
+            <div className="col-md-5 col-12 pr-0">
                 <div className="input-group input-group-sm">
                     <input
                         type="text"
@@ -297,10 +298,10 @@ export function FilterKK({ data, setData, filter, resetFilter, role }) {
     )
 }
 
-export function FilterIuran({ data, setData, filter, resetFilter, role }) {
+export function FilterIuran({ data, setData, filter, resetFilter, role, tambahShow }) {
     return (
-        <form onSubmit={filter} className="filter-form form-filter px-0 pb-2 mb-2 w-50">
-            <div className="ml-3"style={{ width: "30rem" }}>
+        <form onSubmit={filter} className="filter-form form-filter px-0 pb-2 mb-2 w-100">
+            <div className="ml-3" style={{ width: "30rem" }}>
                 <div className="input-group input-group-sm">
                     <input
                         type="text"
@@ -320,9 +321,22 @@ export function FilterIuran({ data, setData, filter, resetFilter, role }) {
                 <i className="fas fa-undo"></i>
             </Link>
 
-            <button className="btn btn-success my-auto mr-3" title="Export Iuran ke Excel" style={{borderRadius: "0.2rem"}}>
+            <button
+                className="btn btn-success my-auto mr-3"
+                title="Export Iuran ke Excel"
+                style={{ borderRadius: "0.2rem" }}
+                onClick={() => window.location.href = `/${role}/export/iuran`}
+            >
                 <i className="fas fa-file-excel"></i>
             </button>
-        </form>
+            <Role role={['rt', 'rw']}>
+                <div className="text-end ml-auto mr-3">
+                    <button type="button" onClick={() => tambahShow()} className="btn-input btn btn-sm btn-success">
+                        <i className="fas fa-plus mr-2"></i>
+                        Tambah Iuran
+                    </button>
+                </div>
+            </Role>
+        </form >
     )
 }

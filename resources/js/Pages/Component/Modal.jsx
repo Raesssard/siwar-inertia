@@ -628,6 +628,11 @@ export function DetailPengaduan({ selectedData, detailShow, onClose, onUpdated, 
         isi_komentar: "",
         file: null,
     })
+    const [preview, setPreview] = useState({
+        show: false,
+        type: "",
+        src: "",
+    })
     const [komentar, setKomentar] = useState([])
     const [captionExpanded, setCaptionExpanded] = useState(false)
     const [commentExpanded, setCommentExpanded] = useState({})
@@ -752,10 +757,13 @@ export function DetailPengaduan({ selectedData, detailShow, onClose, onUpdated, 
             isi_komentar: "Sudah diteruskan ke RW untuk ditindaklanjuti"
         })
             .then(res => {
-                console.log(res.data.pengaduan)
-                console.log(res.data.komentar)
+                const newKomentar = res.data.komentar;
+                const updatedPengaduan = res.data.pengaduan;
+                console.log('newKomentar', newKomentar);
+                console.log('updatedPengaduan', updatedPengaduan);
+                setKomentar(prev => [newKomentar, ...prev])
                 setIsConfirm(true)
-                setKomentar(prev => [res.data, ...prev])
+                if (onUpdated) onUpdated(updatedPengaduan)
             })
             .catch(err => console.error(err))
     }
@@ -985,6 +993,37 @@ export function DetailPengaduan({ selectedData, detailShow, onClose, onUpdated, 
                                                                     borderRadius: "10px",
                                                                     position: "relative",
                                                                 }}>
+                                                                <button
+                                                                    onClick={() =>
+                                                                        setPreview({
+                                                                            show: true,
+                                                                            type: komen.file_name.endsWith(".pdf")
+                                                                                ? "pdf"
+                                                                                : komen.file_name.match(/\.(mp4|webm|avi)$/)
+                                                                                    ? "video"
+                                                                                    : "image",
+                                                                            src: getFileUrl(komen.file_path),
+                                                                        })
+                                                                    }
+                                                                    style={{
+                                                                        position: "absolute",
+                                                                        top: "5px",
+                                                                        right: "5px",
+                                                                        zIndex: 10,
+                                                                        background: "rgba(0, 0, 0, 0.5)",
+                                                                        color: "white",
+                                                                        border: "none",
+                                                                        borderRadius: "50%",
+                                                                        width: "25px",
+                                                                        height: "25px",
+                                                                        cursor: "pointer",
+                                                                        fontWeight: "bold",
+                                                                        lineHeight: "1",
+                                                                    }}
+                                                                    title="Lihat Lampiran"
+                                                                >
+                                                                    <i className="fa-solid fa-expand"></i>
+                                                                </button>
                                                                 {komen.file_name.endsWith(".jpg") || komen.file_name.endsWith(".jpeg") || komen.file_name.endsWith(".png") || komen.file_name.endsWith(".gif") ? (
                                                                     <img
                                                                         src={getFileUrl(komen.file_path)}
@@ -1050,6 +1089,60 @@ export function DetailPengaduan({ selectedData, detailShow, onClose, onUpdated, 
                                                 ))
                                             ) : (
                                                 <p className="text-muted">Belum ada komentar</p>
+                                            )}
+                                            {preview.show && (
+                                                <div
+                                                    className="preview-overlay"
+                                                    onClick={() => setPreview({ show: false, src: "", type: "" })}
+                                                    style={{
+                                                        position: "fixed",
+                                                        top: 0,
+                                                        left: 0,
+                                                        width: "100vw",
+                                                        height: "100vh",
+                                                        background: "rgba(0,0,0,0.8)",
+                                                        display: "flex",
+                                                        alignItems: "center",
+                                                        justifyContent: "center",
+                                                        zIndex: 9999,
+                                                    }}
+                                                >
+                                                    {preview.type === "image" ? (
+                                                        <img
+                                                            src={preview.src}
+                                                            alt="Preview"
+                                                            style={{
+                                                                maxWidth: "90%",
+                                                                maxHeight: "90%",
+                                                                objectFit: "contain",
+                                                                borderRadius: "10px",
+                                                            }}
+                                                        />
+                                                    ) : preview.type === "video" ? (
+                                                        <video
+                                                            src={preview.src}
+                                                            controls
+                                                            autoPlay
+                                                            style={{
+                                                                maxWidth: "90%",
+                                                                maxHeight: "90%",
+                                                                borderRadius: "10px",
+                                                                backgroundColor: "black",
+                                                            }}
+                                                        />
+                                                    ) : preview.type === "pdf" ? (
+                                                        <embed
+                                                            src={preview.src}
+                                                            type="application/pdf"
+                                                            style={{
+                                                                width: "80%",
+                                                                height: "90%",
+                                                                borderRadius: "10px",
+                                                                backgroundColor: "white",
+                                                            }}
+                                                        />
+                                                    ) : null}
+                                                </div>
                                             )}
                                         </div>
                                         <div className="komen p-3 border-top">
@@ -2358,7 +2451,7 @@ export function DetailPengumuman({ selectedData, detailShow, onClose, onUpdated,
                                                                         fontWeight: "bold",
                                                                         lineHeight: "1",
                                                                     }}
-                                                                    title="Hapus file"
+                                                                    title="Lihat Lampiran"
                                                                 >
                                                                     <i className="fa-solid fa-expand"></i>
                                                                 </button>
@@ -3329,6 +3422,168 @@ export function DetailWarga({ selectedData, detailShow, onClose, userData }) {
                             >
                                 <i className="bi bi-check2-circle"></i> Tutup
                             </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </>
+    )
+}
+
+export function TambahIuran({ tambahShow, onClose, onAdded, role, golongan }) {
+    const [data, setData] = useState({
+        nama: "",
+        tgl_tagih: "",
+        tgl_tempo: "",
+        jenis: "manual",
+        nominal: "",
+    })
+    const [golonganList, setGolonganList] = useState([])
+
+    useEffect(() => {
+        setGolonganList(golongan)
+    }, [])
+
+    const handleChange = (e) => {
+        setData({ ...data, [e.target.name]: e.target.value })
+    }
+
+    const handleNominalChange = (id, value) => {
+        setData({ ...data, [`nominal_${id}`]: value })
+    }
+
+    const handleSubmit = (e) => {
+        e.preventDefault()
+        axios.post(`/${role}/iuran`, data)
+            .then(res => {
+                if (onAdded) {
+                    onAdded(res.data.iuran)
+                }
+                setData({
+                    nama: "",
+                    tgl_tagih: "",
+                    tgl_tempo: "",
+                    jenis: "manual",
+                    nominal: "",
+                })
+                onClose()
+            })
+    }
+
+    useEffect(() => {
+        const handleEsc = (e) => {
+            if (e.key === "Escape") onClose()
+        }
+
+        document.addEventListener("keydown", handleEsc)
+        return () => document.removeEventListener("keydown", handleEsc)
+    }, [onClose])
+
+    if (!tambahShow) return null
+
+    return (
+        <>
+            <div
+                className="modal fade show"
+                tabIndex="-1"
+                style={{
+                    display: "block",
+                    backgroundColor: "rgba(0,0,0,0.5)"
+                }}
+                onClick={() => {
+                    onClose()
+                }}
+            >
+                <div
+                    className="modal-dialog modal-dialog-scrollable modal-dialog-centered"
+                    onClick={(e) => e.stopPropagation()}
+                >
+                    <div className="modal-content shadow-lg border-0">
+                        <div className="modal-body p-0 m-0">
+                            <div className="d-flex tambah-body flex-column" style={{ width: "100%", maxHeight: "80vh", overflowY: "auto" }}>
+                                <div className="p-3">
+                                    <form onSubmit={handleSubmit} className="h-100">
+                                        <div className="mb-3">
+                                            <label className="form-label">Nama Iuran</label>
+                                            <input
+                                                name="nama"
+                                                type="text"
+                                                className="tambah-judul form-control"
+                                                onChange={handleChange}
+                                                required
+                                            />
+                                        </div>
+
+                                        <div className="mb-3">
+                                            <label className="form-label">Tanggal Tagih</label>
+                                            <input
+                                                name="tgl_tagih"
+                                                type="date"
+                                                className="tambah-kategori form-control"
+                                                onChange={handleChange}
+                                                required
+                                            />
+                                        </div>
+
+                                        <div className="mb-3">
+                                            <label className="form-label">Tanggal Tempo</label>
+                                            <input
+                                                name="tgl_tempo"
+                                                type="date"
+                                                className="tambah-kategori form-control"
+                                                onChange={handleChange}
+                                                required
+                                            />
+                                        </div>
+
+                                        <div className="mb-3">
+                                            <label className="form-label">Jenis Iuran: </label>
+                                            <select
+                                                name="jenis"
+                                                className="edit-tujuan form-select"
+                                                value={data.jenis}
+                                                onChange={handleChange}
+                                            >
+                                                <option value="manual">Manual</option>
+                                                <option value="otomatis">Otomatis</option>
+                                            </select>
+                                        </div>
+
+                                        {data.jenis === "manual" && (
+                                            <div className="mb-3">
+                                                <label className="form-label">Nominal Iuran</label>
+                                                <input
+                                                    type="number"
+                                                    name="nominal"
+                                                    className="tambah-judul form-control"
+                                                    onChange={handleChange}
+                                                />
+                                            </div>
+                                        )}
+
+                                        {data.jenis === "otomatis" && (
+                                            <div className="mb-3">
+                                                <h4 className="mb-3">Nominal per Golongan:</h4>
+                                                {golonganList.map((g) => (
+                                                    <div key={g.id} className="mb-3">{console.log(g)}
+                                                        <label>{g.jenis}</label>
+                                                        <input
+                                                            type="number"
+                                                            className="tambah-judul form-control"
+                                                            onChange={(e) => handleNominalChange(g.id, e.target.value)}
+                                                        />
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
+
+                                        <button type="submit" className="btn btn-primary ml-auto mt-auto">
+                                            <i className="fas fa-save mr-2"></i>
+                                            Simpan
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

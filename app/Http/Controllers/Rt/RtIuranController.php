@@ -43,13 +43,15 @@ class RtIuranController extends Controller
             $query->where('id_rt', $request->input('rt'));
         }
 
-        $iuran = $query->paginate(5);
-
         $golongan_list = Kategori_golongan::all();
         $title = 'Iuran';
 
+        $iuranOtomatis = (clone $query)->where('jenis', 'otomatis')->paginate(10);
+        $iuranManual = (clone $query)->where('jenis', 'manual')->paginate(10);
+
         return Inertia::render('RT/Iuran', [
-            'iuran' => $iuran,
+            'iuranOtomatis' => $iuranOtomatis,
+            'iuranManual' => $iuranManual,
             'golongan_list' => $golongan_list,
             'title' => $title,
         ]);
@@ -141,7 +143,11 @@ class RtIuranController extends Controller
         }
 
 
-        return redirect()->route('rt.iuran.index')->with('success', 'Iuran berhasil dibuat beserta tagihannya.');
+        return response()->json([
+            'success' => true,
+            'message' => 'Iuran berhasil dibuat beserta tagihannya.',
+            'iuran' => $iuran
+        ]);
     }
 
     public function edit(string $id)
@@ -205,7 +211,11 @@ class RtIuranController extends Controller
             }
         }
 
-        return redirect()->route('rt.iuran.index')->with('success', 'Iuran berhasil diperbarui.');
+        return response()->json([
+            'success' => true,
+            'message' => 'Iuran berhasil dibuat beserta tagihannya.',
+            'iuran' => $iuran
+        ]);
     }
 
     public function destroy(string $id)
@@ -220,8 +230,14 @@ class RtIuranController extends Controller
         if ($iuran->level === 'rw' && $iuran->id_rw !== $user->id_rw) {
             return back()->with('error', 'Anda tidak berhak menghapus iuran RW ini.');
         }
-
+        $jenis = $iuran->jenis;
         $iuran->delete();
+        return response()->json([
+            'success' => true,
+            'message' => 'Iuran berhasil dihapus.',
+            'id' => $id,
+            'jenis' => $jenis,
+        ]);
         return redirect()->route('rt.iuran.index')->with('success', 'Iuran berhasil dihapus.');
     }
 
