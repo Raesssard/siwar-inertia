@@ -40,46 +40,46 @@ export default function Transaksi() {
                 <div className="table-header">
                     <h4>Data Transaksi RT/RW</h4>
                 </div>
-
-                <table className="table-custom">
-                    <thead>
-                        <tr>
-                            <th scope="col">No.</th>
-                            <th scope="col">Tanggal</th>
-                            <th scope="col">Jenis</th>
-                            <th scope="col">Nama Transaksi</th>
-                            <th scope="col">Keterangan</th>
-                            <th scope="col">Nominal</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {transaksi.data.length > 0 ? (
-                            transaksi.data.map((item, index) => (
-                                <tr key={item.id}>
-                                    <td>{index + 1}</td>
-                                    <td>{formatTanggal(item.tanggal)}</td>
-                                    <td>
-                                        {item.jenis === 'pemasukan' ? (
-                                            <span className="badge bg-success">Pemasukan</span>
-                                        ) : (
-                                            <span className="badge bg-danger">Pengeluaran</span>
-                                        )}
-                                    </td>
-                                    <td>{item.nama_transaksi}</td>
-                                    <td>{item.keterangan}</td>
-                                    <td>{formatRupiah(item.nominal)}</td>
-                                </tr>
-                            ))
-                        ) : (
+                <div className="table-scroll">
+                    <table className="table-custom">
+                        <thead>
                             <tr>
-                                <td colSpan="6" className="text-center">
-                                    Tidak ada data
-                                </td>
+                                <th scope="col">No.</th>
+                                <th scope="col">Tanggal</th>
+                                <th scope="col">Jenis</th>
+                                <th scope="col">Nama Transaksi</th>
+                                <th scope="col">Keterangan</th>
+                                <th scope="col">Nominal</th>
                             </tr>
-                        )}
-                    </tbody>
-                </table>
-
+                        </thead>
+                        <tbody>
+                            {transaksi.data.length > 0 ? (
+                                transaksi.data.map((item, index) => (
+                                    <tr key={item.id}>
+                                        <td>{index + 1}</td>
+                                        <td>{formatTanggal(item.tanggal)}</td>
+                                        <td>
+                                            {item.jenis === 'pemasukan' ? (
+                                                <span className="badge bg-success">Pemasukan</span>
+                                            ) : (
+                                                <span className="badge bg-danger">Pengeluaran</span>
+                                            )}
+                                        </td>
+                                        <td>{item.nama_transaksi}</td>
+                                        <td>{item.keterangan}</td>
+                                        <td>{formatRupiah(item.nominal)}</td>
+                                    </tr>
+                                ))
+                            ) : (
+                                <tr>
+                                    <td colSpan="6" className="text-center">
+                                        Tidak ada data
+                                    </td>
+                                </tr>
+                            )}
+                        </tbody>
+                    </table>
+                </div>
                 {transaksi.links && (
                     <div className="pagination-container">
                         <ul className="pagination-custom">
@@ -100,6 +100,7 @@ export default function Transaksi() {
                                             dangerouslySetInnerHTML={{
                                                 __html: label,
                                             }}
+                                            title={`Pergi ke halaman ${label === "&lt;" ? 'sebelumnya' : label === "&gt;" ? 'selanjutnya' : label}`}
                                         />
                                     </li>
                                 );
