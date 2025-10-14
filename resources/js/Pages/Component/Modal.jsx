@@ -840,18 +840,39 @@ export function EditPermissionModal({ form, setForm, handleEdit, onClose }) {
 }
 
 export function DetailPengaduan({ selectedData, detailShow, onClose, onUpdated, onDeleted, userData, role }) {
+    const { data, setData, reset } = useForm({
+        isi_komentar: "",
+        file: null,
+    })
     const [komentar, setKomentar] = useState([])
-    const [newKomentar, setNewKomentar] = useState("")
     const [captionExpanded, setCaptionExpanded] = useState(false)
     const [commentExpanded, setCommentExpanded] = useState({})
     const [isOverflowing, setIsOverflowing] = useState(false)
     const [isEdit, setIsEdit] = useState(false)
+    const [isConfirm, setIsConfirm] = useState(false)
+    const [previewBukti, setPreviewBukti] = useState(null)
     const textRef = useRef(null)
     const komenRef = useRef(null)
+    const videoRef = useRef(null)
+    const komenVideoRef = useRef(null)
+    const previewVideoRef = useRef(null)
+    const fileInputRef = useRef(null)
+
+    const handleClear = () => {
+        setData("file", null)
+        setPreviewBukti(null)
+        if (fileInputRef.current) fileInputRef.current.value = ""
+        videoRef.current.play()
+    }
+
+    useEffect(() => {
+        setIsConfirm(selectedData?.konfirmasi_rw === 'menunggu' || selectedData?.konfirmasi_rw === 'sudah')
+    }, [selectedData])
 
     const toggleEdit = () => {
         setIsEdit(!isEdit)
     }
+
     const toggleExpand = (id) => {
         setCommentExpanded((prev) => ({
             ...prev,
@@ -878,27 +899,79 @@ export function DetailPengaduan({ selectedData, detailShow, onClose, onUpdated, 
         if (isEdit) return
 
         const handleEsc = (e) => {
-            if (e.key === "Escape") onClose()
+            if (e.key === "Escape") {
+                onClose()
+                setIsConfirm(selectedData?.konfirmasi_rw === 'menunggu' || selectedData?.konfirmasi_rw === 'sudah')
+            }
         }
 
         document.addEventListener("keydown", handleEsc)
         return () => document.removeEventListener("keydown", handleEsc)
     }, [isEdit, onClose])
 
+    const handleFileChange = (e) => {
+        const selectedFile = e.target.files[0]
+
+        if (!selectedFile) {
+            setPreviewBukti(null)
+            setData("file", null)
+            return
+        }
+
+        setData("file", selectedFile || null)
+
+        const fileName = selectedFile.name.toLowerCase()
+
+        if (fileName.endsWith(".jpg") || fileName.endsWith(".jpeg") || fileName.endsWith(".png") || fileName.endsWith(".gif")) {
+            const reader = new FileReader()
+            reader.onload = (ev) => setPreviewBukti({ type: "image", src: ev.target.result })
+            reader.readAsDataURL(selectedFile)
+        } else if (fileName.endsWith(".mp4") || fileName.endsWith(".webm") || fileName.endsWith(".avi")) {
+            setPreviewBukti({ type: "video", src: URL.createObjectURL(selectedFile) })
+        } else if (fileName.endsWith(".pdf")) {
+            setPreviewBukti({ type: "pdf", src: URL.createObjectURL(selectedFile) })
+        } else {
+            setPreviewBukti({ type: "other", name: selectedFile.name })
+        }
+    }
+
     const handleSubmit = () => {
-        if (!newKomentar.trim()) return
-        axios.post(`/${role}/pengaduan/${selectedData.id}/komentar`, {
-            isi_komentar: newKomentar
+        if (!data.isi_komentar.trim() && !data.file) return
+
+        const formData = new FormData()
+        formData.append("isi_komentar", data.isi_komentar)
+        if (data.file) formData.append("file", data.file)
+
+        axios.post(`/${role}/pengaduan/${selectedData.id}/komentar`, formData, {
+            headers: { "Content-Type": "multipart/form-data" },
         })
             .then(res => {
                 setKomentar(prev => [res.data, ...prev])
-                setNewKomentar("")
+                reset()
+                handleClear()
                 if (komenRef.current) {
                     komenRef.current.scrollTo({
                         top: 0,
-                        behavior: "smooth"
+                        behavior: "smooth",
                     })
                 }
+            })
+            .catch(err => {
+
+                console.error(err)
+            })
+    }
+
+    const handleConfirm = () => {
+        axios.put(`/${role}/pengaduan/${selectedData.id}/konfirmasi`, {
+            konfirmasi_rw: 'menunggu',
+            isi_komentar: "Sudah diteruskan ke RW untuk ditindaklanjuti"
+        })
+            .then(res => {
+                console.log(res.data.pengaduan)
+                console.log(res.data.komentar)
+                setIsConfirm(true)
+                setKomentar(prev => [res.data, ...prev])
             })
             .catch(err => console.error(err))
     }
@@ -909,26 +982,76 @@ export function DetailPengaduan({ selectedData, detailShow, onClose, onUpdated, 
         }
         document.addEventListener("keydown", handleEnter)
         return () => document.removeEventListener("keydown", handleEnter)
-    }, [newKomentar, selectedData])
+    }, [data.isi_komentar, selectedData])
 
-    if (!detailShow || !selectedData) return null
-
-    const fileName = selectedData.file_name?.toLowerCase() || ""
+    const fileName = selectedData?.file_name?.toLowerCase() || ""
 
     const handleCheckboxChange = (checked) => {
-        const newStatus = checked ? 'selesai' : 'dproses';
+        const newStatus = checked ? 'selesai' : 'diproses'
 
-        axios.put(`/${role}/pengaduan/${selectedData.id}`, { status: newStatus })
+        axios.put(`/${role}/pengaduan/${selectedData.id}/status`, { status: newStatus })
             .then(res => {
-                console.log("Status diperbarui:", res.data);
+                console.log("Status diperbarui:", res.data)
                 if (onUpdated) {
-                    onUpdated({ ...selectedData, status: newStatus });
+                    onUpdated({ ...selectedData, status: newStatus })
                 }
             })
             .catch(err => {
-                console.error("Gagal ubah status:", err.response?.data || err);
-            });
-    };
+                console.error("Gagal ubah status:", err.response?.data || err)
+            })
+    }
+
+    useEffect(() => {
+        if (videoRef.current) {
+            if ((previewBukti && previewBukti.type === "video") && videoRef.current) {
+                videoRef.current.pause()
+            }
+        }
+
+        if (komenVideoRef.current) {
+            if ((previewBukti && previewBukti.type === "video") && komenVideoRef.current) {
+                komenVideoRef.current.pause()
+            }
+        }
+    }, [previewBukti, videoRef, komenVideoRef])
+
+    useEffect(() => {
+        const komenVideo = komenVideoRef.current
+        const selectedVideo = videoRef.current
+        const previewVideo = previewVideoRef.current
+
+        const pauseOthers = (source) => {
+            if (source !== komenVideo && komenVideo && !komenVideo.paused) komenVideo.pause()
+            if (source !== selectedVideo && selectedVideo && !selectedVideo.paused) selectedVideo.pause()
+            if (source !== previewVideo && previewVideo && !previewVideo.paused) previewVideo.pause()
+        }
+
+        const handleKomenPlay = () => pauseOthers(komenVideo)
+        const handleSelectedPlay = () => pauseOthers(selectedVideo)
+        const handlePreviewPlay = () => pauseOthers(previewVideo)
+
+        if (komenVideo) komenVideo.addEventListener("play", handleKomenPlay)
+        if (selectedVideo) selectedVideo.addEventListener("play", handleSelectedPlay)
+        if (previewVideo) previewVideo.addEventListener("play", handlePreviewPlay)
+
+        return () => {
+            if (komenVideo) komenVideo.removeEventListener("play", handleKomenPlay)
+            if (selectedVideo) selectedVideo.removeEventListener("play", handleSelectedPlay)
+            if (previewVideo) previewVideo.removeEventListener("play", handlePreviewPlay)
+        }
+    }, [previewBukti,
+        komenVideoRef.current,
+        videoRef.current,
+        previewVideoRef.current])
+
+    const getFileUrl = (src) => {
+        if (!src) return ""
+        if (src.startsWith("data:")) return src
+        if (src.startsWith("blob:")) return src
+        return `/storage/${src}`
+    }
+
+    if (!detailShow || !selectedData) return null
 
     return (
         <>
@@ -937,11 +1060,12 @@ export function DetailPengaduan({ selectedData, detailShow, onClose, onUpdated, 
                 tabIndex="-1"
                 style={{
                     display: "block",
-                    backgroundColor: "rgba(0,0,0,0.5)"
+                    backgroundColor: "rgba(0,0,0,0.5)",
                 }}
                 onClick={() => {
                     onClose()
                     setIsEdit(false)
+                    setIsConfirm(selectedData?.konfirmasi_rw === 'menunggu' || selectedData?.konfirmasi_rw === 'sudah')
                 }}
             >
                 <div
@@ -977,9 +1101,10 @@ export function DetailPengaduan({ selectedData, detailShow, onClose, onUpdated, 
                                                         />
                                                     ) : fileName.endsWith(".mp4") || fileName.endsWith(".webm") || fileName.endsWith(".avi") ? (
                                                         <video
+                                                            ref={videoRef}
                                                             src={`/storage/${selectedData.file_path}`}
                                                             controls
-                                                            autoPlay
+                                                            autoPlay={!previewBukti}
                                                             loop
                                                             className="w-100"
                                                             style={{ maxHeight: "80vh", objectFit: "contain" }}
@@ -1066,7 +1191,57 @@ export function DetailPengaduan({ selectedData, detailShow, onClose, onUpdated, 
                                                         <small className="text-muted">
                                                             • <FormatWaktu createdAt={komen.created_at} />
                                                         </small>
-
+                                                        {(komen.file_path && komen.file_name) && (
+                                                            <div
+                                                                className="flex-fill border-end bg-black d-flex align-items-center justify-content-center mb-2 mt-2"
+                                                                style={{
+                                                                    width: "200px",
+                                                                    height: "200px",
+                                                                    overflow: "hidden",
+                                                                    borderRadius: "10px",
+                                                                    position: "relative",
+                                                                }}>
+                                                                {komen.file_name.endsWith(".jpg") || komen.file_name.endsWith(".jpeg") || komen.file_name.endsWith(".png") || komen.file_name.endsWith(".gif") ? (
+                                                                    <img
+                                                                        src={getFileUrl(komen.file_path)}
+                                                                        alt="Preview"
+                                                                        style={{
+                                                                            maxWidth: "100%",
+                                                                            maxHeight: "100%",
+                                                                            objectFit: "contain"
+                                                                        }}
+                                                                    />
+                                                                ) : komen.file_name.endsWith(".mp4") || komen.file_name.endsWith(".webm") || komen.file_name.endsWith(".avi") ? (
+                                                                    <video
+                                                                        ref={komenVideoRef}
+                                                                        src={getFileUrl(komen.file_path)}
+                                                                        controls
+                                                                        loop
+                                                                        style={{
+                                                                            maxWidth: "100%",
+                                                                            maxHeight: "100%",
+                                                                            objectFit: "contain",
+                                                                            backgroundColor: "black"
+                                                                        }}
+                                                                    />
+                                                                ) : komen.file_name.endsWith(".pdf") ? (
+                                                                    <embed
+                                                                        src={getFileUrl(komen.file_path)}
+                                                                        type="application/pdf"
+                                                                        className="pdf-preview"
+                                                                        style={{
+                                                                            width: "100%",
+                                                                            height: "100%",
+                                                                            backgroundColor: "black"
+                                                                        }}
+                                                                    />
+                                                                ) : (
+                                                                    <p style={{ color: "white", textAlign: "center" }}>
+                                                                        File dipilih: {komen.file_name}
+                                                                    </p>
+                                                                )}
+                                                            </div>
+                                                        )}
                                                         <p
                                                             className={`mb-2 komen ${commentExpanded[komen.id]
                                                                 ? "line-clamp-none"
@@ -1076,7 +1251,7 @@ export function DetailPengaduan({ selectedData, detailShow, onClose, onUpdated, 
                                                             {komen.isi_komentar}
                                                         </p>
 
-                                                        {komen.isi_komentar.length > 100 && (
+                                                        {komen.isi_komentar?.length > 100 && (
                                                             <button
                                                                 className="btn-expand btn btn-link p-0 text-decoration-none mt-0"
                                                                 onClick={() => toggleExpand(komen.id)}
@@ -1094,18 +1269,129 @@ export function DetailPengaduan({ selectedData, detailShow, onClose, onUpdated, 
                                             )}
                                         </div>
                                         <div className="komen p-3 border-top">
-                                            <div className="input-group">
-                                                <input
-                                                    type="text"
-                                                    className="form-control komen"
-                                                    placeholder="Tambah komentar..."
-                                                    value={newKomentar}
-                                                    onChange={(e) => setNewKomentar(e.target.value)}
-                                                />
-                                                <button className="btn btn-primary my-0" type="button" onClick={handleSubmit}>
-                                                    <i className="far fa-paper-plane"></i>
+                                            {(role === 'rt' && !isConfirm) ? (
+                                                <button className="btn btn-primary w-100" type="button" onClick={handleConfirm}>
+                                                    <i className="fas fa-check mr-2"></i>
+                                                    Konfirmasi
                                                 </button>
-                                            </div>
+                                            ) : (
+                                                <>
+                                                    {previewBukti && (
+                                                        <div
+                                                            className="flex-fill border-end bg-black d-flex align-items-center justify-content-center mb-3"
+                                                            style={{
+                                                                width: "200px",
+                                                                height: "200px",
+                                                                overflow: "hidden",
+                                                                borderRadius: "10px",
+                                                                position: "relative",
+                                                            }}>
+                                                            <button
+                                                                onClick={handleClear}
+                                                                style={{
+                                                                    position: "absolute",
+                                                                    top: "5px",
+                                                                    right: "5px",
+                                                                    zIndex: 10,
+                                                                    background: "rgba(0, 0, 0, 0.5)",
+                                                                    color: "white",
+                                                                    border: "none",
+                                                                    borderRadius: "50%",
+                                                                    width: "25px",
+                                                                    height: "25px",
+                                                                    cursor: "pointer",
+                                                                    fontWeight: "bold",
+                                                                    lineHeight: "1",
+                                                                }}
+                                                                title="Hapus file"
+                                                            >
+                                                                ✕
+                                                            </button>
+                                                            <div id="preview" style={{ width: "100%", height: "100%" }}>
+                                                                {previewBukti && previewBukti.type === "image" && (
+                                                                    <img
+                                                                        src={getFileUrl(previewBukti.src)}
+                                                                        alt="Preview"
+                                                                        style={{
+                                                                            maxWidth: "100%",
+                                                                            maxHeight: "100%",
+                                                                            objectFit: "contain"
+                                                                        }}
+                                                                    />
+                                                                )}
+                                                                {previewBukti && previewBukti.type === "video" && (
+                                                                    <video
+                                                                        ref={previewVideoRef}
+                                                                        src={getFileUrl(previewBukti.src)}
+                                                                        controls
+                                                                        autoPlay
+                                                                        loop
+                                                                        style={{
+                                                                            maxWidth: "100%",
+                                                                            maxHeight: "100%",
+                                                                            objectFit: "contain",
+                                                                            backgroundColor: "black"
+                                                                        }}
+                                                                    />
+                                                                )}
+                                                                {previewBukti && previewBukti.type === "pdf" && (
+                                                                    <embed
+                                                                        src={getFileUrl(previewBukti.src)}
+                                                                        type="application/pdf"
+                                                                        className="pdf-preview"
+                                                                        style={{
+                                                                            width: "100%",
+                                                                            height: "100%",
+                                                                            backgroundColor: "black"
+                                                                        }}
+                                                                    />
+                                                                )}
+                                                                {previewBukti && previewBukti.type === "other" && (
+                                                                    <p style={{ color: "white", textAlign: "center" }}>
+                                                                        File dipilih: {previewBukti.name}
+                                                                    </p>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                    <div className="input-group">
+                                                        <input
+                                                            type="text"
+                                                            className="form-control komen"
+                                                            placeholder="Tambah komentar..."
+                                                            value={data.isi_komentar}
+                                                            onChange={(e) => setData("isi_komentar", e.target.value)}
+                                                            title="Masukkan Pesan"
+                                                        />
+                                                        <Role role={['rt', 'rw']}>
+                                                            <input
+                                                                ref={fileInputRef}
+                                                                type="file"
+                                                                id="fileInput"
+                                                                name="file"
+                                                                className="d-none"
+                                                                onChange={handleFileChange}
+                                                            />
+                                                            <button
+                                                                className="btn komen btn-primary my-0"
+                                                                type="button"
+                                                                onClick={() => document.getElementById('fileInput').click()}
+                                                                title="Masukkan Lampiran"
+                                                            >
+                                                                <i className="fas fa-paperclip"></i>
+                                                            </button>
+                                                        </Role>
+                                                        <button
+                                                            className="btn komen btn-primary my-0"
+                                                            type="button"
+                                                            onClick={handleSubmit}
+                                                            title="Kirim Pesan"
+                                                        >
+                                                            <i className="far fa-paper-plane"></i>
+                                                        </button>
+                                                    </div>
+                                                </>
+                                            )}
                                         </div>
                                     </div>
                                 </div>
@@ -1119,7 +1405,7 @@ export function DetailPengaduan({ selectedData, detailShow, onClose, onUpdated, 
 }
 
 export function EditPengaduan({ toggle, onUpdated, onDeleted, pengaduan }) {
-    const { data, setData, put, processing, errors } = useForm({
+    const { data, setData } = useForm({
         judul: pengaduan.judul || "",
         isi: pengaduan.isi || "",
         level: pengaduan.level || "",
@@ -1324,7 +1610,6 @@ export function EditPengaduan({ toggle, onUpdated, onDeleted, pengaduan }) {
                                 id="fileInput"
                                 name="file"
                                 className="d-none"
-                                accept="image/,video/,.pdf,.doc,.docx"
                                 onChange={handleFileChange}
                             />
                             <button
@@ -1613,6 +1898,17 @@ export function DetailKK({ selectedData, detailShow, onClose, role }) {
     const [uploading, setUploading] = useState(false)
     const [viewDoc, setViewDoc] = useState(null)
 
+    useEffect(() => {
+        const handleEsc = (e) => {
+            if (e.key === "Escape") {
+                onClose()
+            }
+        }
+
+        document.addEventListener("keydown", handleEsc)
+        return () => document.removeEventListener("keydown", handleEsc)
+    }, [onClose])
+
     const kepala = selectedData.warga?.find(
         (w) =>
             w.status_hubungan_dalam_keluarga?.toLowerCase() === "kepala keluarga"
@@ -1676,11 +1972,6 @@ export function DetailKK({ selectedData, detailShow, onClose, role }) {
                     <div className="modal-content shadow border-0">
                         <div className="modal-header bg-success text-white">
                             <h5 className="modal-title text-white">Detail Kartu Keluarga</h5>
-                            <button
-                                type="button"
-                                className="btn-close btn-close-white"
-                                onClick={onClose}
-                            ></button>
                         </div>
 
                         <div className="modal-body kk d-block p-4">
@@ -1938,14 +2229,60 @@ export function DetailKK({ selectedData, detailShow, onClose, role }) {
 }
 
 export function DetailPengumuman({ selectedData, detailShow, onClose, onUpdated, onDeleted, userData, role }) {
+    const { data, setData, reset } = useForm({
+        isi_komentar: "",
+        file: null,
+    })
+    const [preview, setPreview] = useState({
+        show: false,
+        type: "",
+        src: "",
+    })
     const [komentar, setKomentar] = useState([])
-    const [newKomentar, setNewKomentar] = useState("")
     const [captionExpanded, setCaptionExpanded] = useState(false)
     const [commentExpanded, setCommentExpanded] = useState({})
     const [isOverflowing, setIsOverflowing] = useState(false)
     const [isEdit, setIsEdit] = useState(false)
+    const [previewFileKomen, setPreviewFileKomen] = useState(null)
+    const videoRef = useRef(null)
+    const komenVideoRef = useRef(null)
+    const previewVideoRef = useRef(null)
+    const fileInputRef = useRef(null)
     const textRef = useRef(null)
     const komenRef = useRef(null)
+
+    const handleClear = () => {
+        setData("file", null)
+        setPreviewFileKomen(null)
+        if (fileInputRef.current) fileInputRef.current.value = ""
+        videoRef.current.play()
+    }
+
+    const handleFileChange = (e) => {
+        const selectedFile = e.target.files[0]
+
+        if (!selectedFile) {
+            setPreviewFileKomen(null)
+            setData("file", null)
+            return
+        }
+
+        setData("file", selectedFile || null)
+
+        const fileName = selectedFile.name.toLowerCase()
+
+        if (fileName.endsWith(".jpg") || fileName.endsWith(".jpeg") || fileName.endsWith(".png") || fileName.endsWith(".gif")) {
+            const reader = new FileReader()
+            reader.onload = (ev) => setPreviewFileKomen({ type: "image", src: ev.target.result })
+            reader.readAsDataURL(selectedFile)
+        } else if (fileName.endsWith(".mp4") || fileName.endsWith(".webm") || fileName.endsWith(".avi")) {
+            setPreviewFileKomen({ type: "video", src: URL.createObjectURL(selectedFile) })
+        } else if (fileName.endsWith(".pdf")) {
+            setPreviewFileKomen({ type: "pdf", src: URL.createObjectURL(selectedFile) })
+        } else {
+            setPreviewFileKomen({ type: "other", name: selectedFile.name })
+        }
+    }
 
     const toggleEdit = () => {
         setIsEdit(!isEdit)
@@ -1974,21 +2311,30 @@ export function DetailPengumuman({ selectedData, detailShow, onClose, onUpdated,
     }, [selectedData])
 
     const handleSubmit = () => {
-        if (!newKomentar.trim()) return
-        axios.post(`/${role}/pengumuman/${selectedData.id}/komentar`, {
-            isi_komentar: newKomentar
+        if (!data.isi_komentar.trim() && !data.file) return
+
+        const formData = new FormData()
+        formData.append("isi_komentar", data.isi_komentar)
+        if (data.file) formData.append("file", data.file)
+
+        axios.post(`/${role}/pengumuman/${selectedData.id}/komentar`, formData, {
+            headers: { "Content-Type": "multipart/form-data" },
         })
             .then(res => {
                 setKomentar(prev => [res.data, ...prev])
-                setNewKomentar("")
+                reset()
+                handleClear()
                 if (komenRef.current) {
                     komenRef.current.scrollTo({
                         top: 0,
-                        behavior: "smooth"
+                        behavior: "smooth",
                     })
                 }
             })
-            .catch(err => console.error(err))
+            .catch(err => {
+
+                console.error(err)
+            })
     }
 
     useEffect(() => {
@@ -1997,17 +2343,70 @@ export function DetailPengumuman({ selectedData, detailShow, onClose, onUpdated,
         }
         document.addEventListener("keydown", handleEnter)
         return () => document.removeEventListener("keydown", handleEnter)
-    }, [newKomentar, selectedData])
+    }, [data.isi_komentar, selectedData])
 
     useEffect(() => {
+        if (isEdit) return
+
         const handleEsc = (e) => {
             if (e.key === "Escape") onClose()
         }
+
         document.addEventListener("keydown", handleEsc)
         return () => document.removeEventListener("keydown", handleEsc)
-    }, [onClose])
+    }, [isEdit, onClose])
+
+    useEffect(() => {
+        if (videoRef.current) {
+            if ((previewFileKomen && previewFileKomen.type === "video") && videoRef.current) {
+                videoRef.current.pause()
+            }
+        }
+
+        if (komenVideoRef.current) {
+            if ((previewFileKomen && previewFileKomen.type === "video") && komenVideoRef.current) {
+                komenVideoRef.current.pause()
+            }
+        }
+    }, [previewFileKomen, videoRef, komenVideoRef])
+
+    useEffect(() => {
+        const komenVideo = komenVideoRef.current
+        const selectedVideo = videoRef.current
+        const previewVideo = previewVideoRef.current
+
+        const pauseOthers = (source) => {
+            if (source !== komenVideo && komenVideo && !komenVideo.paused) komenVideo.pause()
+            if (source !== selectedVideo && selectedVideo && !selectedVideo.paused) selectedVideo.pause()
+            if (source !== previewVideo && previewVideo && !previewVideo.paused) previewVideo.pause()
+        }
+
+        const handleKomenPlay = () => pauseOthers(komenVideo)
+        const handleSelectedPlay = () => pauseOthers(selectedVideo)
+        const handlePreviewPlay = () => pauseOthers(previewVideo)
+
+        if (komenVideo) komenVideo.addEventListener("play", handleKomenPlay)
+        if (selectedVideo) selectedVideo.addEventListener("play", handleSelectedPlay)
+        if (previewVideo) previewVideo.addEventListener("play", handlePreviewPlay)
+
+        return () => {
+            if (komenVideo) komenVideo.removeEventListener("play", handleKomenPlay)
+            if (selectedVideo) selectedVideo.removeEventListener("play", handleSelectedPlay)
+            if (previewVideo) previewVideo.removeEventListener("play", handlePreviewPlay)
+        }
+    }, [previewFileKomen,
+        komenVideoRef.current,
+        videoRef.current,
+        previewVideoRef.current])
 
     if (!detailShow || !selectedData) return null
+
+    const getFileUrl = (src) => {
+        if (!src) return ""
+        if (src.startsWith("data:")) return src
+        if (src.startsWith("blob:")) return src
+        return `/storage/${src}`
+    }
 
     const fileName = selectedData.dokumen_name?.toLowerCase() || ""
 
@@ -2059,6 +2458,7 @@ export function DetailPengumuman({ selectedData, detailShow, onClose, onUpdated,
                                                         />
                                                     ) : fileName.endsWith(".mp4") || fileName.endsWith(".webm") || fileName.endsWith(".avi") ? (
                                                         <video
+                                                            ref={videoRef}
                                                             src={`/storage/${selectedData.dokumen_path}`}
                                                             controls
                                                             autoPlay
@@ -2135,7 +2535,90 @@ export function DetailPengumuman({ selectedData, detailShow, onClose, onUpdated,
                                                         <small className="text-muted">
                                                             • <FormatWaktu createdAt={komen.created_at} />
                                                         </small>
-
+                                                        {(komen.file_path && komen.file_name) && (
+                                                            <div
+                                                                className="flex-fill border-end bg-black d-flex align-items-center justify-content-center mb-2 mt-2"
+                                                                style={{
+                                                                    width: "200px",
+                                                                    height: "200px",
+                                                                    overflow: "hidden",
+                                                                    borderRadius: "10px",
+                                                                    position: "relative",
+                                                                    cursor: "pointer",
+                                                                }}
+                                                            >
+                                                                <button
+                                                                    onClick={() =>
+                                                                        setPreview({
+                                                                            show: true,
+                                                                            type: komen.file_name.endsWith(".pdf")
+                                                                                ? "pdf"
+                                                                                : komen.file_name.match(/\.(mp4|webm|avi)$/)
+                                                                                    ? "video"
+                                                                                    : "image",
+                                                                            src: getFileUrl(komen.file_path),
+                                                                        })
+                                                                    }
+                                                                    style={{
+                                                                        position: "absolute",
+                                                                        top: "5px",
+                                                                        right: "5px",
+                                                                        zIndex: 10,
+                                                                        background: "rgba(0, 0, 0, 0.5)",
+                                                                        color: "white",
+                                                                        border: "none",
+                                                                        borderRadius: "50%",
+                                                                        width: "25px",
+                                                                        height: "25px",
+                                                                        cursor: "pointer",
+                                                                        fontWeight: "bold",
+                                                                        lineHeight: "1",
+                                                                    }}
+                                                                    title="Hapus file"
+                                                                >
+                                                                    <i className="fa-solid fa-expand"></i>
+                                                                </button>
+                                                                {komen.file_name.match(/\.(jpg|jpeg|png|gif)$/) ? (
+                                                                    <img
+                                                                        src={getFileUrl(komen.file_path)}
+                                                                        alt="Preview"
+                                                                        style={{
+                                                                            maxWidth: "100%",
+                                                                            maxHeight: "100%",
+                                                                            objectFit: "contain",
+                                                                        }}
+                                                                    />
+                                                                ) : komen.file_name.match(/\.(mp4|webm|avi)$/) ? (
+                                                                    <video
+                                                                        ref={komenVideoRef}
+                                                                        src={getFileUrl(komen.file_path)}
+                                                                        controls
+                                                                        loop
+                                                                        style={{
+                                                                            maxWidth: "100%",
+                                                                            maxHeight: "100%",
+                                                                            objectFit: "contain",
+                                                                            backgroundColor: "black",
+                                                                        }}
+                                                                    />
+                                                                ) : komen.file_name.endsWith(".pdf") ? (
+                                                                    <embed
+                                                                        src={getFileUrl(komen.file_path)}
+                                                                        type="application/pdf"
+                                                                        className="pdf-preview"
+                                                                        style={{
+                                                                            width: "100%",
+                                                                            height: "100%",
+                                                                            backgroundColor: "black",
+                                                                        }}
+                                                                    />
+                                                                ) : (
+                                                                    <p style={{ color: "white", textAlign: "center" }}>
+                                                                        File dipilih: {komen.file_name}
+                                                                    </p>
+                                                                )}
+                                                            </div>
+                                                        )}
                                                         <p
                                                             className={`mb-2 komen ${commentExpanded[komen.id]
                                                                 ? "line-clamp-none"
@@ -2145,7 +2628,7 @@ export function DetailPengumuman({ selectedData, detailShow, onClose, onUpdated,
                                                             {komen.isi_komentar}
                                                         </p>
 
-                                                        {komen.isi_komentar.length > 100 && (
+                                                        {komen.isi_komentar?.length > 100 && (
                                                             <button
                                                                 className="btn-expand btn btn-link p-0 text-decoration-none mt-0"
                                                                 onClick={() => toggleExpand(komen.id)}
@@ -2161,17 +2644,167 @@ export function DetailPengumuman({ selectedData, detailShow, onClose, onUpdated,
                                             ) : (
                                                 <p className="text-muted">Belum ada komentar</p>
                                             )}
+                                            {preview.show && (
+                                                <div
+                                                    className="preview-overlay"
+                                                    onClick={() => setPreview({ show: false, src: "", type: "" })}
+                                                    style={{
+                                                        position: "fixed",
+                                                        top: 0,
+                                                        left: 0,
+                                                        width: "100vw",
+                                                        height: "100vh",
+                                                        background: "rgba(0,0,0,0.8)",
+                                                        display: "flex",
+                                                        alignItems: "center",
+                                                        justifyContent: "center",
+                                                        zIndex: 9999,
+                                                    }}
+                                                >
+                                                    {preview.type === "image" ? (
+                                                        <img
+                                                            src={preview.src}
+                                                            alt="Preview"
+                                                            style={{
+                                                                maxWidth: "90%",
+                                                                maxHeight: "90%",
+                                                                objectFit: "contain",
+                                                                borderRadius: "10px",
+                                                            }}
+                                                        />
+                                                    ) : preview.type === "video" ? (
+                                                        <video
+                                                            src={preview.src}
+                                                            controls
+                                                            autoPlay
+                                                            style={{
+                                                                maxWidth: "90%",
+                                                                maxHeight: "90%",
+                                                                borderRadius: "10px",
+                                                                backgroundColor: "black",
+                                                            }}
+                                                        />
+                                                    ) : preview.type === "pdf" ? (
+                                                        <embed
+                                                            src={preview.src}
+                                                            type="application/pdf"
+                                                            style={{
+                                                                width: "80%",
+                                                                height: "90%",
+                                                                borderRadius: "10px",
+                                                                backgroundColor: "white",
+                                                            }}
+                                                        />
+                                                    ) : null}
+                                                </div>
+                                            )}
                                         </div>
                                         <div className="komen p-3 border-top">
+                                            {previewFileKomen && (
+                                                <div
+                                                    className="flex-fill border-end bg-black d-flex align-items-center justify-content-center mb-3"
+                                                    style={{
+                                                        width: "200px",
+                                                        height: "200px",
+                                                        overflow: "hidden",
+                                                        borderRadius: "10px",
+                                                        position: "relative",
+                                                    }}>
+                                                    <button
+                                                        onClick={handleClear}
+                                                        style={{
+                                                            position: "absolute",
+                                                            top: "5px",
+                                                            right: "5px",
+                                                            zIndex: 10,
+                                                            background: "rgba(0, 0, 0, 0.5)",
+                                                            color: "white",
+                                                            border: "none",
+                                                            borderRadius: "50%",
+                                                            width: "25px",
+                                                            height: "25px",
+                                                            cursor: "pointer",
+                                                            fontWeight: "bold",
+                                                            lineHeight: "1",
+                                                        }}
+                                                        title="Hapus file"
+                                                    >
+                                                        ✕
+                                                    </button>
+                                                    <div id="preview" style={{ width: "100%", height: "100%" }}>
+                                                        {previewFileKomen && previewFileKomen.type === "image" && (
+                                                            <img
+                                                                src={getFileUrl(previewFileKomen.src)}
+                                                                alt="Preview"
+                                                                style={{
+                                                                    maxWidth: "100%",
+                                                                    maxHeight: "100%",
+                                                                    objectFit: "contain"
+                                                                }}
+                                                            />
+                                                        )}
+                                                        {previewFileKomen && previewFileKomen.type === "video" && (
+                                                            <video
+                                                                ref={previewVideoRef}
+                                                                src={getFileUrl(previewFileKomen.src)}
+                                                                controls
+                                                                autoPlay
+                                                                loop
+                                                                style={{
+                                                                    maxWidth: "100%",
+                                                                    maxHeight: "100%",
+                                                                    objectFit: "contain",
+                                                                    backgroundColor: "black"
+                                                                }}
+                                                            />
+                                                        )}
+                                                        {previewFileKomen && previewFileKomen.type === "pdf" && (
+                                                            <embed
+                                                                src={getFileUrl(previewFileKomen.src)}
+                                                                type="application/pdf"
+                                                                className="pdf-preview"
+                                                                style={{
+                                                                    width: "100%",
+                                                                    height: "100%",
+                                                                    backgroundColor: "black"
+                                                                }}
+                                                            />
+                                                        )}
+                                                        {previewFileKomen && previewFileKomen.type === "other" && (
+                                                            <p style={{ color: "white", textAlign: "center" }}>
+                                                                File dipilih: {previewFileKomen.name}
+                                                            </p>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            )}
                                             <div className="input-group">
                                                 <input
                                                     type="text"
                                                     className="form-control komen"
                                                     placeholder="Tambah komentar..."
-                                                    value={newKomentar}
-                                                    onChange={(e) => setNewKomentar(e.target.value)}
+                                                    value={data.isi_komentar}
+                                                    onChange={(e) => setData("isi_komentar", e.target.value)}
                                                 />
-                                                <button className="btn btn-primary my-0" type="button" onClick={handleSubmit}>
+                                                <Role role={['rt', 'rw']}>
+                                                    <input
+                                                        ref={fileInputRef}
+                                                        type="file"
+                                                        id="fileInput"
+                                                        name="file"
+                                                        className="d-none"
+                                                        onChange={handleFileChange}
+                                                    />
+                                                    <button
+                                                        className="btn komen btn-primary my-0"
+                                                        type="button"
+                                                        onClick={() => document.getElementById('fileInput').click()}
+                                                        title="Masukkan Lampiran"
+                                                    >
+                                                        <i className="fas fa-paperclip"></i>
+                                                    </button>
+                                                </Role>
+                                                <button className="btn komen btn-primary my-0" type="button" onClick={handleSubmit}>
                                                     <i className="far fa-paper-plane"></i>
                                                 </button>
                                             </div>
@@ -2663,6 +3296,255 @@ export function TambahPengumuman({ tambahShow, onClose, onAdded, role }) {
                                     </div>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </>
+    )
+}
+
+export function DetailWarga({ selectedData, detailShow, onClose, userData }) {
+    if (!detailShow || !selectedData) return null
+
+    useEffect(() => {
+        const handleEsc = (e) => {
+            if (e.key === "Escape") {
+                onClose()
+            }
+        }
+
+        document.addEventListener("keydown", handleEsc)
+        return () => document.removeEventListener("keydown", handleEsc)
+    }, [onClose])
+
+    return (
+        <>
+            <div
+                className="modal fade show"
+                tabIndex="-1"
+                style={{ display: "block", backgroundColor: "rgba(0,0,0,0.5)" }}
+                onClick={onClose}
+            >
+                <div
+                    className="modal-dialog modal-xl modal-dialog-scrollable modal-dialog-centered"
+                    onClick={(e) => e.stopPropagation()}
+                >
+                    <div className="modal-content shadow border-0">
+                        <div className="modal-body kk d-block p-4">
+                            <div className="kk-header w-100">
+                                <div className="kk-header-main-title">
+                                    <h4>Detail Warga {userData?.rukun_tetangga
+                                        ? `RT ${userData?.rukun_tetangga?.nomor_rt}`
+                                        : `RW ${userData?.rw?.nomor_rw}`}
+                                    </h4>
+                                </div>
+                            </div>
+
+                            <div className="kk-info-grid mb-2">
+                                <div className="kk-info-item">
+                                    <p><strong>Nama Lengkap</strong> : {selectedData.nama ?? '-'}</p>
+                                    <p><strong>NIK</strong> : {selectedData.nik ?? '-'}</p>
+                                    <p><strong>No. KK</strong> : {selectedData.no_kk ?? '-'}</p>
+                                    <p><strong>Alamat</strong> : {selectedData.kartu_keluarga?.alamat ?? '-'}</p>
+                                    <p><strong>Jenis Kelamin</strong> : {selectedData.jenis_kelamin.charAt(0).toUpperCase() + selectedData.jenis_kelamin.slice(1) ?? '-'}</p>
+                                    <p><strong>Tempat Lahir</strong> : {selectedData.tempat_lahir ?? '-'}</p>
+                                    <p><strong>Tanggal Lahir</strong> : {formatTanggal(selectedData.tanggal_lahir) ?? '-'}</p>
+                                    <p><strong>Agama</strong> : {selectedData.agama ?? '-'}</p>
+                                    <p><strong>Pendidikan</strong> : {selectedData.pendidikan ?? '-'}</p>
+                                    <p><strong>Pekerjaan</strong> : {selectedData.pekerjaan ?? '-'}</p>
+                                    <p><strong>Status Perkawinan</strong> : {selectedData.status_perkawinan ?? '-'}</p>
+                                    <p><strong>Status Hubungan dalam Keluarga</strong> : {selectedData.status_hubungan_dalam_keluarga.charAt(0).toUpperCase() + selectedData.status_hubungan_dalam_keluarga.slice(1) ?? '-'}</p>
+                                    <p><strong>Golongan Darah</strong> : {selectedData.golongan_darah ?? '-'}</p>
+                                    <p><strong>Kewarganegaraan</strong> : {selectedData.kewarganegaraan ?? '-'}</p>
+                                    <p><strong>No Paspor</strong> : {selectedData.no_paspor ?? '-'}</p>
+                                    <p><strong>Tanggal Terbit Paspor</strong> : {formatTanggal(selectedData.tgl_terbit_paspor) ?? '-'}</p>
+                                    <p><strong>Tanggal Akhir Paspor</strong> : {formatTanggal(selectedData.tgl_berakhir_paspor) ?? '-'}</p>
+                                </div>
+                                <div className="kk-info-item">
+                                    <p><strong>No Paspor</strong> : {selectedData.no_kitas ?? '-'}</p>
+                                    <p><strong>Tanggal Terbit Paspor</strong> : {formatTanggal(selectedData.tgl_terbit_kitas) ?? '-'}</p>
+                                    <p><strong>Tanggal Akhir Paspor</strong> : {formatTanggal(selectedData.tgl_berakhir_kitas) ?? '-'}</p>
+                                    <p><strong>No Paspor</strong> : {selectedData.no_kitap ?? '-'}</p>
+                                    <p><strong>Tanggal Terbit Paspor</strong> : {formatTanggal(selectedData.tgl_terbit_kitap) ?? '-'}</p>
+                                    <p><strong>Tanggal Akhir Paspor</strong> : {formatTanggal(selectedData.tgl_berakhir_kitap) ?? '-'}</p>
+                                    <p><strong>Nama Ayah</strong> : {selectedData.nama_ayah ?? '-'}</p>
+                                    <p><strong>Nama Ibu</strong> : {selectedData.nama_ibu ?? '-'}</p>
+                                    <p><strong>Alamat Asal</strong> : {selectedData.alamat_asal ?? '-'}</p>
+                                    <p><strong>Alamat Domisili</strong> : {selectedData.alamat_domisili ?? '-'}</p>
+                                    <p><strong>Tanggal Mulai Tinggal</strong> : {formatTanggal(selectedData.tanggal_mulai_tinggal) ?? '-'}</p>
+                                    <p><strong>Tujuan Pindah</strong> : {selectedData.tujuan_pindah ?? '-'}</p>
+                                    <p><strong>Status Warga</strong> : {selectedData.status_warga.charAt(0).toUpperCase() + selectedData.status_warga.slice(1) ?? '-'}</p>
+                                    <p><strong>RT/RW</strong> :{" "}
+                                        {selectedData.kartu_keluarga?.rukun_tetangga?.nomor_rt ?? '-'}/{selectedData.kartu_keluarga?.rw?.nomor_rw ?? '-'}
+                                    </p>
+                                </div>
+                            </div>{console.log(selectedData.kartu_keluarga)}
+
+                            {/* <hr className="my-2" style={{ borderTop: "2px solid #e0e0e0", width: "100%" }} />
+
+                            <h6 className="fw-bold text-center mb-3 mt-2">
+                                DAFTAR ANGGOTA KELUARGA
+                            </h6>
+                            <div className="table-responsive">
+                                <table className="table table-bordered table-striped table-sm align-middle">
+                                    <thead className="table-success text-center small">
+                                        <tr>
+                                            <th rowSpan="2">No.</th>
+                                            <th rowSpan="2">Nama Lengkap</th>
+                                            <th rowSpan="2">NIK</th>
+                                            <th rowSpan="2">Jenis Kelamin</th>
+                                            <th colSpan="2">Tempat, Tanggal Lahir</th>
+                                            <th rowSpan="2">Agama</th>
+                                            <th rowSpan="2">Pendidikan</th>
+                                            <th rowSpan="2">Jenis Pekerjaan</th>
+                                            <th rowSpan="2">Golongan Darah</th>
+                                            <th rowSpan="2">Status Perkawinan</th>
+                                            <th rowSpan="2">Status Hubungan Dalam Keluarga</th>
+                                            <th rowSpan="2">Kewarganegaraan</th>
+                                            <th colSpan="2">Dokumen Imigrasi</th>
+                                            <th colSpan="2">Nama Orang Tua</th>
+                                            <th rowSpan="2">Status Warga</th>
+                                        </tr>
+                                        <tr>
+                                            <th>Tempat Lahir</th>
+                                            <th>Tanggal Lahir</th>
+                                            <th>No. Paspor</th>
+                                            <th>No. KITAS/KITAP</th>
+                                            <th>Nama Ayah</th>
+                                            <th>Nama Ibu</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="small">
+                                        {selectedData?.warga && selectedData.warga.length > 0 ? (
+                                            selectedData.warga
+                                                .sort((a, b) => {
+                                                    const getRank = (hubungan) => {
+                                                        if (hubungan === "Kepala Keluarga") return 2
+                                                        if (hubungan === "Istri") return 1
+                                                        return 0
+                                                    }
+                                                    return getRank(b.status_hubungan_dalam_keluarga) - getRank(a.status_hubungan_dalam_keluarga)
+                                                })
+                                                .map((data, index) => (
+                                                    <tr key={index}>
+                                                        <td className="text-center">{index + 1}</td>
+                                                        <td className="text-center">{data.nama ?? '-'}</td>
+                                                        <td className="text-center">{data.nik ?? '-'}</td>
+                                                        <td className="text-center">{data.jenis_kelamin.charAt(0).toUpperCase() + data.jenis_kelamin.slice(1) ?? '-'}</td>
+                                                        <td>{data.tempat_lahir ?? '-'}</td>
+                                                        <td className="text-center">
+                                                            {formatTanggal(data.tanggal_lahir)}
+                                                        </td>
+                                                        <td className="text-center">{data.agama ?? '-'}</td>
+                                                        <td className="text-center">{data.pendidikan ?? '-'}</td>
+                                                        <td className="text-center">{data.pekerjaan ?? '-'}</td>
+                                                        <td className="text-center">{data.golongan_darah ?? '-'}</td>
+                                                        <td className="text-center">{data.status_perkawinan.charAt(0).toUpperCase() + data.status_perkawinan.slice(1) ?? '-'}</td>
+                                                        <td className="text-center">{data.status_hubungan_dalam_keluarga.charAt(0).toUpperCase() + data.status_hubungan_dalam_keluarga.slice(1) ?? '-'}</td>
+                                                        <td className="text-center">{data.kewarganegaraan ?? 'WNI'}</td>
+                                                        <td className="text-center">{data.no_paspor ?? '-'}</td>
+                                                        <td className="text-center">
+                                                            {`${data.no_kitas ?? '-'} / ${data.no_kitap ?? '-'}`}
+                                                        </td>
+                                                        <td className="text-center">{data.nama_ayah ?? '-'}</td>
+                                                        <td className="text-center">{data.nama_ibu ?? '-'}</td>
+                                                        <td className="text-center">{data.status_warga.charAt(0).toUpperCase() + data.status_warga.slice(1) ?? '-'}</td>
+                                                    </tr>
+                                                ))
+                                        ) : (
+                                            <tr>
+                                                <td colSpan="19" className="text-center text-muted p-4">
+                                                    Tidak ada anggota keluarga yang terdaftar untuk Kartu Keluarga ini.
+                                                </td>
+                                            </tr>
+                                        )}
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div className="kk-document-section mt-1">
+                                <h6 className="fw-bold mb-3">Unggah / Perbarui Dokumen KK</h6>
+
+                                <form onSubmit={handleUpload} className="input-group mb-2 d-flex">
+                                    <input
+                                        type="file"
+                                        name="kk_file"
+                                        className="form-control"
+                                        accept=".pdf, .jpg, .jpeg, .png"
+                                        onChange={handleFileChange}
+                                    />
+                                    <button
+                                        className="btn btn-success m-0"
+                                        type="submit"
+                                        disabled={uploading}
+                                        style={{ borderRadius: '0 0.35rem 0.35rem 0' }}
+                                    >
+                                        {uploading ? "Mengunggah..." : "Unggah"}
+                                    </button>
+                                </form>
+                                <small className="form-text text-muted">
+                                    Format: PDF, JPG, JPEG, PNG (maks. 5MB)
+                                </small>
+
+                                {previewUrl && (
+                                    <div className="mt-3">
+                                        <p className="fw-bold">Preview:</p>
+                                        {isPdf ? (
+                                            <iframe
+                                                src={previewUrl}
+                                                style={{ width: "100%", height: "400px" }}
+                                            />
+                                        ) : (
+                                            <img
+                                                src={previewUrl}
+                                                alt="Preview Dokumen"
+                                                style={{
+                                                    maxWidth: "100%",
+                                                    borderRadius: "10px",
+                                                    boxShadow: "0 0 5px rgba(0,0,0,0.2)",
+                                                }}
+                                            />
+                                        )}
+                                    </div>
+                                )}
+
+                                {selectedData.foto_kk && (
+                                    <div className="mt-4">
+                                        <h6>Dokumen Saat Ini:</h6>
+                                        <div className="d-flex align-items-center gap-3">
+                                            <button
+                                                type="button"
+                                                className="btn btn-outline-primary"
+                                                onClick={() =>
+                                                    setViewDoc(
+                                                        `/storage/${selectedData.foto_kk}`
+                                                    )
+                                                }
+                                            >
+                                                <i className="fas fa-eye me-1"></i> Lihat Dokumen
+                                            </button>
+                                            <button
+                                                type="button"
+                                                className="btn btn-outline-danger"
+                                                onClick={handleDelete}
+                                            >
+                                                <i className="fas fa-trash me-1"></i> Hapus
+                                            </button>
+                                        </div>
+                                    </div>
+                                )}
+                            </div> */}
+                        </div>
+
+                        <div className="modal-footer bg-light">
+                            <button
+                                type="button"
+                                className="btn btn-outline-success"
+                                onClick={onClose}
+                            >
+                                <i className="bi bi-check2-circle"></i> Tutup
+                            </button>
                         </div>
                     </div>
                 </div>
