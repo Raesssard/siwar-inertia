@@ -22,6 +22,7 @@ use App\Http\Controllers\Rt\Rt_transaksiController;
 use App\Http\Controllers\Rt\Rt_wargaController;
 use App\Http\Controllers\Rt\RtIuranController;
 use App\Http\Controllers\Rw\RwKartuKeluargaController;
+use App\Http\Controllers\Rw\RwPengumumanController;
 use App\Http\Controllers\Rw\RwRukunTetanggaController;
 use App\Http\Controllers\Rw\RwWargaController;
 use App\Models\Rw;
@@ -77,6 +78,12 @@ Route::middleware(['auth'])->group(function () {
         Route::resource('rt', RwRukunTetanggaController::class)->except(['create', 'edit', 'show']);
         Route::resource('warga', RwWargaController::class);
         Route::resource('kartu_keluarga', RwKartuKeluargaController::class);
+        Route::resource('pengumuman', RwPengumumanController::class);
+        
+        Route::get('/pengumuman/{id}/export-pdf', [RwPengumumanController::class, 'exportPDF'])
+            ->name('pengumuman.export.pdf');
+        Route::post('/pengumuman/{id}/komentar', [RwPengumumanController::class, 'komen'])
+            ->name('pengumuman.komentar.komen');
 
         Route::post('kartu_keluarga/{no_kk}/upload-foto', [RwKartuKeluargaController::class, 'uploadFoto'])
         ->name('kartu_keluarga.upload');
