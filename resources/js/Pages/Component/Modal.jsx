@@ -1756,11 +1756,6 @@ export function DetailKK({ selectedData, detailShow, onClose, role }) {
                     <div className="modal-content shadow border-0">
                         <div className="modal-header bg-success text-white">
                             <h5 className="modal-title text-white">Detail Kartu Keluarga</h5>
-                            <button
-                                type="button"
-                                className="btn-close btn-close-white"
-                                onClick={onClose}
-                            ></button>
                         </div>
 
                         <div className="modal-body kk d-block p-4">
@@ -3085,6 +3080,255 @@ export function TambahPengumuman({ tambahShow, onClose, onAdded, role }) {
                                     </div>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </>
+    )
+}
+
+export function DetailWarga({ selectedData, detailShow, onClose, userData }) {
+    if (!detailShow || !selectedData) return null
+
+    useEffect(() => {
+        const handleEsc = (e) => {
+            if (e.key === "Escape") {
+                onClose()
+            }
+        }
+
+        document.addEventListener("keydown", handleEsc)
+        return () => document.removeEventListener("keydown", handleEsc)
+    }, [onClose])
+
+    return (
+        <>
+            <div
+                className="modal fade show"
+                tabIndex="-1"
+                style={{ display: "block", backgroundColor: "rgba(0,0,0,0.5)" }}
+                onClick={onClose}
+            >
+                <div
+                    className="modal-dialog modal-xl modal-dialog-scrollable modal-dialog-centered"
+                    onClick={(e) => e.stopPropagation()}
+                >
+                    <div className="modal-content shadow border-0">
+                        <div className="modal-body kk d-block p-4">
+                            <div className="kk-header w-100">
+                                <div className="kk-header-main-title">
+                                    <h4>Detail Warga {userData?.rukun_tetangga
+                                        ? `RT ${userData?.rukun_tetangga?.nomor_rt}`
+                                        : `RW ${userData?.rw?.nomor_rw}`}
+                                    </h4>
+                                </div>
+                            </div>
+
+                            <div className="kk-info-grid mb-2">
+                                <div className="kk-info-item">
+                                    <p><strong>Nama Lengkap</strong> : {selectedData.nama ?? '-'}</p>
+                                    <p><strong>NIK</strong> : {selectedData.nik ?? '-'}</p>
+                                    <p><strong>No. KK</strong> : {selectedData.no_kk ?? '-'}</p>
+                                    <p><strong>Alamat</strong> : {selectedData.kartu_keluarga?.alamat ?? '-'}</p>
+                                    <p><strong>Jenis Kelamin</strong> : {selectedData.jenis_kelamin.charAt(0).toUpperCase() + selectedData.jenis_kelamin.slice(1) ?? '-'}</p>
+                                    <p><strong>Tempat Lahir</strong> : {selectedData.tempat_lahir ?? '-'}</p>
+                                    <p><strong>Tanggal Lahir</strong> : {formatTanggal(selectedData.tanggal_lahir) ?? '-'}</p>
+                                    <p><strong>Agama</strong> : {selectedData.agama ?? '-'}</p>
+                                    <p><strong>Pendidikan</strong> : {selectedData.pendidikan ?? '-'}</p>
+                                    <p><strong>Pekerjaan</strong> : {selectedData.pekerjaan ?? '-'}</p>
+                                    <p><strong>Status Perkawinan</strong> : {selectedData.status_perkawinan ?? '-'}</p>
+                                    <p><strong>Status Hubungan dalam Keluarga</strong> : {selectedData.status_hubungan_dalam_keluarga.charAt(0).toUpperCase() + selectedData.status_hubungan_dalam_keluarga.slice(1) ?? '-'}</p>
+                                    <p><strong>Golongan Darah</strong> : {selectedData.golongan_darah ?? '-'}</p>
+                                    <p><strong>Kewarganegaraan</strong> : {selectedData.kewarganegaraan ?? '-'}</p>
+                                    <p><strong>No Paspor</strong> : {selectedData.no_paspor ?? '-'}</p>
+                                    <p><strong>Tanggal Terbit Paspor</strong> : {formatTanggal(selectedData.tgl_terbit_paspor) ?? '-'}</p>
+                                    <p><strong>Tanggal Akhir Paspor</strong> : {formatTanggal(selectedData.tgl_berakhir_paspor) ?? '-'}</p>
+                                </div>
+                                <div className="kk-info-item">
+                                    <p><strong>No Paspor</strong> : {selectedData.no_kitas ?? '-'}</p>
+                                    <p><strong>Tanggal Terbit Paspor</strong> : {formatTanggal(selectedData.tgl_terbit_kitas) ?? '-'}</p>
+                                    <p><strong>Tanggal Akhir Paspor</strong> : {formatTanggal(selectedData.tgl_berakhir_kitas) ?? '-'}</p>
+                                    <p><strong>No Paspor</strong> : {selectedData.no_kitap ?? '-'}</p>
+                                    <p><strong>Tanggal Terbit Paspor</strong> : {formatTanggal(selectedData.tgl_terbit_kitap) ?? '-'}</p>
+                                    <p><strong>Tanggal Akhir Paspor</strong> : {formatTanggal(selectedData.tgl_berakhir_kitap) ?? '-'}</p>
+                                    <p><strong>Nama Ayah</strong> : {selectedData.nama_ayah ?? '-'}</p>
+                                    <p><strong>Nama Ibu</strong> : {selectedData.nama_ibu ?? '-'}</p>
+                                    <p><strong>Alamat Asal</strong> : {selectedData.alamat_asal ?? '-'}</p>
+                                    <p><strong>Alamat Domisili</strong> : {selectedData.alamat_domisili ?? '-'}</p>
+                                    <p><strong>Tanggal Mulai Tinggal</strong> : {formatTanggal(selectedData.tanggal_mulai_tinggal) ?? '-'}</p>
+                                    <p><strong>Tujuan Pindah</strong> : {selectedData.tujuan_pindah ?? '-'}</p>
+                                    <p><strong>Status Warga</strong> : {selectedData.status_warga.charAt(0).toUpperCase() + selectedData.status_warga.slice(1) ?? '-'}</p>
+                                    <p><strong>RT/RW</strong> :{" "}
+                                        {selectedData.kartu_keluarga?.rukun_tetangga?.nomor_rt ?? '-'}/{selectedData.kartu_keluarga?.rw?.nomor_rw ?? '-'}
+                                    </p>
+                                </div>
+                            </div>{console.log(selectedData.kartu_keluarga)}
+
+                            {/* <hr className="my-2" style={{ borderTop: "2px solid #e0e0e0", width: "100%" }} />
+
+                            <h6 className="fw-bold text-center mb-3 mt-2">
+                                DAFTAR ANGGOTA KELUARGA
+                            </h6>
+                            <div className="table-responsive">
+                                <table className="table table-bordered table-striped table-sm align-middle">
+                                    <thead className="table-success text-center small">
+                                        <tr>
+                                            <th rowSpan="2">No.</th>
+                                            <th rowSpan="2">Nama Lengkap</th>
+                                            <th rowSpan="2">NIK</th>
+                                            <th rowSpan="2">Jenis Kelamin</th>
+                                            <th colSpan="2">Tempat, Tanggal Lahir</th>
+                                            <th rowSpan="2">Agama</th>
+                                            <th rowSpan="2">Pendidikan</th>
+                                            <th rowSpan="2">Jenis Pekerjaan</th>
+                                            <th rowSpan="2">Golongan Darah</th>
+                                            <th rowSpan="2">Status Perkawinan</th>
+                                            <th rowSpan="2">Status Hubungan Dalam Keluarga</th>
+                                            <th rowSpan="2">Kewarganegaraan</th>
+                                            <th colSpan="2">Dokumen Imigrasi</th>
+                                            <th colSpan="2">Nama Orang Tua</th>
+                                            <th rowSpan="2">Status Warga</th>
+                                        </tr>
+                                        <tr>
+                                            <th>Tempat Lahir</th>
+                                            <th>Tanggal Lahir</th>
+                                            <th>No. Paspor</th>
+                                            <th>No. KITAS/KITAP</th>
+                                            <th>Nama Ayah</th>
+                                            <th>Nama Ibu</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="small">
+                                        {selectedData?.warga && selectedData.warga.length > 0 ? (
+                                            selectedData.warga
+                                                .sort((a, b) => {
+                                                    const getRank = (hubungan) => {
+                                                        if (hubungan === "Kepala Keluarga") return 2
+                                                        if (hubungan === "Istri") return 1
+                                                        return 0
+                                                    }
+                                                    return getRank(b.status_hubungan_dalam_keluarga) - getRank(a.status_hubungan_dalam_keluarga)
+                                                })
+                                                .map((data, index) => (
+                                                    <tr key={index}>
+                                                        <td className="text-center">{index + 1}</td>
+                                                        <td className="text-center">{data.nama ?? '-'}</td>
+                                                        <td className="text-center">{data.nik ?? '-'}</td>
+                                                        <td className="text-center">{data.jenis_kelamin.charAt(0).toUpperCase() + data.jenis_kelamin.slice(1) ?? '-'}</td>
+                                                        <td>{data.tempat_lahir ?? '-'}</td>
+                                                        <td className="text-center">
+                                                            {formatTanggal(data.tanggal_lahir)}
+                                                        </td>
+                                                        <td className="text-center">{data.agama ?? '-'}</td>
+                                                        <td className="text-center">{data.pendidikan ?? '-'}</td>
+                                                        <td className="text-center">{data.pekerjaan ?? '-'}</td>
+                                                        <td className="text-center">{data.golongan_darah ?? '-'}</td>
+                                                        <td className="text-center">{data.status_perkawinan.charAt(0).toUpperCase() + data.status_perkawinan.slice(1) ?? '-'}</td>
+                                                        <td className="text-center">{data.status_hubungan_dalam_keluarga.charAt(0).toUpperCase() + data.status_hubungan_dalam_keluarga.slice(1) ?? '-'}</td>
+                                                        <td className="text-center">{data.kewarganegaraan ?? 'WNI'}</td>
+                                                        <td className="text-center">{data.no_paspor ?? '-'}</td>
+                                                        <td className="text-center">
+                                                            {`${data.no_kitas ?? '-'} / ${data.no_kitap ?? '-'}`}
+                                                        </td>
+                                                        <td className="text-center">{data.nama_ayah ?? '-'}</td>
+                                                        <td className="text-center">{data.nama_ibu ?? '-'}</td>
+                                                        <td className="text-center">{data.status_warga.charAt(0).toUpperCase() + data.status_warga.slice(1) ?? '-'}</td>
+                                                    </tr>
+                                                ))
+                                        ) : (
+                                            <tr>
+                                                <td colSpan="19" className="text-center text-muted p-4">
+                                                    Tidak ada anggota keluarga yang terdaftar untuk Kartu Keluarga ini.
+                                                </td>
+                                            </tr>
+                                        )}
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div className="kk-document-section mt-1">
+                                <h6 className="fw-bold mb-3">Unggah / Perbarui Dokumen KK</h6>
+
+                                <form onSubmit={handleUpload} className="input-group mb-2 d-flex">
+                                    <input
+                                        type="file"
+                                        name="kk_file"
+                                        className="form-control"
+                                        accept=".pdf, .jpg, .jpeg, .png"
+                                        onChange={handleFileChange}
+                                    />
+                                    <button
+                                        className="btn btn-success m-0"
+                                        type="submit"
+                                        disabled={uploading}
+                                        style={{ borderRadius: '0 0.35rem 0.35rem 0' }}
+                                    >
+                                        {uploading ? "Mengunggah..." : "Unggah"}
+                                    </button>
+                                </form>
+                                <small className="form-text text-muted">
+                                    Format: PDF, JPG, JPEG, PNG (maks. 5MB)
+                                </small>
+
+                                {previewUrl && (
+                                    <div className="mt-3">
+                                        <p className="fw-bold">Preview:</p>
+                                        {isPdf ? (
+                                            <iframe
+                                                src={previewUrl}
+                                                style={{ width: "100%", height: "400px" }}
+                                            />
+                                        ) : (
+                                            <img
+                                                src={previewUrl}
+                                                alt="Preview Dokumen"
+                                                style={{
+                                                    maxWidth: "100%",
+                                                    borderRadius: "10px",
+                                                    boxShadow: "0 0 5px rgba(0,0,0,0.2)",
+                                                }}
+                                            />
+                                        )}
+                                    </div>
+                                )}
+
+                                {selectedData.foto_kk && (
+                                    <div className="mt-4">
+                                        <h6>Dokumen Saat Ini:</h6>
+                                        <div className="d-flex align-items-center gap-3">
+                                            <button
+                                                type="button"
+                                                className="btn btn-outline-primary"
+                                                onClick={() =>
+                                                    setViewDoc(
+                                                        `/storage/${selectedData.foto_kk}`
+                                                    )
+                                                }
+                                            >
+                                                <i className="fas fa-eye me-1"></i> Lihat Dokumen
+                                            </button>
+                                            <button
+                                                type="button"
+                                                className="btn btn-outline-danger"
+                                                onClick={handleDelete}
+                                            >
+                                                <i className="fas fa-trash me-1"></i> Hapus
+                                            </button>
+                                        </div>
+                                    </div>
+                                )}
+                            </div> */}
+                        </div>
+
+                        <div className="modal-footer bg-light">
+                            <button
+                                type="button"
+                                className="btn btn-outline-success"
+                                onClick={onClose}
+                            >
+                                <i className="bi bi-check2-circle"></i> Tutup
+                            </button>
                         </div>
                     </div>
                 </div>

@@ -1,8 +1,9 @@
 import Layout from "@/Layouts/Layout"
 import { Head, Link, useForm, usePage } from "@inertiajs/react"
-import React from "react"
+import React, { useState } from "react"
 import { FilterWarga } from "../Component/Filter"
 import { formatRupiah, formatTanggal } from "../Component/GetPropRole"
+import { DetailWarga } from "../Component/Modal"
 
 export default function DataWarga() {
     const {
@@ -13,10 +14,18 @@ export default function DataWarga() {
     } = usePage().props
     const { props } = usePage()
     const role = props.auth?.currentRole
+    const user = props.auth?.user
     const { get, data, setData } = useForm({
         search: '',
         jenis_kelamin: ''
     })
+    const [showModal, setShowModal] = useState(false)
+    const [selected, setSelected] = useState(null)
+
+    const modalDetail = (item) => {
+        setSelected(item)
+        setShowModal(true)
+    }
 
     const filter = (e) => {
         e.preventDefault()
@@ -85,7 +94,7 @@ export default function DataWarga() {
                                         </td>
                                         <td className="text-center">{item.kartu_keluarga.rukun_tetangga.nomor_rt}</td>
                                         <td className="text-center">
-                                            <button className="btn btn-success btn-sm" onClick={() => console.log("should nampilin detail warga")}>
+                                            <button className="btn btn-success btn-sm" onClick={() => modalDetail(item)}>
                                                 <i className="fas fa-info"></i>
                                             </button>
                                         </td>
@@ -128,6 +137,12 @@ export default function DataWarga() {
                         </ul>
                     </div>
                 )}
+                <DetailWarga
+                    selectedData={selected}
+                    detailShow={showModal}
+                    onClose={() => setShowModal(false)}
+                    userData={user}
+                />
             </div>
         </Layout>
     )
