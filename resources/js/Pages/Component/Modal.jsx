@@ -679,43 +679,95 @@ export function EditRolePermissionModal({
     onClose,
 }) {
     return (
-        <div className="modal fade show" style={{ display: "block", backgroundColor: "rgba(0,0,0,0.5)" }}>
-            <div className="modal-dialog modal-lg modal-dialog-centered">
-                <div className="modal-content modal-custom">
-                    <div className="modal-header">
-                        <h5>Atur Permissions untuk Role: <strong>{role.name}</strong></h5>
-                        <button type="button" className="btn-close" onClick={onClose} />
+        <div
+            className="modal fade show"
+            style={{ display: "block", backgroundColor: "rgba(0,0,0,0.5)" }}
+        >
+            <div className="modal-dialog modal-xl modal-dialog-centered">
+                <div className="modal-content shadow-lg border-0 rounded-3">
+                    {/* Header */}
+                    <div className="modal-header bg-primary text-white">
+                        <h5 className="modal-title">
+                            Atur Permissions untuk Role:{" "}
+                            <strong className="text-warning">{role.name}</strong>
+                        </h5>
+                        <button
+                            type="button"
+                            className="btn-close btn-close-white"
+                            onClick={onClose}
+                        />
                     </div>
-                    <div className="modal-body">
-                        <div className="row">
-                            {permissions.length ? (
-                                permissions.map((perm) => (
-                                    <div key={perm.id} className="col-md-4 mb-2">
-                                        <label className="d-flex align-items-center">
+
+                    {/* Body */}
+                    <div
+                        className="modal-body"
+                        style={{
+                            maxHeight: "70vh",
+                            overflowY: "auto",
+                            backgroundColor: "#f9fafb",
+                            padding: "20px 25px",
+                        }}
+                    >
+                        {permissions.length ? (
+                            <div className="row g-3">
+                                {permissions.map((perm) => (
+                                    <div key={perm.id} className="col-12 col-sm-6 col-md-4 col-lg-3">
+                                        <label
+                                            className="d-flex align-items-center p-2 rounded border bg-white shadow-sm hover-shadow-sm"
+                                            style={{
+                                                transition: "all 0.2s ease",
+                                                cursor: "pointer",
+                                            }}
+                                        >
                                             <input
                                                 type="checkbox"
                                                 checked={selectedPerms.includes(perm.name)}
                                                 onChange={() => togglePermission(perm.name)}
                                                 className="form-check-input me-2"
                                             />
-                                            {perm.name}
+                                            <span
+                                                className="text-dark"
+                                                style={{
+                                                    fontSize: "0.9rem",
+                                                    wordBreak: "break-word",
+                                                }}
+                                            >
+                                                {perm.name}
+                                            </span>
                                         </label>
                                     </div>
-                                ))
-                            ) : (
-                                <div className="text-center text-muted">Tidak ada permission tersedia.</div>
-                            )}
-                        </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="text-center text-muted py-4">
+                                Tidak ada permission tersedia.
+                            </div>
+                        )}
                     </div>
-                    <div className="modal-footer">
-                        <button type="button" className="btn btn-secondary" onClick={onClose}>Batal</button>
-                        <button type="button" className="btn btn-primary" onClick={handleSave}>Simpan Permissions</button>
+
+                    {/* Footer */}
+                    <div className="modal-footer border-top bg-light">
+                        <button
+                            type="button"
+                            className="btn btn-secondary px-4"
+                            onClick={onClose}
+                        >
+                            Batal
+                        </button>
+                        <button
+                            type="button"
+                            className="btn btn-primary px-4"
+                            onClick={handleSave}
+                        >
+                            Simpan Permissions
+                        </button>
                     </div>
                 </div>
             </div>
         </div>
-    )
+    );
 }
+
 
 export function AddPermissionModal({ form, setForm, handleAdd, onClose }) {
     return (

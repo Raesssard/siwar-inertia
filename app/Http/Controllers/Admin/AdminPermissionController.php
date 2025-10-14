@@ -18,7 +18,7 @@ class AdminPermissionController extends Controller
             $query->where('name', 'like', "%{$request->keyword}%");
         }
 
-        $permissions = $query->orderBy('id', 'desc')->paginate(10)->withQueryString();
+        $permissions = $query->orderBy('id', 'asc')->paginate(15)->withQueryString();
 
         return Inertia::render('Admin/Permission', [
             'permissions' => $permissions,

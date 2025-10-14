@@ -19,107 +19,107 @@ class PermissionSeeder extends Seeder
                 'dashboard.admin',
 
                 // RW management
-                'rw.view', 'create.rw', 'edit.rw', 'delete.rw', 'toggle.rw',
+                'view.rw', 'create.rw', 'edit.rw', 'delete.rw', 'toggle.rw',
 
                 // RT management
-                'rt.view', 'create.rt', 'edit.rt', 'delete.rt', 'toggle.rt',
+                'view.rt', 'create.rt', 'edit.rt', 'delete.rt', 'toggle.rt',
 
                 // Kategori & Golongan
-                'kategori_golongan.view', 'create.kategori_golongan', 'edit.kategori_golongan', 'delete.kategori_golongan',
+                'view.kategori_golongan', 'create.kategori_golongan', 'edit.kategori_golongan', 'delete.kategori_golongan',
 
                 // Role management
-                'role.view', 'create.role', 'edit.role', 'delete.role', 'assign.permissions.to.role',
+                'view.role', 'create.role', 'edit.role', 'delete.role', 'assign.permissions.to.role',
 
                 // Permission management
-                'permission.view', 'create.permission', 'edit.permission', 'delete.permission',
+                'view.permission', 'create.permission', 'edit.permission', 'delete.permission',
             ],
 
             'rw' => [
                 'dashboard.rw',
 
                 // RT
-                'rt.view', 'create.rt', 'edit.rt', 'delete.rt', 'toggle.rt',
+                'view.rt', 'create.rt', 'edit.rt', 'delete.rt', 'toggle.rt',
 
                 // Warga & KK
-                'warga.view', 'create.warga', 'edit.warga', 'delete.warga',
-                'kartu_keluarga.view', 'create.kartu_keluarga', 'edit.kartu_keluarga', 'delete.kartu_keluarga',
+                'view.warga', 'create.warga', 'edit.warga', 'delete.warga',
+                'view.kartu_keluarga', 'create.kartu_keluarga', 'edit.kartu_keluarga', 'delete.kartu_keluarga',
 
                 // Pengumuman
-                'pengumuman.view', 'create.rwpengumuman', 'edit.rwpengumuman', 'delete.rwpengumuman', 'export.pengumuman',
+                'view.pengumuman', 'create.rwpengumuman', 'edit.rwpengumuman', 'delete.rwpengumuman', 'export.pengumuman',
 
                 // Pengaduan
-                'pengaduan.view', 'respond.pengaduan', 'confirm.pengaduan',
+                'view.pengaduan', 'respond.pengaduan', 'confirm.pengaduan',
 
                 // Iuran
-                'iuran.view', 'create.iuran', 'edit.iuran', 'delete.iuran', 'export.iuran',
+                'view.iuran', 'create.iuran', 'edit.iuran', 'delete.iuran', 'export.iuran',
 
                 // Tagihan
-                'tagihan.view', 'delete.tagihan', 'export.tagihan',
+                'view.tagihan', 'delete.tagihan', 'export.tagihan',
 
                 // Transaksi
-                'transaksi.view', 'create.transaksi', 'edit.transaksi', 'delete.transaksi', 'export.transaksi',
+                'view.transaksi', 'create.transaksi', 'edit.transaksi', 'delete.transaksi', 'export.transaksi',
             ],
 
             'rt' => [
                 'dashboard.rt',
 
                 // Warga & KK
-                'warga.view',
-                'kartu_keluarga.view',
+                'view.warga',
+                'view.kartu_keluarga',
 
                 // Pengumuman
-                'pengumuman.view', 'create.pengumuman', 'edit.pengumuman', 'delete.pengumuman', 'export.pengumuman',
+                'view.pengumuman', 'create.pengumuman', 'edit.pengumuman', 'delete.pengumuman', 'export.pengumuman',
 
                 // Pengaduan
-                'pengaduan.view', 'respond.pengaduan',
+                'view.pengaduan', 'respond.pengaduan',
 
                 // Iuran
-                'iuran.view', 'export.iuran',
+                'view.iuran', 'export.iuran',
 
                 // Tagihan
-                'tagihan.view', 'export.tagihan',
+                'view.tagihan', 'export.tagihan',
 
                 // Transaksi
-                'transaksi.view', 'export.transaksi',
+                'view.transaksi', 'export.transaksi',
             ],
 
             'warga' => [
                 'dashboard.warga',
 
                 // Pengumuman & Pengaduan
-                'pengumuman.view',
-                'pengaduan.view', 'create.pengaduan', 'edit.pengaduan', 'delete.pengaduan', 'comment.pengaduan',
+                'view.pengumuman',
+                'view.pengaduan', 'create.pengaduan', 'edit.pengaduan', 'delete.pengaduan', 'comment.pengaduan',
 
                 // KK, Tagihan, Transaksi
-                'kartu_keluarga.view',
-                'tagihan.view',
-                'transaksi.view',
+                'view.kartu_keluarga',
+                'view.tagihan',
+                'view.transaksi',
             ],
 
             'sekretaris' => [
                 // RT management
-                'rt.view', 'create.rt', 'edit.rt', 'delete.rt', 'toggle.rt',
+                'view.rt', 'create.rt', 'edit.rt', 'delete.rt', 'toggle.rt',
 
                 // Warga & KK
-                'warga.view', 'create.warga', 'edit.warga', 'delete.warga',
-                'kartu_keluarga.view', 'create.kartu_keluarga', 'edit.kartu_keluarga', 'delete.kartu_keluarga',
+                'view.warga', 'create.warga', 'edit.warga', 'delete.warga',
+                'view.kartu_keluarga', 'create.kartu_keluarga', 'edit.kartu_keluarga', 'delete.kartu_keluarga',
 
                 // Pengumuman RW
-                'pengumuman.view', 'create.rwpengumuman', 'edit.rwpengumuman', 'delete.rwpengumuman', 'export.pengumuman',
+                'view.pengumuman', 'create.rwpengumuman', 'edit.rwpengumuman', 'delete.rwpengumuman', 'export.pengumuman',
 
                 // Pengaduan
-                'pengaduan.view', 'respond.pengaduan', 'confirm.pengaduan',
+                'view.pengaduan', 'respond.pengaduan', 'confirm.pengaduan',
             ],
 
             'bendahara' => [
                 // Iuran
-                'iuran.view', 'create.iuran', 'edit.iuran', 'delete.iuran', 'export.iuran',
+                'view.iuran', 'create.iuran', 'edit.iuran', 'delete.iuran', 'export.iuran',
 
                 // Tagihan
-                'tagihan.view', 'delete.tagihan', 'export.tagihan',
+                'view.tagihan', 'delete.tagihan', 'export.tagihan',
 
                 // Transaksi
-                'transaksi.view', 'create.transaksi', 'edit.transaksi', 'delete.transaksi', 'export.transaksi',
+                'view.transaksi', 'create.transaksi', 'edit.transaksi', 'delete.transaksi', 'export.transaksi',
             ],
         ];
 
