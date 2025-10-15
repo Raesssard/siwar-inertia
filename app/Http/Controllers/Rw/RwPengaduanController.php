@@ -4,138 +4,142 @@ namespace App\Http\Controllers\Rw;
 
 use App\Http\Controllers\Controller;
 use App\Models\Pengaduan;
-use App\Models\PengaduanKomentar;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
+use Inertia\Inertia;
 
 class RwPengaduanController extends Controller
 {
     public function index(Request $request)
     {
-        $title = ' Daftar Pengaduan Warga';
+        $title = 'Pengaduan';
         $user = Auth::user();
+        $rw = $user->rw;
 
-        $pengaduan_rw = $user->rw->nomor_rw;
+        $tahun = $request->input('tahun');
+        $bulan = $request->input('bulan');
+        $search = $request->input('search');
+        $kategori = $request->input('kategori');
 
-        $pengaduan_rw_saya = Pengaduan::WhereHas('warga.kartuKeluarga.rw', function ($aduan) use ($pengaduan_rw) {
-            $aduan->where('konfirmasi_rw', '!=', 'belum')->where('nomor_rw', $pengaduan_rw);
-        });
+        // 🔹 Ambil SEMUA pengaduan di wilayah RW ini (baik RT maupun RW)
+        $pengaduan = Pengaduan::query()
+            ->whereHas('warga.kartuKeluarga.rw', fn($q) => $q->where('id', $rw->id))
+            ->with([
+                'warga',
+                'komentar.user',
+                'warga.kartuKeluarga.rukunTetangga',
+                'warga.kartuKeluarga.rw'
+            ])
+            ->when($tahun, fn($q) => $q->whereYear('created_at', $tahun))
+            ->when($bulan, fn($q) => $q->whereMonth('created_at', $bulan))
+            ->when($search, fn($q) => $q->where('judul', 'like', "%$search%"))
+            ->when($kategori, fn($q) => $q->where('level', $kategori))
+            ->orderByDesc('created_at')
+            ->get();
 
-        if ($request->filled('search')) {
-            $hasil = $request->input('search');
-            $pengaduan_rw_saya->where(function ($item) use ($hasil) {
-                $item->where('judul', 'like', "%$hasil%");
-            });
-        }
+        $total_pengaduan_rw = Pengaduan::whereHas('warga.kartuKeluarga.rw', fn($q) => $q->where('id', $rw->id))->count();
 
-        $rw_pengaduan = $pengaduan_rw_saya->orderBy('created_at', 'desc')
-            ->paginate(10);
+        $list_bulan = [
+            'januari', 'februari', 'maret', 'april', 'mei', 'juni',
+            'juli', 'agustus', 'september', 'oktober', 'november', 'desember'
+        ];
 
-        $total_pengaduan_rw = $rw_pengaduan->count();
+        $list_tahun = Pengaduan::selectRaw('YEAR(created_at) as tahun')
+            ->groupBy('tahun')
+            ->orderByDesc('tahun')
+            ->pluck('tahun');
 
-        return view('rw.pengaduan.pengaduan', compact('title', 'rw_pengaduan', 'total_pengaduan_rw'));
+        $list_level = Pengaduan::select('level')->distinct()->pluck('level');
+
+        return Inertia::render('Rw/Pengaduan', [
+            'title' => $title,
+            'pengaduan' => $pengaduan,
+            'total_pengaduan_rw' => $total_pengaduan_rw,
+            'list_bulan' => $list_bulan,
+            'list_tahun' => $list_tahun,
+            'list_level' => $list_level,
+        ]);
     }
 
-    // cek dulu ada gk rute updatenya di php artisan route:list,
-    // klo belum tambah dulu di web.php
-    public function update(Request $request, $id)
+    /**
+     * 🔹 Update status (diproses / selesai)
+     * Hanya RW yang bisa ubah langsung.
+     * RT tidak bisa ubah ke selesai sebelum konfirmasi disetujui.
+     */
+    public function updateStatus(Request $request, $id)
     {
+        $pengaduan = Pengaduan::findOrFail($id);
         $status = $request->input('status');
+
+        if ($pengaduan->level === 'rt' && $pengaduan->konfirmasi_rw !== 'sudah' && $status === 'selesai') {
+            return response()->json([
+                'error' => 'Belum dapat diselesaikan karena belum dikonfirmasi oleh RW.',
+            ], 403);
+        }
+
+        $pengaduan->update(['status' => $status]);
+
+        return response()->json([
+            'pengaduan' => $pengaduan->fresh(['warga', 'komentar.user']),
+        ]);
+    }
+
+    /**
+     * 🔹 Update konfirmasi RW
+     * - RT memanggil: dari `belum` ke `menunggu`
+     * - RW memanggil: dari `menunggu` ke `sudah`
+     * - RW (jika level RW): langsung set `sudah`
+     */
+    public function updateKonfirmasi(Request $request, $id)
+    {
+        $pengaduan = Pengaduan::findOrFail($id);
+        $user = Auth::user();
+        $role = $user->roles->pluck('name')->first(); // 'rt' atau 'rw'
+
+        if ($pengaduan->level === 'rw') {
+            // Langsung disetujui otomatis
+            $pengaduan->update(['konfirmasi_rw' => 'sudah']);
+        } else {
+            // level = 'rt'
+            if ($role === 'rt' && $pengaduan->konfirmasi_rw === 'belum') {
+                $pengaduan->update(['konfirmasi_rw' => 'menunggu']);
+            } elseif ($role === 'rw' && $pengaduan->konfirmasi_rw === 'menunggu') {
+                $pengaduan->update(['konfirmasi_rw' => 'sudah']);
+            }
+        }
+
+        return response()->json([
+            'pengaduan' => $pengaduan->fresh(['warga', 'komentar.user']),
+        ]);
+    }
+
+    public function komen(Request $request, $id)
+    {
+        $request->validate([
+            'isi_komentar' => 'required_without:file|string|nullable|max:255',
+            'file' => 'required_without:isi_komentar|nullable|file|mimes:jpg,jpeg,png,gif,mp4,mov,avi,mkv,doc,docx,pdf|max:20480',
+        ]);
 
         $pengaduan = Pengaduan::findOrFail($id);
 
-        $dataYangDiUpdate = [
-            'status' => $status,
-        ];
+        $filePath = null;
+        $fileName = null;
 
-        $pengaduan->update($dataYangDiUpdate);
-
-        if ($request->wantsJson()) {
-            return response()->json(
-                $pengaduan->fresh([
-                    'warga',
-                    'komentar.user',
-                    'warga.kartuKeluarga.rukunTetangga',
-                    'warga.kartuKeluarga.rw'
-                ])
-            );
+        if ($request->hasFile('file')) {
+            $file = $request->file('file');
+            $fileName = time() . '_' . $file->getClientOriginalName();
+            $filePath = $file->storeAs('file_pengaduan', $fileName, 'public');
         }
 
-        return redirect()->route('rt.pengaduan.index')
-            ->with('success', 'Pengaduan berhasil diperbarui.');
-    }
-
-    public function baca(Request $request, $id)
-    {
-
-        $rw_user = Auth::user()->rw->nomor_rw;
-
-        $pengaduan_rw_saya = Pengaduan::whereHas('warga.kartuKeluarga.rw', function ($aduan) use ($rw_user) {
-            $aduan->where('nomor_rw', $rw_user);
-        })->findOrFail($id);
-
-        if (
-            $pengaduan_rw_saya->status === 'belum' &&
-            $pengaduan_rw_saya->status !== 'diproses' &&
-            $pengaduan_rw_saya->status !== 'selesai'
-        ) {
-            $pengaduan_rw_saya->update([
-                'status' => 'diproses',
-                'konfirmasi_rw' => 'sudah'
-            ]);
-
-            PengaduanKomentar::create([
-                'pengaduan_id' => $pengaduan_rw_saya->id,
-                'user_id' => Auth::id(),
-                'isi_komentar' => 'Terimakasih, akan kami tindaklanjuti pengaduan tentang ' . $pengaduan_rw_saya->judul,
-            ]);
-        }
-
-        if ($request->boolean('selesai')) {
-            $request->validate([
-                'file' => 'nullable|file|mimes:jpg,jpeg,png,gif,mp4,mov,avi,mkv,doc,docx,pdf|max:20480',
-                'komentar' => 'required',
-            ]);
-
-            $filePath = null;
-            $fileName = null;
-
-            if ($request->hasFile('file')) {
-                $file = $request->file('file');
-                $fileName = time() . '_' . $file->getClientOriginalName();
-                $filePath = $file->storeAs('bukti_selesai', $fileName, 'public');
-            }
-
-            $dataUpdate = [
-                'status' => 'selesai',
-                'foto_bukti' => $filePath,
-            ];
-
-            PengaduanKomentar::create([
-                'pengaduan_id' => $pengaduan_rw_saya->id,
-                'user_id' => Auth::id(),
-                'isi_komentar' => $request->input('komentar'),
-            ]);
-
-            $pengaduan_rw_saya->update($dataUpdate);
-
-            return back()->with('success', 'Pengaduan telah selesai.');
-        }
-    }
-
-    public function confirm($id)
-    {
-        $rw_user = Auth::user()->rw->nomor_rw;
-
-        $pengaduan_rw_saya = Pengaduan::whereHas('warga.kartuKeluarga.rw', function ($aduan) use ($rw_user) {
-            $aduan->where('nomor_rw', $rw_user);
-        })->findOrFail($id);
-
-        $pengaduan_rw_saya->update([
-            'konfirmasi_rw' => 'sudah'
+        $komentar = $pengaduan->komentar()->create([
+            'user_id' => Auth::id(),
+            'isi_komentar' => $request->isi_komentar,
+            'file_path' => $filePath,
+            'file_name' => $fileName,
         ]);
 
-        return back()->with('success', 'Pengaduan telah dikonfirmasi.');
+        $komentar->load('user');
+
+        return response()->json($komentar);
     }
 }

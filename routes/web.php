@@ -22,6 +22,7 @@ use App\Http\Controllers\Rt\Rt_transaksiController;
 use App\Http\Controllers\Rt\Rt_wargaController;
 use App\Http\Controllers\Rt\RtIuranController;
 use App\Http\Controllers\Rw\RwKartuKeluargaController;
+use App\Http\Controllers\Rw\RwPengaduanController;
 use App\Http\Controllers\Rw\RwPengumumanController;
 use App\Http\Controllers\Rw\RwRukunTetanggaController;
 use App\Http\Controllers\Rw\RwWargaController;
@@ -79,7 +80,12 @@ Route::middleware(['auth'])->group(function () {
         Route::resource('warga', RwWargaController::class);
         Route::resource('kartu_keluarga', RwKartuKeluargaController::class);
         Route::resource('pengumuman', RwPengumumanController::class);
-        
+
+        Route::get('pengaduan', [RwPengaduanController::class, 'index'])->name('pengaduan.index');
+        Route::put('pengaduan/{id}/status', [RwPengaduanController::class, 'updateStatus'])->name('pengaduan.updateStatus');
+        Route::put('pengaduan/{id}/konfirmasi', [RwPengaduanController::class, 'updateKonfirmasi'])->name('pengaduan.updateKonfirmasi');
+        Route::post('pengaduan/{id}/komentar', [RwPengaduanController::class, 'komen'])->name('pengaduan.komentar.komen');
+
         Route::get('/pengumuman/{id}/export-pdf', [RwPengumumanController::class, 'exportPDF'])
             ->name('pengumuman.export.pdf');
         Route::post('/pengumuman/{id}/komentar', [RwPengumumanController::class, 'komen'])
