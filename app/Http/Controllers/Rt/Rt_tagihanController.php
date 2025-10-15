@@ -11,6 +11,7 @@ use App\Models\Transaksi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Inertia\Inertia;
 
 class Rt_tagihanController extends Controller
 {
@@ -34,7 +35,11 @@ class Rt_tagihanController extends Controller
             ->get();
 
         // Base query (untuk dipakai manual & otomatis)
-        $baseQuery = Tagihan::with('iuran')
+        $baseQuery = Tagihan::with([
+            'iuran',
+            'kartuKeluarga',
+            'kartuKeluarga.warga',
+        ])
             ->whereHas('kartuKeluarga', function ($q) use ($idRt, $idRw, $user) {
                 if ($user->hasRole('rt')) {
                     $q->where('id_rt', $idRt);
@@ -69,12 +74,12 @@ class Rt_tagihanController extends Controller
             ->paginate(10, ['*'], 'otomatis_page');
 
 
-        return view('rt.iuran.tagihan', compact(
-            'title',
-            'tagihanManual',
-            'tagihanOtomatis',
-            'kartuKeluargaForFilter'
-        ));
+        return Inertia::render('RT/Tagihan', [
+            'title' => $title,
+            'tagihanManual' => $tagihanManual,
+            'tagihanOtomatis' => $tagihanOtomatis,
+            'kartuKeluargaForFilter' => $kartuKeluargaForFilter
+        ]);
     }
 
     /**
@@ -120,7 +125,6 @@ class Rt_tagihanController extends Controller
             Tagihan::create($dataToStore);
 
             return redirect()->route('rt.iuran.index')->with('success', 'Tagihan manual berhasil ditambahkan.');
-
         } catch (\Exception $e) {
             Log::error('Error creating tagihan manual:', ['message' => $e->getMessage()]);
             return redirect()->back()->withInput()->with('error', 'Gagal menambahkan tagihan manual. Error: ' . $e->getMessage());
@@ -186,7 +190,6 @@ class Rt_tagihanController extends Controller
             $tagihan->delete();
 
             return redirect()->route('rt.iuran.index')->with('success', 'Tagihan manual berhasil dihapus.');
-
         } catch (\Exception $e) {
             Log::error('Error deleting tagihan manual:', ['message' => $e->getMessage()]);
             return redirect()->back()->with('error', 'Gagal menghapus tagihan manual. Error: ' . $e->getMessage());

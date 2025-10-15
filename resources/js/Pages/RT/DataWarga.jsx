@@ -2,7 +2,7 @@ import Layout from "@/Layouts/Layout"
 import { Head, Link, useForm, usePage } from "@inertiajs/react"
 import React, { useState } from "react"
 import { FilterWarga } from "../Component/Filter"
-import { formatRupiah, formatTanggal } from "../Component/GetPropRole"
+import { formatTanggal } from "../Component/GetPropRole"
 import { DetailWarga } from "../Component/Modal"
 
 export default function DataWarga() {

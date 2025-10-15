@@ -157,7 +157,7 @@ export default function Pengumuman() {
                                             <span><i className="fas fa-clock mr-1"></i><FormatWaktu createdAt={item.created_at} /></span>
                                         </div>
                                         <div className="text-sm text-gray-500 mb-2 mx-3 flex justify-between">
-                                            <span><i className="fas fa-users mr-1"></i>{item.rukun_tetangga ? `RT ${item.rukun_tetangga.nomor_rt}/ RW ${item.rw.nomor_rw}` : ""}</span>
+                                            <span><i className="fas fa-users mr-1"></i>{item.rukun_tetangga ? `RT ${item.rukun_tetangga.nomor_rt}/RW ${item.rw.nomor_rw}` : `RW ${item.rw.nomor_rw}`}</span>
                                         </div>
                                         <p className="isi-pengaduan text-gray-700 text-sm mb-3 mx-3 line-clamp-3">
                                             {item.isi.length > 100 ? item.isi.slice(0, 100) + "..." : item.isi}

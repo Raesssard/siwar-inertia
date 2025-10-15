@@ -5,8 +5,8 @@ import { Link } from "@inertiajs/react";
 export function StatCard({ href, color, title, value, icon }) {
     return (
         <div className="col-xl-3 col-md-6 mb-4">
-            <div className={`card dashboard border-left-${color} shadow py-2 h-100 card-clickable`}>
-                <Link href={href} className="text-decoration-none d-flex aling-item-center justify-content-center">
+            <div className={`card dashboard border-left-${color} shadow py-0 h-100 card-clickable`}>
+                <Link href={href} className="text-decoration-none d-flex aling-item-center justify-content-center h-100">
                     <div className="card-body dashboard">
                         <div className="row no-gutters align-items-center">
                             {/* Text */}
