@@ -43,11 +43,11 @@ class RtIuranController extends Controller
             $query->where('id_rt', $request->input('rt'));
         }
 
-        $golongan_list = Kategori_golongan::all();
+        $golongan_list = Kategori_golongan::with('iuranGolongan')->get();
         $title = 'Iuran';
 
-        $iuranOtomatis = (clone $query)->where('jenis', 'otomatis')->paginate(10);
-        $iuranManual = (clone $query)->where('jenis', 'manual')->paginate(10);
+        $iuranOtomatis = (clone $query)->where('jenis', 'otomatis')->orderBy('tgl_tagih', 'desc')->paginate(10);
+        $iuranManual = (clone $query)->where('jenis', 'manual')->orderBy('tgl_tagih', 'desc')->paginate(10);
 
         return Inertia::render('RT/Iuran', [
             'iuranOtomatis' => $iuranOtomatis,
@@ -67,7 +67,7 @@ class RtIuranController extends Controller
             'tgl_tagih' => 'required|date',
             'tgl_tempo' => 'required|date',
             'jenis' => 'required|in:manual,otomatis',
-            'nominal' => 'nullable|required_if:jenis,manual|numeric|min:0',
+            'nominal' => 'nullable|required_if:jenis,manual|numeric|min:0|max:99999999',
         ]);
 
         // 🔹 Tentukan scope RT atau RW
@@ -142,6 +142,7 @@ class RtIuranController extends Controller
             }
         }
 
+        $iuran->load(['iuran_golongan', 'iuran_golongan.golongan']);
 
         return response()->json([
             'success' => true,
@@ -160,56 +161,34 @@ class RtIuranController extends Controller
 
     public function update(Request $request, string $id)
     {
-        $iuran = Iuran::findOrFail($id);
+        $iuranGol = IuranGolongan::findOrFail($id);
 
         $request->validate([
-            'nama' => 'required|string|max:255',
-            'tgl_tagih' => 'required|date',
-            'tgl_tempo' => 'required|date',
-            'jenis' => 'required|in:manual,otomatis',
+            'nominal' => 'nullable|required_if:jenis,manual|numeric|min:0|max:99999999',
         ]);
 
-        Tagihan::where('id_iuran', $id)->update([
-            'jenis' => $request->jenis,
+        $iuranGol->update([
+            'nominal' => $request->nominal,
         ]);
 
-        $iuran->update([
-            'nama' => $request->nama,
-            'tgl_tagih' => $request->tgl_tagih,
-            'tgl_tempo' => $request->tgl_tempo,
-            'jenis' => $request->jenis,
-            'nominal' => $request->jenis === 'manual' ? $request->nominal : null,
-        ]);
+        $iuran = Iuran::findOrFail($iuranGol->id_iuran);
 
-        IuranGolongan::where('id_iuran', $iuran->id)->delete();
+        $kkList = $iuran->level === 'rt'
+            ? Kartu_keluarga::where('id_rt', $iuran->id_rt)->get()
+            : Kartu_keluarga::where('id_rw', $iuran->id_rw)->get();
 
-        if ($request->jenis === 'otomatis') {
-            foreach ($request->input('nominal', []) as $id_golongan => $nominal) {
-                if ($nominal !== null) {
-                    IuranGolongan::create([
-                        'id_iuran'   => $iuran->id,
-                        'id_golongan' => $id_golongan,
-                        'nominal'    => $nominal,
-                    ]);
-                }
-            }
+        $iuranNominals = IuranGolongan::where('id_iuran', $iuran->id)
+            ->pluck('nominal', 'id_golongan');
 
-            // Ambil KK sesuai scope iuran
-            $kkList = $iuran->level === 'rt'
-                ? Kartu_keluarga::where('id_rt', $iuran->id_rt)->get()
-                : Kartu_keluarga::where('id_rw', $iuran->id_rw)->get();
+        foreach ($kkList as $kk) {
+            $nominalTagihan = $iuranNominals[$kk->kategori_iuran] ?? 0;
 
-            $iuranNominals = IuranGolongan::where('id_iuran', $iuran->id)
-                ->pluck('nominal', 'id_golongan');
-
-            foreach ($kkList as $kk) {
-                $nominalTagihan = $iuranNominals[$kk->kategori_iuran] ?? 0;
-
-                Tagihan::where('id_iuran', $iuran->id)
-                    ->where('no_kk', $kk->no_kk)
-                    ->update(['nominal' => $nominalTagihan]);
-            }
+            Tagihan::where('id_iuran', $iuran->id)
+                ->where('no_kk', $kk->no_kk)
+                ->update(['nominal' => $nominalTagihan]);
         }
+
+        $iuran->load(['iuran_golongan', 'iuran_golongan.golongan']);
 
         return response()->json([
             'success' => true,
@@ -218,27 +197,59 @@ class RtIuranController extends Controller
         ]);
     }
 
-    public function destroy(string $id)
+    public function destroy(string $id, $jenis)
     {
-        $iuran = Iuran::findOrFail($id);
+        Log::info("Hapus iuran - ID: {$id}, Jenis: {$jenis}");
 
-        // 🔹 Cek otorisasi: hanya RT/RW pembuat yang boleh hapus
-        $user = Auth::user();
-        if ($iuran->level === 'rt' && $iuran->id_rt !== $user->id_rt) {
-            return back()->with('error', 'Anda tidak berhak menghapus iuran RT ini.');
+        try {
+            if ($jenis === 'otomatis') {
+                $iuranGol = IuranGolongan::findOrFail($id);
+                $id_iuran = $iuranGol->id_iuran;
+
+                Log::info("Ditemukan iuran golongan: ", $iuranGol->toArray());
+
+                $iuranGol->delete();
+
+                $sisa = IuranGolongan::where('id_iuran', $id_iuran)->count();
+
+                if ($sisa === 0) {
+                    Iuran::where('id', $id_iuran)->delete();
+                }
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Iuran golongan berhasil dihapus.',
+                    'id' => $id,
+                    'jenis' => 'otomatis',
+                ]);
+            } else {
+                $iuran = Iuran::findOrFail($id);
+                Log::info("Ditemukan iuran utama: ", $iuran->toArray());
+
+                $user = Auth::user();
+                if ($iuran->level === 'rt' && $iuran->id_rt !== $user->id_rt) {
+                    return back()->with('error', 'Anda tidak berhak menghapus iuran RT ini.');
+                }
+                if ($iuran->level === 'rw' && $iuran->id_rw !== $user->id_rw) {
+                    return back()->with('error', 'Anda tidak berhak menghapus iuran RW ini.');
+                }
+
+                $iuran->delete();
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Iuran berhasil dihapus.',
+                    'id' => $id,
+                    'jenis' => 'manual',
+                ]);
+            }
+        } catch (\Exception $e) {
+            Log::error("Gagal hapus iuran: " . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan: ' . $e->getMessage(),
+            ], 500);
         }
-        if ($iuran->level === 'rw' && $iuran->id_rw !== $user->id_rw) {
-            return back()->with('error', 'Anda tidak berhak menghapus iuran RW ini.');
-        }
-        $jenis = $iuran->jenis;
-        $iuran->delete();
-        return response()->json([
-            'success' => true,
-            'message' => 'Iuran berhasil dihapus.',
-            'id' => $id,
-            'jenis' => $jenis,
-        ]);
-        return redirect()->route('rt.iuran.index')->with('success', 'Iuran berhasil dihapus.');
     }
 
     public function generateMonthlyTagihan()

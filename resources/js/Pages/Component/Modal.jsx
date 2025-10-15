@@ -655,7 +655,8 @@ export function DetailPengaduan({ selectedData, detailShow, onClose, onUpdated, 
     }
 
     useEffect(() => {
-        setIsConfirm(selectedData?.konfirmasi_rw === 'menunggu' || selectedData?.konfirmasi_rw === 'sudah')
+        if (role === 'rt') setIsConfirm(selectedData?.konfirmasi_rw === 'menunggu' || selectedData?.konfirmasi_rw === 'sudah')
+        if (role === 'rw') setIsConfirm(selectedData?.konfirmasi_rw === 'sudah')
     }, [selectedData])
 
     const toggleEdit = () => {
@@ -929,11 +930,9 @@ export function DetailPengaduan({ selectedData, detailShow, onClose, onUpdated, 
                                             {(userData.nik === selectedData.nik_warga && role === 'warga') ? (
                                                 <div className="d-flex justify-between">
                                                     <h5 className="fw-bold mb-1 mt-2">{selectedData.judul}</h5>
-                                                    <Role role="warga">
-                                                        <button onClick={toggleEdit} title="Edit Pengaduan">
-                                                            <i className="far fa-edit"></i>
-                                                        </button>
-                                                    </Role>
+                                                    <button onClick={toggleEdit} title="Edit Pengaduan">
+                                                        <i className="far fa-edit"></i>
+                                                    </button>
                                                 </div>
                                             ) : (role.includes('rt') || role.includes('rw')) ? (
                                                 <div className="d-flex justify-between">
@@ -1146,7 +1145,7 @@ export function DetailPengaduan({ selectedData, detailShow, onClose, onUpdated, 
                                             )}
                                         </div>
                                         <div className="komen p-3 border-top">
-                                            {(role === 'rt' && !isConfirm) ? (
+                                            {((role.includes('rt') || role.includes('rw')) && !isConfirm) ? (
                                                 <button className="btn btn-primary w-100" type="button" onClick={handleConfirm}>
                                                     <i className="fas fa-check mr-2"></i>
                                                     Konfirmasi
@@ -2383,7 +2382,7 @@ export function DetailPengumuman({ selectedData, detailShow, onClose, onUpdated,
                                                 <strong>
                                                     {selectedData.rukun_tetangga ? selectedData.rukun_tetangga.nama_ketua_rt : selectedData.rw.nama_ketua_rw}
                                                 </strong> • {" "}
-                                                RT {selectedData.rukun_tetangga?.nomor_rt}/{""}
+                                                {selectedData.rukun_tetangga && `RT ${selectedData.rukun_tetangga?.nomor_rt}/`}
                                                 RW {selectedData.rw?.nomor_rw}{" "}
                                                 • <FormatWaktu createdAt={selectedData.created_at} />
                                             </small>
@@ -2715,8 +2714,6 @@ export function EditPengumuman({ toggle, onUpdated, onDeleted, pengumuman, role 
     const confirmDelete = (e) => {
         e.preventDefault()
         setShowAlert(false)
-        console.log("role:", role)
-        console.log("delete URL:", `/${role}/pengumuman/${pengumuman.id}`)
 
         axios.delete(`/${role}/pengumuman/${pengumuman.id}`)
             .then(res => {
@@ -3553,10 +3550,15 @@ export function TambahIuran({ tambahShow, onClose, onAdded, role, golongan }) {
                                             <div className="mb-3">
                                                 <label className="form-label">Nominal Iuran</label>
                                                 <input
-                                                    type="number"
+                                                    type="text"
                                                     name="nominal"
                                                     className="tambah-judul form-control"
                                                     onChange={handleChange}
+                                                    onInput={(e) => {
+                                                        if (e.target.value.length > 8) {
+                                                            e.target.value = e.target.value.slice(0, 8);
+                                                        }
+                                                    }}
                                                 />
                                             </div>
                                         )}
@@ -3565,17 +3567,143 @@ export function TambahIuran({ tambahShow, onClose, onAdded, role, golongan }) {
                                             <div className="mb-3">
                                                 <h4 className="mb-3">Nominal per Golongan:</h4>
                                                 {golonganList.map((g) => (
-                                                    <div key={g.id} className="mb-3">{console.log(g)}
+                                                    <div key={g.id} className="mb-3">
                                                         <label>{g.jenis}</label>
                                                         <input
                                                             type="number"
                                                             className="tambah-judul form-control"
+                                                            onInput={(e) => {
+                                                                if (e.target.value.length > 8) {
+                                                                    e.target.value = e.target.value.slice(0, 8);
+                                                                }
+                                                            }}
                                                             onChange={(e) => handleNominalChange(g.id, e.target.value)}
                                                         />
                                                     </div>
                                                 ))}
                                             </div>
                                         )}
+
+                                        <button type="submit" className="btn btn-primary ml-auto mt-auto">
+                                            <i className="fas fa-save mr-2"></i>
+                                            Simpan
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </>
+    )
+}
+
+export function EditIuranOtomatis({ editShow, onClose, onUpdated, role, golongan, iuran, iuranGol }) {
+    const { data, setData } = useForm({
+        nominal: "",
+    })
+
+    useEffect(() => {
+        if (iuranGol) {
+            setData({
+                nominal: iuranGol.nominal || "",
+            });
+        }
+    }, [iuranGol, setData]);
+
+    const handleSubmit = (e) => {
+        e.preventDefault()
+        axios.put(`/${role}/iuran/${iuranGol.id}`, data)
+            .then(res => {
+                if (onUpdated) onUpdated(res.data.iuran)
+                setData({ nominal: "" })
+                onClose()
+            })
+    }
+
+    useEffect(() => {
+        const handleEsc = (e) => {
+            if (e.key === "Escape") onClose()
+        }
+
+        document.addEventListener("keydown", handleEsc)
+        return () => document.removeEventListener("keydown", handleEsc)
+    }, [onClose])
+
+    if (!editShow) return null
+
+    return (
+        <>
+            <div
+                className="modal fade show"
+                tabIndex="-1"
+                style={{
+                    display: "block",
+                    backgroundColor: "rgba(0,0,0,0.5)"
+                }}
+                onClick={() => {
+                    onClose()
+                }}
+            >
+                <div
+                    className="modal-dialog modal-dialog-scrollable modal-dialog-centered"
+                    onClick={(e) => e.stopPropagation()}
+                >
+                    <div className="modal-content shadow-lg border-0">
+                        <div className="modal-body p-0 m-0">
+                            <div className="d-flex tambah-body flex-column" style={{ width: "100%", maxHeight: "80vh", overflowY: "auto" }}>
+                                <div className="p-3">
+                                    <form onSubmit={handleSubmit} className="h-100">
+                                        <div className="mb-3">
+                                            <label className="form-label">Iuran Golongan</label>
+                                            <input
+                                                name="nama"
+                                                type="text"
+                                                value={golongan.jenis}
+                                                className="tambah-judul form-control"
+                                                disabled
+                                            />
+                                        </div>
+
+                                        <div className="mb-3">
+                                            <label className="form-label">Tanggal Tagih</label>
+                                            <input
+                                                name="tgl_tagih"
+                                                type="date"
+                                                value={iuran.tgl_tagih}
+                                                className="tambah-kategori form-control"
+                                                disabled
+                                            />
+                                        </div>
+
+                                        <div className="mb-3">
+                                            <label className="form-label">Tanggal Tempo</label>
+                                            <input
+                                                name="tgl_tempo"
+                                                type="date"
+                                                value={iuran.tgl_tempo}
+                                                className="tambah-kategori form-control"
+                                                disabled
+                                            />
+                                        </div>
+
+                                        <div className="mb-3">
+                                            <label className="form-label">Nominal Iuran</label>
+                                            <input
+                                                type="number"
+                                                name="nominal"
+                                                value={data.nominal}
+                                                className="tambah-judul form-control"
+                                                onChange={(e) => setData("nominal", e.target.value)}
+                                                onInput={(e) => {
+                                                    if (e.target.value.length > 8) {
+                                                        e.target.value = e.target.value.slice(0, 8);
+                                                    }
+                                                }}
+                                                required
+                                            />
+                                        </div>
 
                                         <button type="submit" className="btn btn-primary ml-auto mt-auto">
                                             <i className="fas fa-save mr-2"></i>

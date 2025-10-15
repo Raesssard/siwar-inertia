@@ -13,10 +13,11 @@ return new class extends Migration
     {
         Schema::create('transaksi', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('tagihan_id')->constrained('tagihan')->onDelete('cascade')->nullable();
             $table->string('rt');
             $table->date('tanggal');
-            $table->enum('jenis', ['pemasukan', 'pengeluaran']); // jenis transaksi
-            $table->decimal('nominal', 15, 2);                   // nilai nominal
+            $table->enum('jenis', ['pemasukan', 'pengeluaran']);
+            $table->decimal('nominal', 15, 2);
             $table->string('nama_transaksi');
             $table->text('keterangan')->nullable();
             $table->timestamps();
