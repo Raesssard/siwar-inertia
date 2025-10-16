@@ -2,22 +2,87 @@ import Layout from "@/Layouts/Layout"
 import { Head, Link, useForm, usePage } from "@inertiajs/react"
 import React, { useState } from "react"
 import { formatRupiah, formatTanggal } from "../Component/GetPropRole"
+import Swal from "sweetalert2"
+import { FilterTagihan } from "../Component/Filter"
+import { EditTagihan } from "../Component/Modal"
 
 export default function Tagihan() {
     const {
         title,
-        tagihanManual,
-        tagihanOtomatis,
+        tagihanManual: tagihanManualFromServer,
+        tagihanOtomatis: tagihanOtomatisFromServer,
         kartuKeluargaForFilter
     } = usePage().props
+    const [selected, setSelected] = useState(null)
+    const [tagihanManualList, setTagihanManualList] = useState(tagihanManualFromServer.data || [])
+    const [tagihanOtomatisList, setTagihanOtomatisList] = useState(tagihanOtomatisFromServer.data || [])
+    const [showModalEdit, setShowModalEdit] = useState(false)
     const { props } = usePage()
     const role = props.auth?.currentRole
+    const { get, data, setData } = useForm({
+        search: '',
+    })
+
+    const modalEdit = (item) => {
+        setSelected(item)
+        setShowModalEdit(true)
+    }
+
+    const filter = (e) => {
+        e.preventDefault()
+        get(`/${role}/tagihan`, { preserveState: true, preserveScroll: true })
+    }
+
+    const resetFilter = () => {
+        setData({
+            search: '',
+        })
+    }
+
+    const handleDelete = (id) => {
+        Swal.fire({
+            title: "Yakin hapus iuran ini?",
+            text: "Data yang dihapus tidak bisa dikembalikan!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#d33",
+            cancelButtonColor: "#3085d6",
+            confirmButtonText: "Ya, hapus",
+            cancelButtonText: "Batal",
+        }).then((result) => {
+            if (result.isConfirmed) {
+                axios.delete(`/${role}/tagihan/${id}`)
+                    .then((res) => {
+                        Swal.fire("Terhapus!", "Data iuran berhasil dihapus.", "success")
+                        const jenis = res.data?.jenis
+                        if (jenis === "otomatis") {
+                            setTagihanOtomatisList(prev => prev.filter(item => item.id !== id))
+                        } else {
+                            setTagihanManualList(prev => prev.filter(item => item.id !== id))
+                        }
+                    })
+                    .catch(() => {
+                        console.log(`/${role}/tagihan/${id}, ini rutenya salah mas🗿`)
+                        console.log(id)
+                        Swal.fire("Gagal!", "Terjadi kesalahan saat menghapus data.", "error")
+                    })
+            }
+        })
+    }
 
     return (
         <Layout>
             <Head title={`${title} - ${role.length <= 2
                 ? role.toUpperCase()
                 : role.charAt(0).toUpperCase() + role.slice(1)}`} />
+            <FilterTagihan
+                data={data}
+                setData={setData}
+                filter={filter}
+                resetFilter={resetFilter}
+                role={role}
+                kk_list={kartuKeluargaForFilter}
+            />
             <div className="table-container">
                 <div className="table-header">
                     <h4>Data Tagihan Manual</h4>
@@ -39,9 +104,9 @@ export default function Tagihan() {
                             </tr>
                         </thead>
                         <tbody>
-                            {tagihanManual.data?.length > 0 ? (
-                                tagihanManual.data?.map((item, index) => (
-                                    <tr key={item.id}>{console.log(item)}
+                            {tagihanManualList?.length > 0 ? (
+                                tagihanManualList?.map((item, index) => (
+                                    <tr key={item.id}>
                                         <td className="text-center">{index + 1}</td>
                                         <td className="text-center">{item.nama ?? '-'}</td>
                                         <td className="text-center">{item.no_kk ?? '-'}</td>
@@ -60,10 +125,10 @@ export default function Tagihan() {
                                         <td className="text-center">{formatTanggal(item.tgl_bayar)}</td>
                                         <td className="text-center">
                                             <div className="d-flex justify-content-center align-items-center gap-2">
-                                                <button className="btn btn-sm btn-warning my-auto" title="Edit Tagihan" onClick={() => console.log('edit tagihan?? kykny')}>
+                                                <button className="btn btn-sm btn-warning my-auto" title="Edit Tagihan" onClick={() => modalEdit(item)}>
                                                     <i className="fa-solid fa-pen-to-square"></i>
                                                 </button>
-                                                <button className="btn btn-sm btn-danger my-auto" title="Hapus Tagihan" onClick={() => console.log('delete tagihan?? kykny')}>
+                                                <button className="btn btn-sm btn-danger my-auto" title="Hapus Tagihan" onClick={() => handleDelete(item.id)}>
                                                     <i className="fa-solid fa-trash"></i>
                                                 </button>
                                             </div>
@@ -80,10 +145,10 @@ export default function Tagihan() {
                         </tbody>
                     </table>
                 </div>
-                {tagihanManual.links && (
+                {tagihanManualFromServer.links && (
                     <div className="pagination-container">
                         <ul className="pagination-custom">
-                            {tagihanManual.links.map((link, index) => {
+                            {tagihanManualFromServer.links.map((link, index) => {
                                 let label = link.label;
                                 if (label.includes("Previous")) label = "&lt;"
                                 if (label.includes("Next")) label = "&gt;"
@@ -130,8 +195,8 @@ export default function Tagihan() {
                             </tr>
                         </thead>
                         <tbody>
-                            {tagihanOtomatis.data?.length > 0 ? (
-                                tagihanOtomatis.data?.map((item, index) => (
+                            {tagihanOtomatisList?.length > 0 ? (
+                                tagihanOtomatisList?.map((item, index) => (
                                     <tr key={item.id}>
                                         <td className="text-center">{index + 1}</td>
                                         <td className="text-center">{item.nama ?? '-'}</td>
@@ -150,9 +215,14 @@ export default function Tagihan() {
                                         </td>
                                         <td className="text-center">{formatTanggal(item.tgl_bayar)}</td>
                                         <td className="text-center">
-                                            <button className="btn btn-sm btn-danger my-auto" title="Hapus Iuran" onClick={() => console.log('delete tagihan?? kykny')}>
-                                                <i className="fa-solid fa-trash"></i>
-                                            </button>
+                                            <div className="d-flex justify-content-center align-items-center gap-2">
+                                                <button className="btn btn-sm btn-warning my-auto" title="Edit Tagihan" onClick={() => modalEdit(item)}>
+                                                    <i className="fa-solid fa-pen-to-square"></i>
+                                                </button>
+                                                <button className="btn btn-sm btn-danger my-auto" title="Hapus Tagihan" onClick={() => handleDelete(item.id)}>
+                                                    <i className="fa-solid fa-trash"></i>
+                                                </button>
+                                            </div>
                                         </td>
                                     </tr>
                                 ))
@@ -166,10 +236,10 @@ export default function Tagihan() {
                         </tbody>
                     </table>
                 </div>
-                {tagihanOtomatis.links && (
+                {tagihanOtomatisFromServer.links && (
                     <div className="pagination-container">
                         <ul className="pagination-custom">
-                            {tagihanOtomatis.links.map((link, index) => {
+                            {tagihanOtomatisFromServer.links.map((link, index) => {
                                 let label = link.label;
                                 if (label.includes("Previous")) label = "&lt;"
                                 if (label.includes("Next")) label = "&gt;"
@@ -195,6 +265,29 @@ export default function Tagihan() {
                     </div>
                 )}
             </div>
+            <EditTagihan
+                editShow={showModalEdit}
+                onClose={() => setShowModalEdit(false)}
+                onUpdated={(updated) => {
+                    setSelected(updated)
+                    if (updated.iuran.jenis === "manual") {
+                        setTagihanManualList(prev =>
+                            prev.map(item =>
+                                item.id === updated.id ? updated : item
+                            )
+                        )
+                    } else {
+
+                        setTagihanOtomatisList(prev =>
+                            prev.map(item =>
+                                item.id === updated.id ? updated : item
+                            )
+                        )
+                    }
+                }}
+                role={role}
+                selectedData={selected}
+            />
         </Layout>
     )
 }

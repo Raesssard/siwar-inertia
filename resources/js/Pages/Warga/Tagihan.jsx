@@ -19,7 +19,7 @@ export default function Tagihan() {
 
     const filter = (e) => {
         e.preventDefault()
-        get(`/${role}/transaksi`, { preserveState: true, preserveScroll: true })
+        get(`/${role}/tagihan`, { preserveState: true, preserveScroll: true })
     }
 
     const resetFilter = () => {

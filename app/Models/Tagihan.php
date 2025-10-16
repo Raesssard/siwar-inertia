@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Tagihan extends Model
 {
@@ -45,4 +46,8 @@ class Tagihan extends Model
         return $this->belongsTo(Iuran::class, 'id_iuran', 'id');
     }
 
+    public function transaksi(): HasOne
+    {
+        return $this->hasOne(Transaksi::class, 'tagihan_id', 'id');
+    }
 }

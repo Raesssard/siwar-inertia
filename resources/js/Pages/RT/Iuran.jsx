@@ -85,6 +85,8 @@ export default function Iuran() {
         })
     }
 
+    let no = 1
+
     const rows = iuranListOtomatis.flatMap((item, index) =>
         golongan_list
             .map((gol) => {
@@ -92,7 +94,7 @@ export default function Iuran() {
                 if (!matched) return null
                 return (
                     <tr key={`${item.id}-${gol.id}`}>
-                        <td className="text-center">{index + 1}</td>
+                        <td className="text-center">{no++}</td>
                         <td className="text-center">
                             {gol.jenis.charAt(0).toUpperCase() + gol.jenis.slice(1)}
                         </td>

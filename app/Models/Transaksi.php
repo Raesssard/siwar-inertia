@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Transaksi extends Model
 {
@@ -12,9 +13,10 @@ class Transaksi extends Model
     protected $table = 'transaksi';
 
     protected $fillable = [
+        'tagihan_id',
         'rt',
         'tanggal',
-        'jenis',        // enum: pemasukan/pengeluaran
+        'jenis',
         'nominal',
         'nama_transaksi',
         'keterangan',
@@ -24,4 +26,9 @@ class Transaksi extends Model
         'tanggal' => 'date',
         'nominal' => 'decimal:2',
     ];
+
+    public function tagihan(): BelongsTo
+    {
+        return $this->belongsTo(Tagihan::class, 'tagihan_id', 'id');
+    }
 }
