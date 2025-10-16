@@ -81,6 +81,9 @@ Route::middleware(['auth'])->group(function () {
         Route::resource('kartu_keluarga', RwKartuKeluargaController::class);
         Route::resource('pengumuman', RwPengumumanController::class);
 
+        Route::get('warga/create', [RwWargaController::class, 'create'])->name('warga.create');
+        Route::get('warga/{id}/edit', [RwWargaController::class, 'edit'])->name('warga.edit');
+
         Route::get('pengaduan', [RwPengaduanController::class, 'index'])->name('pengaduan.index');
         Route::put('pengaduan/{id}/status', [RwPengaduanController::class, 'updateStatus'])->name('pengaduan.updateStatus');
         Route::put('pengaduan/{id}/konfirmasi', [RwPengaduanController::class, 'updateKonfirmasi'])->name('pengaduan.updateKonfirmasi');
@@ -92,12 +95,13 @@ Route::middleware(['auth'])->group(function () {
             ->name('pengumuman.komentar.komen');
 
         Route::post('kartu_keluarga/{no_kk}/upload-foto', [RwKartuKeluargaController::class, 'uploadFoto'])
-        ->name('kartu_keluarga.upload');
+            ->name('kartu_keluarga.upload');
         Route::delete('kartu_keluarga/{no_kk}/delete-foto', [RwKartuKeluargaController::class, 'deleteFoto'])
-        ->name('kartu_keluarga.delete');
+            ->name('kartu_keluarga.delete');
+
         // 🔹 Toggle status aktif / nonaktif
         Route::put('rt/{id}/toggle-status', [RwRukunTetanggaController::class, 'toggleStatus'])
-            ->name('rt.toggleStatus'); // ✅ Tambahkan ini
+            ->name('rt.toggleStatus');
     });
 
 

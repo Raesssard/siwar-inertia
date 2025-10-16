@@ -1,11 +1,12 @@
 import React, { useEffect, useRef, useState } from "react"
-import { Link, useForm, usePage } from "@inertiajs/react"
+import { Link, useForm, usePage, router } from "@inertiajs/react"
 import logo from '../../../../public/img/logo.png'
 import axios from "axios"
 import { FormatWaktu } from "../Warga/Pengaduan"
 import { SidebarLink } from "./SidebarLink"
 import { formatTanggal, getAdminLinks, getRtLinks, getWargaLinks, getRwLinks } from "./GetPropRole"
 import Role from "./Role"
+import Swal from "sweetalert2"
 
 export function ModalSidebar({ modalIsOpen, modalShow }) {
     const { url } = usePage()
@@ -1979,7 +1980,7 @@ export function TambahPengaduan({ tambahShow, onClose, onAdded }) {
     )
 }
 
-export function TambahEditKK({ show, onClose, dataKK = null, kategoriIuran, role }) {
+export function TambahEditKK({ show, onClose, dataKK = null, kategoriIuran, daftarRT = [], role }) {
   const isEdit = !!dataKK;
 
   const { data, setData, post, put, processing, reset } = useForm({
@@ -1997,6 +1998,7 @@ export function TambahEditKK({ show, onClose, dataKK = null, kategoriIuran, role
     kabupaten_kota_penerbit: dataKK?.kabupaten_kota_penerbit ?? "",
     nama_kepala_dukcapil: dataKK?.nama_kepala_dukcapil ?? "",
     nip_kepala_dukcapil: dataKK?.nip_kepala_dukcapil ?? "",
+    id_rt: dataKK?.id_rt ?? "",
   });
 
   useEffect(() => {
@@ -2016,6 +2018,7 @@ export function TambahEditKK({ show, onClose, dataKK = null, kategoriIuran, role
         kabupaten_kota_penerbit: dataKK.kabupaten_kota_penerbit,
         nama_kepala_dukcapil: dataKK.nama_kepala_dukcapil,
         nip_kepala_dukcapil: dataKK.nip_kepala_dukcapil,
+        id_rt: dataKK.id_rt ?? "",
       });
     } else {
       reset();
@@ -2044,35 +2047,36 @@ export function TambahEditKK({ show, onClose, dataKK = null, kategoriIuran, role
       onClick={onClose}
     >
       <div
-        className="modal-dialog modal-lg modal-dialog-centered"
+        className="modal-dialog modal-xl modal-dialog-centered"
         onClick={(e) => e.stopPropagation()}
+        style={{ maxWidth: "80%", margin: "auto" }}
       >
-        <div className="modal-content shadow-lg border-0">
+        <div className="modal-content shadow-lg border-0 rounded-3">
           <div className="modal-header bg-success text-white">
-            <h5 className="modal-title mb-0 fw-semibold">
+            <h5 className="modal-title fw-semibold">
               {isEdit ? "Edit Kartu Keluarga" : "Tambah Kartu Keluarga"}
             </h5>
           </div>
 
           <form onSubmit={submit}>
-            <div className="modal-body py-4 px-4">
-              {/* Baris 1 - No KK & No Registrasi */}
-              <div className="row g-3 mb-2">
+            <div className="modal-body px-4 py-4">
+              {/* No KK dan No Registrasi */}
+              <div className="row g-3 mb-3">
                 <div className="col-md-6">
-                  <label className="form-label fw-medium">No KK</label>
+                  <label className="form-label fw-medium">No. KK</label>
                   <input
                     type="text"
-                    className="form-control"
+                    className="form-control shadow-sm"
                     value={data.no_kk}
                     onChange={(e) => setData("no_kk", e.target.value)}
                     required
                   />
                 </div>
                 <div className="col-md-6">
-                  <label className="form-label fw-medium">No Registrasi</label>
+                  <label className="form-label fw-medium">No. Registrasi</label>
                   <input
                     type="text"
-                    className="form-control"
+                    className="form-control shadow-sm"
                     value={data.no_registrasi}
                     onChange={(e) => setData("no_registrasi", e.target.value)}
                     required
@@ -2080,71 +2084,85 @@ export function TambahEditKK({ show, onClose, dataKK = null, kategoriIuran, role
                 </div>
               </div>
 
-              {/* Baris 2 - Alamat */}
-              <div className="row g-3 mb-2">
-                <div className="col-12">
-                  <label className="form-label fw-medium">Alamat</label>
-                  <textarea
-                    className="form-control"
-                    rows="2"
-                    value={data.alamat}
-                    onChange={(e) => setData("alamat", e.target.value)}
+              {/* Pilih RT */}
+              <div className="row g-3 mb-3">
+                <div className="col-md-6">
+                  <label className="form-label fw-medium">Pilih RT</label>
+                  <select
+                    className="form-select shadow-sm"
+                    value={data.id_rt}
+                    onChange={(e) => setData("id_rt", e.target.value)}
                     required
-                  ></textarea>
+                  >
+                    <option value="">-- Pilih RT --</option>
+                    {daftarRT.map((rt) => (
+                      <option key={rt.id} value={rt.id}>
+                        RT {rt.nomor_rt} / RW {rt.rw.nomor_rw}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="col-md-6">
+                  <label className="form-label fw-medium">Kategori Iuran</label>
+                  <select
+                    className="form-select shadow-sm"
+                    value={data.kategori_iuran}
+                    onChange={(e) => setData("kategori_iuran", e.target.value)}
+                    required
+                  >
+                    <option value="">-- Pilih Kategori --</option>
+                    {Array.isArray(kategoriIuran)
+                ? kategoriIuran.map((item) => (
+                    <option key={item.id} value={item.id}>
+                        {item.jenis}
+                    </option>
+                    ))
+                : Object.entries(kategoriIuran).map(([id, val]) => (
+                    <option key={id} value={id}>
+                        {val?.jenis ?? val}
+                    </option>
+                    ))}
+                  </select>
                 </div>
               </div>
 
-              {/* Baris 3 - Lokasi */}
-              <div className="row g-3 mb-2">
-                <div className="col-md-6">
-                  <label className="form-label fw-medium">Kelurahan</label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    value={data.kelurahan}
-                    onChange={(e) => setData("kelurahan", e.target.value)}
-                    required
-                  />
-                </div>
-                <div className="col-md-6">
-                  <label className="form-label fw-medium">Kecamatan</label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    value={data.kecamatan}
-                    onChange={(e) => setData("kecamatan", e.target.value)}
-                    required
-                  />
-                </div>
-                <div className="col-md-6">
-                  <label className="form-label fw-medium">Kabupaten</label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    value={data.kabupaten}
-                    onChange={(e) => setData("kabupaten", e.target.value)}
-                    required
-                  />
-                </div>
-                <div className="col-md-6">
-                  <label className="form-label fw-medium">Provinsi</label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    value={data.provinsi}
-                    onChange={(e) => setData("provinsi", e.target.value)}
-                    required
-                  />
-                </div>
+              {/* Alamat */}
+              <div className="mb-3">
+                <label className="form-label fw-medium">Alamat Lengkap</label>
+                <textarea
+                  className="form-control shadow-sm"
+                  rows="2"
+                  value={data.alamat}
+                  onChange={(e) => setData("alamat", e.target.value)}
+                  required
+                ></textarea>
               </div>
 
-              {/* Baris 4 - Kode Pos, Tanggal Terbit, Kategori Iuran */}
-              <div className="row g-3 mb-2">
+              {/* Lokasi */}
+              <div className="row g-3 mb-3">
+                {["kelurahan", "kecamatan", "kabupaten", "provinsi"].map((field, i) => (
+                  <div className="col-md-6" key={i}>
+                    <label className="form-label fw-medium">
+                      {field.charAt(0).toUpperCase() + field.slice(1)}
+                    </label>
+                    <input
+                      type="text"
+                      className="form-control shadow-sm"
+                      value={data[field]}
+                      onChange={(e) => setData(field, e.target.value)}
+                      required
+                    />
+                  </div>
+                ))}
+              </div>
+
+              {/* Info Tambahan */}
+              <div className="row g-3 mb-3">
                 <div className="col-md-4">
                   <label className="form-label fw-medium">Kode Pos</label>
                   <input
                     type="text"
-                    className="form-control"
+                    className="form-control shadow-sm"
                     value={data.kode_pos}
                     onChange={(e) => setData("kode_pos", e.target.value)}
                     required
@@ -2154,95 +2172,61 @@ export function TambahEditKK({ show, onClose, dataKK = null, kategoriIuran, role
                   <label className="form-label fw-medium">Tanggal Terbit</label>
                   <input
                     type="date"
-                    className="form-control"
+                    className="form-control shadow-sm"
                     value={data.tgl_terbit}
                     onChange={(e) => setData("tgl_terbit", e.target.value)}
                     required
                   />
                 </div>
                 <div className="col-md-4">
-                  <label className="form-label fw-medium">Kategori Iuran</label>
-                  <select
-                    className="form-select"
-                    value={data.kategori_iuran}
-                    onChange={(e) => setData("kategori_iuran", e.target.value)}
-                    required
-                  >
-                    <option value="">-- Pilih --</option>
-                    {Object.entries(kategoriIuran).map(([id, nama]) => (
-                      <option key={id} value={id}>
-                        {nama}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              {/* Baris 5 - Info Dukcapil */}
-              <div className="row g-3 mb-2">
-                <div className="col-md-6">
                   <label className="form-label fw-medium">Instansi Penerbit</label>
                   <input
                     type="text"
-                    className="form-control"
+                    className="form-control shadow-sm"
                     value={data.instansi_penerbit}
                     onChange={(e) => setData("instansi_penerbit", e.target.value)}
                   />
                 </div>
+              </div>
+
+              {/* Info Dukcapil */}
+              <div className="row g-3 mb-3">
                 <div className="col-md-6">
                   <label className="form-label fw-medium">Kabupaten/Kota Penerbit</label>
                   <input
                     type="text"
-                    className="form-control"
+                    className="form-control shadow-sm"
                     value={data.kabupaten_kota_penerbit}
-                    onChange={(e) =>
-                      setData("kabupaten_kota_penerbit", e.target.value)
-                    }
+                    onChange={(e) => setData("kabupaten_kota_penerbit", e.target.value)}
                   />
                 </div>
                 <div className="col-md-6">
                   <label className="form-label fw-medium">Nama Kepala Dukcapil</label>
                   <input
                     type="text"
-                    className="form-control"
+                    className="form-control shadow-sm"
                     value={data.nama_kepala_dukcapil}
-                    onChange={(e) =>
-                      setData("nama_kepala_dukcapil", e.target.value)
-                    }
+                    onChange={(e) => setData("nama_kepala_dukcapil", e.target.value)}
                   />
                 </div>
                 <div className="col-md-6">
                   <label className="form-label fw-medium">NIP Kepala Dukcapil</label>
                   <input
                     type="text"
-                    className="form-control"
+                    className="form-control shadow-sm"
                     value={data.nip_kepala_dukcapil}
-                    onChange={(e) =>
-                      setData("nip_kepala_dukcapil", e.target.value)
-                    }
+                    onChange={(e) => setData("nip_kepala_dukcapil", e.target.value)}
                   />
                 </div>
               </div>
             </div>
 
-            <div className="modal-footer bg-light px-4 py-3">
-              <button
-                type="button"
-                className="btn btn-secondary px-4"
-                onClick={onClose}
-              >
-                Batal
+            <div className="modal-footer bg-light d-flex justify-content-between">
+              <button type="button" className="btn btn-outline-secondary px-4" onClick={onClose}>
+                <i className="bi bi-x-circle"></i> Batal
               </button>
-              <button
-                type="submit"
-                className="btn btn-success px-4"
-                disabled={processing}
-              >
-                {processing
-                  ? "Menyimpan..."
-                  : isEdit
-                  ? "Perbarui"
-                  : "Simpan"}
+              <button type="submit" className="btn btn-success px-4" disabled={processing}>
+                {processing ? "Menyimpan..." : isEdit ? "Perbarui" : "Simpan"}
               </button>
             </div>
           </form>
@@ -2263,9 +2247,7 @@ export function DetailKK({ selectedData, detailShow, onClose, role }) {
 
     useEffect(() => {
         const handleEsc = (e) => {
-            if (e.key === "Escape") {
-                onClose()
-            }
+            if (e.key === "Escape") onClose()
         }
 
         document.addEventListener("keydown", handleEsc)
@@ -2291,26 +2273,31 @@ export function DetailKK({ selectedData, detailShow, onClose, role }) {
 
     const handleUpload = async (e) => {
         e.preventDefault()
+        if (!selectedFile) return alert("Pilih file terlebih dahulu!")
 
+        setUploading(true)
         const formData = new FormData()
         formData.append("kk_file", selectedFile)
         formData.append("_method", "PUT")
 
-        axios.post(`/rt/kartu_keluarga/${selectedData.no_kk}/upload-foto`, formData)
-            .then(res => {
+        axios
+            .post(`/rt/kartu_keluarga/${selectedData.no_kk}/upload-foto`, formData)
+            .then((res) => {
                 console.log("Upload sukses:", res.data)
                 alert("Dokumen berhasil diunggah!")
             })
-            .catch(err => {
+            .catch((err) => {
                 console.error("Upload gagal:", err.response?.data || err)
                 alert("Gagal upload file, cek console/log Laravel.")
             })
+            .finally(() => setUploading(false))
     }
 
     const handleDelete = () => {
         if (!window.confirm("Yakin hapus dokumen ini?")) return
 
-        axios.delete(`/${role}/kartu_keluarga/${selectedData.no_kk}/delete-foto`)
+        axios
+            .delete(`/${role}/kartu_keluarga/${selectedData.no_kk}/delete-foto`)
             .then(() => {
                 alert("Dokumen berhasil dihapus!")
             })
@@ -2331,8 +2318,8 @@ export function DetailKK({ selectedData, detailShow, onClose, role }) {
                 <div
                     className="modal-dialog modal-xl modal-dialog-scrollable modal-dialog-centered"
                     style={{
-                        maxWidth: '80%', // kasih jarak kiri kanan
-                        margin: 'auto',  // pastikan tetap di tengah
+                        maxWidth: "80%",
+                        margin: "auto",
                     }}
                     onClick={(e) => e.stopPropagation()}
                 >
@@ -2344,11 +2331,11 @@ export function DetailKK({ selectedData, detailShow, onClose, role }) {
                         <div className="modal-body kk d-block p-4">
                             <div className="kk-header w-100">
                                 <div className="kk-header-top-line">
-                                    <div className="kk-header-left-space">
-                                    </div>
+                                    <div className="kk-header-left-space"></div>
                                     <div className="kk-header-right-reg">
                                         {selectedData.no_registrasi && (
-                                            <p>No. Registrasi:
+                                            <p>
+                                                No. Registrasi:
                                                 <strong>{selectedData.no_registrasi}</strong>
                                             </p>
                                         )}
@@ -2357,28 +2344,55 @@ export function DetailKK({ selectedData, detailShow, onClose, role }) {
 
                                 <div className="kk-header-main-title">
                                     <h4>KARTU KELUARGA</h4>
-                                    <p className="no-kk-big">No. KK: <strong>{selectedData.no_kk}</strong></p>
+                                    <p className="no-kk-big">
+                                        No. KK: <strong>{selectedData.no_kk}</strong>
+                                    </p>
                                 </div>
                             </div>
 
                             <div className="kk-info-grid mb-2">
                                 <div className="kk-info-item">
-                                    <p><strong>Nama Kepala Keluarga</strong> : {kepala.nama ?? '-'}</p>
-                                    <p><strong>Alamat</strong> : {selectedData.alamat ?? '-'}</p>
-                                    <p><strong>RT/RW</strong> :{" "}
-                                        {selectedData.rukun_tetangga.nomor_rt ?? '-'}/{selectedData.rw.nomor_rw ?? '-'}
+                                    <p>
+                                        <strong>Nama Kepala Keluarga</strong> :{" "}
+                                        {kepala?.nama ?? "-"}
                                     </p>
-                                    <p><strong>Desa/Kelurahan</strong> : {selectedData.kelurahan ?? '-'}</p>
+                                    <p>
+                                        <strong>Alamat</strong> : {selectedData.alamat ?? "-"}
+                                    </p>
+                                    <p>
+                                        <strong>RT/RW</strong> :{" "}
+                                        {selectedData.rukun_tetangga.nomor_rt ?? "-"}/
+                                        {selectedData.rw.nomor_rw ?? "-"}
+                                    </p>
+                                    <p>
+                                        <strong>Desa/Kelurahan</strong> :{" "}
+                                        {selectedData.kelurahan ?? "-"}
+                                    </p>
                                 </div>
                                 <div className="kk-info-item">
-                                    <p><strong>Kecamatan</strong> : {selectedData.kecamatan ?? '-'}</p>
-                                    <p><strong>Kabupaten/Kota</strong> : {selectedData.kabupaten ?? '-'}</p>
-                                    <p><strong>Kode Pos</strong> : {selectedData.kode_pos ?? '-'}</p>
-                                    <p><strong>Provinsi</strong> : {selectedData.provinsi ?? '-'}</p>
+                                    <p>
+                                        <strong>Kecamatan</strong> :{" "}
+                                        {selectedData.kecamatan ?? "-"}
+                                    </p>
+                                    <p>
+                                        <strong>Kabupaten/Kota</strong> :{" "}
+                                        {selectedData.kabupaten ?? "-"}
+                                    </p>
+                                    <p>
+                                        <strong>Kode Pos</strong> :{" "}
+                                        {selectedData.kode_pos ?? "-"}
+                                    </p>
+                                    <p>
+                                        <strong>Provinsi</strong> :{" "}
+                                        {selectedData.provinsi ?? "-"}
+                                    </p>
                                 </div>
                             </div>
 
-                            <hr className="my-2" style={{ borderTop: "2px solid #e0e0e0", width: "100%" }} />
+                            <hr
+                                className="my-2"
+                                style={{ borderTop: "2px solid #e0e0e0", width: "100%" }}
+                            />
 
                             <h6 className="fw-bold text-center mb-3 mt-2">
                                 DAFTAR ANGGOTA KELUARGA
@@ -2388,7 +2402,13 @@ export function DetailKK({ selectedData, detailShow, onClose, role }) {
                                     <div className="d-flex justify-content-end mb-3">
                                         <button
                                             className="btn btn-primary btn-sm"
-                                            onClick={() => alert('Fitur tambah warga nanti disambungkan')}
+                                            onClick={() =>
+                                                router.visit(
+                                                    route("rw.warga.create", {
+                                                        no_kk: selectedData.no_kk,
+                                                    })
+                                                )
+                                            }
                                         >
                                             <i className="bi bi-person-plus"></i> Tambah Warga
                                         </button>
@@ -2426,7 +2446,8 @@ export function DetailKK({ selectedData, detailShow, onClose, role }) {
                                         </tr>
                                     </thead>
                                     <tbody className="small">
-                                        {selectedData?.warga && selectedData.warga.length > 0 ? (
+                                        {selectedData?.warga &&
+                                        selectedData.warga.length > 0 ? (
                                             selectedData.warga
                                                 .sort((a, b) => {
                                                     const getRank = (hubungan) => {
@@ -2434,45 +2455,119 @@ export function DetailKK({ selectedData, detailShow, onClose, role }) {
                                                         if (hubungan === "Istri") return 1
                                                         return 0
                                                     }
-                                                    return getRank(b.status_hubungan_dalam_keluarga) - getRank(a.status_hubungan_dalam_keluarga)
+                                                    return (
+                                                        getRank(
+                                                            b.status_hubungan_dalam_keluarga
+                                                        ) -
+                                                        getRank(
+                                                            a.status_hubungan_dalam_keluarga
+                                                        )
+                                                    )
                                                 })
                                                 .map((data, index) => (
                                                     <tr key={index}>
                                                         <td className="text-center">{index + 1}</td>
-                                                        <td className="text-center">{data.nama ?? '-'}</td>
-                                                        <td className="text-center">{data.nik ?? '-'}</td>
-                                                        <td className="text-center">{data.jenis_kelamin.charAt(0).toUpperCase() + data.jenis_kelamin.slice(1) ?? '-'}</td>
-                                                        <td>{data.tempat_lahir ?? '-'}</td>
+                                                        <td className="text-center">
+                                                            {data.nama ?? "-"}
+                                                        </td>
+                                                        <td className="text-center">
+                                                            {data.nik ?? "-"}
+                                                        </td>
+                                                        <td className="text-center">
+                                                            {data.jenis_kelamin
+                                                                ? data.jenis_kelamin.charAt(0).toUpperCase() +
+                                                                  data.jenis_kelamin.slice(1)
+                                                                : "-"}
+                                                        </td>
+                                                        <td>{data.tempat_lahir ?? "-"}</td>
                                                         <td className="text-center">
                                                             {formatTanggal(data.tanggal_lahir)}
                                                         </td>
-                                                        <td className="text-center">{data.agama ?? '-'}</td>
-                                                        <td className="text-center">{data.pendidikan ?? '-'}</td>
-                                                        <td className="text-center">{data.pekerjaan ?? '-'}</td>
-                                                        <td className="text-center">{data.golongan_darah ?? '-'}</td>
-                                                        <td className="text-center">{data.status_perkawinan.charAt(0).toUpperCase() + data.status_perkawinan.slice(1) ?? '-'}</td>
-                                                        <td className="text-center">{data.status_hubungan_dalam_keluarga.charAt(0).toUpperCase() + data.status_hubungan_dalam_keluarga.slice(1) ?? '-'}</td>
-                                                        <td className="text-center">{data.kewarganegaraan ?? 'WNI'}</td>
-                                                        <td className="text-center">{data.no_paspor ?? '-'}</td>
                                                         <td className="text-center">
-                                                            {`${data.no_kitas ?? '-'} / ${data.no_kitap ?? '-'}`}
+                                                            {data.agama ?? "-"}
                                                         </td>
-                                                        <td className="text-center">{data.nama_ayah ?? '-'}</td>
-                                                        <td className="text-center">{data.nama_ibu ?? '-'}</td>
-                                                        <td className="text-center">{data.status_warga.charAt(0).toUpperCase() + data.status_warga.slice(1) ?? '-'}</td>
+                                                        <td className="text-center">
+                                                            {data.pendidikan ?? "-"}
+                                                        </td>
+                                                        <td className="text-center">
+                                                            {data.pekerjaan ?? "-"}
+                                                        </td>
+                                                        <td className="text-center">
+                                                            {data.golongan_darah ?? "-"}
+                                                        </td>
+                                                        <td className="text-center">
+                                                            {data.status_perkawinan
+                                                                ? data.status_perkawinan.charAt(0).toUpperCase() +
+                                                                  data.status_perkawinan.slice(1)
+                                                                : "-"}
+                                                        </td>
+                                                        <td className="text-center">
+                                                            {data.status_hubungan_dalam_keluarga
+                                                                ? data.status_hubungan_dalam_keluarga
+                                                                      .charAt(0)
+                                                                      .toUpperCase() +
+                                                                  data.status_hubungan_dalam_keluarga.slice(1)
+                                                                : "-"}
+                                                        </td>
+                                                        <td className="text-center">
+                                                            {data.kewarganegaraan ?? "WNI"}
+                                                        </td>
+                                                        <td className="text-center">
+                                                            {data.no_paspor ?? "-"}
+                                                        </td>
+                                                        <td className="text-center">
+                                                            {`${data.no_kitas ?? "-"} / ${
+                                                                data.no_kitap ?? "-"
+                                                            }`}
+                                                        </td>
+                                                        <td className="text-center">
+                                                            {data.nama_ayah ?? "-"}
+                                                        </td>
+                                                        <td className="text-center">
+                                                            {data.nama_ibu ?? "-"}
+                                                        </td>
+                                                        <td className="text-center">
+                                                            {data.status_warga
+                                                                ? data.status_warga.charAt(0).toUpperCase() +
+                                                                  data.status_warga.slice(1)
+                                                                : "-"}
+                                                        </td>
                                                         <Role role="rw">
                                                             <td className="text-center">
                                                                 <button
                                                                     className="btn btn-warning btn-sm me-1"
-                                                                    onClick={() => alert(`Edit warga: ${data.nama}`)}
+                                                                    onClick={() =>
+                                                                        router.visit(
+                                                                            route("rw.warga.edit", data.id)
+                                                                        )
+                                                                    }
                                                                 >
                                                                     <i className="bi bi-pencil-square"></i>
                                                                 </button>
                                                                 <button
                                                                     className="btn btn-danger btn-sm"
                                                                     onClick={() => {
-                                                                        if (confirm(`Hapus warga ${data.nama}?`)) {
-                                                                            alert('Fitur delete warga akan disambungkan ke backend.')
+                                                                        if (
+                                                                            confirm(
+                                                                                `Hapus warga ${data.nama}?`
+                                                                            )
+                                                                        ) {
+                                                                            router.delete(
+                                                                                route(
+                                                                                    "rw.warga.destroy",
+                                                                                    data.id
+                                                                                ),
+                                                                                {
+                                                                                    onSuccess: () =>
+                                                                                        alert(
+                                                                                            "Warga berhasil dihapus"
+                                                                                        ),
+                                                                                    onError: () =>
+                                                                                        alert(
+                                                                                            "Gagal menghapus warga"
+                                                                                        ),
+                                                                                }
+                                                                            )
                                                                         }
                                                                     }}
                                                                 >
@@ -2484,8 +2579,12 @@ export function DetailKK({ selectedData, detailShow, onClose, role }) {
                                                 ))
                                         ) : (
                                             <tr>
-                                                <td colSpan="19" className="text-center text-muted p-4">
-                                                    Tidak ada anggota keluarga yang terdaftar untuk Kartu Keluarga ini.
+                                                <td
+                                                    colSpan="19"
+                                                    className="text-center text-muted p-4"
+                                                >
+                                                    Tidak ada anggota keluarga yang terdaftar untuk
+                                                    Kartu Keluarga ini.
                                                 </td>
                                             </tr>
                                         )}
@@ -2494,9 +2593,14 @@ export function DetailKK({ selectedData, detailShow, onClose, role }) {
                             </div>
 
                             <div className="kk-document-section mt-1">
-                                <h6 className="fw-bold mb-3">Unggah / Perbarui Dokumen KK</h6>
+                                <h6 className="fw-bold mb-3">
+                                    Unggah / Perbarui Dokumen KK
+                                </h6>
 
-                                <form onSubmit={handleUpload} className="input-group mb-2 d-flex">
+                                <form
+                                    onSubmit={handleUpload}
+                                    className="input-group mb-2 d-flex"
+                                >
                                     <input
                                         type="file"
                                         name="kk_file"
@@ -2508,7 +2612,7 @@ export function DetailKK({ selectedData, detailShow, onClose, role }) {
                                         className="btn btn-success m-0"
                                         type="submit"
                                         disabled={uploading}
-                                        style={{ borderRadius: '0 0.35rem 0.35rem 0' }}
+                                        style={{ borderRadius: "0 0.35rem 0.35rem 0" }}
                                     >
                                         {uploading ? "Mengunggah..." : "Unggah"}
                                     </button>
@@ -2532,7 +2636,8 @@ export function DetailKK({ selectedData, detailShow, onClose, role }) {
                                                 style={{
                                                     maxWidth: "100%",
                                                     borderRadius: "10px",
-                                                    boxShadow: "0 0 5px rgba(0,0,0,0.2)",
+                                                    boxShadow:
+                                                        "0 0 5px rgba(0,0,0,0.2)",
                                                 }}
                                             />
                                         )}
