@@ -205,7 +205,7 @@ export function FilterTransaksi({ data, setData, filter, resetFilter, role }) {
     )
 }
 
-export function FilterTagihan({ data, setData, filter, resetFilter, role }) {
+export function FilterTagihan({ data, setData, filter, resetFilter, role, kk_list }) {
     return (
         <form onSubmit={filter} className="filter-form form-filter d-flex px-0 g-2 pb-2 mb-2 w-100">
             <div className="col-md-5 col-12 pr-2">
@@ -224,9 +224,30 @@ export function FilterTagihan({ data, setData, filter, resetFilter, role }) {
                 </div>
             </div>
 
-            <Link href={`/${role}/tagihan`} onClick={resetFilter} className="btn-input btn btn-secondary btn-sm flex-fill p-0 mx-0" title="Reset" style={{ maxWidth: "3rem" }}>
-                <i className="fas fa-undo"></i>
-            </Link>
+            <div className="d-flex flex-wrap gap-2" style={role === 'warga' ? { maxWidth: "3rem", minWidth: "3rem" } : null}>
+                <Role role={['rt', 'rw']}>
+                    <select
+                        name="no_kk_filter"
+                        value={data.no_kk_filter}
+                        onChange={(e) => setData('no_kk_filter', e.target.value)}
+                        className="form-select form-select-sm w-auto flex-fill my-2 mx-0"
+                    >
+                        <option value="">Semua Kartu Keluarga</option>
+                        {kk_list?.map((kk) => (
+                            <option key={kk.no_kk} value={kk.no_kk}>
+                                {kk.no_kk}
+                            </option>
+                        ))}
+                    </select>
+                    <button type="submit" className="btn-input btn btn-sm btn-primary flex-fill p-0 mx-0" title="Filter Warga" style={{ maxWidth: "3rem", minWidth: "3rem" }}>
+                        <i className="fas fa-filter"></i>
+                    </button>
+                </Role>
+                <Link href={`/${role}/tagihan`} onClick={resetFilter} className="btn-input btn btn-secondary btn-sm flex-fill p-0 mx-0" title="Reset" style={{ maxWidth: "3rem", minWidth: "3rem" }}>
+                    <i className="fas fa-undo"></i>
+                </Link>
+            </div>
+
         </form>
     )
 }
