@@ -179,7 +179,7 @@ export function FilterPengumuman({ data, setData, daftar_tahun, list_bulan, daft
     )
 }
 
-export function FilterTransaksi({ data, setData, filter, resetFilter, role }) {
+export function FilterTransaksi({ data, setData, daftar_tahun, daftar_bulan, filter, resetFilter, tambahShow, role }) {
     return (
         <form onSubmit={filter} className="filter-form form-filter d-flex px-0 g-2 pb-2 mb-2 w-100">
             <div className="col-md-5 col-12 pr-2">
@@ -190,17 +190,56 @@ export function FilterTransaksi({ data, setData, filter, resetFilter, role }) {
                         value={data.search}
                         onChange={(e) => setData('search', e.target.value)}
                         className="form-control"
-                        placeholder="Cari Nama..."
+                        placeholder="Cari Transaksi..."
                     />
-                    <button className="btn-filter btn btn-primary" type="submit">
+                    <button className="btn-filter btn btn-primary my-0" type="submit">
                         <i className="fas fa-search"></i>
                     </button>
                 </div>
             </div>
 
-            <Link href={`/${role}/transaksi`} onClick={resetFilter} className="btn-input btn btn-secondary btn-sm flex-fill p-0 mx-0" title="Reset" style={{ maxWidth: "3rem" }}>
-                <i className="fas fa-undo"></i>
-            </Link>
+
+            <div className="d-flex flex-wrap gap-2" style={{width: "55%"}}>
+                <select
+                    name="tahun"
+                    value={data.tahun}
+                    onChange={(e) => setData('tahun', e.target.value)}
+                    className="form-select form-select-sm w-auto flex-fill my-2"
+                >
+                    <option value="">Semua Tahun</option>
+                    {daftar_tahun.map((th) => (
+                        <option key={th} value={th}>
+                            {th}
+                        </option>
+                    ))}
+                </select>
+
+                <select
+                    name="bulan"
+                    value={data.bulan}
+                    onChange={(e) => setData('bulan', e.target.value)}
+                    className="form-select form-select-sm w-auto flex-fill my-2"
+                >
+                    <option value="">Semua Bulan</option>
+                    {daftar_bulan.map((nama, index) => (
+                        <option key={index + 1} value={index + 1}>
+                            {nama.charAt(0).toUpperCase() + nama.slice(1)}
+                        </option>
+                    ))}
+                </select>
+                <button type="submit" className="btn-input btn btn-sm btn-primary flex-fill p-0" title="Filter Pengumuman" style={{ maxWidth: "3rem", minWidth: "3rem" }}>
+                    <i className="fas fa-filter"></i>
+                </button>
+                <Link href={`/${role}/transaksi`} onClick={resetFilter} className="btn-input btn btn-secondary btn-sm flex-fill p-0 mx-0" title="Reset" style={{ maxWidth: "3rem", minWidth: "3rem" }}>
+                    <i className="fas fa-undo"></i>
+                </Link>
+                <Role role={['rt', 'rw']}>
+                    <button type="button" onClick={() => tambahShow()} className="btn-input btn btn-sm btn-success">
+                        <i className="fas fa-plus mr-2"></i>
+                        Buat Transaksi
+                    </button>
+                </Role>
+            </div>
         </form>
     )
 }

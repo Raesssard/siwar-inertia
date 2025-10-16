@@ -22,7 +22,7 @@ export default function Tagihan() {
     const { get, data, setData } = useForm({
         search: '',
     })
-
+console.log(showModalEdit)
     const modalEdit = (item) => {
         setSelected(item)
         setShowModalEdit(true)
@@ -41,7 +41,7 @@ export default function Tagihan() {
 
     const handleDelete = (id) => {
         Swal.fire({
-            title: "Yakin hapus iuran ini?",
+            title: "Yakin hapus tagihan ini?",
             text: "Data yang dihapus tidak bisa dikembalikan!",
             icon: "warning",
             showCancelButton: true,
@@ -53,7 +53,7 @@ export default function Tagihan() {
             if (result.isConfirmed) {
                 axios.delete(`/${role}/tagihan/${id}`)
                     .then((res) => {
-                        Swal.fire("Terhapus!", "Data iuran berhasil dihapus.", "success")
+                        Swal.fire("Terhapus!", "Data Tagihan berhasil dihapus.", "success")
                         const jenis = res.data?.jenis
                         if (jenis === "otomatis") {
                             setTagihanOtomatisList(prev => prev.filter(item => item.id !== id))
@@ -92,7 +92,7 @@ export default function Tagihan() {
                         <thead>
                             <tr>
                                 <th className="px-3 text-center" scope="col">No.</th>
-                                <th className="px-3 text-center" scope="col">Nama Iuran</th>
+                                <th className="px-3 text-center" scope="col">Nama Tagihan</th>
                                 <th className="px-3 text-center" scope="col">No. KK</th>
                                 <th className="px-3 text-center" scope="col">Nama Kepala Keluarga</th>
                                 <th className="px-3 text-center" scope="col">Nominal</th>
@@ -183,7 +183,7 @@ export default function Tagihan() {
                         <thead>
                             <tr>
                                 <th className="px-3 text-center" scope="col">No.</th>
-                                <th className="px-3 text-center" scope="col">Nama Iuran</th>
+                                <th className="px-3 text-center" scope="col">Nama Tagihan</th>
                                 <th className="px-3 text-center" scope="col">No. KK</th>
                                 <th className="px-3 text-center" scope="col">Nama Kepala Keluarga</th>
                                 <th className="px-3 text-center" scope="col">Nominal</th>

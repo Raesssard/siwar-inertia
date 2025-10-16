@@ -4,7 +4,7 @@ import logo from '../../../../public/img/logo.png'
 import axios from "axios"
 import { FormatWaktu } from "../Warga/Pengaduan"
 import { SidebarLink } from "./SidebarLink"
-import { formatTanggal, getAdminLinks, getRtLinks, getWargaLinks, getRwLinks } from "./GetPropRole"
+import { formatTanggal, getAdminLinks, getRtLinks, getWargaLinks, getRwLinks, formatRupiah } from "./GetPropRole"
 import Role from "./Role"
 
 export function ModalSidebar({ modalIsOpen, modalShow }) {
@@ -3570,6 +3570,7 @@ export function EditTagihan({ editShow, onClose, onUpdated, role, selectedData }
         kategori_pembayaran: "",
         bukti_transfer: "",
     })
+    const [buktiLama, setBuktiLama] = useState(null)
     const [previewBuktiTransfer, setPreviewBuktiTransfer] = useState(null)
     const fileInputRef = useRef(null)
 
@@ -3590,12 +3591,6 @@ export function EditTagihan({ editShow, onClose, onUpdated, role, selectedData }
             const reader = new FileReader()
             reader.onload = (ev) => setPreviewBuktiTransfer({ type: "image", src: ev.target.result })
             reader.readAsDataURL(selectedFile)
-        } else if (fileName.endsWith(".mp4") || fileName.endsWith(".webm") || fileName.endsWith(".avi")) {
-            setPreviewBuktiTransfer({ type: "video", src: URL.createObjectURL(selectedFile) })
-        } else if (fileName.endsWith(".pdf")) {
-            setPreviewBuktiTransfer({ type: "pdf", src: URL.createObjectURL(selectedFile) })
-        } else {
-            setPreviewBuktiTransfer({ type: "other", name: selectedFile.name })
         }
     }
 
@@ -3607,6 +3602,7 @@ export function EditTagihan({ editShow, onClose, onUpdated, role, selectedData }
                 kategori_pembayaran: selectedData.kategori_pembayaran || "tunai",
                 bukti_transfer: selectedData.bukti_transfer || null,
             });
+            setBuktiLama(selectedData.bukti_transfer || null)
         }
     }, [selectedData, setData]);
 
@@ -3614,8 +3610,12 @@ export function EditTagihan({ editShow, onClose, onUpdated, role, selectedData }
         e.preventDefault()
 
         const formData = new FormData()
-        Object.keys(data).forEach((key) => {
-            formData.append(key, data[key] ?? "")
+        Object.entries(data).forEach(([key, value]) => {
+            if (key === "bukti_transfer" && value instanceof File) {
+                formData.append(key, value)
+            } else {
+                formData.append(key, value ?? "")
+            }
         })
 
         axios.post(`/${role}/tagihan/${selectedData.id}?_method=PUT`, formData, {
@@ -3629,7 +3629,7 @@ export function EditTagihan({ editShow, onClose, onUpdated, role, selectedData }
                     status_bayar: "",
                     tgl_bayar: "",
                     kategori_pembayaran: "tunai",
-                    bukti_transfer: "",
+                    bukti_transfer: null,
                 })
                 onClose()
             })
@@ -3650,6 +3650,7 @@ export function EditTagihan({ editShow, onClose, onUpdated, role, selectedData }
 
     const handleClear = () => {
         setData("bukti_transfer", null)
+        setBuktiLama(null)
         setPreviewBuktiTransfer(null)
         if (fileInputRef.current) fileInputRef.current.value = ""
     }
@@ -3660,6 +3661,26 @@ export function EditTagihan({ editShow, onClose, onUpdated, role, selectedData }
         if (src.startsWith("blob:")) return src
         return `/storage/${src}`
     }
+
+    useEffect(() => {
+        if (data.status_bayar === 'belum_bayar') {
+            setBuktiLama(null)
+            setData(prev => ({
+                ...prev,
+                kategori_pembayaran: "tunai",
+                bukti_transfer: null,
+            }))
+        }
+    }, [data.status_bayar])
+
+    useEffect(() => {
+        if (data.kategori_pembayaran === 'tunai') {
+            setData("bukti_transfer", null)
+            setBuktiLama(null)
+            setPreviewBuktiTransfer(null)
+            if (fileInputRef.current) fileInputRef.current.value = ""
+        }
+    }, [data.kategori_pembayaran])
 
     if (!editShow) return null
 
@@ -3672,8 +3693,8 @@ export function EditTagihan({ editShow, onClose, onUpdated, role, selectedData }
                     display: "block",
                     backgroundColor: "rgba(0,0,0,0.5)"
                 }}
-                onClick={() => {
-                    onClose()
+                onClick={(e) => {
+                    if (e.target === e.currentTarget) onClose()
                 }}
             >
                 <div
@@ -3731,7 +3752,7 @@ export function EditTagihan({ editShow, onClose, onUpdated, role, selectedData }
                                                     borderBottom: '1px solid lightgray',
                                                     borderRadius: '0',
                                                 }}
-                                            >
+                                            >{console.log(data.status_bayar === "belum_bayar")}
                                                 <option value="tunai">Tunai</option>
                                                 <option value="transfer">Transfer</option>
                                             </select>
@@ -3739,7 +3760,7 @@ export function EditTagihan({ editShow, onClose, onUpdated, role, selectedData }
 
                                         {data.kategori_pembayaran === 'transfer' && (
                                             <div className="mb-3">
-                                                {previewBuktiTransfer && (
+                                                {(previewBuktiTransfer || buktiLama) && (
                                                     <div
                                                         className="flex-fill border-end bg-black d-flex align-items-center justify-content-center mb-3"
                                                         style={{
@@ -3750,7 +3771,11 @@ export function EditTagihan({ editShow, onClose, onUpdated, role, selectedData }
                                                             position: "relative",
                                                         }}>
                                                         <button
-                                                            onClick={handleClear}
+                                                            type="button"
+                                                            onClick={(e) => {
+                                                                e.stopPropagation()
+                                                                handleClear()
+                                                            }}
                                                             style={{
                                                                 position: "absolute",
                                                                 top: "5px",
@@ -3771,9 +3796,14 @@ export function EditTagihan({ editShow, onClose, onUpdated, role, selectedData }
                                                             ✕
                                                         </button>
                                                         <div id="preview" style={{ width: "100%", height: "100%" }}>
-                                                            {previewBuktiTransfer && previewBuktiTransfer.type === "image" && (
+                                                            {((previewBuktiTransfer && previewBuktiTransfer.type === "image") || (buktiLama && /\.(jpg|jpeg|png|gif)$/i.test(buktiLama))) && (
                                                                 <img
-                                                                    src={getFileUrl(previewBuktiTransfer.src)}
+                                                                    src={
+                                                                        (previewBuktiTransfer && previewBuktiTransfer.type === "image")
+                                                                            ? getFileUrl(previewBuktiTransfer.src)
+                                                                            : (buktiLama && /\.(jpg|jpeg|png|gif)$/i.test(buktiLama))
+                                                                            && getFileUrl(buktiLama)
+                                                                    }
                                                                     alt="Preview"
                                                                     style={{
                                                                         maxWidth: "100%",
@@ -3781,38 +3811,6 @@ export function EditTagihan({ editShow, onClose, onUpdated, role, selectedData }
                                                                         objectFit: "contain"
                                                                     }}
                                                                 />
-                                                            )}
-                                                            {previewBuktiTransfer && previewBuktiTransfer.type === "video" && (
-                                                                <video
-                                                                    ref={previewVideoRef}
-                                                                    src={getFileUrl(previewBuktiTransfer.src)}
-                                                                    controls
-                                                                    autoPlay
-                                                                    loop
-                                                                    style={{
-                                                                        maxWidth: "100%",
-                                                                        maxHeight: "100%",
-                                                                        objectFit: "contain",
-                                                                        backgroundColor: "black"
-                                                                    }}
-                                                                />
-                                                            )}
-                                                            {previewBuktiTransfer && previewBuktiTransfer.type === "pdf" && (
-                                                                <embed
-                                                                    src={getFileUrl(previewBuktiTransfer.src)}
-                                                                    type="application/pdf"
-                                                                    className="pdf-preview"
-                                                                    style={{
-                                                                        width: "100%",
-                                                                        height: "100%",
-                                                                        backgroundColor: "black"
-                                                                    }}
-                                                                />
-                                                            )}
-                                                            {previewBuktiTransfer && previewBuktiTransfer.type === "other" && (
-                                                                <p style={{ color: "white", textAlign: "center" }}>
-                                                                    File dipilih: {previewBuktiTransfer.name}
-                                                                </p>
                                                             )}
                                                         </div>
                                                     </div>
@@ -3825,31 +3823,29 @@ export function EditTagihan({ editShow, onClose, onUpdated, role, selectedData }
                                                     className="d-none"
                                                     onChange={handleFileChange}
                                                     accept="image/*"
+                                                    onClick={(e) => { e.target.value = null }}
                                                 />
                                                 <button
                                                     type="button"
                                                     className="edit-file btn btn-outline-primary m-0"
                                                     title="Upload File"
-                                                    onClick={() => document.getElementById('fileInput').click()}
+                                                    onClick={() => fileInputRef.current?.click()}
+                                                    value={data.status_bayar === "belum_bayar" && null}
+                                                    disabled={data.status_bayar === "belum_bayar"}
                                                 >
                                                     <i className="fas fa-upload mr-2"></i>
                                                     <small>
                                                         Upload Bukti Transfer
                                                     </small>
                                                 </button>
-                                                {selectedData?.bukti_transfer && !data.bukti_transfer && (
-                                                    <small className="text-muted d-block mt-2">
-                                                        File lama: {selectedData.bukti_transfer}
+                                                {(selectedData?.bukti_transfer !== data.bukti_transfer) && (
+                                                    <small className="text-mute d-block mt-2">
+                                                        File dipilih: {data.bukti_transfer?.name || "(Tidak ada file)"}
                                                     </small>
                                                 )}
-                                                {data.bukti_transfer && (
-                                                    <small className="text-success d-block mt-2">
-                                                        File dipilih: {data.bukti_transfer.name}
-                                                    </small>
-                                                )}
-                                                {(!selectedData?.bukti_transfer && !previewBuktiTransfer) && (
-                                                    <small className="text-danger d-block mt-2">
-                                                        File tidak ada
+                                                {(selectedData?.bukti_transfer === data.bukti_transfer) && (
+                                                    <small className="text-mute d-block mt-2">
+                                                        File tidak bisa sama dengan yang sebelumnnya
                                                     </small>
                                                 )}
                                             </div>
@@ -3860,6 +3856,120 @@ export function EditTagihan({ editShow, onClose, onUpdated, role, selectedData }
                                             Simpan
                                         </button>
                                     </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </>
+    )
+}
+
+export function DetailTagihan({ selectedData, detailShow, onClose }) {
+    if (!detailShow || !selectedData) return null
+
+    useEffect(() => {
+        const handleEsc = (e) => {
+            if (e.key === "Escape") onClose()
+        }
+
+        document.addEventListener("keydown", handleEsc)
+        return () => document.removeEventListener("keydown", handleEsc)
+    }, [onClose])
+
+    const getFileUrl = (src) => {
+        if (!src) return ""
+        if (src.startsWith("data:")) return src
+        if (src.startsWith("blob:")) return src
+        return `/storage/${src}`
+    }
+
+    return (
+        <>
+            <div
+                className="modal fade show"
+                tabIndex="-1"
+                style={{
+                    display: "block",
+                    backgroundColor: "rgba(0,0,0,0.5)"
+                }}
+                onClick={(e) => {
+                    if (e.target === e.currentTarget) onClose()
+                }}
+            >
+                <div
+                    className="modal-dialog modal-dialog-scrollable modal-dialog-centered"
+                    onClick={(e) => e.stopPropagation()}
+                >
+                    <div className="modal-content shadow-lg border-0">
+                        <div className="modal-header bg-success text-white">
+                            <h5 className="modal-title text-white">Detail Kartu Keluarga</h5>
+                        </div>
+                        <div className="modal-body p-0 m-0">
+                            <div className="d-flex tambah-body flex-column" style={{ width: "100%", maxHeight: "80vh", overflowY: "auto" }}>
+                                <div className="p-3">
+                                    <div className="kk-info-item">
+                                        <p><strong>Tagihan</strong>: {selectedData.nama}</p>
+                                        <p><strong>Nominal</strong>: {formatRupiah(selectedData.nominal)}</p>
+                                        <p><strong>Tanggal Tagih</strong>: {formatTanggal(selectedData.tgl_tagih)}</p>
+                                        <p><strong>Tanggal Tempo</strong>: {formatTanggal(selectedData.tgl_tempo)}</p>
+                                        <p><strong>Jenis Tagihan</strong>: {selectedData.jenis === 'manual' ? (
+                                            <span className="badge bg-primary d-flex align-items-center justify-content-center text-white ml-1">Manual</span>
+                                        ) : (
+                                            <span className="badge bg-secondary d-flex align-items-center justify-content-center text-white ml-1">Otomatis</span>
+                                        )}
+                                        </p>
+                                    </div>
+                                    <div className="kk-info-item">
+                                        <p><strong>Status</strong>: {selectedData.status_bayar === 'sudah_bayar' ? (
+                                            <span className="badge bg-success d-flex align-items-center justify-content-center text-white ml-1">Sudah Bayar</span>
+                                        ) : (
+                                            <span className="badge bg-danger d-flex align-items-center justify-content-center text-white ml-1">Belum Bayar</span>
+                                        )}</p>
+                                        {selectedData.status_bayar === 'sudah_bayar' && (
+                                            <>
+                                                <p><strong>Tanggal Bayar</strong>: {formatTanggal(selectedData.tgl_bayar)}</p>
+                                                <p><strong>Kategori Pembayaran</strong>: {selectedData.kategori_pembayaran}</p>
+                                            </>
+                                        )}
+                                    </div>
+
+                                    <div className="mb-3 mt-3">
+                                        {(selectedData.bukti_transfer && selectedData.status_bayar === 'sudah_bayar') && (
+                                            <>
+                                                <p><strong>Bukti Transfer: </strong></p>
+                                                <div
+                                                    className="flex-fill border-end bg-black d-flex align-items-center justify-content-center mb-3"
+                                                    style={{
+                                                        width: "200px",
+                                                        height: "200px",
+                                                        overflow: "hidden",
+                                                        borderRadius: "10px",
+                                                        position: "relative",
+                                                    }}>
+                                                    <div id="preview" style={{ width: "100%", height: "100%" }}>
+                                                        {(selectedData.bukti_transfer && /\.(jpg|jpeg|png|gif)$/i.test(selectedData.bukti_transfer)) && (
+                                                            <img
+                                                                src={getFileUrl(selectedData.bukti_transfer)}
+                                                                alt="Preview"
+                                                                style={{
+                                                                    maxWidth: "100%",
+                                                                    maxHeight: "100%",
+                                                                    objectFit: "contain"
+                                                                }}
+                                                            />
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </>
+                                        )}
+                                    </div>
+
+                                    <button onClick={() => onClose()} className="btn btn-success ml-auto mt-auto">
+                                        <i className="fa-regular fa-circle-check mr-2"></i>
+                                        Tutup
+                                    </button>
                                 </div>
                             </div>
                         </div>

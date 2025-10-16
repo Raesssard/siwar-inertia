@@ -9,61 +9,63 @@ use App\Models\Rukun_tetangga;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Inertia\Inertia;
 
 class Rt_transaksiController extends Controller
 {
 
     public function index(Request $request)
     {
-        $title = "Data Transaksi RT";
+        Log::info('Data Filter Transaksi:', $request->all());
+
+        $title = "Transaksi";
 
         /** @var User $user */
-        $user = Auth::user();
-        $idRt = $user->rukunTetangga->rt;
+        $idRt = Auth::user()->rukunTetangga->nomor_rt;
 
-        // filter hanya transaksi untuk RT user login
-        $query = Transaksi::where('rt', $idRt);
+        $search = $request->input('search');
+        $tahun = $request->input('tahun');
+        $bulan = $request->input('bulan');
 
-        if ($request->filled('search')) {
-            $query->where('nama_transaksi', 'like', '%' . $request->search . '%');
-        }
+        $query = Transaksi::where('rt', $idRt)
+            ->when($search, fn($q) => $q->where('nama_transaksi', 'like', '%' . $search . '%'))
+            ->when($tahun, fn($q) => $q->whereYear('tanggal', $tahun))
+            ->when($bulan, fn($q) => $q->whereMonth('tanggal', $bulan));
 
-        if ($request->filled('tahun')) {
-            $query->whereYear('tanggal', $request->tahun);
-        }
-
-        if ($request->filled('bulan')) {
-            $query->whereMonth('tanggal', $request->bulan);
-        }
-
-        $transaksi = (clone $query)->orderBy('tanggal', 'desc')->get();
-        $paginatedTransaksi = $query->orderBy('tanggal', 'desc')->paginate(10);
+        $transaksi = $query->orderBy('tanggal', 'desc')->paginate(10);
 
         $daftar_tahun = Transaksi::selectRaw('YEAR(tanggal) as tahun')
             ->distinct()
             ->orderBy('tahun', 'desc')
             ->pluck('tahun');
 
-        // RT user login saja
-        $rukun_tetangga = $user->rukunTetangga ? [$user->rukunTetangga->id => $user->rukunTetangga->rt] : [];
+        $daftar_bulan = [
+            'januari',
+            'februari',
+            'maret',
+            'april',
+            'mei',
+            'juni',
+            'juli',
+            'agustus',
+            'september',
+            'oktober',
+            'november',
+            'desember'
+        ];
 
-        $pengeluaran = $request->pengeluaran ?? 0;
+        if ($request->wantsJson()) {
+            return response()->json(
+                $transaksi->fresh()
+            );
+        }
 
-        $totalPemasukanBelumTercatat = 0;
-
-        $jumlah = $totalPemasukanBelumTercatat - $pengeluaran;
-
-        return view('rt.iuran.transaksi', compact(
-            'title',
-            'transaksi',
-            'paginatedTransaksi',
-            'daftar_tahun',
-            'rukun_tetangga',
-            'totalPemasukanBelumTercatat',
-            'pengeluaran',
-            'jumlah',
-            'user',
-        ));
+        return Inertia::render('RT/Transaksi', [
+            'title' => $title,
+            'transaksi' => $transaksi,
+            'daftar_tahun' => $daftar_tahun,
+            'daftar_bulan' => $daftar_bulan,
+        ]);
     }
 
     public function store(Request $request)
@@ -107,10 +109,15 @@ class Rt_transaksiController extends Controller
         return redirect()->route('rt.transaksi.index')->with('success', 'Transaksi berhasil diperbarui!');
     }
 
-    public function destroy(Transaksi $rt_transaksi)
+    public function destroy(string $id)
     {
+        $rt_transaksi = Transaksi::findOrFail($id);
+
         $rt_transaksi->delete();
 
-        return redirect()->route('rt.transaksi.index')->with('success', 'Transaksi berhasil dihapus.');
+        return response()->json([
+            'success' => true,
+            'message' => 'Tagihan berhasil dihapus.',
+        ]);
     }
 }
