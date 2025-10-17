@@ -1,8 +1,9 @@
 import Layout from "@/Layouts/Layout"
 import { Head, Link, useForm, usePage } from "@inertiajs/react"
-import React from "react"
+import React, { useState } from "react"
 import { FilterTagihan } from "../Component/Filter"
 import { formatRupiah, formatTanggal } from "../Component/GetPropRole"
+import { DetailTagihan } from "../Component/Modal"
 
 export default function Tagihan() {
     const {
@@ -14,6 +15,13 @@ export default function Tagihan() {
     const { get, data, setData } = useForm({
         search: '',
     })
+    const [showModal, setShowModal] = useState(false)
+    const [selected, setSelected] = useState(null)
+
+    const modalDetail = (item) => {
+        setSelected(item)
+        setShowModal(true)
+    }
 
     const role = props.auth?.currentRole
 
@@ -48,35 +56,35 @@ export default function Tagihan() {
                     <table className="table-custom">
                         <thead>
                             <tr>
-                                <th scope="col">No.</th>
-                                <th scope="col">Tagihan</th>
-                                <th scope="col">Nominal</th>
-                                <th scope="col">Tanggal Tagih</th>
-                                <th scope="col">Tanggal Tempo</th>
-                                <th scope="col">Status</th>
-                                <th scope="col">Tanggal Bayar</th>
-                                <th scope="col">Detail</th>
+                                <th className="px-3 text-center" scope="col">No.</th>
+                                <th className="px-3 text-center" scope="col">Tagihan</th>
+                                <th className="px-3 text-center" scope="col">Nominal</th>
+                                <th className="px-3 text-center" scope="col">Tanggal Tagih</th>
+                                <th className="px-3 text-center" scope="col">Tanggal Tempo</th>
+                                <th className="px-3 text-center" scope="col">Status</th>
+                                <th className="px-3 text-center" scope="col">Tanggal Bayar</th>
+                                <th className="px-3 text-center" scope="col">Detail</th>
                             </tr>
                         </thead>
                         <tbody>
                             {tagihanManual.data.length > 0 ? (
                                 tagihanManual.data.map((item, index) => (
                                     <tr key={item.id}>
-                                        <td>{index + 1}</td>
-                                        <td>{item.nama}</td>
-                                        <td>{formatRupiah(item.nominal)}</td>
-                                        <td>{formatTanggal(item.tgl_tagih)}</td>
-                                        <td>{formatTanggal(item.tgl_tempo)}</td>
-                                        <td>
+                                        <td className="text-center">{index + 1}</td>
+                                        <td className="text-center">{item.nama}</td>
+                                        <td className="text-center">{formatRupiah(item.nominal)}</td>
+                                        <td className="text-center">{formatTanggal(item.tgl_tagih)}</td>
+                                        <td className="text-center">{formatTanggal(item.tgl_tempo)}</td>
+                                        <td className="text-center">
                                             {item.status_bayar === 'sudah_bayar' ? (
-                                                <span className="badge bg-success">Sudah Bayar</span>
+                                                <span className="badge bg-success text-white">Sudah Bayar</span>
                                             ) : (
-                                                <span className="badge bg-warning">Belum Bayar</span>
+                                                <span className="badge bg-warning text-white">Belum Bayar</span>
                                             )}
                                         </td>
-                                        <td>{item.tgl_bayar ? formatTanggal(item.tgl_bayar) : "-"}</td>
-                                        <td>
-                                            <button className="btn btn-success btn-sm">
+                                        <td className="text-center">{item.tgl_bayar ? formatTanggal(item.tgl_bayar) : "-"}</td>
+                                        <td className="text-center">
+                                            <button className="btn btn-success btn-sm" onClick={() => modalDetail(item)}>
                                                 <i className="fas fa-info"></i>
                                             </button>
                                         </td>
@@ -130,35 +138,35 @@ export default function Tagihan() {
                     <table className="table-custom">
                         <thead>
                             <tr>
-                                <th scope="col">No.</th>
-                                <th scope="col">Tagihan</th>
-                                <th scope="col">Nominal</th>
-                                <th scope="col">Tanggal Tagih</th>
-                                <th scope="col">Tanggal Tempo</th>
-                                <th scope="col">Status</th>
-                                <th scope="col">Tanggal Bayar</th>
-                                <th scope="col">Detail</th>
+                                <th className="px-3 text-center" scope="col">No.</th>
+                                <th className="px-3 text-center" scope="col">Tagihan</th>
+                                <th className="px-3 text-center" scope="col">Nominal</th>
+                                <th className="px-3 text-center" scope="col">Tanggal Tagih</th>
+                                <th className="px-3 text-center" scope="col">Tanggal Tempo</th>
+                                <th className="px-3 text-center" scope="col">Status</th>
+                                <th className="px-3 text-center" scope="col">Tanggal Bayar</th>
+                                <th className="px-3 text-center" scope="col">Detail</th>
                             </tr>
                         </thead>
                         <tbody>
                             {tagihanOtomatis.data.length > 0 ? (
                                 tagihanOtomatis.data.map((item, index) => (
                                     <tr key={item.id}>
-                                        <td>{index + 1}</td>
-                                        <td>{item.nama}</td>
-                                        <td>{formatRupiah(item.nominal)}</td>
-                                        <td>{formatTanggal(item.tgl_tagih)}</td>
-                                        <td>{formatTanggal(item.tgl_tempo)}</td>
-                                        <td>
+                                        <td className="text-center">{index + 1}</td>
+                                        <td className="text-center">{item.nama}</td>
+                                        <td className="text-center">{formatRupiah(item.nominal)}</td>
+                                        <td className="text-center">{formatTanggal(item.tgl_tagih)}</td>
+                                        <td className="text-center">{formatTanggal(item.tgl_tempo)}</td>
+                                        <td className="text-center">
                                             {item.status_bayar === 'sudah_bayar' ? (
-                                                <span className="badge bg-success">Sudah Bayar</span>
+                                                <span className="badge bg-success text-white">Sudah Bayar</span>
                                             ) : (
-                                                <span className="badge bg-warning">Belum Bayar</span>
+                                                <span className="badge bg-warning text-white">Belum Bayar</span>
                                             )}
                                         </td>
-                                        <td>{item.tgl_bayar ? formatTanggal(item.tgl_bayar) : "-"}</td>
-                                        <td>
-                                            <button className="btn btn-success btn-sm">
+                                        <td className="text-center">{item.tgl_bayar ? formatTanggal(item.tgl_bayar) : "-"}</td>
+                                        <td className="text-center">
+                                            <button className="btn btn-success btn-sm" onClick={() => modalDetail(item)}>
                                                 <i className="fas fa-info"></i>
                                             </button>
                                         </td>
@@ -203,6 +211,11 @@ export default function Tagihan() {
                     </div>
                 )}
             </div>
+            <DetailTagihan
+                selectedData={selected}
+                detailShow={showModal}
+                onClose={() => setShowModal(false)}
+            />
         </Layout>
     )
 }

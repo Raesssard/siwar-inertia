@@ -24,7 +24,7 @@ class Rt_tagihanController extends Controller
      */
     public function index(Request $request)
     {
-        $title = 'Data Tagihan';
+        $title = 'Tagihan';
 
         /** @var User $user */
         $user = Auth::user();
@@ -91,55 +91,6 @@ class Rt_tagihanController extends Controller
     }
 
     /**
-     * Menyimpan data tagihan manual baru.
-     */
-    public function store(Request $request)
-    {
-        Log::info('Data received for store tagihan:', $request->all());
-
-        $validated = $request->validate([
-            'nama' => 'required|string|max:255',
-            'tgl_tagih' => 'required|date',
-            'tgl_tempo' => 'required|date',
-            'jenis' => 'required|in:otomatis,manual',
-            'nominal_manual' => 'required_if:jenis,manual|numeric|min:0',
-            'no_kk' => 'required|string|max:255|exists:kartu_keluarga,no_kk',
-            'status_bayar' => 'required|in:sudah_bayar,belum_bayar',
-            'tgl_bayar' => 'nullable|date',
-            'id_iuran' => 'nullable|exists:iuran,id',
-            'kategori_pembayaran' => 'nullable|in:transfer,tunai',
-            'bukti_transfer' => 'nullable|string|max:255',
-        ]);
-
-        if ($validated['jenis'] !== 'manual') {
-            return redirect()->back()->with('error', 'Hanya tagihan manual yang dapat ditambahkan melalui form ini.');
-        }
-
-        try {
-            $dataToStore = [
-                'nama' => $validated['nama'],
-                'tgl_tagih' => $validated['tgl_tagih'],
-                'tgl_tempo' => $validated['tgl_tempo'],
-                'jenis' => 'manual',
-                'nominal' => $validated['nominal_manual'],
-                'no_kk' => $validated['no_kk'],
-                'status_bayar' => $validated['status_bayar'],
-                'tgl_bayar' => $validated['tgl_bayar'] ?? null,
-                'id_iuran' => $validated['id_iuran'] ?? null,
-                'kategori_pembayaran' => $validated['kategori_pembayaran'] ?? null,
-                'bukti_transfer' => $validated['bukti_transfer'] ?? null,
-            ];
-
-            Tagihan::create($dataToStore);
-
-            return redirect()->route('rt.iuran.index')->with('success', 'Tagihan manual berhasil ditambahkan.');
-        } catch (\Exception $e) {
-            Log::error('Error creating tagihan manual:', ['message' => $e->getMessage()]);
-            return redirect()->back()->withInput()->with('error', 'Gagal menambahkan tagihan manual. Error: ' . $e->getMessage());
-        }
-    }
-
-    /**
      * Memperbarui tagihan manual.
      */
     public function update(Request $request, $id)
@@ -188,12 +139,14 @@ class Rt_tagihanController extends Controller
                 ]);
             }
 
-            if ($validated['status_bayar'] === 'belum_bayar' && $tagihan->transaksi) {
+            if ($validated['status_bayar'] === 'belum_bayar') {
                 $tagihan->update([
+                    'bukti_transfer' => null,
                     'tgl_bayar' => null,
                 ]);
-
-                $tagihan->transaksi->delete();
+                if ($tagihan->transaksi) {
+                    $tagihan->transaksi->delete();
+                }
             }
 
             $iuran->load(['iuran_golongan', 'iuran_golongan.golongan']);

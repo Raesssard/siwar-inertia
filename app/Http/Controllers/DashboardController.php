@@ -63,7 +63,7 @@ class DashboardController extends Controller
                 if ($userRwId) {
                     $query->orWhere(function ($subQuery) use ($userRwId) {
                         $subQuery->where('id_rw', $userRwId)
-                            ->whereNull('id_rt'); // Penting: Hanya pengumuman tingkat RW
+                            ->whereNull('id_rt');
                     });
                 }
             });
@@ -85,7 +85,7 @@ class DashboardController extends Controller
                 })
                 ->sum('nominal');
 
-            $transaksi = Transaksi::where('rt', $user->warga->kartuKeluarga->rukunTetangga->rt);
+            $transaksi = Transaksi::where('rt', $user->warga->kartuKeluarga->rukunTetangga->nomor_rt);
             $pemasukan = (clone $transaksi)->where('jenis', 'pemasukan')->sum('nominal');
             $pengeluaran = (clone $transaksi)->where('jenis', 'pengeluaran')->sum('nominal');
             $jumlah_transaksi = (clone $transaksi)->count();
@@ -94,7 +94,7 @@ class DashboardController extends Controller
             $total_pemasukan_iuran = Tagihan::where('status_bayar', 'sudah_bayar')
                 ->sum('nominal');
 
-            $total_pemasukan_transaksi = Transaksi::where('jenis', 'pemasukan')->sum('nominal');
+            $total_pemasukan_transaksi = Transaksi::where('jenis', 'pemasukan')->whereNull('tagihan_id')->sum('nominal');
             $total_pengeluaran = Transaksi::where('jenis', 'pengeluaran')->sum('nominal');
 
             $total_pemasukan = $total_pemasukan_iuran + $total_pemasukan_transaksi;
@@ -149,7 +149,7 @@ class DashboardController extends Controller
             $jumlah_warga_pendatang = Warga::where('status_warga', 'pendatang')
                 ->whereIn('no_kk', $kk_nomor_list)
                 ->count();
-            $rt = Transaksi::where('rt', Auth::user()->rukunTetangga->rt);
+            $rt = Transaksi::where('rt', Auth::user()->rukunTetangga->nomor_rt);
             $total_pemasukan = (clone $rt)->where('jenis', 'pemasukan')->sum('nominal');
             $pengeluaran = (clone $rt)->where('jenis', 'pengeluaran')->sum('nominal');
             $total_saldo_akhir = $total_pemasukan - $pengeluaran;

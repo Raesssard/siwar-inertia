@@ -17,6 +17,9 @@ class WargatransaksiController extends Controller
         $title = 'Transaksi';
         /** @var User $user */
         $user = Auth::user();
+        $search = $request->input('search');
+        $tahun = $request->input('tahun');
+        $bulan = $request->input('bulan');
 
         // Cek akses dan data warga serta kartu keluarga
         if (!$user || !$user->hasRole('warga') || !$user->warga || !$user->warga->kartuKeluarga || !$user->warga->kartuKeluarga->rukunTetangga) {
@@ -32,21 +35,39 @@ class WargatransaksiController extends Controller
             return redirect('/')->with('error', 'Data RT Anda tidak ditemukan. Silakan hubungi RT/RW Anda.');
         }
 
-        $query = Transaksi::where('rt', $idRt); // Filter transaksi berdasarkan id_rt dari KK
-
-        if ($request->filled('search')) {
-            $search = $request->input('search');
-            $query->where(function ($q) use ($search) {
-                $q->where('nama_transaksi', 'like', '%' . $search . '%')
-                    ->orWhere('keterangan', 'like', '%' . $search . '%');
-            });
-        }
+        $query = Transaksi::where('rt', $idRt)
+            ->when($search, fn($q) => $q->where('nama_transaksi', 'like', '%' . $search . '%'))
+            ->when($tahun, fn($q) => $q->whereYear('tanggal', $tahun))
+            ->when($bulan, fn($q) => $q->whereMonth('tanggal', $bulan));
 
         $transaksi = $query->orderBy('tanggal', 'desc')->orderBy('id', 'desc')->paginate(10);
 
+
+        $daftar_tahun = Transaksi::selectRaw('YEAR(tanggal) as tahun')
+            ->distinct()
+            ->orderBy('tahun', 'desc')
+            ->pluck('tahun');
+
+        $daftar_bulan = [
+            'januari',
+            'februari',
+            'maret',
+            'april',
+            'mei',
+            'juni',
+            'juli',
+            'agustus',
+            'september',
+            'oktober',
+            'november',
+            'desember'
+        ];
+
         return Inertia::render('Warga/Transaksi', [
             'title' => $title,
-            'transaksi' => $transaksi
+            'transaksi' => $transaksi,
+            'daftar_tahun' => $daftar_tahun,
+            'daftar_bulan' => $daftar_bulan,
         ]);
     }
 }
