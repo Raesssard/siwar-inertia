@@ -81,6 +81,7 @@ Route::middleware(['auth'])->group(function () {
         Route::resource('kartu_keluarga', RwKartuKeluargaController::class);
         Route::resource('pengumuman', RwPengumumanController::class);
 
+        Route::get('warga/orangtua/{no_kk}', [RwWargaController::class, 'getOrangTua'])->name('warga.getOrangTua');
         Route::get('warga/create', [RwWargaController::class, 'create'])->name('warga.create');
         Route::get('warga/{id}/edit', [RwWargaController::class, 'edit'])->name('warga.edit');
 

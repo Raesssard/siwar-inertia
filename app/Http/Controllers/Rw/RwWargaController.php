@@ -8,6 +8,7 @@ use App\Models\HistoryWarga;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 
 class RwWargaController extends Controller
@@ -48,12 +49,23 @@ class RwWargaController extends Controller
         ]);
     }
 
-    public function create()
+    public function create(Request $request)
     {
         $title = 'Tambah Warga';
+        $noKK = $request->query('no_kk'); // ambil dari URL query string
+        $wargaList = [];
+
+        if ($noKK) {
+            // Ambil semua warga dengan nomor KK tersebut (untuk autofill ayah & ibu)
+            $wargaList = Warga::where('no_kk', $noKK)->get();
+        }
+
+        // Kirim data noKK dan wargaList ke komponen Inertia
         return Inertia::render('Rw/FormWarga', [
             'title' => $title,
             'warga' => null,
+            'noKK' => $noKK,
+            'wargaList' => $wargaList,
         ]);
     }
 
@@ -76,12 +88,27 @@ class RwWargaController extends Controller
             'nama_ayah' => 'required|string',
             'nama_ibu' => 'required|string',
             'status_warga' => 'required|in:penduduk,pendatang',
+
+            // ✅ tambahan untuk WNA
+            'no_paspor' => 'nullable|string|max:50',
+            'tgl_terbit_paspor' => 'nullable|date',
+            'tgl_berakhir_paspor' => 'nullable|date',
+            'no_kitas' => 'nullable|string|max:50',
+            'tgl_terbit_kitas' => 'nullable|date',
+            'tgl_berakhir_kitas' => 'nullable|date',
+            'no_kitap' => 'nullable|string|max:50',
+            'tgl_terbit_kitap' => 'nullable|date',
+            'tgl_berakhir_kitap' => 'nullable|date',
+
+            // ✅ tambahan untuk pendatang
             'alamat_asal' => 'nullable|string',
             'alamat_domisili' => 'nullable|string',
             'tanggal_mulai_tinggal' => 'nullable|date',
             'tujuan_pindah' => 'nullable|string',
         ]);
 
+        Log::info('Data Warga:', $request->all());
+        Log::info('Validasi Berhasil:', $validated);
         $warga = Warga::create($validated);
 
         HistoryWarga::create([
@@ -126,6 +153,19 @@ class RwWargaController extends Controller
             'nama_ayah' => 'required|string',
             'nama_ibu' => 'required|string',
             'status_warga' => 'required|in:penduduk,pendatang',
+
+            // ✅ tambahan untuk WNA
+            'no_paspor' => 'nullable|string|max:50',
+            'tgl_terbit_paspor' => 'nullable|date',
+            'tgl_berakhir_paspor' => 'nullable|date',
+            'no_kitas' => 'nullable|string|max:50',
+            'tgl_terbit_kitas' => 'nullable|date',
+            'tgl_berakhir_kitas' => 'nullable|date',
+            'no_kitap' => 'nullable|string|max:50',
+            'tgl_terbit_kitap' => 'nullable|date',
+            'tgl_berakhir_kitap' => 'nullable|date',
+
+            // ✅ tambahan untuk pendatang
             'alamat_asal' => 'nullable|string',
             'alamat_domisili' => 'nullable|string',
             'tanggal_mulai_tinggal' => 'nullable|date',
@@ -153,4 +193,21 @@ class RwWargaController extends Controller
 
         return redirect()->route('rw.warga.index')->with('success', 'Warga berhasil dihapus dan dicatat ke history.');
     }
+
+    public function getOrangTua($no_kk)
+    {
+        $ayah = Warga::where('no_kk', $no_kk)
+            ->where('status_hubungan_dalam_keluarga', 'kepala keluarga')
+            ->first();
+
+        $ibu = Warga::where('no_kk', $no_kk)
+            ->where('status_hubungan_dalam_keluarga', 'istri')
+            ->first();
+
+        return Inertia::render('Rw/FormWarga', [
+            'ayah' => $ayah,
+            'ibu' => $ibu,
+        ]);
+    }
+
 }
