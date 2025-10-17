@@ -22,7 +22,10 @@ export default function Tagihan() {
     const { get, data, setData } = useForm({
         search: '',
     })
-console.log(showModalEdit)
+
+console.log(tagihanManualList)
+console.log(tagihanOtomatisList)
+
     const modalEdit = (item) => {
         setSelected(item)
         setShowModalEdit(true)
@@ -276,6 +279,7 @@ console.log(showModalEdit)
                                 item.id === updated.id ? updated : item
                             )
                         )
+                        console.log(tagihanManualList)
                     } else {
 
                         setTagihanOtomatisList(prev =>
@@ -283,6 +287,7 @@ console.log(showModalEdit)
                                 item.id === updated.id ? updated : item
                             )
                         )
+                        console.log(tagihanOtomatisList)
                     }
                 }}
                 role={role}

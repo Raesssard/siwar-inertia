@@ -3277,12 +3277,18 @@ export function TambahIuran({ tambahShow, onClose, onAdded, role, golongan }) {
         tgl_tempo: "",
         jenis: "manual",
         nominal: "",
+        periode: "",
     })
     const [golonganList, setGolonganList] = useState([])
 
     useEffect(() => {
         setGolonganList(golongan)
-    }, [])
+        const defaults = {}
+        golongan.forEach(g => {
+            defaults[`periode_${g.id}`] = "1"
+        })
+        setData(prev => ({ ...prev, ...defaults }))
+    }, [golongan])
 
     const handleChange = (e) => {
         setData({ ...data, [e.target.name]: e.target.value })
@@ -3290,6 +3296,10 @@ export function TambahIuran({ tambahShow, onClose, onAdded, role, golongan }) {
 
     const handleNominalChange = (id, value) => {
         setData({ ...data, [`nominal_${id}`]: value })
+    }
+
+    const handlePeriodeChange = (id, value) => {
+        setData({ ...data, [`periode_${id}`]: value })
     }
 
     const handleSubmit = (e) => {
@@ -3305,6 +3315,7 @@ export function TambahIuran({ tambahShow, onClose, onAdded, role, golongan }) {
                     tgl_tempo: "",
                     jenis: "manual",
                     nominal: "",
+                    periode: "",
                 })
                 onClose()
             })
@@ -3393,12 +3404,12 @@ export function TambahIuran({ tambahShow, onClose, onAdded, role, golongan }) {
                                             <div className="mb-3">
                                                 <label className="form-label">Nominal Iuran</label>
                                                 <input
-                                                    type="text"
+                                                    type="number"
                                                     name="nominal"
                                                     className="tambah-judul form-control"
                                                     onChange={handleChange}
                                                     onInput={(e) => {
-                                                        if (e.target.value.length > 8) {
+                                                        if (e.target.value.length > 8 || e.target.value.length < 0) {
                                                             e.target.value = e.target.value.slice(0, 8);
                                                         }
                                                     }}
@@ -3409,21 +3420,50 @@ export function TambahIuran({ tambahShow, onClose, onAdded, role, golongan }) {
                                         {data.jenis === "otomatis" && (
                                             <div className="mb-3">
                                                 <h4 className="mb-3">Nominal per Golongan:</h4>
-                                                {golonganList.map((g) => (
-                                                    <div key={g.id} className="mb-3">
-                                                        <label>{g.jenis}</label>
-                                                        <input
-                                                            type="number"
-                                                            className="tambah-judul form-control"
-                                                            onInput={(e) => {
-                                                                if (e.target.value.length > 8) {
-                                                                    e.target.value = e.target.value.slice(0, 8);
-                                                                }
-                                                            }}
-                                                            onChange={(e) => handleNominalChange(g.id, e.target.value)}
-                                                        />
-                                                    </div>
-                                                ))}
+                                                {golonganList.map((g) => {
+                                                    let items = []
+                                                    for (let i = 1; i <= 12; i++) {
+                                                        items.push(<option value={i} key={i}>{i} Bulan</option>)
+                                                    }
+
+                                                    return (
+                                                        <div key={g.id} className="mb-3 d-flex col gap-3">
+                                                            <div className="w-100">
+                                                                <label>{g.jenis === 'umkm'
+                                                                    ? g.jenis.toUpperCase()
+                                                                    : g.jenis.charAt(0).toUpperCase() + g.jenis.slice(1)}</label>
+                                                                <input
+                                                                    type="number"
+                                                                    className="tambah-judul form-control"
+                                                                    onInput={(e) => {
+                                                                        if (e.target.value.length > 8 || e.target.value.length < 0) {
+                                                                            e.target.value = e.target.value.slice(0, 8);
+                                                                        }
+                                                                    }}
+                                                                    onChange={(e) => handleNominalChange(g.id, e.target.value)}
+                                                                    required
+                                                                />
+                                                            </div>
+                                                            <div className="w-100">
+                                                                <label>Periode</label>
+                                                                <select
+                                                                    name="periode"
+                                                                    className="tambah-judul form-control"
+                                                                    onChange={(e) => handlePeriodeChange(g.id, e.target.value)}
+                                                                    required
+                                                                    style={{
+                                                                        border: '0',
+                                                                        borderBottom: '1px solid lightgray',
+                                                                        borderRadius: '0',
+                                                                        width: '100%',
+                                                                    }}
+                                                                >
+                                                                    {items}
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                    )
+                                                })}
                                             </div>
                                         )}
 
@@ -3445,22 +3485,28 @@ export function TambahIuran({ tambahShow, onClose, onAdded, role, golongan }) {
 export function EditIuranOtomatis({ editShow, onClose, onUpdated, role, golongan, iuran, iuranGol }) {
     const { data, setData } = useForm({
         nominal: "",
+        periode: "",
     })
 
     useEffect(() => {
         if (iuranGol) {
             setData({
                 nominal: iuranGol.nominal || "",
+                periode: iuranGol.periode || "",
             });
         }
     }, [iuranGol, setData]);
 
     const handleSubmit = (e) => {
         e.preventDefault()
+        console.log(data)
         axios.put(`/${role}/iuran/${iuranGol.id}`, data)
             .then(res => {
                 if (onUpdated) onUpdated(res.data.iuran)
-                setData({ nominal: "" })
+                setData({
+                    nominal: "",
+                    periode: "",
+                })
                 onClose()
             })
     }
@@ -3475,6 +3521,11 @@ export function EditIuranOtomatis({ editShow, onClose, onUpdated, role, golongan
     }, [onClose])
 
     if (!editShow) return null
+
+    let items = []
+    for (let i = 1; i <= 12; i++) {
+        items.push(<option value={i} key={i}>{i} Bulan</option>)
+    }
 
     return (
         <>
@@ -3548,6 +3599,25 @@ export function EditIuranOtomatis({ editShow, onClose, onUpdated, role, golongan
                                             />
                                         </div>
 
+                                        <div className="mb-3">
+                                            <label>Periode Iuran</label>
+                                            <select
+                                                name="periode"
+                                                className="tambah-judul form-control"
+                                                value={data.periode}
+                                                onChange={(e) => setData("periode", e.target.value)}
+                                                required
+                                                style={{
+                                                    border: '0',
+                                                    borderBottom: '1px solid lightgray',
+                                                    borderRadius: '0',
+                                                    width: '100%',
+                                                }}
+                                            >
+                                                {items}
+                                            </select>
+                                        </div>
+
                                         <button type="submit" className="btn btn-primary ml-auto mt-auto">
                                             <i className="fas fa-save mr-2"></i>
                                             Simpan
@@ -3604,7 +3674,7 @@ export function EditTagihan({ editShow, onClose, onUpdated, role, selectedData }
             });
             setBuktiLama(selectedData.bukti_transfer || null)
         }
-    }, [selectedData, setData]);
+    }, [selectedData, setData, editShow]);
 
     const handleSubmit = (e) => {
         e.preventDefault()
@@ -3752,7 +3822,7 @@ export function EditTagihan({ editShow, onClose, onUpdated, role, selectedData }
                                                     borderBottom: '1px solid lightgray',
                                                     borderRadius: '0',
                                                 }}
-                                            >{console.log(data.status_bayar === "belum_bayar")}
+                                            >
                                                 <option value="tunai">Tunai</option>
                                                 <option value="transfer">Transfer</option>
                                             </select>
@@ -3970,6 +4040,278 @@ export function DetailTagihan({ selectedData, detailShow, onClose }) {
                                         <i className="fa-regular fa-circle-check mr-2"></i>
                                         Tutup
                                     </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </>
+    )
+}
+
+export function TambahTransaksi({ tambahShow, onClose, onAdded, role }) {
+    const { data, setData } = useForm({
+        tanggal: "",
+        nama_transaksi: "",
+        nominal: "",
+        keterangan: "",
+    })
+
+    const handleSubmit = (e) => {
+        e.preventDefault()
+
+        const formData = new FormData()
+        formData.append('tanggal', data.tanggal)
+        formData.append('nama_transaksi', data.nama_transaksi)
+        formData.append('nominal', data.nominal)
+        formData.append('keterangan', data.keterangan)
+
+        axios.post(`/${role}/transaksi`, formData)
+            .then(res => {
+                if (onAdded) {
+                    onAdded(res.data.transaksi)
+                }
+                setData({
+                    tanggal: "",
+                    nama_transaksi: "",
+                    nominal: "",
+                    keterangan: "",
+                })
+                onClose()
+            })
+    }
+
+    useEffect(() => {
+        const handleEsc = (e) => {
+            if (e.key === "Escape") onClose()
+        }
+
+        document.addEventListener("keydown", handleEsc)
+        return () => document.removeEventListener("keydown", handleEsc)
+    }, [onClose])
+
+    if (!tambahShow) return null
+
+    return (
+        <>
+            <div
+                className="modal fade show"
+                tabIndex="-1"
+                style={{
+                    display: "block",
+                    backgroundColor: "rgba(0,0,0,0.5)"
+                }}
+                onClick={() => {
+                    onClose()
+                }}
+            >
+                <div
+                    className="modal-dialog modal-dialog-scrollable modal-dialog-centered"
+                    onClick={(e) => e.stopPropagation()}
+                >
+                    <div className="modal-content shadow-lg border-0">
+                        <div className="modal-body p-0 m-0">
+                            <div className="d-flex tambah-body flex-column" style={{ width: "100%", maxHeight: "80vh", overflowY: "auto" }}>
+                                <div className="p-3">
+                                    <form onSubmit={handleSubmit} className="h-100">
+                                        <div className="mb-3">
+                                            <label className="form-label">Nama Transaksi</label>
+                                            <input
+                                                name="nama_transaksi"
+                                                type="text"
+                                                className="tambah-judul form-control"
+                                                onChange={(huruf) => setData('nama_transaksi', huruf.target.value)}
+                                                required
+                                            />
+                                        </div>
+
+                                        <div className="mb-3">
+                                            <label className="form-label">Tanggal Transaksi</label>
+                                            <input
+                                                name="tanggal"
+                                                type="date"
+                                                className="tambah-kategori form-control"
+                                                onChange={(tanggal) => setData('tanggal', tanggal.target.value)}
+                                                required
+                                            />
+                                        </div>
+
+                                        <div className="mb-3">
+                                            <label className="form-label">Nominal Transaksi</label>
+                                            <input
+                                                type="text"
+                                                name="nominal"
+                                                className="tambah-judul form-control"
+                                                onChange={(nominal) => setData('nominal', nominal.target.value)}
+                                                onInput={(e) => {
+                                                    if (e.target.value.length > 8) {
+                                                        e.target.value = e.target.value.slice(0, 8);
+                                                    }
+                                                }}
+                                            />
+                                        </div>
+
+                                        <div className="mb-3">
+                                            <label className="form-label">Keterangan</label>
+                                            <textarea
+                                                name="keterangan"
+                                                className="edit-isi form-control"
+                                                rows="3"
+                                                onChange={(e) => setData("keterangan", e.target.value)}
+                                            ></textarea>
+                                        </div>
+
+                                        <button type="submit" className="btn btn-primary ml-auto mt-auto">
+                                            <i className="fas fa-save mr-2"></i>
+                                            Simpan
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </>
+    )
+}
+
+export function EditTransaksi({ editShow, onClose, onUpdated, role, selectedData }) {
+    const { data, setData } = useForm({
+        tanggal: "",
+        nama_transaksi: "",
+        nominal: "",
+        keterangan: "",
+    })
+    console.log(selectedData)
+    console.log(data)
+    useEffect(() => {
+        if (selectedData) {
+            setData({
+                tanggal: selectedData.tanggal || "",
+                nama_transaksi: selectedData.nama_transaksi || "",
+                nominal: selectedData.nominal || "",
+                keterangan: selectedData.keterangan || "",
+            });
+        }
+    }, [selectedData, setData, editShow]);
+
+    const handleSubmit = (e) => {
+        e.preventDefault()
+
+        const formData = new FormData()
+        formData.append('_method', 'PUT')
+        formData.append('tanggal', data.tanggal)
+        formData.append('nama_transaksi', data.nama_transaksi)
+        formData.append('nominal', data.nominal)
+        formData.append('keterangan', data.keterangan)
+
+        axios.post(`/${role}/transaksi/${selectedData.id}`, formData)
+            .then((res) => {
+                if (onUpdated) onUpdated(res.data.transaksi)
+                setData({
+                    tanggal: "",
+                    nama_transaksi: "",
+                    nominal: "",
+                    keterangan: "",
+                })
+                onClose()
+            })
+            .catch((err) => {
+                console.error(err.response?.data || err)
+                alert("Gagal update tagihan! Lihat console untuk detail.")
+            })
+    }
+
+    useEffect(() => {
+        const handleEsc = (e) => {
+            if (e.key === "Escape") onClose()
+        }
+
+        document.addEventListener("keydown", handleEsc)
+        return () => document.removeEventListener("keydown", handleEsc)
+    }, [onClose])
+
+    if (!editShow) return null
+
+    return (
+        <>
+            <div
+                className="modal fade show"
+                tabIndex="-1"
+                style={{
+                    display: "block",
+                    backgroundColor: "rgba(0,0,0,0.5)"
+                }}
+                onClick={(e) => {
+                    if (e.target === e.currentTarget) onClose()
+                }}
+            >
+                <div
+                    className="modal-dialog modal-dialog-scrollable modal-dialog-centered"
+                    onClick={(e) => e.stopPropagation()}
+                >
+                    <div className="modal-content shadow-lg border-0">
+                        <div className="modal-body p-0 m-0">
+                            <div className="d-flex tambah-body flex-column" style={{ width: "100%", maxHeight: "80vh", overflowY: "auto" }}>
+                                <div className="p-3">
+                                    <form onSubmit={handleSubmit} className="h-100">
+                                        <div className="mb-3">
+                                            <label className="form-label">Nama Transaksi</label>
+                                            <input
+                                                name="nama_transaksi"
+                                                type="text"
+                                                value={data.nama_transaksi}
+                                                className="tambah-judul form-control"
+                                                onChange={(huruf) => setData('nama_transaksi', huruf.target.value)}
+                                                required
+                                            />
+                                        </div>
+
+                                        <div className="mb-3">
+                                            <label className="form-label">Tanggal bayar</label>
+                                            <input
+                                                name="tanggal"
+                                                type="date"
+                                                value={data.tanggal ? data.tanggal.split('T')[0] : ''}
+                                                className="tambah-kategori form-control"
+                                                onChange={(e) => setData('tanggal', e.target.value)}
+                                            />
+                                        </div>
+
+                                        <div className="mb-3">
+                                            <label className="form-label">Nominal Transaksi</label>
+                                            <input
+                                                type="text"
+                                                name="nominal"
+                                                value={data.nominal}
+                                                className="tambah-judul form-control"
+                                                onChange={(nominal) => setData('nominal', nominal.target.value)}
+                                                onInput={(e) => {
+                                                    if (e.target.value.length > 8) {
+                                                        e.target.value = e.target.value.slice(0, 8);
+                                                    }
+                                                }}
+                                            />
+                                        </div>
+
+                                        <div className="mb-3">
+                                            <label className="form-label">Keterangan</label>
+                                            <textarea
+                                                name="keterangan"
+                                                className="edit-isi form-control"
+                                                value={data.keterangan}
+                                                rows="3"
+                                                onChange={(e) => setData("keterangan", e.target.value)}
+                                            ></textarea>
+                                        </div>
+
+                                        <button type="submit" className="btn btn-primary ml-auto mt-auto">
+                                            <i className="fas fa-save mr-2"></i>
+                                            Simpan
+                                        </button>
+                                    </form>
                                 </div>
                             </div>
                         </div>

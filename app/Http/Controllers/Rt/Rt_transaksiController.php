@@ -16,8 +16,6 @@ class Rt_transaksiController extends Controller
 
     public function index(Request $request)
     {
-        Log::info('Data Filter Transaksi:', $request->all());
-
         $title = "Transaksi";
 
         /** @var User $user */
@@ -71,42 +69,53 @@ class Rt_transaksiController extends Controller
     public function store(Request $request)
     {
         $user = Auth::user();
-        $noRt = $user->rukunTetangga->rt;
+        $noRt = $user->rukunTetangga->nomor_rt;
         $request->validate([
             'tanggal' => 'required|date',
             'nama_transaksi' => 'required|string|max:255',
-            'jenis' => 'required|in:pemasukan,pengeluaran',
             'nominal' => 'required|numeric|min:0',
             'keterangan' => 'nullable|string',
         ]);
 
         $dataYangDimasukin = [
+            'tagihan_id' => null,
             'rt' => $noRt,
             'tanggal' => $request->tanggal,
             'nama_transaksi' => $request->nama_transaksi,
-            'jenis' => $request->jenis,
+            'jenis' => 'pemasukan',
             'nominal' => $request->nominal,
             'keterangan' => $request->keterangan,
         ];
 
-        Transaksi::create($dataYangDimasukin);
+        $transaksi = Transaksi::create($dataYangDimasukin);
 
-        return redirect()->route('rt.transaksi.index')->with('success', 'Transaksi berhasil ditambahkan!');
+        return response()->json([
+            'success' => true,
+            'message' => 'Transaksi berhasil dibuat.',
+            'transaksi' => $transaksi
+        ]);
     }
 
-    public function update(Request $request, Transaksi $rt_transaksi)
+    public function update(Request $request, string $id)
     {
+        Log::info("Data received for update tagihan ID {$id}:", $request->all());
+        Log::info('VALIDATION DATA:', $request->all());
+        $rt_transaksi = Transaksi::findOrFail($id);
+
         $validated = $request->validate([
             'tanggal' => 'required|date',
             'nama_transaksi' => 'required|string|max:255',
-            'jenis' => 'required|in:pemasukan,pengeluaran',
             'nominal' => 'required|numeric|min:0',
             'keterangan' => 'nullable|string',
         ]);
 
         $rt_transaksi->update($validated);
 
-        return redirect()->route('rt.transaksi.index')->with('success', 'Transaksi berhasil diperbarui!');
+        return response()->json([
+            'success' => true,
+            'message' => 'Transaksi berhasil diubah',
+            'transaksi' => $rt_transaksi
+        ]);
     }
 
     public function destroy(string $id)
@@ -117,7 +126,7 @@ class Rt_transaksiController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Tagihan berhasil dihapus.',
+            'message' => 'Transaksi berhasil dihapus.',
         ]);
     }
 }

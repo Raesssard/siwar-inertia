@@ -16,6 +16,7 @@ return new class extends Migration
             $table->foreignId('id_iuran')->constrained('iuran')->onDelete('cascade');
             $table->foreignId('id_golongan')->constrained('kategori_golongan')->onDelete('cascade');
             $table->integer('nominal');
+            $table->integer('periode');
             $table->timestamps();
         });
     }

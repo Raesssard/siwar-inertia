@@ -30,7 +30,7 @@ export default function Dashboard() {
   return (
     <Layout>
       {/* diubah lagi, biar keliatan lebih ringkas */}
-      <Head title={`${title} ${role.length <= 2
+      <Head title={`${title} - ${role.length <= 2
         ? role.toUpperCase()
         : role.charAt(0).toUpperCase() + role.slice(1)}`}
       />

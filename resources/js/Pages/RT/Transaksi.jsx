@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react"
 import { formatRupiah, formatTanggal } from "../Component/GetPropRole"
 import Swal from "sweetalert2"
 import { FilterTransaksi } from "../Component/Filter"
+import { EditTransaksi, TambahTransaksi } from "../Component/Modal"
 
 export default function Transaksi() {
     const {
@@ -16,12 +17,19 @@ export default function Transaksi() {
     const role = props.auth?.currentRole
     const user = props.auth?.user
     const [transaksiList, setTransaksiList] = useState(transaksiFromServer.data || [])
+    const [selected, setSelected] = useState(null)
     const [showModalTambah, setShowModalTambah] = useState(false)
+    const [showModalEdit, setShowModalEdit] = useState(false)
     const { get, data, setData } = useForm({
         search: '',
         tahun: '',
         bulan: '',
     })
+
+    const modalEdit = (tableData) => {
+        setSelected(tableData)
+        setShowModalEdit(true)
+    }
 
     useEffect(() => {
         setTransaksiList(transaksiFromServer.data)
@@ -119,7 +127,7 @@ export default function Transaksi() {
                                         <td className="text-center">{item.keterangan ?? '-'}</td>
                                         <td className="text-center">
                                             <div className="d-flex justify-content-center align-items-center gap-2">
-                                                <button className="btn btn-sm btn-warning my-auto" title="Edit Transaksi" onClick={() => console.log('should munculin modal edit transaksi')}>
+                                                <button className="btn btn-sm btn-warning my-auto" title="Edit Transaksi" onClick={() => modalEdit(item)}>
                                                     <i className="fa-solid fa-pen-to-square"></i>
                                                 </button>
                                                 <button className="btn btn-sm btn-danger my-auto" title="Hapus Transaksi" onClick={() => handleDelete(item.id)}>
@@ -168,6 +176,29 @@ export default function Transaksi() {
                     </div>
                 )}
             </div>
+            <TambahTransaksi
+                tambahShow={showModalTambah}
+                onClose={() => setShowModalTambah(false)}
+                onAdded={(transaksiBaru) => {
+                    setTransaksiList(prev => [transaksiBaru, ...prev])
+                }}
+                role={role}
+            />
+            <EditTransaksi
+                editShow={showModalEdit}
+                onClose={() => setShowModalEdit(false)}
+                onUpdated={(updated) => {
+                    console.log(updated)
+                    setSelected(updated)
+                    setTransaksiList(prev =>
+                        prev.map(item =>
+                            item.id === updated.id ? updated : item
+                        )
+                    )
+                }}
+                role={role}
+                selectedData={selected}
+            />
         </Layout>
     )
 }
