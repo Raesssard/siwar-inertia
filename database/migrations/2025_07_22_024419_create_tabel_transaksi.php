@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('transaksi', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('tagihan_id')->constrained('tagihan')->onDelete('cascade')->nullable();
+            $table->foreignId('tagihan_id')->nullable()->constrained('tagihan')->onDelete('cascade');
             $table->string('rt');
             $table->date('tanggal');
             $table->enum('jenis', ['pemasukan', 'pengeluaran']);

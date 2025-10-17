@@ -12,6 +12,7 @@ class IuranGolongan extends Model
         'id_iuran',
         'id_golongan',
         'nominal',
+        'periode',
     ];
 
     public function iuran(): BelongsTo

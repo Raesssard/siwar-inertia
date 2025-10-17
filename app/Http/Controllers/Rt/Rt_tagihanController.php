@@ -95,10 +95,6 @@ class Rt_tagihanController extends Controller
      */
     public function update(Request $request, $id)
     {
-        Log::info("Data received for update tagihan ID {$id}:", $request->all());
-        Log::info('FILES:', $request->allFiles());
-        Log::info('VALIDATION DATA:', $request->all());
-
         $tagihan = Tagihan::findOrFail($id);
         $iuran = $tagihan->iuran;
 

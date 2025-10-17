@@ -9,6 +9,7 @@ use App\Models\Kartu_keluarga;
 use App\Models\Kategori_golongan;
 use App\Models\Rukun_tetangga;
 use App\Models\Tagihan;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth; // Tetap diperlukan jika ada filter iuran per RT
 use Illuminate\Support\Facades\Log;
@@ -59,6 +60,8 @@ class RtIuranController extends Controller
 
     public function store(Request $request)
     {
+        Log::info('request yg masuk:', $request->all());
+
         /** @var User $user */
         $user = Auth::user();
 
@@ -67,7 +70,7 @@ class RtIuranController extends Controller
             'tgl_tagih' => 'required|date',
             'tgl_tempo' => 'required|date',
             'jenis' => 'required|in:manual,otomatis',
-            'nominal' => 'nullable|required_if:jenis,manual|numeric|min:0|max:99999999',
+            'nominal' => 'required_if:jenis,manual|nullable|numeric|min:0|max:99999999',
         ]);
 
         // 🔹 Tentukan scope RT atau RW
@@ -113,11 +116,13 @@ class RtIuranController extends Controller
 
             foreach ($golonganList as $golongan) {
                 $nominal = $request->input("nominal_{$golongan->id}");
+                $periode = $request->input("periode_{$golongan->id}", $request->periode ?? 1);
                 if ($nominal !== null) {
                     IuranGolongan::create([
                         'id_iuran' => $iuran->id,
                         'id_golongan' => $golongan->id, // pakai id_golongan
                         'nominal' => $nominal,
+                        'periode' => $periode,
                     ]);
                 }
             }
@@ -164,35 +169,22 @@ class RtIuranController extends Controller
         $iuranGol = IuranGolongan::findOrFail($id);
 
         $request->validate([
-            'nominal' => 'nullable|required_if:jenis,manual|numeric|min:0|max:99999999',
+            'nominal' => 'required|numeric|min:0|max:99999999',
+            'periode' => 'required|numeric|min:0|max:12',
         ]);
 
         $iuranGol->update([
             'nominal' => $request->nominal,
+            'periode' => $request->periode,
         ]);
 
         $iuran = Iuran::findOrFail($iuranGol->id_iuran);
-
-        $kkList = $iuran->level === 'rt'
-            ? Kartu_keluarga::where('id_rt', $iuran->id_rt)->get()
-            : Kartu_keluarga::where('id_rw', $iuran->id_rw)->get();
-
-        $iuranNominals = IuranGolongan::where('id_iuran', $iuran->id)
-            ->pluck('nominal', 'id_golongan');
-
-        foreach ($kkList as $kk) {
-            $nominalTagihan = $iuranNominals[$kk->kategori_iuran] ?? 0;
-
-            Tagihan::where('id_iuran', $iuran->id)
-                ->where('no_kk', $kk->no_kk)
-                ->update(['nominal' => $nominalTagihan]);
-        }
 
         $iuran->load(['iuran_golongan', 'iuran_golongan.golongan']);
 
         return response()->json([
             'success' => true,
-            'message' => 'Iuran berhasil dibuat beserta tagihannya.',
+            'message' => 'Iuran berhasil diedit.',
             'iuran' => $iuran
         ]);
     }
@@ -254,44 +246,54 @@ class RtIuranController extends Controller
 
     public function generateMonthlyTagihan()
     {
-        $today = now()->startOfDay();
+        $today = now();
 
-        $iurans = Iuran::where('jenis', 'otomatis')
-            ->whereDay('tgl_tagih', $today->day)
-            ->get();
+        $iurans = Iuran::with('iuran_golongan')->where('jenis', 'otomatis')->get();
 
         foreach ($iurans as $iuran) {
-            $iuranNominals = IuranGolongan::where('id_iuran', $iuran->id)
-                ->pluck('nominal', 'id_golongan');
+            Log::info("Cek iuran: {$iuran->nama}, level={$iuran->level}, golongan_count=" . $iuran->iuran_golongan->count());
 
             $kkList = $iuran->level === 'rt'
                 ? Kartu_keluarga::where('id_rt', $iuran->id_rt)->get()
                 : Kartu_keluarga::where('id_rw', $iuran->id_rw)->get();
 
-            foreach ($kkList as $kk) {
-                $nominalTagihan = $iuranNominals[$kk->kategori_iuran] ?? 0;
+            foreach ($iuran->iuran_golongan as $golongan) {
+                $periode = $golongan->periode ?? 1;
 
-                $exists = Tagihan::where('id_iuran', $iuran->id)
-                    ->where('no_kk', $kk->no_kk)
-                    ->whereMonth('tgl_tagih', $today->month)
-                    ->whereYear('tgl_tagih', $today->year)
-                    ->exists();
+                $tagihanTerakhir = Tagihan::where('id_iuran', $iuran->id)
+                    ->orderByDesc('tgl_tagih')
+                    ->first();
 
-                if (!$exists) {
-                    Tagihan::create([
-                        'nama' => $iuran->nama,
-                        'tgl_tagih' => $today,
-                        'tgl_tempo' => $iuran->tgl_tempo ?? $today->copy()->addDays(10),
-                        'jenis' => 'otomatis',
-                        'nominal' => $nominalTagihan,
-                        'no_kk' => $kk->no_kk,
-                        'status_bayar' => 'belum_bayar',
-                        'id_iuran' => $iuran->id,
-                    ]);
+                $tglTerakhir = $tagihanTerakhir
+                    ? \Carbon\Carbon::parse($tagihanTerakhir->tgl_tagih)
+                    : \Carbon\Carbon::parse($iuran->tgl_tagih);
+
+                $nextTagih = $tglTerakhir->copy()->addMonths($periode);
+
+                if ($nextTagih->isSameMonth($today)) {
+                    foreach ($kkList as $kk) {
+                        if ($kk->kategori_iuran != $golongan->id_golongan) continue;
+
+                        Tagihan::create([
+                            'nama' => $iuran->nama,
+                            'tgl_tagih' => $nextTagih->format('Y-m-d'),
+                            'tgl_tempo' => $nextTagih->copy()->addDays(7)->format('Y-m-d'),
+                            'jenis' => 'otomatis',
+                            'nominal' => $golongan->nominal,
+                            'no_kk' => $kk->no_kk,
+                            'status_bayar' => 'belum_bayar',
+                            'id_iuran' => $iuran->id,
+                        ]);
+                    }
+
+                    Log::info("Tagihan otomatis dibuat untuk iuran {$iuran->nama} periode {$nextTagih->format('m-Y')}");
                 }
             }
         }
 
-        return redirect()->route('rt.iuran.index')->with('success', 'Tagihan bulanan berhasil dibuat.');
+        return response()->json([
+            'success' => true,
+            'message' => 'Tagihan otomatis berhasil digenerate sesuai periode.',
+        ]);
     }
 }
