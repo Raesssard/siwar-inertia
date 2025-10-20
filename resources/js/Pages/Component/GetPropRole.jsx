@@ -194,7 +194,7 @@ export function getAdminLinks() {
 export function getRwCards({ ...rest }) {
     return [
         {
-            href: "/rw/rukun_tetangga",
+            href: "/rw/rt",
             color: "info",
             title: "Jumlah RT",
             value: rest.jumlah_rt,
@@ -212,7 +212,7 @@ export function getRwCards({ ...rest }) {
             color: "primary",
             title: "Jumlah Warga",
             value: rest.jumlah_warga,
-            icon: "people-fill",
+            icon: "users",
         },
         {
             href: "/rw/pengaduan",
