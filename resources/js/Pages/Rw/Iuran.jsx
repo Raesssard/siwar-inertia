@@ -1,0 +1,237 @@
+import Layout from "@/Layouts/Layout";
+import { Head, Link, useForm, usePage } from "@inertiajs/react";
+import React, { useState } from "react";
+import { FilterIuran } from "../Component/Filter";
+import { formatRupiah, formatTanggal } from "../Component/GetPropRole";
+import { EditIuranOtomatis, TambahIuran } from "../Component/Modal";
+import Swal from "sweetalert2";
+
+export default function Iuran() {
+    const {
+        iuranOtomatis: iuranOtomatisFromServer,
+        iuranManual: iuranManualFromServer,
+        golongan_list, 
+        rt_list,
+        title,
+    } = usePage().props;
+
+    const [selected, setSelected] = useState(null);
+    const [selectedIuran, setSelectedIuran] = useState(null);
+    const [selectedGolongan, setSelectedGolongan] = useState(null);
+    const [iuranListOtomatis, setIuranListOtomatis] = useState(iuranOtomatisFromServer.data || []);
+    const [iuranListManual, setIuranListManual] = useState(iuranManualFromServer.data || []);
+    const [showModalTambah, setShowModalTambah] = useState(false);
+    const [showModalEdit, setShowModalEdit] = useState(false);
+
+    const { get, data, setData } = useForm({ search: "" });
+    const role = "rw";
+
+    const modalEdit = (item, matched, gol) => {
+        setSelected(item);
+        setSelectedIuran(matched);
+        setSelectedGolongan(gol);
+        setShowModalEdit(true);
+    };
+
+    const filter = (e) => {
+        e.preventDefault();
+        get(`/rw/iuran`, { preserveState: true, preserveScroll: true });
+    };
+
+    const resetFilter = () => setData({ search: "" });
+
+    const handleAdded = (newIuran) => {
+        if (newIuran.jenis === "otomatis") {
+            setIuranListOtomatis((prev) => [newIuran, ...prev]);
+        } else {
+            setIuranListManual((prev) => [newIuran, ...prev]);
+        }
+    };
+
+    const handleDelete = (id, jenis) => {
+        Swal.fire({
+            title: "Yakin hapus iuran ini?",
+            text: "Data yang dihapus tidak bisa dikembalikan!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#d33",
+            cancelButtonColor: "#3085d6",
+            confirmButtonText: "Ya, hapus",
+            cancelButtonText: "Batal",
+        }).then((result) => {
+            if (result.isConfirmed) {
+                axios
+                    .delete(`/rw/iuran/${id}/${jenis}`)
+                    .then((res) => {
+                        Swal.fire("Terhapus!", res.data.message, "success");
+                        if (jenis === "otomatis") {
+                            setIuranListOtomatis((prev) =>
+                                prev.map((item) => ({
+                                    ...item,
+                                    iuran_golongan: item.iuran_golongan.filter((g) => g.id !== id),
+                                }))
+                            );
+                        } else {
+                            setIuranListManual((prev) => prev.filter((item) => item.id !== id));
+                        }
+                    })
+                    .catch(() => Swal.fire("Gagal!", "Terjadi kesalahan.", "error"));
+            }
+        });
+    };
+
+    let no = 1;
+
+    const rows = iuranListOtomatis.flatMap((item) =>
+        golongan_list
+            .map((gol) => {
+                const matched = item.iuran_golongan?.find((ig) => ig.id_golongan === gol.id);
+                if (!matched) return null;
+                return (
+                    <tr key={`${item.id}-${gol.id}`}>
+                        <td className="text-center">{no++}</td>
+                        <td className="text-center">{item.nama ?? "-"}</td>
+                        <td className="text-center">
+                            {gol.jenis.charAt(0).toUpperCase() + gol.jenis.slice(1)}
+                        </td>
+                        <td className="text-center">{formatRupiah(matched.nominal)}</td>
+                        <td className="text-center">{formatTanggal(item.tgl_tagih) ?? "-"}</td>
+                        <td className="text-center">{formatTanggal(item.tgl_tempo) ?? "-"}</td>
+                        <td className="text-center">
+                            <div className="d-flex justify-content-center gap-2">
+                                <button
+                                    className="btn btn-sm btn-warning"
+                                    onClick={() => modalEdit(item, matched, gol)}
+                                >
+                                    <i className="fa-solid fa-pen-to-square"></i>
+                                </button>
+                                <button
+                                    className="btn btn-sm btn-danger"
+                                    onClick={() => handleDelete(matched.id, item.jenis)}
+                                >
+                                    <i className="fa-solid fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                );
+            })
+            .filter(Boolean)
+    );
+
+    return (
+        <Layout>
+            <Head title={title} />
+            <FilterIuran
+                data={data}
+                setData={setData}
+                filter={filter}
+                resetFilter={resetFilter}
+                role={role}
+                tambahShow={() => setShowModalTambah(true)}
+            />
+            {/* Table Manual */}
+            <div className="table-container">
+                <div className="table-header">
+                    <h4>Data Iuran Manual</h4>
+                </div>
+                <div className="table-scroll">
+                    <table className="table-custom">
+                        <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>Nama</th>
+                                <th>Nominal</th>
+                                <th>Tanggal Tagih</th>
+                                <th>Tanggal Tempo</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {iuranListManual.length ? (
+                                iuranListManual.map((item, i) => (
+                                    <tr key={item.id}>
+                                        <td>{i + 1}</td>
+                                        <td>{item.nama}</td>
+                                        <td>{formatRupiah(item.nominal)}</td>
+                                        <td>{formatTanggal(item.tgl_tagih)}</td>
+                                        <td>{formatTanggal(item.tgl_tempo)}</td>
+                                        <td>
+                                            <button
+                                                className="btn btn-sm btn-danger"
+                                                onClick={() => handleDelete(item.id, item.jenis)}
+                                            >
+                                                <i className="fa-solid fa-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))
+                            ) : (
+                                <tr>
+                                    <td colSpan="6" className="text-center">
+                                        Tidak ada data
+                                    </td>
+                                </tr>
+                            )}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            {/* Table Otomatis */}
+            <div className="table-container mt-4">
+                <div className="table-header">
+                    <h4>Data Iuran Otomatis</h4>
+                </div>
+                <div className="table-scroll">
+                    <table className="table-custom">
+                        <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>Nama</th>
+                                <th>Golongan</th>
+                                <th>Nominal</th>
+                                <th>Tanggal Tagih</th>
+                                <th>Tanggal Tempo</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {rows.length ? (
+                                rows
+                            ) : (
+                                <tr>
+                                    <td colSpan="7" className="text-center">
+                                        Tidak ada data
+                                    </td>
+                                </tr>
+                            )}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <TambahIuran
+                tambahShow={showModalTambah}
+                onClose={() => setShowModalTambah(false)}
+                onAdded={handleAdded}
+                role={role}
+                golongan={golongan_list}
+                rt={rt_list} // ✅ sesuai dengan props di atas
+            />
+            <EditIuranOtomatis
+                editShow={showModalEdit}
+                onClose={() => setShowModalEdit(false)}
+                onUpdated={(updated) => {
+                    setIuranListOtomatis((prev) =>
+                        prev.map((item) => (item.id === updated.id ? updated : item))
+                    );
+                }}
+                role={role}
+                golongan={selectedGolongan}
+                iuranGol={selectedIuran}
+                iuran={selected}
+            />
+        </Layout>
+    );
+}

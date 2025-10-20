@@ -35,6 +35,9 @@ use App\Http\Controllers\Rw\{
   RwPengumumanController,
   RwRukunTetanggaController,
   RwWargaController,
+  RwIuranController,
+  RwTagihanController,
+  RwTransaksiController,
 };
 use App\Models\Rw;
 use Inertia\Inertia;
@@ -90,6 +93,17 @@ Route::middleware(['auth'])->group(function () {
         Route::resource('warga', RwWargaController::class);
         Route::resource('kartu_keluarga', RwKartuKeluargaController::class);
         Route::resource('pengumuman', RwPengumumanController::class);
+        Route::resource('iuran', RwIuranController::class)->except('destroy');
+        Route::delete('/iuran/{id}/{jenis}', [RwIuranController::class, 'destroy'])
+            ->name('iuran.destroy');
+        Route::get('/export/iuran', [ExportController::class, 'exportIuran'])
+            ->name('iuran.export');
+        Route::resource('tagihan', RwTagihanController::class);
+        Route::get('/export/tagihan', [ExportController::class, 'exportTagihan'])
+            ->name('tagihan.export');
+        Route::resource('transaksi', RwTransaksiController::class);
+        Route::get('/export/transaksi', [ExportController::class, 'exportTransaksi'])
+            ->name('transaksi.export');
 
         Route::get('warga/orangtua/{no_kk}', [RwWargaController::class, 'getOrangTua'])->name('warga.getOrangTua');
         Route::get('warga/create', [RwWargaController::class, 'create'])->name('warga.create');

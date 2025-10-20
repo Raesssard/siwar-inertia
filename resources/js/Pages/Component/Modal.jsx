@@ -3899,216 +3899,236 @@ export function DetailWarga({ selectData, detailShow, onClose, userData }) {
     )
 }
 
-export function TambahIuran({ tambahShow, onClose, onAdded, role, golongan }) {
+export function TambahIuran({ tambahShow, onClose, onAdded, role, golongan, rt = [] }) {
     const [data, setData] = useState({
+        id_rt: "",
         nama: "",
         tgl_tagih: "",
         tgl_tempo: "",
         jenis: "manual",
         nominal: "",
         periode: "",
-    })
-    const [golonganList, setGolonganList] = useState([])
+    });
+
+    const [golonganList, setGolonganList] = useState([]);
 
     useEffect(() => {
-        setGolonganList(golongan)
-        const defaults = {}
+        setGolonganList(golongan);
+        const defaults = {};
         golongan.forEach(g => {
-            defaults[`periode_${g.id}`] = "1"
-        })
-        setData(prev => ({ ...prev, ...defaults }))
-    }, [golongan])
+            defaults[`periode_${g.id}`] = "1";
+        });
+        setData(prev => ({ ...prev, ...defaults }));
+    }, [golongan]);
 
     const handleChange = (e) => {
-        setData({ ...data, [e.target.name]: e.target.value })
-    }
+        setData({ ...data, [e.target.name]: e.target.value });
+    };
 
     const handleNominalChange = (id, value) => {
-        setData({ ...data, [`nominal_${id}`]: value })
-    }
+        setData({ ...data, [`nominal_${id}`]: value });
+    };
 
     const handlePeriodeChange = (id, value) => {
-        setData({ ...data, [`periode_${id}`]: value })
-    }
+        setData({ ...data, [`periode_${id}`]: value });
+    };
 
     const handleSubmit = (e) => {
-        e.preventDefault()
+        e.preventDefault();
         axios.post(`/${role}/iuran`, data)
             .then(res => {
-                if (onAdded) {
-                    onAdded(res.data.iuran)
-                }
+                if (onAdded) onAdded(res.data.iuran);
                 setData({
+                    id_rt: "",
                     nama: "",
                     tgl_tagih: "",
                     tgl_tempo: "",
                     jenis: "manual",
                     nominal: "",
                     periode: "",
-                })
-                onClose()
+                });
+                onClose();
             })
-    }
+            .catch(err => {
+                console.error(err);
+                alert("Gagal menyimpan iuran!");
+            });
+    };
 
     useEffect(() => {
         const handleEsc = (e) => {
-            if (e.key === "Escape") onClose()
-        }
+            if (e.key === "Escape") onClose();
+        };
+        document.addEventListener("keydown", handleEsc);
+        return () => document.removeEventListener("keydown", handleEsc);
+    }, [onClose]);
 
-        document.addEventListener("keydown", handleEsc)
-        return () => document.removeEventListener("keydown", handleEsc)
-    }, [onClose])
-
-    if (!tambahShow) return null
+    if (!tambahShow) return null;
 
     return (
-        <>
+        <div
+            className="modal fade show"
+            tabIndex="-1"
+            style={{
+                display: "block",
+                backgroundColor: "rgba(0,0,0,0.5)"
+            }}
+            onClick={onClose}
+        >
             <div
-                className="modal fade show"
-                tabIndex="-1"
-                style={{
-                    display: "block",
-                    backgroundColor: "rgba(0,0,0,0.5)"
-                }}
-                onClick={() => {
-                    onClose()
-                }}
+                className="modal-dialog modal-dialog-scrollable modal-dialog-centered"
+                onClick={(e) => e.stopPropagation()}
             >
-                <div
-                    className="modal-dialog modal-dialog-scrollable modal-dialog-centered"
-                    onClick={(e) => e.stopPropagation()}
-                >
-                    <div className="modal-content shadow-lg border-0">
-                        <div className="modal-body p-0 m-0">
-                            <div className="d-flex tambah-body flex-column" style={{ width: "100%", maxHeight: "80vh", overflowY: "auto" }}>
-                                <div className="p-3">
-                                    <form onSubmit={handleSubmit} className="h-100">
+                <div className="modal-content shadow-lg border-0">
+                    <div className="modal-body p-0 m-0">
+                        <div className="d-flex tambah-body flex-column" style={{ width: "100%", maxHeight: "80vh", overflowY: "auto" }}>
+                            <div className="p-3">
+                                <form onSubmit={handleSubmit} className="h-100">
+                                    {/* Hanya tampil jika role = RW */}
+                                    <Role role="rw">
                                         <div className="mb-3">
-                                            <label className="form-label">Nama Iuran</label>
-                                            <input
-                                                name="nama"
-                                                type="text"
-                                                className="tambah-judul form-control"
-                                                onChange={handleChange}
-                                                required
-                                            />
-                                        </div>
-
-                                        <div className="mb-3">
-                                            <label className="form-label">Tanggal Tagih</label>
-                                            <input
-                                                name="tgl_tagih"
-                                                type="date"
-                                                className="tambah-kategori form-control"
-                                                onChange={handleChange}
-                                                required
-                                            />
-                                        </div>
-
-                                        <div className="mb-3">
-                                            <label className="form-label">Tanggal Tempo</label>
-                                            <input
-                                                name="tgl_tempo"
-                                                type="date"
-                                                className="tambah-kategori form-control"
-                                                onChange={handleChange}
-                                                required
-                                            />
-                                        </div>
-
-                                        <div className="mb-3">
-                                            <label className="form-label">Jenis Iuran: </label>
+                                            <label className="form-label">Pilih RT</label>
                                             <select
-                                                name="jenis"
-                                                className="edit-tujuan form-select"
-                                                value={data.jenis}
+                                                name="id_rt"
+                                                className="form-select"
+                                                value={data.id_rt}
                                                 onChange={handleChange}
+                                                required
                                             >
-                                                <option value="manual">Manual</option>
-                                                <option value="otomatis">Otomatis</option>
+                                                <option value="">-- Pilih RT --</option>
+                                                {rt.length > 0 ? (
+                                                    rt.map((item) => (
+                                                        <option key={item.id} value={item.id}>
+                                                            RT {item.nomor_rt}
+                                                        </option>
+                                                    ))
+                                                ) : (
+                                                    <option value="">Tidak ada RT</option>
+                                                )}
                                             </select>
                                         </div>
+                                    </Role>
 
-                                        {data.jenis === "manual" && (
-                                            <div className="mb-3">
-                                                <label className="form-label">Nominal Iuran</label>
-                                                <input
-                                                    type="number"
-                                                    name="nominal"
-                                                    className="tambah-judul form-control"
-                                                    onChange={handleChange}
-                                                    onInput={(e) => {
-                                                        if (e.target.value.length > 8 || e.target.value.length < 0) {
-                                                            e.target.value = e.target.value.slice(0, 8);
-                                                        }
-                                                    }}
-                                                />
-                                            </div>
-                                        )}
+                                    <div className="mb-3">
+                                        <label className="form-label">Nama Iuran</label>
+                                        <input
+                                            name="nama"
+                                            type="text"
+                                            className="tambah-judul form-control"
+                                            onChange={handleChange}
+                                            required
+                                        />
+                                    </div>
 
-                                        {data.jenis === "otomatis" && (
-                                            <div className="mb-3">
-                                                <h4 className="mb-3">Nominal per Golongan:</h4>
-                                                {golonganList.map((g) => {
-                                                    let items = []
-                                                    for (let i = 1; i <= 12; i++) {
-                                                        items.push(<option value={i} key={i}>{i} Bulan</option>)
+                                    <div className="mb-3">
+                                        <label className="form-label">Tanggal Tagih</label>
+                                        <input
+                                            name="tgl_tagih"
+                                            type="date"
+                                            className="form-control"
+                                            onChange={handleChange}
+                                            required
+                                        />
+                                    </div>
+
+                                    <div className="mb-3">
+                                        <label className="form-label">Tanggal Tempo</label>
+                                        <input
+                                            name="tgl_tempo"
+                                            type="date"
+                                            className="form-control"
+                                            onChange={handleChange}
+                                            required
+                                        />
+                                    </div>
+
+                                    <div className="mb-3">
+                                        <label className="form-label">Jenis Iuran</label>
+                                        <select
+                                            name="jenis"
+                                            className="form-select"
+                                            value={data.jenis}
+                                            onChange={handleChange}
+                                        >
+                                            <option value="manual">Manual</option>
+                                            <option value="otomatis">Otomatis</option>
+                                        </select>
+                                    </div>
+
+                                    {data.jenis === "manual" && (
+                                        <div className="mb-3">
+                                            <label className="form-label">Nominal Iuran</label>
+                                            <input
+                                                type="number"
+                                                name="nominal"
+                                                className="form-control"
+                                                onChange={handleChange}
+                                                onInput={(e) => {
+                                                    if (e.target.value.length > 8) {
+                                                        e.target.value = e.target.value.slice(0, 8);
                                                     }
+                                                }}
+                                                required
+                                            />
+                                        </div>
+                                    )}
 
-                                                    return (
-                                                        <div key={g.id} className="mb-3 d-flex col gap-3">
-                                                            <div className="w-100">
-                                                                <label>{g.jenis === 'umkm'
+                                    {data.jenis === "otomatis" && (
+                                        <div className="mb-3">
+                                            <h5 className="mb-3">Nominal per Golongan:</h5>
+                                            {golonganList.map((g) => {
+                                                const items = [];
+                                                for (let i = 1; i <= 12; i++) {
+                                                    items.push(<option value={i} key={i}>{i} Bulan</option>);
+                                                }
+
+                                                return (
+                                                    <div key={g.id} className="mb-3 d-flex col gap-3">
+                                                        <div className="w-100">
+                                                            <label>
+                                                                {g.jenis === "umkm"
                                                                     ? g.jenis.toUpperCase()
-                                                                    : g.jenis.charAt(0).toUpperCase() + g.jenis.slice(1)}</label>
-                                                                <input
-                                                                    type="number"
-                                                                    className="tambah-judul form-control"
-                                                                    onInput={(e) => {
-                                                                        if (e.target.value.length > 8 || e.target.value.length < 0) {
-                                                                            e.target.value = e.target.value.slice(0, 8);
-                                                                        }
-                                                                    }}
-                                                                    onChange={(e) => handleNominalChange(g.id, e.target.value)}
-                                                                    required
-                                                                />
-                                                            </div>
-                                                            <div className="w-100">
-                                                                <label>Periode</label>
-                                                                <select
-                                                                    name="periode"
-                                                                    className="tambah-judul form-control"
-                                                                    onChange={(e) => handlePeriodeChange(g.id, e.target.value)}
-                                                                    required
-                                                                    style={{
-                                                                        border: '0',
-                                                                        borderBottom: '1px solid lightgray',
-                                                                        borderRadius: '0',
-                                                                        width: '100%',
-                                                                    }}
-                                                                >
-                                                                    {items}
-                                                                </select>
-                                                            </div>
+                                                                    : g.jenis.charAt(0).toUpperCase() + g.jenis.slice(1)}
+                                                            </label>
+                                                            <input
+                                                                type="number"
+                                                                className="form-control"
+                                                                onInput={(e) => {
+                                                                    if (e.target.value.length > 8) {
+                                                                        e.target.value = e.target.value.slice(0, 8);
+                                                                    }
+                                                                }}
+                                                                onChange={(e) => handleNominalChange(g.id, e.target.value)}
+                                                                required
+                                                            />
                                                         </div>
-                                                    )
-                                                })}
-                                            </div>
-                                        )}
+                                                        <div className="w-100">
+                                                            <label>Periode</label>
+                                                            <select
+                                                                className="form-control"
+                                                                onChange={(e) => handlePeriodeChange(g.id, e.target.value)}
+                                                                required
+                                                            >
+                                                                {items}
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+                                    )}
 
-                                        <button type="submit" className="btn btn-primary ml-auto mt-auto">
-                                            <i className="fas fa-save mr-2"></i>
-                                            Simpan
-                                        </button>
-                                    </form>
-                                </div>
+                                    <button type="submit" className="btn btn-primary mt-2">
+                                        <i className="fas fa-save mr-2"></i> Simpan
+                                    </button>
+                                </form>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </>
-    )
+        </div>
+    );
 }
 
 export function EditIuranOtomatis({ editShow, onClose, onUpdated, role, golongan, iuran, iuranGol }) {
