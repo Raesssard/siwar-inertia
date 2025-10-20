@@ -80,6 +80,7 @@ export default function Transaksi() {
                 ? role.toUpperCase()
                 : role.charAt(0).toUpperCase() + role.slice(1)}`} />
             <FilterTransaksi
+                transaksi={transaksiList}
                 data={data}
                 setData={setData}
                 daftar_tahun={daftar_tahun}

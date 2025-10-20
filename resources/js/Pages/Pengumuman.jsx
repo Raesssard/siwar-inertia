@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react"
 import Layout from "@/Layouts/Layout"
 import { Head, Link, usePage, useForm } from "@inertiajs/react"
-import { DetailPengumuman } from "./Component/Modal"
+import { DetailPengumuman, TambahPengumuman } from "./Component/Modal"
 import { FilterPengumuman } from "./Component/Filter"
 import Masonry from "react-masonry-css"
 import FileDisplay from "./Component/FileDisplay"
@@ -10,7 +10,7 @@ import { FormatWaktu, splitWaktu } from "./Pengaduan"
 export default function Pengumuman() {
     const {
         title,
-        pengumuman,
+        pengumuman: pengumumanFromServer,
         list_bulan,
         daftar_tahun,
         daftar_kategori,
@@ -18,9 +18,11 @@ export default function Pengumuman() {
         total_pengumuman_filtered,
     } = usePage().props
     const [selected, setSelected] = useState(null)
-    const [showModal, setShowModal] = useState(false)
+    const [showModalDetail, setShowModalDetail] = useState(false)
+    const [showModalTambah, setShowModalTambah] = useState(false)
     const cardBodyRef = useRef(null)
     const [showButton, setShowButton] = useState(false)
+    const [pengumumanList, setPengumumanList] = useState(pengumumanFromServer)
     const { props } = usePage()
     const [total, setTotal] = useState(total_pengumuman)
     const [totalFiltered, setTotalFiltered] = useState(total_pengumuman_filtered)
@@ -32,7 +34,7 @@ export default function Pengumuman() {
         level: ''
     })
 
-    const groupByWaktu = pengumuman.reduce((groups, item) => {
+    const groupByWaktu = pengumumanList.reduce((groups, item) => {
         const kategori = splitWaktu({ createdAt: item.created_at })
         if (!groups[kategori]) groups[kategori] = []
         groups[kategori].push(item)
@@ -44,7 +46,7 @@ export default function Pengumuman() {
 
     const modalDetail = (item) => {
         setSelected(item)
-        setShowModal(true)
+        setShowModalDetail(true)
     }
 
     const scrollToTop = () => {
@@ -126,6 +128,7 @@ export default function Pengumuman() {
                 daftar_kategori={daftar_kategori}
                 filter={filter}
                 resetFilter={resetFilter}
+                tambahShow={() => setShowModalTambah(true)}
                 role={role}
             />
             <div className="d-flex justify-content-between align-items-center mb-3 mx-4 w-100">
@@ -141,65 +144,103 @@ export default function Pengumuman() {
                 </div>
             </div>
             <div className="col-12">
-                {Object.entries(groupByWaktu).map(([kategori, items]) => (
+                {pengumumanList.length ? Object.entries(groupByWaktu).map(([kategori, items]) => (
                     <div key={kategori}>
                         <div className="text-muted mb-3 mt-3 mx-4 w-100">
                             {kategori}
                         </div>
                         <div ref={cardBodyRef} className="card-body pengumuman">
-                            {items.length ? (
-                                <Masonry
-                                    breakpointCols={breakpointColumnsObj}
-                                    className="flex gap-4"
-                                    columnClassName="space-y-4"
-                                >
-                                    {items.map((item, index) => (
-                                        <div
-                                            key={index}
-                                            className="card-clickable d-flex justify-content-center align-items-center flex-column"
-                                            onClick={() => modalDetail(item)}
-                                        >
-                                            <FileDisplay
-                                                filePath={`/storage/${item.dokumen_path}`}
-                                                judul={item.dokumen_name}
-                                                displayStyle={imgStyle}
-                                            />
-                                            <h2 className="font-semibold text-lg mb-2 text-left mx-3">
-                                                {item.judul}
-                                            </h2>
-                                            <div className="text-sm text-gray-500 mb-2 d-flex gap-3">
-                                                <span>
-                                                    <i className="fas fa-user mr-1"></i>
-                                                    {item.rukun_tetangga
-                                                        ? item.rukun_tetangga.nama_ketua_rt
-                                                        : item.rw.nama_ketua_rw}
-                                                </span>
-                                                <span>
-                                                    <i className="fas fa-clock mr-1"></i>
-                                                    <FormatWaktu createdAt={item.created_at} />
-                                                </span>
+                            {items.length && (
+                                <>
+                                    <Masonry
+                                        breakpointCols={breakpointColumnsObj}
+                                        className="flex gap-4"
+                                        columnClassName="space-y-4"
+                                    >
+                                        {items.map((item, index) => (
+                                            <div
+                                                key={index}
+                                                className="card-clickable d-flex justify-content-center align-items-center flex-column"
+                                                onClick={() => modalDetail(item)}
+                                            >
+                                                <FileDisplay
+                                                    filePath={`/storage/${item.dokumen_path}`}
+                                                    judul={item.dokumen_name}
+                                                    displayStyle={imgStyle}
+                                                />
+                                                <h2 className="font-semibold text-lg mb-2 text-left mx-3">
+                                                    {item.judul}
+                                                </h2>
+                                                <div className="text-sm text-gray-500 mb-2 d-flex gap-3">
+                                                    <span>
+                                                        <i className="fas fa-user mr-1"></i>
+                                                        {item.rukun_tetangga
+                                                            ? item.rukun_tetangga.nama_ketua_rt
+                                                            : item.rw.nama_ketua_rw}
+                                                    </span>
+                                                    <span>
+                                                        <i className="fas fa-clock mr-1"></i>
+                                                        <FormatWaktu createdAt={item.created_at} />
+                                                    </span>
+                                                </div>
+                                                <p className="isi-pengaduan text-gray-700 text-sm mb-3 mx-3 line-clamp-3">
+                                                    {item.isi.length > 100
+                                                        ? item.isi.slice(0, 100) + "..."
+                                                        : item.isi}
+                                                </p>
                                             </div>
-                                            <p className="isi-pengaduan text-gray-700 text-sm mb-3 mx-3 line-clamp-3">
-                                                {item.isi.length > 100
-                                                    ? item.isi.slice(0, 100) + "..."
-                                                    : item.isi}
-                                            </p>
-                                        </div>
-                                    ))}
-                                </Masonry>
-                            ) : (
-                                <span className="d-block w-100 text-muted text-center">
-                                    Tidak ada Pengumuman
-                                </span>
+                                        ))}
+                                    </Masonry>
+                                    {showButton && (
+                                        <button
+                                            onClick={scrollToTop}
+                                            className={`btn btn-primary scroll-top-btn ${showButton ? "show" : ""}`}
+                                        >
+                                            <i className="fas fa-arrow-up"></i>
+                                        </button>
+                                    )}
+                                </>
                             )}
                         </div>
                     </div>
-                ))}
+                )) : (
+                    <div ref={cardBodyRef} className="card-body pengumuman">
+                        <span className="d-block w-100 text-muted text-center">
+                            Tidak ada Pengumuman
+                        </span>
+                    </div>
+                )}
                 <DetailPengumuman
                     selectedData={selected}
-                    detailShow={showModal}
-                    onClose={() => setShowModal(false)}
+                    detailShow={showModalDetail}
+                    onClose={() => setShowModalDetail(false)}
+                    onUpdated={(updated) => {
+                        setSelected(updated)
+                        setPengumumanList(prev =>
+                            prev.map(item =>
+                                item.id === updated.id ? updated : item
+                            )
+                        )
+                    }}
+                    onDeleted={(deletedId) => {
+                        setPengumumanList(prev => prev.filter(item => item.id !== deletedId))
+                        setTotal(prev => prev - 1)
+                        setTotalFiltered(prev => prev - 1)
+                        setShowModalDetail(false)
+                    }}
                     userData={user}
+                    role={role}
+                />
+                <TambahPengumuman
+                    tambahShow={showModalTambah}
+                    onClose={() => setShowModalTambah(false)}
+                    onAdded={(newPengumuman) => {
+                        setPengumumanList(prev => [newPengumuman, ...prev])
+                        setTotal(prev => prev + 1)
+                        setTotalFiltered(prev => prev + 1)
+                        setSelected(newPengumuman)
+                        setShowModalDetail(true)
+                    }}
                     role={role}
                 />
             </div>

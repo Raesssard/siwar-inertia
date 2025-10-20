@@ -17,6 +17,8 @@ class RwPengumumanController extends Controller
 {
     public function index(Request $request)
     {
+        $title = 'Pengumuman';
+
         $search = $request->input('search');
         $tahun = $request->input('tahun');
         $bulan = $request->input('bulan');
@@ -37,7 +39,8 @@ class RwPengumumanController extends Controller
             $q->where('id_rw', $rwId);
         });
 
-        $total_pengumuman = (clone $baseQuery)->count();
+        $total_pengumuman = Pengumuman::where('id_rw', $rwId)->count();
+        $total_pengumuman_filtered = (clone $baseQuery)->count();
 
         // Filter pencarian
         $pengumuman = (clone $baseQuery)
@@ -60,8 +63,6 @@ class RwPengumumanController extends Controller
             ->orderByDesc('tanggal')
             ->get();
 
-        $total_filtered = $pengumuman->count();
-
         $daftar_tahun = Pengumuman::selectRaw('YEAR(tanggal) as tahun')
             ->distinct()
             ->orderByDesc('tahun')
@@ -72,18 +73,28 @@ class RwPengumumanController extends Controller
             ->pluck('kategori');
 
         $list_bulan = [
-            'januari', 'februari', 'maret', 'april', 'mei', 'juni',
-            'juli', 'agustus', 'september', 'oktober', 'november', 'desember'
+            'januari',
+            'februari',
+            'maret',
+            'april',
+            'mei',
+            'juni',
+            'juli',
+            'agustus',
+            'september',
+            'oktober',
+            'november',
+            'desember'
         ];
 
-        return Inertia::render('Rw/Pengumuman', [
-            'title' => 'Pengumuman',
+        return Inertia::render('Pengumuman', [
             'pengumuman' => $pengumuman,
-            'list_bulan' => $list_bulan,
+            'title' => $title,
             'daftar_tahun' => $daftar_tahun,
             'daftar_kategori' => $daftar_kategori,
             'total_pengumuman' => $total_pengumuman,
-            'total_pengumuman_filtered' => $total_filtered,
+            'total_pengumuman_filtered' => $total_pengumuman_filtered,
+            'list_bulan' => $list_bulan,
         ]);
     }
 
@@ -172,9 +183,7 @@ class RwPengumumanController extends Controller
         $rwUser = Auth::user()->warga->kartuKeluarga->rw ?? null;
         $rwId = $rwUser->id ?? null;
 
-        $pengumuman = Pengumuman::where('id_rw', $rwId)
-            ->whereNull('id_rt')
-            ->findOrFail($id);
+        $pengumuman = Pengumuman::findOrFail($id);
 
         if ($pengumuman->dokumen_path && Storage::disk('public')->exists($pengumuman->dokumen_path)) {
             Storage::disk('public')->delete($pengumuman->dokumen_path);
@@ -185,7 +194,7 @@ class RwPengumumanController extends Controller
         return response()->json(['message' => 'Pengumuman berhasil dihapus', 'id' => $id]);
     }
 
-        public function exportPDF($id)
+    public function exportPDF($id)
     {
         $pengumuman = Pengumuman::findOrFail($id);
 

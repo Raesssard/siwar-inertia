@@ -179,7 +179,7 @@ export function FilterPengumuman({ data, setData, daftar_tahun, list_bulan, daft
     )
 }
 
-export function FilterTransaksi({ data, setData, daftar_tahun, daftar_bulan, filter, resetFilter, tambahShow, role }) {
+export function FilterTransaksi({ transaksi, data, setData, daftar_tahun, daftar_bulan, filter, resetFilter, tambahShow, role }) {
     return (
         <form onSubmit={filter} className="filter-form form-filter d-flex px-0 g-2 pb-2 mb-2 w-100">
             <div className="col-md-5 col-12 pr-2">
@@ -233,16 +233,17 @@ export function FilterTransaksi({ data, setData, daftar_tahun, daftar_bulan, fil
                 <Link href={`/${role}/transaksi`} onClick={resetFilter} className="btn-input btn btn-secondary btn-sm flex-fill p-0 mx-0" title="Reset" style={{ maxWidth: "3rem", minWidth: "3rem" }}>
                     <i className="fas fa-undo"></i>
                 </Link>
-                <button
-                    className="btn btn-success my-auto mr-3"
-                    type="button"
-                    title="Export Transaksi ke Excel"
-                    style={{ borderRadius: "0.2rem" }}
-                    onClick={() => window.location.href = `/${role}/export/transaksi`}
-                >
-                    <i className="fas fa-file-excel"></i>
-                </button>
                 <Role role={['rt', 'rw']}>
+                    <button
+                        className="btn btn-success my-auto mr-3"
+                        type="button"
+                        title={!transaksi.length ? "Tidak ada Transaksi yang dapat diexport" : "Export Transaksi ke Excel"}
+                        style={{ borderRadius: "0.2rem" }}
+                        onClick={() => window.location.href = `/${role}/export/transaksi`}
+                        disabled={!transaksi.length}
+                    >
+                        <i className="fas fa-file-excel"></i>
+                    </button>
                     <button type="button" onClick={() => tambahShow()} className="btn-input btn btn-sm btn-success">
                         <i className="fas fa-plus mr-2"></i>
                         Buat Transaksi
@@ -253,7 +254,7 @@ export function FilterTransaksi({ data, setData, daftar_tahun, daftar_bulan, fil
     )
 }
 
-export function FilterTagihan({ data, setData, filter, resetFilter, role, kk_list }) {
+export function FilterTagihan({ tagihanManual, tagihanOtomatis, data, setData, filter, resetFilter, role, kk_list }) {
     return (
         <form onSubmit={filter} className="filter-form form-filter d-flex px-0 g-2 pb-2 mb-2 w-100">
             <div className="col-md-5 col-12 pr-2">
@@ -296,16 +297,19 @@ export function FilterTagihan({ data, setData, filter, resetFilter, role, kk_lis
                 </Link>
             </div>
 
-            <button
-                className="btn btn-success my-auto mr-3 ml-auto"
-                type="button"
-                title="Export Tagihan ke Excel"
-                style={{ borderRadius: "0.2rem" }}
-                onClick={() => window.location.href = `/${role}/export/tagihan`}
-            >
-                <i className="fas fa-file-excel mr-2"></i>
-                Export Tagihan
-            </button>
+            <Role role={['rt', 'rw']}>
+                <button
+                    className="btn btn-success my-auto mr-3 ml-auto"
+                    type="button"
+                    title={!tagihanManual.length && !tagihanOtomatis.length ? "Tidak ada Tagihan yang dapat diexport" : "Export Tagihan ke Excel"}
+                    style={{ borderRadius: "0.2rem" }}
+                    onClick={() => window.location.href = `/${role}/export/tagihan`}
+                    disabled={!tagihanManual.length && !tagihanOtomatis.length}
+                >
+                    <i className="fas fa-file-excel mr-2"></i>
+                    Export Tagihan
+                </button>
+            </Role>
         </form>
     )
 }
@@ -377,7 +381,7 @@ export function FilterKK({ data, setData, filter, resetFilter, role }) {
     )
 }
 
-export function FilterIuran({ data, setData, filter, resetFilter, role, tambahShow }) {
+export function FilterIuran({ iuranManual, iuranOtomatis, data, setData, filter, resetFilter, role, tambahShow }) {
     return (
         <form onSubmit={filter} className="filter-form form-filter px-0 pb-2 mb-2 w-100">
             <div className="ml-3" style={{ width: "30rem" }}>
@@ -400,16 +404,17 @@ export function FilterIuran({ data, setData, filter, resetFilter, role, tambahSh
                 <i className="fas fa-undo"></i>
             </Link>
 
-            <button
-                className="btn btn-success my-auto mr-3"
-                type="button"
-                title="Export Iuran ke Excel"
-                style={{ borderRadius: "0.2rem" }}
-                onClick={() => window.location.href = `/${role}/export/iuran`}
-            >
-                <i className="fas fa-file-excel"></i>
-            </button>
             <Role role={['rt', 'rw']}>
+                <button
+                    className="btn btn-success my-auto mr-3"
+                    type="button"
+                    title={!iuranManual.length && !iuranOtomatis.length ? "Tidak ada Iuran yang dapat diexport" : "Export Iuran ke Excel"}
+                    style={{ borderRadius: "0.2rem" }}
+                    onClick={() => window.location.href = `/${role}/export/iuran`}
+                    disabled={!iuranManual.length && !iuranOtomatis.length}
+                >
+                    <i className="fas fa-file-excel"></i>
+                </button>
                 <div className="text-end ml-auto mr-3">
                     <button type="button" onClick={() => tambahShow()} className="btn-input btn btn-sm btn-success">
                         <i className="fas fa-plus mr-2"></i>
