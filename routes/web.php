@@ -29,6 +29,13 @@ use App\Http\Controllers\Rt\{
     Rt_wargaController,
     RtIuranController,
 };
+use App\Http\Controllers\Rw\{
+    RwPengaduanController,
+    RwPengumumanController,
+    RwRukunTetanggaController,
+    RwWargaController,
+    RwKartuKeluargaController,
+};
 use Inertia\Inertia;
 
 

@@ -126,7 +126,7 @@ class PengumumanWargaController extends Controller
         $rukun_tetangga = $userRtId ? Rt::find($userRtId) : null;
         $title = 'Pengumuman';
 
-        return Inertia::render('Warga/Pengumuman', [
+        return Inertia::render('Pengumuman', [
             'pengumuman' => $pengumuman,
             'rukun_tetangga' => $rukun_tetangga,
             'title' => $title,

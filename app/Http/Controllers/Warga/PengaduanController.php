@@ -98,7 +98,7 @@ class PengaduanController extends Controller
             ->distinct()
             ->pluck('level');
 
-        return Inertia::render('Warga/Pengaduan', [
+        return Inertia::render('Pengaduan', [
             'pengaduan' => $pengaduan,
             'title' => $title,
             'total_pengaduan' => $total_pengaduan,

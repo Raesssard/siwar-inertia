@@ -2,10 +2,11 @@ import React, { useState, useEffect, useRef } from "react"
 import Layout from "@/Layouts/Layout"
 import { Head, Link, usePage, useForm } from "@inertiajs/react"
 import Masonry from "react-masonry-css"
-import FileDisplay from "../Component/FileDisplay"
-import { DetailPengaduan, TambahPengaduan } from "../Component/Modal"
-import { FilterPengaduan } from "../Component/Filter"
+import FileDisplay from "./Component/FileDisplay"
+import { DetailPengaduan, TambahPengaduan } from "./Component/Modal"
+import { FilterPengaduan } from "./Component/Filter"
 import { Inertia } from "@inertiajs/inertia"
+import Role from "./Component/Role"
 
 export function FormatWaktu({ createdAt }) {
     const now = new Date()
@@ -37,23 +38,44 @@ export function FormatWaktu({ createdAt }) {
     )
 }
 
+function getWeek(date) {
+    const firstDayOfYear = new Date(date.getFullYear(), 0, 1)
+    const pastDaysOfYear = (date - firstDayOfYear) / 86400000
+    return Math.ceil((pastDaysOfYear + firstDayOfYear.getDay() + 1) / 7)
+}
+
 export function splitWaktu({ createdAt }) {
     const now = new Date()
     const created = new Date(createdAt)
     const diffMs = now - created
     const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24))
+    const sameWeek =
+        getWeek(now) === getWeek(created) &&
+        now.getFullYear() === created.getFullYear()
+
+    const sameMonth =
+        now.getMonth() === created.getMonth() &&
+        now.getFullYear() === created.getFullYear()
+
+    const lastMonth =
+        now.getMonth() - created.getMonth() === 1 &&
+        now.getFullYear() === created.getFullYear()
 
     if (diffDays < 1) {
         return "Hari ini"
     } else if (diffDays < 2) {
         return "Kemarin"
-    } else if (diffDays < 7) {
+    } else if (sameWeek) {
         return "Minggu ini"
-    } else if (diffDays < 30) {
+    } else if (!sameWeek && sameMonth) {
         return "Minggu lalu"
-    } else {
+    } else if (lastMonth || diffDays < 60) {
         return "Bulan lalu"
+    } else {
+        const namaBulan = created.toLocaleString("id-ID", { month: "long" })
+        return `${namaBulan} ${created.getFullYear()}`
     }
+
 }
 
 export default function Pengaduan() {
@@ -145,21 +167,6 @@ export default function Pengaduan() {
         display: "block",
     }
 
-    const statusLabel = (status, konfirmasi) => {
-        switch (status) {
-            case "belum":
-                return "Belum dibaca"
-            case "diproses":
-                if (konfirmasi === "sudah") return "Sudah dikonfirmasi"
-                if (konfirmasi === "menunggu") return "Menunggu konfirmasi RW"
-                return "Sedang diproses"
-            case "selesai":
-                return "Selesai"
-            default:
-                return "Status tidak diketahui"
-        }
-    }
-
     const filter = (e) => {
         e.preventDefault()
         get(`/${role}/pengaduan`, { preserveState: true, preserveScroll: true })
@@ -233,8 +240,17 @@ export default function Pengaduan() {
                                                 selesai: "green"
                                             }
 
+                                            const colorClassMap = {
+                                                gray: "bg-gray-200 text-gray-800",
+                                                blue: "bg-blue-200 text-blue-800",
+                                                cyan: "bg-cyan-200 text-cyan-800",
+                                                yellow: "bg-yellow-200 text-yellow-800",
+                                                green: "bg-green-200 text-green-800",
+                                            }
+
                                             const key = `${item.status}${item.status === "diproses" ? "_" + (item.konfirmasi_rw || "default") : ""}`
                                             const color = colorMap[key] || "gray"
+                                            const colorClasses = colorClassMap[color] || "bg-gray-200 text-gray-800"
                                             const label = labelMap[key] || "Status tidak diketahui"
 
                                             return (
@@ -248,22 +264,26 @@ export default function Pengaduan() {
                                                         <span><i className="fas fa-user mr-1"></i>{item.warga.nama}</span>
                                                         <span><i className="fas fa-clock mr-1"></i><FormatWaktu createdAt={item.created_at} /></span>
                                                     </div>
-                                                    {item.nik_warga !== user.nik ? (
-                                                        <div className="text-sm text-gray-500 mb-2 d-flex gap-3">
-                                                            <span><i className="fas fa-users mr-1"></i>RT {item.warga?.kartu_keluarga?.rukun_tetangga?.rt}/RW {item.warga?.kartu_keluarga?.rw?.nomor_rw}</span>
-                                                        </div>
-                                                    ) : ""
-                                                    }
+                                                    <Role role="warga">
+                                                        {item.nik_warga !== user.nik ? (
+                                                            <div className="text-sm text-gray-500 mb-2 d-flex gap-3">
+                                                                <span><i className="fas fa-users mr-1"></i>RT {item.warga?.kartu_keluarga?.rukun_tetangga?.rt}/RW {item.warga?.kartu_keluarga?.rw?.nomor_rw}</span>
+                                                            </div>
+                                                        ) : ""}
+                                                    </Role>
+
                                                     <p className="isi-pengaduan text-gray-700 text-sm mb-3 mx-3 line-clamp-3">
                                                         {item.isi.length > 100 ? item.isi.slice(0, 100) + "..." : item.isi}
                                                     </p>
-                                                    {item.nik_warga === user.nik ?
-                                                        <span className={`px-2 py-1 rounded font-semibold bg-${color}-200 text-${color}-800`} style={{ fontSize: "0.85rem" }}>
-                                                            {label}
-                                                        </span>
-                                                        :
-                                                        ""
-                                                    }
+                                                    <Role role="warga">
+                                                        {item.nik_warga === user.nik ?
+                                                            <span className={`px-2 py-1 rounded font-semibold ${colorClasses}`} style={{ fontSize: "0.85rem" }}>
+                                                                {label}
+                                                            </span>
+                                                            :
+                                                            ""
+                                                        }
+                                                    </Role>
                                                 </div>
                                             )
                                         })}

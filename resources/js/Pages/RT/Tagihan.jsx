@@ -23,9 +23,6 @@ export default function Tagihan() {
         search: '',
     })
 
-console.log(tagihanManualList)
-console.log(tagihanOtomatisList)
-
     const modalEdit = (item) => {
         setSelected(item)
         setShowModalEdit(true)
