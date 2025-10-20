@@ -20,7 +20,7 @@ class AdminKategoriGolonganController extends Controller
             $query->where('jenis', 'like', '%' . $request->jenis . '%');
         }
 
-        $kategori = $query->orderBy('id', 'desc')->paginate(5)->withQueryString();
+        $kategori = $query->orderBy('id', 'desc')->paginate(10)->withQueryString();
 
         return Inertia::render('Admin/KategoriGolongan', [
             'kategori' => $kategori,

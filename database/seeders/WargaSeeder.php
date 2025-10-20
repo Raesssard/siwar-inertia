@@ -84,6 +84,16 @@ class WargaSeeder extends Seeder
             'status_warga' => 'penduduk',
         ]);
 
+        $rw = User::updateOrCreate(
+            ['nik' => '1234567890123452'],
+            [
+                'nama' => 'Pak RW',
+                'password' => Hash::make('password'),
+                'id_rw' => $rw->id,
+            ]
+        );
+        $rw->syncRoles(['rw']);
+
         // akun sementara, cuma buat tes
         $warga = User::updateOrCreate(
             ['nik' => '0000000000000002'],

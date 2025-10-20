@@ -7,13 +7,13 @@ use App\Models\Kartu_keluarga;
 use App\Models\Tagihan;
 use App\Models\Iuran;
 use App\Models\Transaksi;
-use App\Models\Rukun_tetangga;
+use App\Models\Rt;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use App\Exports\TagihanExport;
 use Maatwebsite\Excel\Facades\Excel;
 
-class TagihanController extends Controller
+class RwTagihanController extends Controller
 {
     /**
      * Menampilkan daftar tagihan manual dengan filter dan total nominal.
@@ -145,7 +145,7 @@ class TagihanController extends Controller
                 $kk = Kartu_keluarga::where('no_kk', $tagihan->no_kk)->first();
 
                 if ($kk) {
-                    $rt = Rukun_tetangga::where('id', $kk->id_rt)->value('rt');
+                    $rt = Rt::where('id', $kk->id_rt)->value('rt');
 
                     if ($rt) {
                         Transaksi::create([
@@ -200,20 +200,5 @@ class TagihanController extends Controller
             Log::error('Error deleting tagihan manual:', ['message' => $e->getMessage()]);
             return redirect()->back()->with('error', 'Gagal menghapus tagihan manual. Error: ' . $e->getMessage());
         }
-    }
-    
-    public function exportManual()
-    {
-        return Excel::download(new TagihanExport('manual'), 'Tagihan-Manual.xlsx');
-    }
-
-    public function exportOtomatis()
-    {
-        return Excel::download(new TagihanExport('otomatis'), 'Tagihan-Otomatis.xlsx');
-    }
-
-    public function exportSemua()
-    {
-        return Excel::download(new TagihanExport('all'), 'Tagihan-Semua.xlsx');
     }
 }

@@ -18,16 +18,26 @@ class AppServiceProvider extends ServiceProvider
     {
         Carbon::setLocale('id');
 
-        // Share auth info ke semua Inertia page
+        // Share global data ke semua halaman Inertia
         Inertia::share([
+            // 🔹 Data user login
             'auth' => function () {
                 /** @var User $user */
                 $user = Auth::user();
                 return $user ? [
                     'id' => $user->id,
                     'name' => $user->name,
-                    'roles' => $user->getRoleNames()->toArray(), // array role user
+                    'roles' => $user->getRoleNames()->toArray(),
                 ] : null;
+            },
+
+            // 🔹 Flash message (success, error, info)
+            'flash' => function () {
+                return [
+                    'success' => session('success'),
+                    'error'   => session('error'),
+                    'info'    => session('info'),
+                ];
             },
         ]);
     }

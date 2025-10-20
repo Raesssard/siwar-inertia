@@ -36,7 +36,7 @@ class Rt_wargaController extends Controller
             ->paginate(5)
             ->withQueryString();
 
-        return Inertia::render('RT/DataWarga', [
+        return Inertia::render('Rt/DataWarga', [
             'title' => $title,
             'warga' => $warga,
             'search' => $search,

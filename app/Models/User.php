@@ -24,15 +24,6 @@ class User extends Authenticatable
         'id_rt',
     ];
 
-    // ⛔ Hapus cast JSON roles (sudah pakai Spatie, jadi tidak dipakai)
-    // protected $casts = ['roles' => 'array'];
-
-    // Default id_rw (opsional)
-    protected $attributes = [
-        'id_rw' => 1,
-    ];
-
-    // Relasi
     public function warga()
     {
         return $this->hasOne(Warga::class, 'nik', 'nik');

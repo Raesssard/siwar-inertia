@@ -1,11 +1,12 @@
 import React, { useEffect, useRef, useState } from "react"
-import { Link, useForm, usePage } from "@inertiajs/react"
+import { Link, useForm, usePage, router } from "@inertiajs/react"
 import logo from '../../../../public/img/logo.png'
 import axios from "axios"
 import { FormatWaktu } from "../Warga/Pengaduan"
 import { SidebarLink } from "./SidebarLink"
 import { formatTanggal, getAdminLinks, getRtLinks, getWargaLinks, getRwLinks, formatRupiah } from "./GetPropRole"
 import Role from "./Role"
+import Swal from "sweetalert2"
 
 export function ModalSidebar({ modalIsOpen, modalShow }) {
     const { url } = usePage()
@@ -167,28 +168,51 @@ export function AddRwModal({ form, handleChange, handleAdd, onClose }) {
                         <h5 className="text-lg font-semibold">Tambah RW</h5>
                         <button type="button" onClick={onClose} className="text-gray-500 hover:text-gray-700">✕</button>
                     </div>
+
                     <div className="space-y-3">
                         <div>
                             <label className="block text-sm font-medium">NIK</label>
-                            <input type="text" name="nik" value={form.nik || ""} onChange={handleChange} className="w-full border rounded-md p-2" />
+                            <input type="text" name="nik" value={form.nik || ""} onChange={handleChange} className="w-full border rounded-md p-2"  />
                         </div>
                         <div>
                             <label className="block text-sm font-medium">Nomor RW</label>
-                            <input type="text" name="nomor_rw" value={form.nomor_rw || ""} onChange={handleChange} className="w-full border rounded-md p-2" />
+                            <input type="text" name="nomor_rw" value={form.nomor_rw || ""} onChange={handleChange} className="w-full border rounded-md p-2"  />
                         </div>
                         <div>
                             <label className="block text-sm font-medium">Nama Ketua RW</label>
-                            <input type="text" name="nama_ketua_rw" value={form.nama_ketua_rw || ""} onChange={handleChange} className="w-full border rounded-md p-2" />
+                            <input type="text" name="nama_ketua_rw" value={form.nama_ketua_rw || ""} onChange={handleChange} className="w-full border rounded-md p-2"  />
                         </div>
                         <div>
                             <label className="block text-sm font-medium">Mulai Menjabat</label>
-                            <input type="date" name="mulai_menjabat" value={form.mulai_menjabat || ""} onChange={handleChange} className="w-full border rounded-md p-2" />
+                            <input type="date" name="mulai_menjabat" value={form.mulai_menjabat || ""} onChange={handleChange} className="w-full border rounded-md p-2"  />
                         </div>
                         <div>
                             <label className="block text-sm font-medium">Akhir Jabatan</label>
-                            <input type="date" name="akhir_jabatan" value={form.akhir_jabatan || ""} onChange={handleChange} className="w-full border rounded-md p-2" />
+                            <input type="date" name="akhir_jabatan" value={form.akhir_jabatan || ""} onChange={handleChange} className="w-full border rounded-md p-2"  />
+                        </div>
+
+                        {/* 🔹 Tambahan Jabatan */}
+                        <div>
+                            <label className="block text-sm font-medium">Jabatan</label>
+                            <select name="jabatan" value={form.jabatan || ""} onChange={handleChange} className="w-full border rounded-md p-2">
+                                <option value="">Pilih Jabatan</option>
+                                <option value="ketua">Ketua RW</option>
+                                <option value="sekretaris">Sekretaris RW</option>
+                                <option value="bendahara">Bendahara RW</option>
+                            </select>
+                        </div>
+
+                        {/* 🔹 Tambahan Status */}
+                        <div>
+                            <label className="block text-sm font-medium">Status</label>
+                            <select name="status" value={form.status || ""} onChange={handleChange} className="w-full border rounded-md p-2">
+                                <option value="">Pilih Status</option>
+                                <option value="aktif">Aktif</option>
+                                <option value="nonaktif">Nonaktif</option>
+                            </select>
                         </div>
                     </div>
+
                     <div className="flex justify-end gap-3 pt-4 border-t">
                         <button type="button" onClick={onClose} className="px-4 py-2 bg-gray-200 rounded-md hover:bg-gray-300">Batal</button>
                         <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Simpan</button>
@@ -208,28 +232,41 @@ export function EditRwModal({ form, handleChange, handleEdit, onClose }) {
                         <h5 className="text-lg font-semibold">Edit RW</h5>
                         <button type="button" onClick={onClose} className="text-gray-500 hover:text-gray-700">✕</button>
                     </div>
+
                     <div className="space-y-3">
                         <div>
                             <label className="block text-sm font-medium">NIK</label>
-                            <input type="text" name="nik" value={form.nik || ""} onChange={handleChange} className="w-full border rounded-md p-2" />
+                            <input type="text" name="nik" value={form.nik || ""} onChange={handleChange} className="w-full border rounded-md p-2"  />
                         </div>
                         <div>
                             <label className="block text-sm font-medium">Nomor RW</label>
-                            <input type="text" name="nomor_rw" value={form.nomor_rw || ""} onChange={handleChange} className="w-full border rounded-md p-2" />
+                            <input type="text" name="nomor_rw" value={form.nomor_rw || ""} onChange={handleChange} className="w-full border rounded-md p-2"  />
                         </div>
                         <div>
                             <label className="block text-sm font-medium">Nama Ketua RW</label>
-                            <input type="text" name="nama_ketua_rw" value={form.nama_ketua_rw || ""} onChange={handleChange} className="w-full border rounded-md p-2" />
+                            <input type="text" name="nama_ketua_rw" value={form.nama_ketua_rw || ""} onChange={handleChange} className="w-full border rounded-md p-2"  />
                         </div>
                         <div>
                             <label className="block text-sm font-medium">Mulai Menjabat</label>
-                            <input type="date" name="mulai_menjabat" value={form.mulai_menjabat || ""} onChange={handleChange} className="w-full border rounded-md p-2" />
+                            <input type="date" name="mulai_menjabat" value={form.mulai_menjabat || ""} onChange={handleChange} className="w-full border rounded-md p-2"  />
                         </div>
                         <div>
                             <label className="block text-sm font-medium">Akhir Jabatan</label>
-                            <input type="date" name="akhir_jabatan" value={form.akhir_jabatan || ""} onChange={handleChange} className="w-full border rounded-md p-2" />
+                            <input type="date" name="akhir_jabatan" value={form.akhir_jabatan || ""} onChange={handleChange} className="w-full border rounded-md p-2"  />
+                        </div>
+
+                        {/* 🔹 Tambahan Jabatan */}
+                        <div>
+                            <label className="block text-sm font-medium">Jabatan</label>
+                            <select name="jabatan" value={form.jabatan || ""} onChange={handleChange} className="w-full border rounded-md p-2">
+                                <option value="">Pilih Jabatan</option>
+                                <option value="ketua">Ketua RW</option>
+                                <option value="sekretaris">Sekretaris RW</option>
+                                <option value="bendahara">Bendahara RW</option>
+                            </select>
                         </div>
                     </div>
+
                     <div className="flex justify-end gap-3 pt-4 border-t">
                         <button type="button" onClick={onClose} className="px-4 py-2 bg-gray-200 rounded-md hover:bg-gray-300">Batal</button>
                         <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Update</button>
@@ -240,7 +277,7 @@ export function EditRwModal({ form, handleChange, handleEdit, onClose }) {
     )
 }
 
-export function AddRtModal({ form, handleChange, handleAdd, onClose }) {
+export function AddRtModal({ form, handleChange, handleAdd, onClose, rwList = [], isRw = false }) {
     return (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 fade-in">
             <div className="bg-white rounded-2xl shadow-lg w-full max-w-md animate-scaleIn">
@@ -249,39 +286,134 @@ export function AddRtModal({ form, handleChange, handleAdd, onClose }) {
                         <h5 className="text-lg font-semibold">Tambah RT</h5>
                         <button type="button" onClick={onClose} className="text-gray-500 hover:text-gray-700">✕</button>
                     </div>
+
                     <div className="space-y-3">
+                        {/* 🔹 NIK */}
                         <div>
                             <label className="block text-sm font-medium">NIK</label>
-                            <input type="text" name="nik" value={form.nik || ""} onChange={handleChange} className="w-full border rounded-md p-2" />
+                            <input
+                                type="text"
+                                name="nik"
+                                value={form.nik || ""}
+                                onChange={handleChange}
+                                className="w-full border rounded-md p-2"
+                            />
                         </div>
+
+                        {/* 🔹 Nomor RT */}
                         <div>
                             <label className="block text-sm font-medium">Nomor RT</label>
-                            <input type="text" name="nomor_rt" value={form.nomor_rt || ""} onChange={handleChange} className="w-full border rounded-md p-2" />
+                            <input
+                                type="text"
+                                name="nomor_rt"
+                                value={form.nomor_rt || ""}
+                                onChange={handleChange}
+                                className="w-full border rounded-md p-2"
+                            />
                         </div>
+
+                        {/* 🔹 Nama Ketua RT */}
                         <div>
                             <label className="block text-sm font-medium">Nama Ketua RT</label>
-                            <input type="text" name="nama_ketua_rt" value={form.nama_ketua_rt || ""} onChange={handleChange} className="w-full border rounded-md p-2" />
+                            <input
+                                type="text"
+                                name="nama_ketua_rt"
+                                value={form.nama_ketua_rt || ""}
+                                onChange={handleChange}
+                                className="w-full border rounded-md p-2"
+                            />
                         </div>
+
+                        {/* 🔹 Jabatan */}
+                        <div>
+                            <label className="block text-sm font-medium">Jabatan</label>
+                            <select
+                                name="jabatan"
+                                value={form.jabatan || ""}
+                                onChange={handleChange}
+                                className="w-full border rounded-md p-2"
+                            >
+                                <option value="">-- Pilih Jabatan --</option>
+                                <option value="ketua">Ketua RT</option>
+                                <option value="sekretaris">Sekretaris</option>
+                                <option value="bendahara">Bendahara</option>
+                            </select>
+                        </div>
+
+                        {/* 🔹 Tanggal Menjabat */}
                         <div>
                             <label className="block text-sm font-medium">Mulai Menjabat</label>
-                            <input type="date" name="mulai_menjabat" value={form.mulai_menjabat || ""} onChange={handleChange} className="w-full border rounded-md p-2" />
+                            <input
+                                type="date"
+                                name="mulai_menjabat"
+                                value={form.mulai_menjabat || ""}
+                                onChange={handleChange}
+                                className="w-full border rounded-md p-2"
+                            />
                         </div>
+
                         <div>
                             <label className="block text-sm font-medium">Akhir Jabatan</label>
-                            <input type="date" name="akhir_jabatan" value={form.akhir_jabatan || ""} onChange={handleChange} className="w-full border rounded-md p-2" />
+                            <input
+                                type="date"
+                                name="akhir_jabatan"
+                                value={form.akhir_jabatan || ""}
+                                onChange={handleChange}
+                                className="w-full border rounded-md p-2"
+                            />
+                        </div>
+
+                        {/* 🔹 Pilih RW (hanya untuk admin) */}
+                        {!isRw && (
+                            <div>
+                                <label className="block text-sm font-medium">Pilih RW</label>
+                                <select
+                                    name="id_rw"
+                                    value={form.id_rw || ""}
+                                    onChange={handleChange}
+                                    className="w-full border rounded-md p-2"
+                                >
+                                    <option value="">-- Pilih RW --</option>
+                                    {rwList.map((rw) => (
+                                        <option key={rw.id} value={rw.id}>
+                                            RW {rw.nomor_rw} - {rw.nama_ketua_rw}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                        )}
+
+                        {/* 🔹 Status (tetap muncul untuk semua) */}
+                        <div>
+                            <label className="block text-sm font-medium">Status</label>
+                            <select
+                                name="status"
+                                value={form.status || "aktif"}
+                                onChange={handleChange}
+                                className="w-full border rounded-md p-2"
+                            >
+                                <option value="aktif">Aktif</option>
+                                <option value="nonaktif">Nonaktif</option>
+                            </select>
                         </div>
                     </div>
+
+                    {/* 🔹 Tombol Aksi */}
                     <div className="flex justify-end gap-3 pt-4 border-t">
-                        <button type="button" onClick={onClose} className="px-4 py-2 bg-gray-200 rounded-md hover:bg-gray-300">Batal</button>
-                        <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Simpan</button>
+                        <button type="button" onClick={onClose} className="px-4 py-2 bg-gray-200 rounded-md hover:bg-gray-300">
+                            Batal
+                        </button>
+                        <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+                            Simpan
+                        </button>
                     </div>
                 </form>
             </div>
         </div>
-    )
+    );
 }
 
-export function EditRtModal({ form, handleChange, handleEdit, onClose }) {
+export function EditRtModal({ form, handleChange, handleEdit, onClose, rwList = [], isRw = false }) {
     return (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 fade-in">
             <div className="bg-white rounded-2xl shadow-lg w-full max-w-md animate-scaleIn">
@@ -290,28 +422,61 @@ export function EditRtModal({ form, handleChange, handleEdit, onClose }) {
                         <h5 className="text-lg font-semibold">Edit RT</h5>
                         <button type="button" onClick={onClose} className="text-gray-500 hover:text-gray-700">✕</button>
                     </div>
+
                     <div className="space-y-3">
                         <div>
                             <label className="block text-sm font-medium">NIK</label>
                             <input type="text" name="nik" value={form.nik || ""} onChange={handleChange} className="w-full border rounded-md p-2" />
                         </div>
+
                         <div>
                             <label className="block text-sm font-medium">Nomor RT</label>
                             <input type="text" name="nomor_rt" value={form.nomor_rt || ""} onChange={handleChange} className="w-full border rounded-md p-2" />
                         </div>
+
                         <div>
                             <label className="block text-sm font-medium">Nama Ketua RT</label>
                             <input type="text" name="nama_ketua_rt" value={form.nama_ketua_rt || ""} onChange={handleChange} className="w-full border rounded-md p-2" />
                         </div>
+
+                        {/* 🔹 Jabatan */}
+                        <div>
+                            <label className="block text-sm font-medium">Jabatan</label>
+                            <select name="jabatan" value={form.jabatan || ""} onChange={handleChange} className="w-full border rounded-md p-2">
+                                <option value="">-- Pilih Jabatan --</option>
+                                <option value="ketua">Ketua RT</option>
+                                <option value="sekretaris">Sekretaris</option>
+                                <option value="bendahara">Bendahara</option>
+                            </select>
+                        </div>
+
                         <div>
                             <label className="block text-sm font-medium">Mulai Menjabat</label>
                             <input type="date" name="mulai_menjabat" value={form.mulai_menjabat || ""} onChange={handleChange} className="w-full border rounded-md p-2" />
                         </div>
+
                         <div>
                             <label className="block text-sm font-medium">Akhir Jabatan</label>
                             <input type="date" name="akhir_jabatan" value={form.akhir_jabatan || ""} onChange={handleChange} className="w-full border rounded-md p-2" />
                         </div>
+
+                        {/* 🔹 Pilih RW (hanya untuk admin) */}
+                        {!isRw && (
+                            <div>
+                                <label className="block text-sm font-medium">Pilih RW</label>
+                                <select name="id_rw" value={form.id_rw || ""} onChange={handleChange} className="w-full border rounded-md p-2">
+                                    <option value="">-- Pilih RW --</option>
+                                    {rwList.map((rw) => (
+                                        <option key={rw.id} value={rw.id}>
+                                            RW {rw.nomor_rw} - {rw.nama_ketua_rw}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                        )}
                     </div>
+
+                    {/* 🔹 Tombol Aksi */}
                     <div className="flex justify-end gap-3 pt-4 border-t">
                         <button type="button" onClick={onClose} className="px-4 py-2 bg-gray-200 rounded-md hover:bg-gray-300">Batal</button>
                         <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Update</button>
@@ -319,7 +484,7 @@ export function EditRtModal({ form, handleChange, handleEdit, onClose }) {
                 </form>
             </div>
         </div>
-    )
+    );
 }
 
 export function AddKategoriGolonganModal({ form, handleChange, handleAdd, onClose }) {
@@ -515,43 +680,95 @@ export function EditRolePermissionModal({
     onClose,
 }) {
     return (
-        <div className="modal fade show" style={{ display: "block", backgroundColor: "rgba(0,0,0,0.5)" }}>
-            <div className="modal-dialog modal-lg modal-dialog-centered">
-                <div className="modal-content modal-custom">
-                    <div className="modal-header">
-                        <h5>Atur Permissions untuk Role: <strong>{role.name}</strong></h5>
-                        <button type="button" className="btn-close" onClick={onClose} />
+        <div
+            className="modal fade show"
+            style={{ display: "block", backgroundColor: "rgba(0,0,0,0.5)" }}
+        >
+            <div className="modal-dialog modal-xl modal-dialog-centered">
+                <div className="modal-content shadow-lg border-0 rounded-3">
+                    {/* Header */}
+                    <div className="modal-header bg-primary text-white">
+                        <h5 className="modal-title">
+                            Atur Permissions untuk Role:{" "}
+                            <strong className="text-warning">{role.name}</strong>
+                        </h5>
+                        <button
+                            type="button"
+                            className="btn-close btn-close-white"
+                            onClick={onClose}
+                        />
                     </div>
-                    <div className="modal-body">
-                        <div className="row">
-                            {permissions.length ? (
-                                permissions.map((perm) => (
-                                    <div key={perm.id} className="col-md-4 mb-2">
-                                        <label className="d-flex align-items-center">
+
+                    {/* Body */}
+                    <div
+                        className="modal-body"
+                        style={{
+                            maxHeight: "70vh",
+                            overflowY: "auto",
+                            backgroundColor: "#f9fafb",
+                            padding: "20px 25px",
+                        }}
+                    >
+                        {permissions.length ? (
+                            <div className="row g-3">
+                                {permissions.map((perm) => (
+                                    <div key={perm.id} className="col-12 col-sm-6 col-md-4 col-lg-3">
+                                        <label
+                                            className="d-flex align-items-center p-2 rounded border bg-white shadow-sm hover-shadow-sm"
+                                            style={{
+                                                transition: "all 0.2s ease",
+                                                cursor: "pointer",
+                                            }}
+                                        >
                                             <input
                                                 type="checkbox"
                                                 checked={selectedPerms.includes(perm.name)}
                                                 onChange={() => togglePermission(perm.name)}
                                                 className="form-check-input me-2"
                                             />
-                                            {perm.name}
+                                            <span
+                                                className="text-dark"
+                                                style={{
+                                                    fontSize: "0.9rem",
+                                                    wordBreak: "break-word",
+                                                }}
+                                            >
+                                                {perm.name}
+                                            </span>
                                         </label>
                                     </div>
-                                ))
-                            ) : (
-                                <div className="text-center text-muted">Tidak ada permission tersedia.</div>
-                            )}
-                        </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="text-center text-muted py-4">
+                                Tidak ada permission tersedia.
+                            </div>
+                        )}
                     </div>
-                    <div className="modal-footer">
-                        <button type="button" className="btn btn-secondary" onClick={onClose}>Batal</button>
-                        <button type="button" className="btn btn-primary" onClick={handleSave}>Simpan Permissions</button>
+
+                    {/* Footer */}
+                    <div className="modal-footer border-top bg-light">
+                        <button
+                            type="button"
+                            className="btn btn-secondary px-4"
+                            onClick={onClose}
+                        >
+                            Batal
+                        </button>
+                        <button
+                            type="button"
+                            className="btn btn-primary px-4"
+                            onClick={handleSave}
+                        >
+                            Simpan Permissions
+                        </button>
                     </div>
                 </div>
             </div>
         </div>
-    )
+    );
 }
+
 
 export function AddPermissionModal({ form, setForm, handleAdd, onClose }) {
     return (
@@ -1763,7 +1980,263 @@ export function TambahPengaduan({ tambahShow, onClose, onAdded }) {
     )
 }
 
-export function DetailKK({ selectedData, detailShow, onClose, role, userData }) {
+export function TambahEditKK({ show, onClose, dataKK = null, kategoriIuran, daftarRT = [], role }) {
+  const isEdit = !!dataKK;
+
+  const { data, setData, post, put, processing, reset } = useForm({
+    no_kk: dataKK?.no_kk ?? "",
+    no_registrasi: dataKK?.no_registrasi ?? "",
+    alamat: dataKK?.alamat ?? "",
+    kelurahan: dataKK?.kelurahan ?? "",
+    kecamatan: dataKK?.kecamatan ?? "",
+    kabupaten: dataKK?.kabupaten ?? "",
+    provinsi: dataKK?.provinsi ?? "",
+    kode_pos: dataKK?.kode_pos ?? "",
+    tgl_terbit: dataKK?.tgl_terbit ?? "",
+    kategori_iuran: dataKK?.kategori_iuran ?? "",
+    instansi_penerbit: dataKK?.instansi_penerbit ?? "",
+    kabupaten_kota_penerbit: dataKK?.kabupaten_kota_penerbit ?? "",
+    nama_kepala_dukcapil: dataKK?.nama_kepala_dukcapil ?? "",
+    nip_kepala_dukcapil: dataKK?.nip_kepala_dukcapil ?? "",
+    id_rt: dataKK?.id_rt ?? "",
+  });
+
+  useEffect(() => {
+    if (dataKK) {
+      setData({
+        no_kk: dataKK.no_kk,
+        no_registrasi: dataKK.no_registrasi,
+        alamat: dataKK.alamat,
+        kelurahan: dataKK.kelurahan,
+        kecamatan: dataKK.kecamatan,
+        kabupaten: dataKK.kabupaten,
+        provinsi: dataKK.provinsi,
+        kode_pos: dataKK.kode_pos,
+        tgl_terbit: dataKK.tgl_terbit,
+        kategori_iuran: dataKK.kategori_iuran,
+        instansi_penerbit: dataKK.instansi_penerbit,
+        kabupaten_kota_penerbit: dataKK.kabupaten_kota_penerbit,
+        nama_kepala_dukcapil: dataKK.nama_kepala_dukcapil,
+        nip_kepala_dukcapil: dataKK.nip_kepala_dukcapil,
+        id_rt: dataKK.id_rt ?? "",
+      });
+    } else {
+      reset();
+    }
+  }, [dataKK]);
+
+  if (!show) return null;
+
+  const submit = (e) => {
+    e.preventDefault();
+    if (isEdit) {
+      put(`/${role}/kartu_keluarga/${dataKK.id}`, { preserveScroll: true });
+    } else {
+      post(`/${role}/kartu_keluarga`, { preserveScroll: true });
+    }
+  };
+
+  return (
+    <div
+      className="modal fade show"
+      style={{
+        display: "block",
+        backgroundColor: "rgba(0,0,0,0.5)",
+        zIndex: 1050,
+      }}
+      onClick={onClose}
+    >
+      <div
+        className="modal-dialog modal-xl modal-dialog-centered"
+        onClick={(e) => e.stopPropagation()}
+        style={{ maxWidth: "80%", margin: "auto" }}
+      >
+        <div className="modal-content shadow-lg border-0 rounded-3">
+          <div className="modal-header bg-success text-white">
+            <h5 className="modal-title fw-semibold">
+              {isEdit ? "Edit Kartu Keluarga" : "Tambah Kartu Keluarga"}
+            </h5>
+          </div>
+
+          <form onSubmit={submit}>
+            <div className="modal-body px-4 py-4">
+              {/* No KK dan No Registrasi */}
+              <div className="row g-3 mb-3">
+                <div className="col-md-6">
+                  <label className="form-label fw-medium">No. KK</label>
+                  <input
+                    type="text"
+                    className="form-control shadow-sm"
+                    value={data.no_kk}
+                    onChange={(e) => setData("no_kk", e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="col-md-6">
+                  <label className="form-label fw-medium">No. Registrasi</label>
+                  <input
+                    type="text"
+                    className="form-control shadow-sm"
+                    value={data.no_registrasi}
+                    onChange={(e) => setData("no_registrasi", e.target.value)}
+                    required
+                  />
+                </div>
+              </div>
+
+              {/* Pilih RT */}
+              <div className="row g-3 mb-3">
+                <div className="col-md-6">
+                  <label className="form-label fw-medium">Pilih RT</label>
+                  <select
+                    className="form-select shadow-sm"
+                    value={data.id_rt}
+                    onChange={(e) => setData("id_rt", e.target.value)}
+                    required
+                  >
+                    <option value="">-- Pilih RT --</option>
+                    {daftarRT.map((rt) => (
+                      <option key={rt.id} value={rt.id}>
+                        RT {rt.nomor_rt} / RW {rt.rw.nomor_rw}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="col-md-6">
+                  <label className="form-label fw-medium">Kategori Iuran</label>
+                  <select
+                    className="form-select shadow-sm"
+                    value={data.kategori_iuran}
+                    onChange={(e) => setData("kategori_iuran", e.target.value)}
+                    required
+                  >
+                    <option value="">-- Pilih Kategori --</option>
+                    {Array.isArray(kategoriIuran)
+                ? kategoriIuran.map((item) => (
+                    <option key={item.id} value={item.id}>
+                        {item.jenis}
+                    </option>
+                    ))
+                : Object.entries(kategoriIuran).map(([id, val]) => (
+                    <option key={id} value={id}>
+                        {val?.jenis ?? val}
+                    </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              {/* Alamat */}
+              <div className="mb-3">
+                <label className="form-label fw-medium">Alamat Lengkap</label>
+                <textarea
+                  className="form-control shadow-sm"
+                  rows="2"
+                  value={data.alamat}
+                  onChange={(e) => setData("alamat", e.target.value)}
+                  required
+                ></textarea>
+              </div>
+
+              {/* Lokasi */}
+              <div className="row g-3 mb-3">
+                {["kelurahan", "kecamatan", "kabupaten", "provinsi"].map((field, i) => (
+                  <div className="col-md-6" key={i}>
+                    <label className="form-label fw-medium">
+                      {field.charAt(0).toUpperCase() + field.slice(1)}
+                    </label>
+                    <input
+                      type="text"
+                      className="form-control shadow-sm"
+                      value={data[field]}
+                      onChange={(e) => setData(field, e.target.value)}
+                      required
+                    />
+                  </div>
+                ))}
+              </div>
+
+              {/* Info Tambahan */}
+              <div className="row g-3 mb-3">
+                <div className="col-md-4">
+                  <label className="form-label fw-medium">Kode Pos</label>
+                  <input
+                    type="text"
+                    className="form-control shadow-sm"
+                    value={data.kode_pos}
+                    onChange={(e) => setData("kode_pos", e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="col-md-4">
+                  <label className="form-label fw-medium">Tanggal Terbit</label>
+                  <input
+                    type="date"
+                    className="form-control shadow-sm"
+                    value={data.tgl_terbit}
+                    onChange={(e) => setData("tgl_terbit", e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="col-md-4">
+                  <label className="form-label fw-medium">Instansi Penerbit</label>
+                  <input
+                    type="text"
+                    className="form-control shadow-sm"
+                    value={data.instansi_penerbit}
+                    onChange={(e) => setData("instansi_penerbit", e.target.value)}
+                  />
+                </div>
+              </div>
+
+              {/* Info Dukcapil */}
+              <div className="row g-3 mb-3">
+                <div className="col-md-6">
+                  <label className="form-label fw-medium">Kabupaten/Kota Penerbit</label>
+                  <input
+                    type="text"
+                    className="form-control shadow-sm"
+                    value={data.kabupaten_kota_penerbit}
+                    onChange={(e) => setData("kabupaten_kota_penerbit", e.target.value)}
+                  />
+                </div>
+                <div className="col-md-6">
+                  <label className="form-label fw-medium">Nama Kepala Dukcapil</label>
+                  <input
+                    type="text"
+                    className="form-control shadow-sm"
+                    value={data.nama_kepala_dukcapil}
+                    onChange={(e) => setData("nama_kepala_dukcapil", e.target.value)}
+                  />
+                </div>
+                <div className="col-md-6">
+                  <label className="form-label fw-medium">NIP Kepala Dukcapil</label>
+                  <input
+                    type="text"
+                    className="form-control shadow-sm"
+                    value={data.nip_kepala_dukcapil}
+                    onChange={(e) => setData("nip_kepala_dukcapil", e.target.value)}
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="modal-footer bg-light d-flex justify-content-between">
+              <button type="button" className="btn btn-outline-secondary px-4" onClick={onClose}>
+                <i className="bi bi-x-circle"></i> Batal
+              </button>
+              <button type="submit" className="btn btn-success px-4" disabled={processing}>
+                {processing ? "Menyimpan..." : isEdit ? "Perbarui" : "Simpan"}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export function DetailKK({ selectedData, detailShow, onClose, role }) {
     if (!detailShow || !selectedData) return null
 
     const [selectedFile, setSelectedFile] = useState(null)
@@ -1780,9 +2253,7 @@ export function DetailKK({ selectedData, detailShow, onClose, role, userData }) 
 
     useEffect(() => {
         const handleEsc = (e) => {
-            if (e.key === "Escape") {
-                onClose()
-            }
+            if (e.key === "Escape") onClose()
         }
 
         document.addEventListener("keydown", handleEsc)
@@ -1808,26 +2279,31 @@ export function DetailKK({ selectedData, detailShow, onClose, role, userData }) 
 
     const handleUpload = async (e) => {
         e.preventDefault()
+        if (!selectedFile) return alert("Pilih file terlebih dahulu!")
 
+        setUploading(true)
         const formData = new FormData()
         formData.append("kk_file", selectedFile)
         formData.append("_method", "PUT")
 
-        axios.post(`/rt/kartu_keluarga/${selectedData.no_kk}/upload-foto`, formData)
-            .then(res => {
+        axios
+            .post(`/rt/kartu_keluarga/${selectedData.no_kk}/upload-foto`, formData)
+            .then((res) => {
                 console.log("Upload sukses:", res.data)
                 alert("Dokumen berhasil diunggah!")
             })
-            .catch(err => {
+            .catch((err) => {
                 console.error("Upload gagal:", err.response?.data || err)
                 alert("Gagal upload file, cek console/log Laravel.")
             })
+            .finally(() => setUploading(false))
     }
 
     const handleDelete = () => {
         if (!window.confirm("Yakin hapus dokumen ini?")) return
 
-        axios.delete(`/${role}/kartu_keluarga/${selectedData.no_kk}/delete-foto`)
+        axios
+            .delete(`/${role}/kartu_keluarga/${selectedData.no_kk}/delete-foto`)
             .then(() => {
                 alert("Dokumen berhasil dihapus!")
             })
@@ -1847,6 +2323,10 @@ export function DetailKK({ selectedData, detailShow, onClose, role, userData }) 
             >
                 <div
                     className="modal-dialog modal-xl modal-dialog-scrollable modal-dialog-centered"
+                    style={{
+                        maxWidth: "80%",
+                        margin: "auto",
+                    }}
                     onClick={(e) => e.stopPropagation()}
                 >
                     <div className="modal-content shadow border-0">
@@ -1857,11 +2337,11 @@ export function DetailKK({ selectedData, detailShow, onClose, role, userData }) 
                         <div className="modal-body kk d-block p-4">
                             <div className="kk-header w-100">
                                 <div className="kk-header-top-line">
-                                    <div className="kk-header-left-space">
-                                    </div>
+                                    <div className="kk-header-left-space"></div>
                                     <div className="kk-header-right-reg">
                                         {selectedData.no_registrasi && (
-                                            <p>No. Registrasi:
+                                            <p>
+                                                No. Registrasi:
                                                 <strong>{selectedData.no_registrasi}</strong>
                                             </p>
                                         )}
@@ -1870,7 +2350,9 @@ export function DetailKK({ selectedData, detailShow, onClose, role, userData }) 
 
                                 <div className="kk-header-main-title">
                                     <h4>KARTU KELUARGA</h4>
-                                    <p className="no-kk-big">No. KK: <strong>{selectedData.no_kk}</strong></p>
+                                    <p className="no-kk-big">
+                                        No. KK: <strong>{selectedData.no_kk}</strong>
+                                    </p>
                                 </div>
                             </div>
 
@@ -1880,23 +2362,68 @@ export function DetailKK({ selectedData, detailShow, onClose, role, userData }) 
                                     <p><strong>Alamat</strong> : {selectedData.alamat ?? '-'}</p>
                                     <p><strong>RT/RW</strong> :{" "}
                                         {selectedData.rukun_tetangga.nomor_rt ?? '-'}/{selectedData.rw.nomor_rw ?? '-'}
+                                    <p>
+                                        <strong>Nama Kepala Keluarga</strong> :{" "}
+                                        {kepala?.nama ?? "-"}
                                     </p>
-                                    <p><strong>Desa/Kelurahan</strong> : {selectedData.kelurahan ?? '-'}</p>
+                                    <p>
+                                        <strong>Alamat</strong> : {selectedData.alamat ?? "-"}
+                                    </p>
+                                    <p>
+                                        <strong>RT/RW</strong> :{" "}
+                                        {selectedData.rukun_tetangga.nomor_rt ?? "-"}/
+                                        {selectedData.rw.nomor_rw ?? "-"}
+                                    </p>
+                                    <p>
+                                        <strong>Desa/Kelurahan</strong> :{" "}
+                                        {selectedData.kelurahan ?? "-"}
+                                    </p>
                                 </div>
                                 <div className="kk-info-item">
-                                    <p><strong>Kecamatan</strong> : {selectedData.kecamatan ?? '-'}</p>
-                                    <p><strong>Kabupaten/Kota</strong> : {selectedData.kabupaten ?? '-'}</p>
-                                    <p><strong>Kode Pos</strong> : {selectedData.kode_pos ?? '-'}</p>
-                                    <p><strong>Provinsi</strong> : {selectedData.provinsi ?? '-'}</p>
+                                    <p>
+                                        <strong>Kecamatan</strong> :{" "}
+                                        {selectedData.kecamatan ?? "-"}
+                                    </p>
+                                    <p>
+                                        <strong>Kabupaten/Kota</strong> :{" "}
+                                        {selectedData.kabupaten ?? "-"}
+                                    </p>
+                                    <p>
+                                        <strong>Kode Pos</strong> :{" "}
+                                        {selectedData.kode_pos ?? "-"}
+                                    </p>
+                                    <p>
+                                        <strong>Provinsi</strong> :{" "}
+                                        {selectedData.provinsi ?? "-"}
+                                    </p>
                                 </div>
                             </div>
 
-                            <hr className="my-2" style={{ borderTop: "2px solid #e0e0e0", width: "100%" }} />
+                            <hr
+                                className="my-2"
+                                style={{ borderTop: "2px solid #e0e0e0", width: "100%" }}
+                            />
 
                             <h6 className="fw-bold text-center mb-3 mt-2">
                                 DAFTAR ANGGOTA KELUARGA
                             </h6>
                             <div className="table-responsive">
+                                <Role role="rw">
+                                    <div className="d-flex justify-content-end mb-3">
+                                        <button
+                                            className="btn btn-primary btn-sm"
+                                            onClick={() =>
+                                                router.visit(
+                                                    route("rw.warga.create", {
+                                                        no_kk: selectedData.no_kk,
+                                                    })
+                                                )
+                                            }
+                                        >
+                                            <i className="bi bi-person-plus"></i> Tambah Warga
+                                        </button>
+                                    </div>
+                                </Role>
                                 <table className="table table-bordered table-striped table-sm align-middle">
                                     <thead className="table-success text-center small">
                                         <tr>
@@ -1927,7 +2454,8 @@ export function DetailKK({ selectedData, detailShow, onClose, role, userData }) 
                                         </tr>
                                     </thead>
                                     <tbody className="small">
-                                        {selectedData?.warga && selectedData.warga.length > 0 ? (
+                                        {selectedData?.warga &&
+                                        selectedData.warga.length > 0 ? (
                                             selectedData.warga
                                                 .sort((a, b) => {
                                                     const getRank = (hubungan) => {
@@ -1935,28 +2463,59 @@ export function DetailKK({ selectedData, detailShow, onClose, role, userData }) 
                                                         if (hubungan === "Istri") return 1
                                                         return 0
                                                     }
-                                                    return getRank(b.status_hubungan_dalam_keluarga) - getRank(a.status_hubungan_dalam_keluarga)
+                                                    return (
+                                                        getRank(
+                                                            b.status_hubungan_dalam_keluarga
+                                                        ) -
+                                                        getRank(
+                                                            a.status_hubungan_dalam_keluarga
+                                                        )
+                                                    )
                                                 })
                                                 .map((data, index) => (
                                                     <tr key={index}>
                                                         <td className="text-center">{index + 1}</td>
-                                                        <td className="text-center">{data.nama ?? '-'}</td>
-                                                        <td className="text-center">{data.nik ?? '-'}</td>
-                                                        <td className="text-center">{data.jenis_kelamin.charAt(0).toUpperCase() + data.jenis_kelamin.slice(1) ?? '-'}</td>
-                                                        <td>{data.tempat_lahir ?? '-'}</td>
+                                                        <td className="text-center">
+                                                            {data.nama ?? "-"}
+                                                        </td>
+                                                        <td className="text-center">
+                                                            {data.nik ?? "-"}
+                                                        </td>
+                                                        <td className="text-center">
+                                                            {data.jenis_kelamin
+                                                                ? data.jenis_kelamin.charAt(0).toUpperCase() +
+                                                                  data.jenis_kelamin.slice(1)
+                                                                : "-"}
+                                                        </td>
+                                                        <td>{data.tempat_lahir ?? "-"}</td>
                                                         <td className="text-center">
                                                             {formatTanggal(data.tanggal_lahir)}
                                                         </td>
-                                                        <td className="text-center">{data.agama ?? '-'}</td>
-                                                        <td className="text-center">{data.pendidikan ?? '-'}</td>
-                                                        <td className="text-center">{data.pekerjaan ?? '-'}</td>
-                                                        <td className="text-center">{data.golongan_darah ?? '-'}</td>
-                                                        <td className="text-center">{data.status_perkawinan.charAt(0).toUpperCase() + data.status_perkawinan.slice(1) ?? '-'}</td>
-                                                        <td className="text-center">{data.status_hubungan_dalam_keluarga.charAt(0).toUpperCase() + data.status_hubungan_dalam_keluarga.slice(1) ?? '-'}</td>
-                                                        <td className="text-center">{data.kewarganegaraan ?? 'WNI'}</td>
-                                                        <td className="text-center">{data.no_paspor ?? '-'}</td>
                                                         <td className="text-center">
-                                                            {`${data.no_kitas ?? '-'} / ${data.no_kitap ?? '-'}`}
+                                                            {data.agama ?? "-"}
+                                                        </td>
+                                                        <td className="text-center">
+                                                            {data.pendidikan ?? "-"}
+                                                        </td>
+                                                        <td className="text-center">
+                                                            {data.pekerjaan ?? "-"}
+                                                        </td>
+                                                        <td className="text-center">
+                                                            {data.golongan_darah ?? "-"}
+                                                        </td>
+                                                        <td className="text-center">
+                                                            {data.status_perkawinan
+                                                                ? data.status_perkawinan.charAt(0).toUpperCase() +
+                                                                  data.status_perkawinan.slice(1)
+                                                                : "-"}
+                                                        </td>
+                                                        <td className="text-center">
+                                                            {data.status_hubungan_dalam_keluarga
+                                                                ? data.status_hubungan_dalam_keluarga
+                                                                      .charAt(0)
+                                                                      .toUpperCase() +
+                                                                  data.status_hubungan_dalam_keluarga.slice(1)
+                                                                : "-"}
                                                         </td>
                                                         <td className="text-center">{data.nama_ayah ?? '-'}</td>
                                                         <td className="text-center">{data.nama_ibu ?? '-'}</td>
@@ -1966,12 +2525,82 @@ export function DetailKK({ selectedData, detailShow, onClose, role, userData }) 
                                                                 <i className="fas fa-info"></i>
                                                             </button>
                                                         </td>
+                                                        <td className="text-center">
+                                                            {data.kewarganegaraan ?? "WNI"}
+                                                        </td>
+                                                        <td className="text-center">
+                                                            {data.no_paspor ?? "-"}
+                                                        </td>
+                                                        <td className="text-center">
+                                                            {`${data.no_kitas ?? "-"} / ${
+                                                                data.no_kitap ?? "-"
+                                                            }`}
+                                                        </td>
+                                                        <td className="text-center">
+                                                            {data.nama_ayah ?? "-"}
+                                                        </td>
+                                                        <td className="text-center">
+                                                            {data.nama_ibu ?? "-"}
+                                                        </td>
+                                                        <td className="text-center">
+                                                            {data.status_warga
+                                                                ? data.status_warga.charAt(0).toUpperCase() +
+                                                                  data.status_warga.slice(1)
+                                                                : "-"}
+                                                        </td>
+                                                        <Role role="rw">
+                                                            <td className="text-center">
+                                                                <button
+                                                                    className="btn btn-warning btn-sm me-1"
+                                                                    onClick={() =>
+                                                                        router.visit(
+                                                                            route("rw.warga.edit", data.id)
+                                                                        )
+                                                                    }
+                                                                >
+                                                                    <i className="bi bi-pencil-square"></i>
+                                                                </button>
+                                                                <button
+                                                                    className="btn btn-danger btn-sm"
+                                                                    onClick={() => {
+                                                                        if (
+                                                                            confirm(
+                                                                                `Hapus warga ${data.nama}?`
+                                                                            )
+                                                                        ) {
+                                                                            router.delete(
+                                                                                route(
+                                                                                    "rw.warga.destroy",
+                                                                                    data.id
+                                                                                ),
+                                                                                {
+                                                                                    onSuccess: () =>
+                                                                                        alert(
+                                                                                            "Warga berhasil dihapus"
+                                                                                        ),
+                                                                                    onError: () =>
+                                                                                        alert(
+                                                                                            "Gagal menghapus warga"
+                                                                                        ),
+                                                                                }
+                                                                            )
+                                                                        }
+                                                                    }}
+                                                                >
+                                                                    <i className="bi bi-trash"></i>
+                                                                </button>
+                                                            </td>
+                                                        </Role>
                                                     </tr>
                                                 ))
                                         ) : (
                                             <tr>
-                                                <td colSpan="19" className="text-center text-muted p-4">
-                                                    Tidak ada anggota keluarga yang terdaftar untuk Kartu Keluarga ini.
+                                                <td
+                                                    colSpan="19"
+                                                    className="text-center text-muted p-4"
+                                                >
+                                                    Tidak ada anggota keluarga yang terdaftar untuk
+                                                    Kartu Keluarga ini.
                                                 </td>
                                             </tr>
                                         )}
@@ -1980,9 +2609,14 @@ export function DetailKK({ selectedData, detailShow, onClose, role, userData }) 
                             </div>
 
                             <div className="kk-document-section mt-1">
-                                <h6 className="fw-bold mb-3">Unggah / Perbarui Dokumen KK</h6>
+                                <h6 className="fw-bold mb-3">
+                                    Unggah / Perbarui Dokumen KK
+                                </h6>
 
-                                <form onSubmit={handleUpload} className="input-group mb-2 d-flex">
+                                <form
+                                    onSubmit={handleUpload}
+                                    className="input-group mb-2 d-flex"
+                                >
                                     <input
                                         type="file"
                                         name="kk_file"
@@ -1994,7 +2628,7 @@ export function DetailKK({ selectedData, detailShow, onClose, role, userData }) 
                                         className="btn btn-success m-0"
                                         type="submit"
                                         disabled={uploading}
-                                        style={{ borderRadius: '0 0.35rem 0.35rem 0' }}
+                                        style={{ borderRadius: "0 0.35rem 0.35rem 0" }}
                                     >
                                         {uploading ? "Mengunggah..." : "Unggah"}
                                     </button>
@@ -2018,7 +2652,8 @@ export function DetailKK({ selectedData, detailShow, onClose, role, userData }) 
                                                 style={{
                                                     maxWidth: "100%",
                                                     borderRadius: "10px",
-                                                    boxShadow: "0 0 5px rgba(0,0,0,0.2)",
+                                                    boxShadow:
+                                                        "0 0 5px rgba(0,0,0,0.2)",
                                                 }}
                                             />
                                         )}

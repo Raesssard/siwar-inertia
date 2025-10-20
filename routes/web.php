@@ -29,6 +29,14 @@ use App\Http\Controllers\Rt\{
     Rt_wargaController,
     RtIuranController,
 };
+use App\Http\Controllers\Rw\{
+  RwKartuKeluargaController,
+  RwPengaduanController,
+  RwPengumumanController,
+  RwRukunTetanggaController,
+  RwWargaController,
+};
+use App\Models\Rw;
 use Inertia\Inertia;
 
 
@@ -51,7 +59,13 @@ Route::middleware(['auth'])->group(function () {
     // 🔹 Admin routes
     Route::prefix('admin')->name('admin.')->group(function () {
         Route::resource('rw', AdminRwController::class)->except(['create', 'edit', 'show']);
+        Route::put('rw/{id}/toggle-status', [AdminRwController::class, 'toggleStatus'])
+            ->name('rw.toggleStatus');
+
         Route::resource('rt', AdminRtController::class)->except(['create', 'edit', 'show']);
+        Route::put('rt/{id}/toggle-status', [AdminRtController::class, 'toggleStatus'])
+            ->name('rt.toggleStatus'); // ✅ Tambahkan ini
+
         Route::resource('kategori-golongan', AdminKategoriGolonganController::class)->except(['create', 'edit', 'show']);
         Route::resource('roles', AdminRoleController::class)->except(['create', 'edit', 'show']);
         Route::put('roles/{id}/permissions', [AdminRoleController::class, 'updatePermissions'])->name('roles.permissions.update');
@@ -69,6 +83,38 @@ Route::middleware(['auth'])->group(function () {
         Route::get('tagihan', [WargatagihanController::class, 'index'])->name('tagihan');
         Route::get('transaksi', [WargatransaksiController::class, 'index'])->name('transaksi');
     });
+
+    Route::prefix('rw')->as('rw.')->group(function () {
+        // 🔹 Data RT (CRUD)
+        Route::resource('rt', RwRukunTetanggaController::class)->except(['create', 'edit', 'show']);
+        Route::resource('warga', RwWargaController::class);
+        Route::resource('kartu_keluarga', RwKartuKeluargaController::class);
+        Route::resource('pengumuman', RwPengumumanController::class);
+
+        Route::get('warga/orangtua/{no_kk}', [RwWargaController::class, 'getOrangTua'])->name('warga.getOrangTua');
+        Route::get('warga/create', [RwWargaController::class, 'create'])->name('warga.create');
+        Route::get('warga/{id}/edit', [RwWargaController::class, 'edit'])->name('warga.edit');
+
+        Route::get('pengaduan', [RwPengaduanController::class, 'index'])->name('pengaduan.index');
+        Route::put('pengaduan/{id}/status', [RwPengaduanController::class, 'updateStatus'])->name('pengaduan.updateStatus');
+        Route::put('pengaduan/{id}/konfirmasi', [RwPengaduanController::class, 'updateKonfirmasi'])->name('pengaduan.updateKonfirmasi');
+        Route::post('pengaduan/{id}/komentar', [RwPengaduanController::class, 'komen'])->name('pengaduan.komentar.komen');
+
+        Route::get('/pengumuman/{id}/export-pdf', [RwPengumumanController::class, 'exportPDF'])
+            ->name('pengumuman.export.pdf');
+        Route::post('/pengumuman/{id}/komentar', [RwPengumumanController::class, 'komen'])
+            ->name('pengumuman.komentar.komen');
+
+        Route::post('kartu_keluarga/{no_kk}/upload-foto', [RwKartuKeluargaController::class, 'uploadFoto'])
+            ->name('kartu_keluarga.upload');
+        Route::delete('kartu_keluarga/{no_kk}/delete-foto', [RwKartuKeluargaController::class, 'deleteFoto'])
+            ->name('kartu_keluarga.delete');
+
+        // 🔹 Toggle status aktif / nonaktif
+        Route::put('rt/{id}/toggle-status', [RwRukunTetanggaController::class, 'toggleStatus'])
+            ->name('rt.toggleStatus');
+    });
+
 
     Route::prefix('rt')->as('rt.')->group(function () {
         Route::resource('kartu_keluarga', Rt_kartu_keluargaController::class)->only('index');

@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Rw;
 
 use App\Http\Controllers\Controller;
 use App\Models\Iuran;
-use App\Models\Rukun_tetangga;
+use App\Models\Rt;
 use App\Models\IuranGolongan;
 use App\Models\Kartu_keluarga;
 use App\Models\Kategori_golongan;
@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Exports\IuranExport;
 use Maatwebsite\Excel\Facades\Excel;
 
-class IuranController extends Controller
+class RwIuranController extends Controller
 {
     public function index(Request $request)
     {
@@ -39,7 +39,7 @@ class IuranController extends Controller
         $golongan_list = Kategori_golongan::pluck('jenis', 'id');
 
         // ambil daftar RT untuk filter dropdown
-        $rt = Rukun_tetangga::all();
+        $rt = Rt::all();
 
         return view('rw.iuran.iuran', [
             'iuran' => $iuran,
@@ -254,15 +254,15 @@ if ($request->jenis === 'otomatis') {
         return redirect()->route('rw.iuran.index')->with('success', 'Tagihan bulanan berhasil dibuat.');
     }
 
-    public function export($jenis = 'semua')
-    {
-        // samakan dengan constructor (pakai 'all' bukan 'semua')
-        $jenis = $jenis === 'semua' ? 'all' : $jenis;
+    // public function export($jenis = 'semua')
+    // {
+    //     // samakan dengan constructor (pakai 'all' bukan 'semua')
+    //     $jenis = $jenis === 'semua' ? 'all' : $jenis;
 
-        return Excel::download(new IuranExport($jenis), "iuran-{$jenis}.xlsx");
-    }
+    //     return Excel::download(new IuranExport($jenis), "iuran-{$jenis}.xlsx");
+    // }
     public function updateOtomatis(Request $request, $id)
-{
+    {
     $request->validate([
         'nominal' => 'required|numeric|min:0',
         'tgl_tagih' => 'required|date',

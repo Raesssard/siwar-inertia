@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Rw;
 
 use App\Http\Controllers\Controller;
-use App\Models\Rukun_tetangga;
+use App\Models\Rt;
 use App\Models\Transaksi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Validator;
 use App\Exports\TransaksiExport;
 use Maatwebsite\Excel\Facades\Excel;
 
-class TransaksiController extends Controller
+class RwTransaksiController extends Controller
 {
     /**
      * Menampilkan daftar transaksi dengan filter.
@@ -53,7 +53,7 @@ class TransaksiController extends Controller
                                 ->pluck('tahun');
         $daftar_bulan = range(1, 12);
 
-        $rukun_tetangga = Rukun_tetangga::orderBy('rt', 'asc')->pluck('rt', 'rt');
+        $rukun_tetangga = Rt::orderBy('rt', 'asc')->pluck('rt', 'rt');
 
         return view('rw.iuran.transaksi', compact(
             'title',
@@ -150,16 +150,5 @@ class TransaksiController extends Controller
             Log::error('Gagal hapus transaksi:', ['message' => $e->getMessage()]);
             return redirect()->back()->with('error', 'Terjadi kesalahan.');
         }
-    }
-
-    public function export($jenis)
-    {
-        $filename = 'Transaksi-' . ucfirst($jenis) . '-' . now()->format('Y-m-d') . '.xlsx';
-
-        if (!in_array($jenis, ['pemasukan', 'pengeluaran', 'all'])) {
-            return redirect()->back()->with('error', 'Jenis export tidak valid.');
-        }
-
-        return Excel::download(new TransaksiExport($jenis), $filename);
     }
 }

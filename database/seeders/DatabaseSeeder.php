@@ -19,7 +19,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             KategoriGolonganSeeder::class,
             AdminSeeder::class,
-            WargaSeeder::class
+            PermissionSeeder::class,
         ]);
     }
 }
