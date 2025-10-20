@@ -40,8 +40,9 @@ export function FormatWaktu({ createdAt }) {
 
 function getWeek(date) {
     const firstDayOfYear = new Date(date.getFullYear(), 0, 1)
-    const pastDaysOfYear = (date - firstDayOfYear) / 86400000
-    return Math.ceil((pastDaysOfYear + firstDayOfYear.getDay() + 1) / 7)
+    const dayOfWeek = (firstDayOfYear.getDay() + 6) % 7;
+    const daysSinceYearStart = (date - firstDayOfYear) / 86400000;
+    return Math.ceil((daysSinceYearStart + dayOfWeek + 1) / 7);
 }
 
 export function splitWaktu({ createdAt }) {
@@ -68,7 +69,7 @@ export function splitWaktu({ createdAt }) {
     } else if (sameWeek) {
         return "Minggu ini"
     } else if (!sameWeek && sameMonth) {
-        return "Minggu lalu"
+        return "Bulan ini"
     } else if (lastMonth || diffDays < 60) {
         return "Bulan lalu"
     } else {

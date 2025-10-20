@@ -69,6 +69,7 @@ class PengaduanController extends Controller
         $total_pengaduan = Pengaduan::whereHas('warga.kartuKeluarga', function ($q) use ($user) {
             $q->where('id_rw', $user->id_rw);
         })->count();
+
         $total_pengaduan_filtered = $pengaduan->count();
 
         $list_bulan = [

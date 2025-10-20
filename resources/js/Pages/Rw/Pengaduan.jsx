@@ -4,7 +4,7 @@ import React, { useEffect, useRef, useState } from "react"
 import { FilterPengaduan } from "../Component/Filter"
 import Masonry from "react-masonry-css"
 import FileDisplay from "../Component/FileDisplay"
-import { FormatWaktu } from "../Warga/Pengaduan"
+import { FormatWaktu } from "../Pengaduan"
 import { DetailPengaduan } from "../Component/Modal"
 
 export default function Pengaduan() {

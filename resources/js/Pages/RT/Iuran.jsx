@@ -16,8 +16,8 @@ export default function Iuran() {
     const [selected, setSelected] = useState(null)
     const [selectedIuran, setSelectedIuran] = useState(null)
     const [selectedGolongan, setSelectedGolongan] = useState(null)
-    const [iuranListOtomatis, setIuranListOtomatis] = useState(iuranOtomatisFromServer.data || [])
     const [iuranListManual, setIuranListManual] = useState(iuranManualFromServer.data || [])
+    const [iuranListOtomatis, setIuranListOtomatis] = useState(iuranOtomatisFromServer.data || [])
     const [showModalTambah, setShowModalTambah] = useState(false)
     const [showModalEdit, setShowModalEdit] = useState(false)
     const { props } = usePage()
@@ -133,6 +133,8 @@ export default function Iuran() {
                 ? role.toUpperCase()
                 : role.charAt(0).toUpperCase() + role.slice(1)}`} />
             <FilterIuran
+                iuranManual={iuranListManual}
+                iuranOtomatis={iuranListOtomatis}
                 data={data}
                 setData={setData}
                 filter={filter}

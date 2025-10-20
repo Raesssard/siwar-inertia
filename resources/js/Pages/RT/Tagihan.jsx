@@ -76,6 +76,8 @@ export default function Tagihan() {
                 ? role.toUpperCase()
                 : role.charAt(0).toUpperCase() + role.slice(1)}`} />
             <FilterTagihan
+                tagihanManual={tagihanManualList}
+                tagihanOtomatis={tagihanOtomatisList}
                 data={data}
                 setData={setData}
                 filter={filter}
