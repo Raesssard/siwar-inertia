@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Dompdf\Dompdf;
 use Dompdf\Options;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\View;
 use Inertia\Inertia;
@@ -20,6 +21,7 @@ class Rt_pengumumanController extends Controller
      */
     public function index(Request $request)
     {
+        Log::info("Data yg masuk: ", $request->all());
         $search = $request->input('search');
         $tahun = $request->input('tahun');
         $bulan = $request->input('bulan');
@@ -52,8 +54,6 @@ class Rt_pengumumanController extends Controller
             });
         });
 
-        $total_pengumuman = Pengumuman::where('id_rw', $userRwId)->count();
-        $total_pengumuman_filtered = (clone $baseQuery)->count();
 
         $pengumuman = (clone $baseQuery)
             ->when($search, function ($query) use ($search) {
@@ -125,6 +125,8 @@ class Rt_pengumumanController extends Controller
         ];
 
         $title = 'Pengumuman';
+        $total_pengumuman = Pengumuman::where('id_rw', $userRwId)->count();
+        $total_pengumuman_filtered = $pengumuman->count();
 
         return Inertia::render('Pengumuman', [
             'pengumuman' => $pengumuman,

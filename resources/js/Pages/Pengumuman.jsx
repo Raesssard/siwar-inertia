@@ -34,6 +34,10 @@ export default function Pengumuman() {
         level: ''
     })
 
+    useEffect(() => {
+        setPengumumanList(pengumumanFromServer)
+    }, [pengumumanFromServer])
+
     const groupByWaktu = pengumumanList.reduce((groups, item) => {
         const kategori = splitWaktu({ createdAt: item.created_at })
         if (!groups[kategori]) groups[kategori] = []
@@ -61,7 +65,7 @@ export default function Pengumuman() {
     useEffect(() => {
         setTotal(total_pengumuman)
         setTotalFiltered(total_pengumuman_filtered)
-    }, [total_pengumuman, total_pengumuman_filtered])
+    }, [total_pengumuman, total_pengumuman_filtered, pengumumanFromServer])
 
     useEffect(() => {
         const handleScroll = () => {
