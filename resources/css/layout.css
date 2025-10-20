@@ -236,7 +236,7 @@ div.card-body.pengumuman button.scroll-top-btn.show {
     transform: translateY(0);
 }
 
-div.komen input.komen,
+input.komen,
 input.edit-judul,
 input.tambah-judul,
 input.tambah-kategori,
@@ -246,7 +246,7 @@ input.edit-kategori {
     border-radius: 0;
 }
 
-div.komen input.komen:focus,
+input.komen:focus,
 input.edit-judul:focus,
 input.tambah-judul:focus,
 input.tambah-kategori:focus,
@@ -260,7 +260,7 @@ input.edit-kategori:focus {
     box-shadow: none;
 }
 
-div.komen input.komen:focus-visible,
+input.komen:focus-visible,
 input.edit-judul:focus-visible,
 input.tambah-judul:focus-visible,
 input.tambah-kategori:focus-visible,
@@ -274,7 +274,7 @@ input.edit-kategori:focus-visible {
     box-shadow: none;
 }
 
-div.komen button.komen {
+button.komen {
     border: none;
     border-radius: 0;
     color: gray;
@@ -285,11 +285,11 @@ div.komen button.komen {
     box-shadow: none;
 }
 
-div.komen button.komen:focus,
-div.komen button.komen:focus-visible,
-div.komen button.komen:hover,
-div.komen button.komen:disabled,
-div.komen button.komen.btn-primary:not(:disabled):not(.disabled):active {
+button.komen:focus,
+button.komen:focus-visible,
+button.komen:hover,
+button.komen:disabled,
+button.komen.btn-primary:not(:disabled):not(.disabled):active {
     background-color: transparent;
     color: #4e73df;
     border-bottom: 1px solid lightgray;
@@ -297,7 +297,7 @@ div.komen button.komen.btn-primary:not(:disabled):not(.disabled):active {
     box-shadow: none;
 }
 
-div.komen button.komen:disabled {
+button.komen:disabled {
     cursor: not-allowed;
 }
 

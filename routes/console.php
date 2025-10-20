@@ -12,13 +12,7 @@ Artisan::command('inspire', function () {
 
 
 Schedule::call(function () {
-    Log::info('Scheduler test jalan di Laravel 12: ' . now());
+    Log::info('Test Scheduler Laravel 12: ' . now());
 })->everyMinute();
 
 Schedule::command('iuran:generate-tagihan')->everyMinute();
-
-// Schedule::command('iuran:generate-tagihan')
-//     ->dailyAt('00:10') // misal tiap jam 00:10 pagi
-//     ->runInBackground()
-//     ->withoutOverlapping()
-//     ->onOneServer();
