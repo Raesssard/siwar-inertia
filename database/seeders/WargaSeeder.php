@@ -20,7 +20,7 @@ class WargaSeeder extends Seeder
      */
     public function run(): void
     {
-                $roles = ['admin', 'rw', 'rt', 'warga', 'sekretaris', 'bendahara'];
+        $roles = ['admin', 'rw', 'rt', 'warga', 'sekretaris', 'bendahara'];
         foreach ($roles as $role) {
             Role::firstOrCreate(['name' => $role]);
         }

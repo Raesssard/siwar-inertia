@@ -77,7 +77,7 @@ export default function Tagihan() {
                                             {item.status_bayar === 'sudah_bayar' ? (
                                                 <span className="badge bg-success text-white">Sudah Bayar</span>
                                             ) : (
-                                                <span className="badge bg-warning text-white">Belum Bayar</span>
+                                                <span className="badge bg-danger text-white">Belum Bayar</span>
                                             )}
                                         </td>
                                         <td className="text-center">{item.tgl_bayar ? formatTanggal(item.tgl_bayar) : "-"}</td>

@@ -37,7 +37,7 @@ class RwPengaduanController extends Controller
             ->orderByDesc('created_at')
             ->get();
 
-        $total_pengaduan_rw = Pengaduan::whereHas('warga.kartuKeluarga.rw', fn($q) => $q->where('id', $rw->id))->count();
+        $total_pengaduan = Pengaduan::whereHas('warga.kartuKeluarga.rw', fn($q) => $q->where('id', $rw->id))->count();
 
         $list_bulan = [
             'januari', 'februari', 'maret', 'april', 'mei', 'juni',
@@ -51,10 +51,13 @@ class RwPengaduanController extends Controller
 
         $list_level = Pengaduan::select('level')->distinct()->pluck('level');
 
-        return Inertia::render('Rw/Pengaduan', [
+        $total_pengaduan_filtered = $pengaduan->count();
+
+        return Inertia::render('Pengaduan', [
             'title' => $title,
             'pengaduan' => $pengaduan,
-            'total_pengaduan_rw' => $total_pengaduan_rw,
+            'total_pengaduan' => $total_pengaduan,
+            'total_pengaduan_filtered' => $total_pengaduan_filtered,
             'list_bulan' => $list_bulan,
             'list_tahun' => $list_tahun,
             'list_level' => $list_level,

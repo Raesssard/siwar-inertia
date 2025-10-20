@@ -5,7 +5,7 @@ import { DetailPengumuman, TambahPengumuman } from "../Component/Modal"
 import { FilterPengumuman } from "../Component/Filter"
 import Masonry from "react-masonry-css"
 import FileDisplay from "../Component/FileDisplay"
-import { FormatWaktu } from "../Warga/Pengaduan"
+import { FormatWaktu } from "../Pengaduan"
 
 export default function Pengumuman() {
     const {

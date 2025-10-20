@@ -7,7 +7,6 @@ use App\Models\Pengumuman;
 use App\Models\Rt;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Models\Rukun_tetangga;
 use Dompdf\Dompdf;
 use Dompdf\Options;
 use Illuminate\Support\Facades\Storage;
@@ -125,12 +124,10 @@ class Rt_pengumumanController extends Controller
             'desember'
         ];
 
-        $rukun_tetangga = $userRtId ? Rt::find($userRtId) : null;
         $title = 'Pengumuman';
 
         return Inertia::render('Pengumuman', [
             'pengumuman' => $pengumuman,
-            'rukun_tetangga' => $rukun_tetangga,
             'title' => $title,
             'daftar_tahun' => $daftar_tahun,
             'daftar_kategori' => $daftar_kategori,
