@@ -37,6 +37,25 @@ export function FormatWaktu({ createdAt }) {
     )
 }
 
+export function splitWaktu({ createdAt }) {
+    const now = new Date()
+    const created = new Date(createdAt)
+    const diffMs = now - created
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24))
+
+    if (diffDays < 1) {
+        return "Hari ini"
+    } else if (diffDays < 2) {
+        return "Kemarin"
+    } else if (diffDays < 7) {
+        return "Minggu ini"
+    } else if (diffDays < 30) {
+        return "Minggu lalu"
+    } else {
+        return "Bulan lalu"
+    }
+}
+
 export default function Pengaduan() {
     const { pengaduan: pengaduanFromServer,
         title,
@@ -75,6 +94,13 @@ export default function Pengaduan() {
             })
         }
     }
+
+    const groupByWaktu = pengaduanList.reduce((groups, item) => {
+        const kategori = splitWaktu({ createdAt: item.created_at })
+        if (!groups[kategori]) groups[kategori] = []
+        groups[kategori].push(item)
+        return groups
+    }, {})
 
     useEffect(() => {
         setTotal(total_pengaduan)
@@ -177,79 +203,86 @@ export default function Pengaduan() {
                 </div>
             </div>
             <div className="col-12">
-                <div ref={cardBodyRef} className="card-body pengaduan">
-                    {pengaduanList.length ? (
-                        <>
-                            <Masonry
-                                breakpointCols={breakpointColumnsObj}
-                                className="flex gap-4"
-                                columnClassName="space-y-4"
-                            >
-                                {pengaduanList.map((item, index) => {
-                                    const labelMap = {
-                                        belum: "Belum dibaca",
-                                        diproses_menunggu: "Menunggu konfirmasi RW",
-                                        diproses_sudah: "Sudah dikonfirmasi",
-                                        diproses_default: "Sedang diproses",
-                                        selesai: "Selesai"
-                                    }
+                {Object.entries(groupByWaktu).map(([kategori, items]) => (
+                    <div key={kategori}>
+                        <div className="text-muted mb-3 mt-3 mx-4 w-100">
+                            {kategori}
+                        </div>
+                        <div ref={cardBodyRef} className="card-body pengaduan">
+                            {items.length ? (
+                                <>
+                                    <Masonry
+                                        breakpointCols={breakpointColumnsObj}
+                                        className="flex gap-4"
+                                        columnClassName="space-y-4"
+                                    >
+                                        {items.map((item, index) => {
+                                            const labelMap = {
+                                                belum: "Belum dibaca",
+                                                diproses_menunggu: "Menunggu konfirmasi RW",
+                                                diproses_sudah: "Sudah dikonfirmasi",
+                                                diproses_default: "Sedang diproses",
+                                                selesai: "Selesai"
+                                            }
 
-                                    const colorMap = {
-                                        belum: "gray",
-                                        diproses_menunggu: "blue",
-                                        diproses_sudah: "cyan",
-                                        diproses_default: "yellow",
-                                        selesai: "green"
-                                    }
+                                            const colorMap = {
+                                                belum: "gray",
+                                                diproses_menunggu: "blue",
+                                                diproses_sudah: "cyan",
+                                                diproses_default: "yellow",
+                                                selesai: "green"
+                                            }
 
-                                    const key = `${item.status}${item.status === "diproses" ? "_" + (item.konfirmasi_rw || "default") : ""}`
-                                    const color = colorMap[key] || "gray"
-                                    const label = labelMap[key] || "Status tidak diketahui"
+                                            const key = `${item.status}${item.status === "diproses" ? "_" + (item.konfirmasi_rw || "default") : ""}`
+                                            const color = colorMap[key] || "gray"
+                                            const label = labelMap[key] || "Status tidak diketahui"
 
-                                    return (
-                                        <div key={index} className="card-clickable d-flex justify-content-center align-items-center flex-column" onClick={() => modalDetail(item)}>
-                                            <FileDisplay
-                                                filePath={`/storage/${item.file_path}`}
-                                                judul={item.file_name}
-                                                displayStyle={imgStyle} />
-                                            <h2 className="font-semibold text-lg mb-2 text-left mx-3">{item.judul}</h2>
-                                            <div className="text-sm text-gray-500 mb-2 d-flex gap-3">
-                                                <span><i className="fas fa-user mr-1"></i>{item.warga.nama}</span>
-                                                <span><i className="fas fa-clock mr-1"></i><FormatWaktu createdAt={item.created_at} /></span>
-                                            </div>
-                                            {item.nik_warga !== user.nik ? (
-                                                <div className="text-sm text-gray-500 mb-2 d-flex gap-3">
-                                                    <span><i className="fas fa-users mr-1"></i>RT {item.warga?.kartu_keluarga?.rukun_tetangga?.rt}/RW {item.warga?.kartu_keluarga?.rw?.nomor_rw}</span>
+                                            return (
+                                                <div key={index} className="card-clickable d-flex justify-content-center align-items-center flex-column" onClick={() => modalDetail(item)}>
+                                                    <FileDisplay
+                                                        filePath={`/storage/${item.file_path}`}
+                                                        judul={item.file_name}
+                                                        displayStyle={imgStyle} />
+                                                    <h2 className="font-semibold text-lg mb-2 text-left mx-3">{item.judul}</h2>
+                                                    <div className="text-sm text-gray-500 mb-2 d-flex gap-3">
+                                                        <span><i className="fas fa-user mr-1"></i>{item.warga.nama}</span>
+                                                        <span><i className="fas fa-clock mr-1"></i><FormatWaktu createdAt={item.created_at} /></span>
+                                                    </div>
+                                                    {item.nik_warga !== user.nik ? (
+                                                        <div className="text-sm text-gray-500 mb-2 d-flex gap-3">
+                                                            <span><i className="fas fa-users mr-1"></i>RT {item.warga?.kartu_keluarga?.rukun_tetangga?.rt}/RW {item.warga?.kartu_keluarga?.rw?.nomor_rw}</span>
+                                                        </div>
+                                                    ) : ""
+                                                    }
+                                                    <p className="isi-pengaduan text-gray-700 text-sm mb-3 mx-3 line-clamp-3">
+                                                        {item.isi.length > 100 ? item.isi.slice(0, 100) + "..." : item.isi}
+                                                    </p>
+                                                    {item.nik_warga === user.nik ?
+                                                        <span className={`px-2 py-1 rounded font-semibold bg-${color}-200 text-${color}-800`} style={{ fontSize: "0.85rem" }}>
+                                                            {label}
+                                                        </span>
+                                                        :
+                                                        ""
+                                                    }
                                                 </div>
-                                            ) : ""
-                                            }
-                                            <p className="isi-pengaduan text-gray-700 text-sm mb-3 mx-3 line-clamp-3">
-                                                {item.isi.length > 100 ? item.isi.slice(0, 100) + "..." : item.isi}
-                                            </p>
-                                            {item.nik_warga === user.nik ?
-                                                <span className={`px-2 py-1 rounded font-semibold bg-${color}-200 text-${color}-800`} style={{ fontSize: "0.85rem" }}>
-                                                    {label}
-                                                </span>
-                                                :
-                                                ""
-                                            }
-                                        </div>
-                                    )
-                                })}
-                            </Masonry>
-                            {showButton && (
-                                <button
-                                    onClick={scrollToTop}
-                                    className={`btn btn-primary scroll-top-btn ${showButton ? "show" : ""}`}
-                                >
-                                    <i className="fas fa-arrow-up"></i>
-                                </button>
+                                            )
+                                        })}
+                                    </Masonry>
+                                    {showButton && (
+                                        <button
+                                            onClick={scrollToTop}
+                                            className={`btn btn-primary scroll-top-btn ${showButton ? "show" : ""}`}
+                                        >
+                                            <i className="fas fa-arrow-up"></i>
+                                        </button>
+                                    )}
+                                </>
+                            ) : (
+                                <span className="d-block w-100 text-muted text-center">Tidak ada pengaduan</span>
                             )}
-                        </>
-                    ) : (
-                        <span className="d-block w-100 text-muted text-center">Tidak ada pengaduan</span>
-                    )}
-                </div>
+                        </div>
+                    </div>
+                ))}
                 <DetailPengaduan
                     selectedData={selected}
                     detailShow={showModalDetail}

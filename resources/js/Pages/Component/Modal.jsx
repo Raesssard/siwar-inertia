@@ -2236,7 +2236,7 @@ export function TambahEditKK({ show, onClose, dataKK = null, kategoriIuran, daft
   );
 }
 
-export function DetailKK({ selectedData, detailShow, onClose, role }) {
+export function DetailKK({ selectedData, detailShow, onClose, role, userData }) {
     if (!detailShow || !selectedData) return null
 
     const [selectedFile, setSelectedFile] = useState(null)
@@ -2244,6 +2244,12 @@ export function DetailKK({ selectedData, detailShow, onClose, role }) {
     const [isPdf, setIsPdf] = useState(false)
     const [uploading, setUploading] = useState(false)
     const [viewDoc, setViewDoc] = useState(null)
+    const [selected, setSelected] = useState(null)
+    const [showModal, setShowModal] = useState(false)
+    const modalDetail = (item) => {
+        setSelected(item)
+        setShowModal(true)
+    }
 
     useEffect(() => {
         const handleEsc = (e) => {
@@ -2352,17 +2358,10 @@ export function DetailKK({ selectedData, detailShow, onClose, role }) {
 
                             <div className="kk-info-grid mb-2">
                                 <div className="kk-info-item">
-                                    <p>
-                                        <strong>Nama Kepala Keluarga</strong> :{" "}
-                                        {kepala?.nama ?? "-"}
-                                    </p>
-                                    <p>
-                                        <strong>Alamat</strong> : {selectedData.alamat ?? "-"}
-                                    </p>
-                                    <p>
-                                        <strong>RT/RW</strong> :{" "}
-                                        {selectedData.rukun_tetangga.nomor_rt ?? "-"}/
-                                        {selectedData.rw.nomor_rw ?? "-"}
+                                    <p><strong>Nama Kepala Keluarga</strong> : {kepala?.nama ?? '-'}</p>
+                                    <p><strong>Alamat</strong> : {selectedData.alamat ?? '-'}</p>
+                                    <p><strong>RT/RW</strong> :{" "}
+                                        {selectedData.rukun_tetangga.nomor_rt ?? '-'}/{selectedData.rw.nomor_rw ?? '-'}
                                     </p>
                                     <p>
                                         <strong>Desa/Kelurahan</strong> :{" "}
@@ -2432,6 +2431,7 @@ export function DetailKK({ selectedData, detailShow, onClose, role }) {
                                             <th colSpan="2">Dokumen Imigrasi</th>
                                             <th colSpan="2">Nama Orang Tua</th>
                                             <th rowSpan="2">Status Warga</th>
+                                            <th rowSpan="2">Detail</th>
                                             <Role role="rw">
                                                 <th rowSpan="2">Aksi</th>
                                             </Role>
@@ -2575,6 +2575,11 @@ export function DetailKK({ selectedData, detailShow, onClose, role }) {
                                                                 </button>
                                                             </td>
                                                         </Role>
+                                                        <td className="text-center">
+                                                            <button className="btn btn-success btn-sm" onClick={() => modalDetail(data)} style={{ fontSize: "0.5rem" }}>
+                                                                <i className="fas fa-info"></i>
+                                                            </button>
+                                                        </td>
                                                     </tr>
                                                 ))
                                         ) : (
@@ -2729,6 +2734,12 @@ export function DetailKK({ selectedData, detailShow, onClose, role }) {
                     </div>
                 </div>
             )}
+            <DetailWarga
+                selectData={selected}
+                detailShow={showModal}
+                onClose={() => setShowModal(false)}
+                userData={userData}
+            />
         </>
     )
 }
@@ -2995,7 +3006,7 @@ export function DetailPengumuman({ selectedData, detailShow, onClose, onUpdated,
                                     )}
                                     <div className="flex-fill d-flex flex-column" style={selectedData?.dokumen_path ? { maxWidth: "50%" } : { maxWidth: "100%" }}>
                                         <div className="p-3 border-bottom caption-section">
-                                            {(userData.rukun_tetangga?.id === selectedData.id_rt || userData.rw?.id === selectedData.id_rw) ? (
+                                            {(userData?.rukun_tetangga?.id === selectedData.id_rt || userData?.rw?.id === selectedData.id_rw) ? (
                                                 <div className="d-flex justify-between">
                                                     <h5 className="fw-bold mb-1 mt-2">{selectedData.judul}</h5>
                                                     <Role role={selectedData.rukun_tetangga ? "rt" : "rw"}>
@@ -3596,6 +3607,8 @@ export function TambahPengumuman({ tambahShow, onClose, onAdded, role }) {
     const [previewUrl, setPreviewUrl] = useState(null)
     const fileInputRef = useRef(null)
 
+    const { isiRef } = useRef(null)
+
     useEffect(() => {
         const handleEsc = (e) => {
             if (e.key === "Escape") onClose()
@@ -3753,6 +3766,7 @@ export function TambahPengumuman({ tambahShow, onClose, onAdded, role }) {
                                             <div className="mb-3">
                                                 <label className="form-label">Isi</label>
                                                 <textarea
+                                                    ref={isiRef}
                                                     name="isi"
                                                     className="edit-isi form-control"
                                                     rows="4"
@@ -3807,8 +3821,8 @@ export function TambahPengumuman({ tambahShow, onClose, onAdded, role }) {
     )
 }
 
-export function DetailWarga({ selectedData, detailShow, onClose, userData }) {
-    if (!detailShow || !selectedData) return null
+export function DetailWarga({ selectData, detailShow, onClose, userData }) {
+    if (!detailShow || !selectData) return null
 
     useEffect(() => {
         const handleEsc = (e) => {
@@ -3837,49 +3851,46 @@ export function DetailWarga({ selectedData, detailShow, onClose, userData }) {
                         <div className="modal-body kk d-block p-4">
                             <div className="kk-header w-100">
                                 <div className="kk-header-main-title">
-                                    <h4>Detail Warga {userData?.rukun_tetangga
-                                        ? `RT ${userData?.rukun_tetangga?.nomor_rt}`
-                                        : `RW ${userData?.rw?.nomor_rw}`}
-                                    </h4>
+                                    <h4>Detail Warga</h4>
                                 </div>
                             </div>
 
                             <div className="kk-info-grid mb-2">
                                 <div className="kk-info-item">
-                                    <p><strong>Nama Lengkap</strong> : {selectedData.nama ?? '-'}</p>
-                                    <p><strong>NIK</strong> : {selectedData.nik ?? '-'}</p>
-                                    <p><strong>No. KK</strong> : {selectedData.no_kk ?? '-'}</p>
-                                    <p><strong>Alamat</strong> : {selectedData.kartu_keluarga?.alamat ?? '-'}</p>
-                                    <p><strong>Jenis Kelamin</strong> : {selectedData.jenis_kelamin.charAt(0).toUpperCase() + selectedData.jenis_kelamin.slice(1) ?? '-'}</p>
-                                    <p><strong>Tempat Lahir</strong> : {selectedData.tempat_lahir ?? '-'}</p>
-                                    <p><strong>Tanggal Lahir</strong> : {formatTanggal(selectedData.tanggal_lahir) ?? '-'}</p>
-                                    <p><strong>Agama</strong> : {selectedData.agama ?? '-'}</p>
-                                    <p><strong>Pendidikan</strong> : {selectedData.pendidikan ?? '-'}</p>
-                                    <p><strong>Pekerjaan</strong> : {selectedData.pekerjaan ?? '-'}</p>
-                                    <p><strong>Status Perkawinan</strong> : {selectedData.status_perkawinan ?? '-'}</p>
-                                    <p><strong>Status Hubungan dalam Keluarga</strong> : {selectedData.status_hubungan_dalam_keluarga.charAt(0).toUpperCase() + selectedData.status_hubungan_dalam_keluarga.slice(1) ?? '-'}</p>
-                                    <p><strong>Golongan Darah</strong> : {selectedData.golongan_darah ?? '-'}</p>
-                                    <p><strong>Kewarganegaraan</strong> : {selectedData.kewarganegaraan ?? '-'}</p>
-                                    <p><strong>No Paspor</strong> : {selectedData.no_paspor ?? '-'}</p>
-                                    <p><strong>Tanggal Terbit Paspor</strong> : {formatTanggal(selectedData.tgl_terbit_paspor) ?? '-'}</p>
-                                    <p><strong>Tanggal Akhir Paspor</strong> : {formatTanggal(selectedData.tgl_berakhir_paspor) ?? '-'}</p>
+                                    <p><strong>No. KK</strong> : {selectData.no_kk ?? '-'}</p>
+                                    <p><strong>NIK</strong> : {selectData.nik ?? '-'}</p>
+                                    <p><strong>Nama Lengkap</strong> : {selectData.nama ?? '-'}</p>
+                                    <p><strong>Alamat</strong> : {selectData.kartu_keluarga?.alamat ?? '-'}</p>
+                                    <p><strong>Jenis Kelamin</strong> : {selectData.jenis_kelamin.charAt(0).toUpperCase() + selectData.jenis_kelamin.slice(1) ?? '-'}</p>
+                                    <p><strong>Tempat Lahir</strong> : {selectData.tempat_lahir ?? '-'}</p>
+                                    <p><strong>Tanggal Lahir</strong> : {formatTanggal(selectData.tanggal_lahir) ?? '-'}</p>
+                                    <p><strong>Agama</strong> : {selectData.agama ?? '-'}</p>
+                                    <p><strong>Pendidikan</strong> : {selectData.pendidikan ?? '-'}</p>
+                                    <p><strong>Pekerjaan</strong> : {selectData.pekerjaan ?? '-'}</p>
+                                    <p><strong>Status Perkawinan</strong> : {selectData.status_perkawinan ?? '-'}</p>
+                                    <p><strong>Status Hubungan <br /> dalam Keluarga</strong> : {selectData.status_hubungan_dalam_keluarga.charAt(0).toUpperCase() + selectData.status_hubungan_dalam_keluarga.slice(1) ?? '-'}</p>
+                                    <p><strong>Golongan Darah</strong> : {selectData.golongan_darah ?? '-'}</p>
+                                    <p><strong>Kewarganegaraan</strong> : {selectData.kewarganegaraan ?? '-'}</p>
+                                    <p><strong>No Paspor</strong> : {selectData.no_paspor ?? '-'}</p>
+                                    <p><strong>Tanggal Terbit Paspor</strong> : {formatTanggal(selectData.tgl_terbit_paspor) ?? '-'}</p>
+                                    <p><strong>Tanggal Akhir Paspor</strong> : {formatTanggal(selectData.tgl_berakhir_paspor) ?? '-'}</p>
                                 </div>
                                 <div className="kk-info-item">
-                                    <p><strong>No Paspor</strong> : {selectedData.no_kitas ?? '-'}</p>
-                                    <p><strong>Tanggal Terbit Paspor</strong> : {formatTanggal(selectedData.tgl_terbit_kitas) ?? '-'}</p>
-                                    <p><strong>Tanggal Akhir Paspor</strong> : {formatTanggal(selectedData.tgl_berakhir_kitas) ?? '-'}</p>
-                                    <p><strong>No Paspor</strong> : {selectedData.no_kitap ?? '-'}</p>
-                                    <p><strong>Tanggal Terbit Paspor</strong> : {formatTanggal(selectedData.tgl_terbit_kitap) ?? '-'}</p>
-                                    <p><strong>Tanggal Akhir Paspor</strong> : {formatTanggal(selectedData.tgl_berakhir_kitap) ?? '-'}</p>
-                                    <p><strong>Nama Ayah</strong> : {selectedData.nama_ayah ?? '-'}</p>
-                                    <p><strong>Nama Ibu</strong> : {selectedData.nama_ibu ?? '-'}</p>
-                                    <p><strong>Alamat Asal</strong> : {selectedData.alamat_asal ?? '-'}</p>
-                                    <p><strong>Alamat Domisili</strong> : {selectedData.alamat_domisili ?? '-'}</p>
-                                    <p><strong>Tanggal Mulai Tinggal</strong> : {formatTanggal(selectedData.tanggal_mulai_tinggal) ?? '-'}</p>
-                                    <p><strong>Tujuan Pindah</strong> : {selectedData.tujuan_pindah ?? '-'}</p>
-                                    <p><strong>Status Warga</strong> : {selectedData.status_warga.charAt(0).toUpperCase() + selectedData.status_warga.slice(1) ?? '-'}</p>
+                                    <p><strong>No Paspor</strong> : {selectData.no_kitas ?? '-'}</p>
+                                    <p><strong>Tanggal Terbit Paspor</strong> : {formatTanggal(selectData.tgl_terbit_kitas) ?? '-'}</p>
+                                    <p><strong>Tanggal Akhir Paspor</strong> : {formatTanggal(selectData.tgl_berakhir_kitas) ?? '-'}</p>
+                                    <p><strong>No Paspor</strong> : {selectData.no_kitap ?? '-'}</p>
+                                    <p><strong>Tanggal Terbit Paspor</strong> : {formatTanggal(selectData.tgl_terbit_kitap) ?? '-'}</p>
+                                    <p><strong>Tanggal Akhir Paspor</strong> : {formatTanggal(selectData.tgl_berakhir_kitap) ?? '-'}</p>
+                                    <p><strong>Nama Ayah</strong> : {selectData.nama_ayah ?? '-'}</p>
+                                    <p><strong>Nama Ibu</strong> : {selectData.nama_ibu ?? '-'}</p>
+                                    <p><strong>Alamat Asal</strong> : {selectData.alamat_asal ?? '-'}</p>
+                                    <p><strong>Alamat Domisili</strong> : {selectData.alamat_domisili ?? '-'}</p>
+                                    <p><strong>Tanggal Mulai Tinggal</strong> : {formatTanggal(selectData.tanggal_mulai_tinggal) ?? '-'}</p>
+                                    <p><strong>Tujuan Pindah</strong> : {selectData.tujuan_pindah ?? '-'}</p>
+                                    <p><strong>Status Warga</strong> : {selectData.status_warga.charAt(0).toUpperCase() + selectData.status_warga.slice(1) ?? '-'}</p>
                                     <p><strong>RT/RW</strong> :{" "}
-                                        {selectedData.kartu_keluarga?.rukun_tetangga?.nomor_rt ?? '-'}/{selectedData.kartu_keluarga?.rw?.nomor_rw ?? '-'}
+                                        {selectData.kartu_keluarga?.rukun_tetangga?.nomor_rt ?? '-'}/{selectData.kartu_keluarga?.rw?.nomor_rw ?? '-'}
                                     </p>
                                 </div>
                             </div>
@@ -4815,8 +4826,7 @@ export function EditTransaksi({ editShow, onClose, onUpdated, role, selectedData
         nominal: "",
         keterangan: "",
     })
-    console.log(selectedData)
-    console.log(data)
+
     useEffect(() => {
         if (selectedData) {
             setData({

@@ -95,11 +95,11 @@ export default function Iuran() {
                 return (
                     <tr key={`${item.id}-${gol.id}`}>
                         <td className="text-center">{no++}</td>
+                        <td className="text-center">{item.nama ?? '-'}</td>
                         <td className="text-center">
                             {gol.jenis.charAt(0).toUpperCase() + gol.jenis.slice(1)}
                         </td>
                         <td className="text-center">{formatRupiah(matched.nominal)}</td>
-                        <td className="text-center">{item.nama ?? '-'}</td>
                         <td className="text-center">{formatTanggal(item.tgl_tagih) ?? '-'}</td>
                         <td className="text-center">{formatTanggal(item.tgl_tempo) ?? '-'}</td>
                         <td className="text-center">
@@ -149,8 +149,8 @@ export default function Iuran() {
                         <thead>
                             <tr>
                                 <th className="px-3 text-center" scope="col">No.</th>
-                                <th className="px-3 text-center" scope="col">Nominal</th>
                                 <th className="px-3 text-center" scope="col">Nama</th>
+                                <th className="px-3 text-center" scope="col">Nominal</th>
                                 <th className="px-3 text-center" scope="col">Tanggal Tagih</th>
                                 <th className="px-3 text-center" scope="col">Tanggal Tempo</th>
                                 <th className="px-3 text-center" scope="col">Aksi</th>
@@ -161,8 +161,8 @@ export default function Iuran() {
                                 iuranListManual.map((item, index) => (
                                     <tr key={item.id}>
                                         <td className="text-center">{index + 1}</td>
-                                        <td className="text-center">{formatRupiah(item.nominal) ?? '-'}</td>
                                         <td className="text-center">{item.nama ?? '-'}</td>
+                                        <td className="text-center">{formatRupiah(item.nominal) ?? '-'}</td>
                                         <td className="text-center">{formatTanggal(item.tgl_tagih) ?? '-'}</td>
                                         <td className="text-center">{formatTanggal(item.tgl_tempo) ?? '-'}</td>
                                         <td className="text-center">
@@ -220,9 +220,9 @@ export default function Iuran() {
                         <thead>
                             <tr>
                                 <th className="px-3 text-center" scope="col">No.</th>
+                                <th className="px-3 text-center" scope="col">Nama</th>
                                 <th className="px-3 text-center" scope="col">Golongan</th>
                                 <th className="px-3 text-center" scope="col">Nominal</th>
-                                <th className="px-3 text-center" scope="col">Nama</th>
                                 <th className="px-3 text-center" scope="col">Tanggal Tagih</th>
                                 <th className="px-3 text-center" scope="col">Tanggal Tempo</th>
                                 <th className="px-3 text-center" scope="col">Aksi</th>
