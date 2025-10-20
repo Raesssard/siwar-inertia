@@ -5,7 +5,7 @@ import { DetailPengumuman } from "../Component/Modal"
 import { FilterPengumuman } from "../Component/Filter"
 import Masonry from "react-masonry-css"
 import FileDisplay from "../Component/FileDisplay"
-import { FormatWaktu } from "./Pengaduan"
+import { FormatWaktu, splitWaktu } from "./Pengaduan"
 
 export default function Pengumuman() {
     const {
@@ -31,6 +31,13 @@ export default function Pengumuman() {
         kategori: '',
         level: ''
     })
+
+    const groupByWaktu = pengumuman.reduce((groups, item) => {
+        const kategori = splitWaktu({ createdAt: item.created_at })
+        if (!groups[kategori]) groups[kategori] = []
+        groups[kategori].push(item)
+        return groups
+    }, {})
 
     const role = props.auth?.currentRole
 
@@ -133,48 +140,61 @@ export default function Pengumuman() {
                 </div>
             </div>
             <div className="col-12">
-                <div ref={cardBodyRef} className="card-body pengumuman">
-
-                    {pengumuman.length ? (
-                        <>
-                            <Masonry
-                                breakpointCols={breakpointColumnsObj}
-                                className="flex gap-4"
-                                columnClassName="space-y-4"
-                            >
-                                {pengumuman.map((item, index) => (
-                                    <div key={index} className="card-clickable d-flex justify-content-center align-items-center flex-column" onClick={() => modalDetail(item)}>
-                                        <FileDisplay
-                                            filePath={`/storage/${item.dokumen_path}`}
-                                            judul={item.dokumen_name}
-                                            displayStyle={imgStyle} />{console.log(item)}
-                                        <h2 className="font-semibold text-lg mb-2 text-left mx-3">{item.judul}</h2>
-                                        <div className="text-sm text-gray-500 mb-2 d-flex gap-3">
-                                            <span><i className="fas fa-user mr-1"></i>{item.rukun_tetangga ? item.rukun_tetangga.nama_ketua_rt : item.rw.nama_ketua_rw}</span>
-                                            <span><i className="fas fa-clock mr-1"></i><FormatWaktu createdAt={item.created_at} /></span>
-                                        </div>
-                                        <div className="text-sm text-gray-500 mb-2 mx-3 flex justify-between">
-                                            <span><i className="fas fa-users mr-1"></i>{item.rukun_tetangga ? `RT ${item.rukun_tetangga.nomor_rt}/ RW ${item.rw.nomor_rw}` : ""}</span>
-                                        </div>
-                                        <p className="isi-pengaduan text-gray-700 text-sm mb-3 mx-3 line-clamp-3">
-                                            {item.isi.length > 100 ? item.isi.slice(0, 100) + "..." : item.isi}
-                                        </p>
-                                    </div>
-                                ))}
-                            </Masonry>
-                            {showButton && (
-                                <button
-                                    onClick={scrollToTop}
-                                    className={`btn btn-primary scroll-top-btn ${showButton ? "show" : ""}`}
+                {Object.entries(groupByWaktu).map(([kategori, items]) => (
+                    <div key={kategori}>
+                        <div className="text-muted mb-3 mt-3 mx-4 w-100">
+                            {kategori}
+                        </div>
+                        <div ref={cardBodyRef} className="card-body pengumuman">
+                            {items.length ? (
+                                <Masonry
+                                    breakpointCols={breakpointColumnsObj}
+                                    className="flex gap-4"
+                                    columnClassName="space-y-4"
                                 >
-                                    <i className="fas fa-arrow-up"></i>
-                                </button>
+                                    {items.map((item, index) => (
+                                        <div
+                                            key={index}
+                                            className="card-clickable d-flex justify-content-center align-items-center flex-column"
+                                            onClick={() => modalDetail(item)}
+                                        >
+                                            <FileDisplay
+                                                filePath={`/storage/${item.dokumen_path}`}
+                                                judul={item.dokumen_name}
+                                                displayStyle={imgStyle}
+                                            />
+                                            <h2 className="font-semibold text-lg mb-2 text-left mx-3">
+                                                {item.judul}
+                                            </h2>
+                                            <div className="text-sm text-gray-500 mb-2 d-flex gap-3">
+                                                <span>
+                                                    <i className="fas fa-user mr-1"></i>
+                                                    {item.rukun_tetangga
+                                                        ? item.rukun_tetangga.nama_ketua_rt
+                                                        : item.rw.nama_ketua_rw}
+                                                </span>
+                                                <span>
+                                                    <i className="fas fa-clock mr-1"></i>
+                                                    <FormatWaktu createdAt={item.created_at} />
+                                                </span>
+                                            </div>
+                                            <p className="isi-pengaduan text-gray-700 text-sm mb-3 mx-3 line-clamp-3">
+                                                {item.isi.length > 100
+                                                    ? item.isi.slice(0, 100) + "..."
+                                                    : item.isi}
+                                            </p>
+                                        </div>
+                                    ))}
+                                </Masonry>
+                            ) : (
+                                <span className="d-block w-100 text-muted text-center">
+                                    Tidak ada Pengumuman
+                                </span>
                             )}
-                        </>
-                    ) : (
-                        <span className="d-block w-100 text-muted text-center">Tidak ada Pengumuman</span>
-                    )}
-                </div>
+                        </div>
+                    </div>
+                ))}
+
                 <DetailPengumuman
                     selectedData={selected}
                     detailShow={showModal}

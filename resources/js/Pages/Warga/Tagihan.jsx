@@ -8,8 +8,8 @@ import { DetailTagihan } from "../Component/Modal"
 export default function Tagihan() {
     const {
         title,
-        tagihanManual,
-        tagihanOtomatis
+        tagihanSudahDibayar,
+        tagihanBelumDibayar
     } = usePage().props
     const { props } = usePage()
     const { get, data, setData } = useForm({
@@ -50,7 +50,7 @@ export default function Tagihan() {
             />
             <div className="table-container">
                 <div className="table-header">
-                    <h4>Tagihan Manual</h4>
+                    <h4>Tagihan yang belum dibayar</h4>
                 </div>
                 <div className="table-scroll">
                     <table className="table-custom">
@@ -59,7 +59,6 @@ export default function Tagihan() {
                                 <th className="px-3 text-center" scope="col">No.</th>
                                 <th className="px-3 text-center" scope="col">Tagihan</th>
                                 <th className="px-3 text-center" scope="col">Nominal</th>
-                                <th className="px-3 text-center" scope="col">Tanggal Tagih</th>
                                 <th className="px-3 text-center" scope="col">Tanggal Tempo</th>
                                 <th className="px-3 text-center" scope="col">Status</th>
                                 <th className="px-3 text-center" scope="col">Tanggal Bayar</th>
@@ -67,13 +66,12 @@ export default function Tagihan() {
                             </tr>
                         </thead>
                         <tbody>
-                            {tagihanManual.data.length > 0 ? (
-                                tagihanManual.data.map((item, index) => (
+                            {tagihanBelumDibayar.data.length > 0 ? (
+                                tagihanBelumDibayar.data.map((item, index) => (
                                     <tr key={item.id}>
                                         <td className="text-center">{index + 1}</td>
                                         <td className="text-center">{item.nama}</td>
                                         <td className="text-center">{formatRupiah(item.nominal)}</td>
-                                        <td className="text-center">{formatTanggal(item.tgl_tagih)}</td>
                                         <td className="text-center">{formatTanggal(item.tgl_tempo)}</td>
                                         <td className="text-center">
                                             {item.status_bayar === 'sudah_bayar' ? (
@@ -100,10 +98,10 @@ export default function Tagihan() {
                         </tbody>
                     </table>
                 </div>
-                {tagihanManual.links && (
+                {tagihanBelumDibayar.links && (
                     <div className="pagination-container">
                         <ul className="pagination-custom">
-                            {tagihanManual.links.map((link, index) => {
+                            {tagihanBelumDibayar.links.map((link, index) => {
                                 let label = link.label;
                                 if (label.includes("Previous")) label = "&lt;";
                                 if (label.includes("Next")) label = "&gt;";
@@ -132,7 +130,7 @@ export default function Tagihan() {
 
             <div className="table-container">
                 <div className="table-header">
-                    <h4>Tagihan Otomatis</h4>
+                    <h4>Tagihan yang sudah dibayar</h4>
                 </div>
                 <div className="table-scroll">
                     <table className="table-custom">
@@ -141,7 +139,6 @@ export default function Tagihan() {
                                 <th className="px-3 text-center" scope="col">No.</th>
                                 <th className="px-3 text-center" scope="col">Tagihan</th>
                                 <th className="px-3 text-center" scope="col">Nominal</th>
-                                <th className="px-3 text-center" scope="col">Tanggal Tagih</th>
                                 <th className="px-3 text-center" scope="col">Tanggal Tempo</th>
                                 <th className="px-3 text-center" scope="col">Status</th>
                                 <th className="px-3 text-center" scope="col">Tanggal Bayar</th>
@@ -149,13 +146,12 @@ export default function Tagihan() {
                             </tr>
                         </thead>
                         <tbody>
-                            {tagihanOtomatis.data.length > 0 ? (
-                                tagihanOtomatis.data.map((item, index) => (
+                            {tagihanSudahDibayar.data.length > 0 ? (
+                                tagihanSudahDibayar.data.map((item, index) => (
                                     <tr key={item.id}>
                                         <td className="text-center">{index + 1}</td>
                                         <td className="text-center">{item.nama}</td>
                                         <td className="text-center">{formatRupiah(item.nominal)}</td>
-                                        <td className="text-center">{formatTanggal(item.tgl_tagih)}</td>
                                         <td className="text-center">{formatTanggal(item.tgl_tempo)}</td>
                                         <td className="text-center">
                                             {item.status_bayar === 'sudah_bayar' ? (
@@ -182,10 +178,10 @@ export default function Tagihan() {
                         </tbody>
                     </table>
                 </div>
-                {tagihanOtomatis.links && (
+                {tagihanSudahDibayar.links && (
                     <div className="pagination-container">
                         <ul className="pagination-custom">
-                            {tagihanOtomatis.links.map((link, index) => {
+                            {tagihanSudahDibayar.links.map((link, index) => {
                                 let label = link.label;
                                 if (label.includes("Previous")) label = "&lt;";
                                 if (label.includes("Next")) label = "&gt;";
