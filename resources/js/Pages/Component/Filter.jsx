@@ -199,7 +199,7 @@ export function FilterTransaksi({ data, setData, daftar_tahun, daftar_bulan, fil
             </div>
 
 
-            <div className="d-flex flex-wrap gap-2" style={{width: "55%"}}>
+            <div className="d-flex flex-wrap gap-2" style={{ width: "55%" }}>
                 <select
                     name="tahun"
                     value={data.tahun}
@@ -233,6 +233,15 @@ export function FilterTransaksi({ data, setData, daftar_tahun, daftar_bulan, fil
                 <Link href={`/${role}/transaksi`} onClick={resetFilter} className="btn-input btn btn-secondary btn-sm flex-fill p-0 mx-0" title="Reset" style={{ maxWidth: "3rem", minWidth: "3rem" }}>
                     <i className="fas fa-undo"></i>
                 </Link>
+                <button
+                    className="btn btn-success my-auto mr-3"
+                    type="button"
+                    title="Export Transaksi ke Excel"
+                    style={{ borderRadius: "0.2rem" }}
+                    onClick={() => window.location.href = `/${role}/export/transaksi`}
+                >
+                    <i className="fas fa-file-excel"></i>
+                </button>
                 <Role role={['rt', 'rw']}>
                     <button type="button" onClick={() => tambahShow()} className="btn-input btn btn-sm btn-success">
                         <i className="fas fa-plus mr-2"></i>
@@ -287,6 +296,16 @@ export function FilterTagihan({ data, setData, filter, resetFilter, role, kk_lis
                 </Link>
             </div>
 
+            <button
+                className="btn btn-success my-auto mr-3 ml-auto"
+                type="button"
+                title="Export Tagihan ke Excel"
+                style={{ borderRadius: "0.2rem" }}
+                onClick={() => window.location.href = `/${role}/export/tagihan`}
+            >
+                <i className="fas fa-file-excel mr-2"></i>
+                Export Tagihan
+            </button>
         </form>
     )
 }
@@ -383,6 +402,7 @@ export function FilterIuran({ data, setData, filter, resetFilter, role, tambahSh
 
             <button
                 className="btn btn-success my-auto mr-3"
+                type="button"
                 title="Export Iuran ke Excel"
                 style={{ borderRadius: "0.2rem" }}
                 onClick={() => window.location.href = `/${role}/export/iuran`}

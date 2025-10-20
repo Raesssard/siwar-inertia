@@ -128,7 +128,7 @@ class Rt_pengumumanController extends Controller
         $rukun_tetangga = $userRtId ? Rt::find($userRtId) : null;
         $title = 'Pengumuman';
 
-        return Inertia::render('RT/Pengumuman', [
+        return Inertia::render('Pengumuman', [
             'pengumuman' => $pengumuman,
             'rukun_tetangga' => $rukun_tetangga,
             'title' => $title,
@@ -305,7 +305,7 @@ class Rt_pengumumanController extends Controller
         $pengumuman = Pengumuman::findOrFail($id);
 
 
-        $html = View::make('rt.pengumuman.komponen.export_pengumuman', compact('pengumuman'))->render();
+        $html = View::make('rt.export-pengumuman', compact('pengumuman'))->render();
 
 
         $options = new Options();

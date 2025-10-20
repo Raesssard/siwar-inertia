@@ -60,8 +60,6 @@ class RtIuranController extends Controller
 
     public function store(Request $request)
     {
-        Log::info('request yg masuk:', $request->all());
-
         /** @var User $user */
         $user = Auth::user();
 
@@ -251,7 +249,7 @@ class RtIuranController extends Controller
         $iurans = Iuran::with('iuran_golongan')->where('jenis', 'otomatis')->get();
 
         foreach ($iurans as $iuran) {
-            Log::info("Cek iuran: {$iuran->nama}, level={$iuran->level}, golongan_count=" . $iuran->iuran_golongan->count());
+            Log::info("Cek iuran: {$iuran->nama}, level = {$iuran->level}, golongan_count = " . $iuran->iuran_golongan->count());
 
             $kkList = $iuran->level === 'rt'
                 ? Kartu_keluarga::where('id_rt', $iuran->id_rt)->get()

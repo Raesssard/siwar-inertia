@@ -39,7 +39,6 @@ use App\Http\Controllers\Rw\{
   RwTagihanController,
   RwTransaksiController,
 };
-use App\Models\Rw;
 use Inertia\Inertia;
 
 
