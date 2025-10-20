@@ -56,21 +56,28 @@ export function getWargaCards({ ...rest }) {
             icon: "hand-holding-usd",
         },
         {
-            href: "/warga/transaksi",
+            href: "/dashboard",
             color: "primary",
             title: "Transaksi",
             value: rest.jumlah_transaksi,
             icon: "money-bill-wave",
         },
         {
-            href: "/warga/transaksi",
-            color: "primary",
-            title: "Total Transaksi",
-            value: formatRupiah(rest.total_transaksi),
-            icon: "wallet",
+            href: "/dashboard",
+            color: rest.pemasukan < 1 ? 'warning' : 'success',
+            title: "Pemasukan",
+            value: formatRupiah(rest.pemasukan),
+            icon: "dollar-sign",
         },
         {
-            href: "/warga/transaksi",
+            href: "/dashboard",
+            color: rest.pengeluaran < 1 ? 'success' : 'danger',
+            title: "Pengeluaran",
+            value: formatRupiah(rest.pengeluaran),
+            icon: "donate",
+        },
+        {
+            href: "/dashboard",
             color: "primary",
             title: "Total Saldo",
             value: formatRupiah(rest.total_saldo_akhir),
@@ -92,6 +99,11 @@ export function getWargaLinks() {
             icon: "id-card",
         },
         {
+            href: "/warga/tagihan",
+            text: "Tagihan",
+            icon: "money-check-alt",
+        },
+        {
             href: "/warga/pengumuman",
             text: "Pengumuman",
             icon: "comments",
@@ -100,16 +112,6 @@ export function getWargaLinks() {
             href: "/warga/pengaduan",
             text: "Pengaduan",
             icon: "paper-plane",
-        },
-        {
-            href: "/warga/tagihan",
-            text: "Tagihan",
-            icon: "money-check-alt",
-        },
-        {
-            href: "/warga/transaksi",
-            text: "Transaksi",
-            icon: "money-bill-wave",
         },
     ];
 }
@@ -331,21 +333,21 @@ export function getRwLinks() {
 export function getRtCards({ ...rest }) {
     return [
         {
-            href: "/rt/warga",
+            href: "/rt/kartu_keluarga",
             color: "primary",
             title: "Jumlah Warga",
             value: rest.jumlah_warga,
             icon: "users",
         },
         {
-            href: "/rt/warga",
+            href: "/rt/kartu_keluarga",
             color: "primary",
             title: "Jumlah Warga Penduduk",
             value: rest.jumlah_warga_penduduk,
             icon: "home",
         },
         {
-            href: "/rt/warga",
+            href: "/rt/kartu_keluarga",
             color: "primary",
             title: "Jumlah Warga Pendatang",
             value: rest.jumlah_warga_pendatang,
@@ -402,11 +404,6 @@ export function getRtLinks() {
             href: "/dashboard",
             text: "Dashboard",
             icon: "tachometer-alt",
-        },
-        {
-            href: "/rt/warga",
-            text: "Data Warga",
-            icon: "users",
         },
         {
             href: "/rt/kartu_keluarga",

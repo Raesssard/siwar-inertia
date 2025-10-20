@@ -89,26 +89,18 @@ class DashboardController extends Controller
             $pemasukan = (clone $transaksi)->where('jenis', 'pemasukan')->sum('nominal');
             $pengeluaran = (clone $transaksi)->where('jenis', 'pengeluaran')->sum('nominal');
             $jumlah_transaksi = (clone $transaksi)->count();
-            $total_transaksi = $pemasukan - $pengeluaran;
 
-            $total_pemasukan_iuran = Tagihan::where('status_bayar', 'sudah_bayar')
-                ->sum('nominal');
-
-            $total_pemasukan_transaksi = Transaksi::where('jenis', 'pemasukan')->whereNull('tagihan_id')->sum('nominal');
-            $total_pengeluaran = Transaksi::where('jenis', 'pengeluaran')->sum('nominal');
-
-            $total_pemasukan = $total_pemasukan_iuran + $total_pemasukan_transaksi;
-
-            $total_saldo_akhir = $total_pemasukan - $total_pengeluaran;
+            $total_saldo_akhir = $pemasukan - $pengeluaran;
 
             $data = array_merge(
                 $data,
                 [
                     'jumlah_pengumuman' => $jumlah_pengumuman,
                     'total_tagihan' => $total_tagihan,
-                    'total_transaksi' => $total_transaksi,
                     'jumlah_tagihan' => $jumlah_tagihan,
                     'jumlah_transaksi' => $jumlah_transaksi,
+                    'pemasukan' => $pemasukan,
+                    'pengeluaran' => $pengeluaran,
                     'total_saldo_akhir' => $total_saldo_akhir,
                     'pengaduan' => Pengaduan::where('nik_warga', $nik)->count(),
                 ]

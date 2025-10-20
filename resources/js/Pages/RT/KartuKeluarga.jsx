@@ -14,6 +14,7 @@ export default function KartuKeluarga() {
         total_kk,
     } = usePage().props
     const { props } = usePage()
+    const user = props.auth?.user
     const role = props.auth?.currentRole
     const { get, data, setData } = useForm({
         search: '',
@@ -132,6 +133,7 @@ export default function KartuKeluarga() {
                     detailShow={showModal}
                     onClose={() => setShowModal(false)}
                     role={role}
+                    userData={user}
                 />
             </div>
         </Layout>

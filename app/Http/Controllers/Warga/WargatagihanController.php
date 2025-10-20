@@ -34,9 +34,8 @@ class WargatagihanController extends Controller
             return redirect('/')->with('error', 'Data Kartu Keluarga Anda tidak ditemukan. Silakan hubungi RT/RW Anda.');
         }
 
-        // --- Query Manual
-        $tagihanManual = Tagihan::where('no_kk', $no_kk_warga)
-            ->where('jenis', 'manual')
+        $tagihanSudahDibayar = Tagihan::where('no_kk', $no_kk_warga)
+            ->where('status_bayar', 'sudah_bayar')
             ->when($request->filled('search'), function ($q) use ($request) {
                 $search = $request->search;
                 $q->where(function ($sub) use ($search) {
@@ -44,12 +43,11 @@ class WargatagihanController extends Controller
                         ->orWhere('nominal', 'like', "%$search%");
                 });
             })
-            ->orderBy('tgl_tagih', 'desc')
+            ->orderBy('created_at', 'desc')
             ->paginate(10, ['*'], 'manual_page');
 
-        // --- Query Otomatis
-        $tagihanOtomatis = Tagihan::where('no_kk', $no_kk_warga)
-            ->where('jenis', 'otomatis')
+        $tagihanBelumDibayar = Tagihan::where('no_kk', $no_kk_warga)
+            ->where('status_bayar', 'belum_bayar')
             ->when($request->filled('search'), function ($q) use ($request) {
                 $search = $request->search;
                 $q->where(function ($sub) use ($search) {
@@ -57,13 +55,13 @@ class WargatagihanController extends Controller
                         ->orWhere('nominal', 'like', "%$search%");
                 });
             })
-            ->orderBy('tgl_tagih', 'desc')
+            ->orderBy('created_at', 'desc')
             ->paginate(10, ['*'], 'otomatis_page');
 
         return Inertia::render('Warga/Tagihan', [
             'title' => $title,
-            'tagihanManual' => $tagihanManual,
-            'tagihanOtomatis' => $tagihanOtomatis
+            'tagihanSudahDibayar' => $tagihanSudahDibayar,
+            'tagihanBelumDibayar' => $tagihanBelumDibayar
         ]);
     }
 }

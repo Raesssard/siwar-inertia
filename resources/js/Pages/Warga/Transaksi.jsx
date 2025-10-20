@@ -76,9 +76,9 @@ export default function Transaksi() {
                                                 <span className="badge bg-danger text-white">Pengeluaran</span>
                                             )}
                                         </td>
-                                        <td className="text-center">{item.nama_transaksi}</td>
-                                        <td className="text-center">{item.keterangan}</td>
-                                        <td className="text-center">{formatRupiah(item.nominal)}</td>
+                                        <td className="text-left">{item.nama_transaksi}</td>
+                                        <td className="text-left">{item.keterangan}</td>
+                                        <td className="text-right">{formatRupiah(item.nominal)}</td>
                                     </tr>
                                 ))
                             ) : (

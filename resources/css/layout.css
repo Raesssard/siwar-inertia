@@ -329,7 +329,7 @@ p.komen {
     word-wrap: break-word;
     overflow-wrap: break-word;
     word-break: break-word;
-    white-space: normal;
+    white-space: pre-line;
 }
 
 p.isi-pengaduan.clamped,

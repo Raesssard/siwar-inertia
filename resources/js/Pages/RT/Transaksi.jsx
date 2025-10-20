@@ -98,14 +98,14 @@ export default function Transaksi() {
                     <table className="table-custom">
                         <thead>
                             <tr>
-                                <th className="px-3 text-center" scope="col">No.</th>
-                                <th className="px-3 text-center" scope="col">RT</th>
-                                <th className="px-3 text-center" scope="col">Tanggal</th>
-                                <th className="px-3 text-center" scope="col">Nama</th>
-                                <th className="px-3 text-center" scope="col">Jenis</th>
-                                <th className="px-3 text-center" scope="col">Nominal</th>
-                                <th className="px-3 text-center" scope="col">Keterangan</th>
-                                <th className="px-3 text-center" scope="col">Aksi</th>
+                                <th className="px-5 text-center" scope="col">No.</th>
+                                <th className="px-5 text-center" scope="col">RT</th>
+                                <th className="px-5 text-center" scope="col">Tanggal</th>
+                                <th className="px-5 text-center" scope="col">Nama</th>
+                                <th className="px-5 text-center" scope="col">Jenis</th>
+                                <th className="px-5 text-center" scope="col">Nominal</th>
+                                <th className="px-5 text-center" scope="col">Keterangan</th>
+                                <th className="px-5 text-center" scope="col">Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -115,7 +115,7 @@ export default function Transaksi() {
                                         <td className="text-center">{index + 1}</td>
                                         <td className="text-center">{item.rt ?? '-'}</td>
                                         <td className="text-center">{formatTanggal(item.tanggal) ?? '-'}</td>
-                                        <td className="text-center">{item.nama_transaksi ?? '-'}</td>
+                                        <td className="text-left">{item.nama_transaksi ?? '-'}</td>
                                         <td className="text-center">
                                             {item.jenis === 'pemasukan' ? (
                                                 <span className="badge bg-success text-white">Pemasukan</span>
@@ -123,8 +123,8 @@ export default function Transaksi() {
                                                 <span className="badge bg-danger text-white">Pengeluaran</span>
                                             )}
                                         </td>
-                                        <td className="text-center">{formatRupiah(item.nominal) ?? '-'}</td>
-                                        <td className="text-center">{item.keterangan ?? '-'}</td>
+                                        <td className="text-right">{formatRupiah(item.nominal) ?? '-'}</td>
+                                        <td className="text-left">{item.keterangan ?? '-'}</td>
                                         <td className="text-center">
                                             <div className="d-flex justify-content-center align-items-center gap-2">
                                                 <button className="btn btn-sm btn-warning my-auto" title="Edit Transaksi" onClick={() => modalEdit(item)}>

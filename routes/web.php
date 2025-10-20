@@ -1,26 +1,34 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\LoginController;
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\Admin\AdminRwController;
-use App\Http\Controllers\Warga\LihatKKController;
-use App\Http\Controllers\Warga\PengaduanController;
-use App\Http\Controllers\Warga\PengumumanWargaController;
-use App\Http\Controllers\Warga\WargatagihanController;
-use App\Http\Controllers\Warga\WargatransaksiController;
-use App\Http\Controllers\Admin\AdminRtController;
-use App\Http\Controllers\Admin\AdminKategoriGolonganController;
-use App\Http\Controllers\Admin\AdminPermissionController;
-use App\Http\Controllers\Admin\AdminRoleController;
-use App\Http\Controllers\Rt\ExportController;
-use App\Http\Controllers\Rt\Rt_kartu_keluargaController;
-use App\Http\Controllers\Rt\Rt_PengaduanController;
-use App\Http\Controllers\Rt\Rt_pengumumanController;
-use App\Http\Controllers\Rt\Rt_tagihanController;
-use App\Http\Controllers\Rt\Rt_transaksiController;
-use App\Http\Controllers\Rt\Rt_wargaController;
-use App\Http\Controllers\Rt\RtIuranController;
+use App\Http\Controllers\{
+    LoginController,
+    DashboardController,
+};
+use App\Http\Controllers\Warga\{
+    LihatKKController,
+    PengaduanController,
+    PengumumanWargaController,
+    WargatagihanController,
+    WargatransaksiController,
+};
+use App\Http\Controllers\Admin\{
+    AdminRtController,
+    AdminRwController,
+    AdminKategoriGolonganController,
+    AdminPermissionController,
+    AdminRoleController,
+};
+use App\Http\Controllers\Rt\{
+    ExportController,
+    Rt_kartu_keluargaController,
+    Rt_PengaduanController,
+    Rt_pengumumanController,
+    Rt_tagihanController,
+    Rt_transaksiController,
+    Rt_wargaController,
+    RtIuranController,
+};
 use Inertia\Inertia;
 
 
@@ -63,7 +71,6 @@ Route::middleware(['auth'])->group(function () {
     });
 
     Route::prefix('rt')->as('rt.')->group(function () {
-        Route::resource('warga', Rt_wargaController::class);
         Route::resource('kartu_keluarga', Rt_kartu_keluargaController::class)->only('index');
         Route::resource('pengumuman', Rt_pengumumanController::class);
         Route::get('/pengumuman/{id}/export-pdf', [Rt_pengumumanController::class, 'exportPDF'])
