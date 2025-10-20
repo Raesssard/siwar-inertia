@@ -37,6 +37,6 @@ export default function Dashboard() {
         {statCards.map((card, index) => (
           <StatCard key={index} {...card} />
         ))}
-    </Layout>
+    </Layout> 
   )
 }

@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react"
 import { Link, useForm, usePage, router } from "@inertiajs/react"
 import logo from '../../../../public/img/logo.png'
 import axios from "axios"
-import { FormatWaktu } from "../Warga/Pengaduan"
+import { FormatWaktu } from "../Pengaduan"
 import { SidebarLink } from "./SidebarLink"
 import { formatTanggal, getAdminLinks, getRtLinks, getWargaLinks, getRwLinks, formatRupiah } from "./GetPropRole"
 import Role from "./Role"
@@ -2994,9 +2994,17 @@ export function DetailPengumuman({ selectedData, detailShow, onClose, onUpdated,
                                     <div className="flex-fill d-flex flex-column" style={selectedData?.dokumen_path ? { maxWidth: "50%" } : { maxWidth: "100%" }}>
                                         <div className="p-3 border-bottom caption-section">
                                             {(userData?.rukun_tetangga?.id === selectedData.id_rt || userData?.rw?.id === selectedData.id_rw) ? (
-                                                <div className="d-flex justify-between">
-                                                    <h5 className="fw-bold mb-1 mt-2">{selectedData.judul}</h5>
+                                                <div className="d-flex">
+                                                    <h5 className="fw-bold mb-1 mt-2 mr-auto">{selectedData.judul}</h5>
                                                     <Role role={selectedData.rukun_tetangga ? "rt" : "rw"}>
+                                                        <button
+                                                            className="btn komen btn-primary my-0"
+                                                            title="Export Pengumuman ke PDF"
+                                                            style={{ border: "none" }}
+                                                            onClick={() => window.location.href = `/${role}/pengumuman/${selectedData.id}/export-pdf`}
+                                                        >
+                                                            <i className="far fa-file-pdf mr-2"></i>
+                                                        </button>
                                                         <button onClick={toggleEdit} title="Edit Pengumuman">
                                                             <i className="far fa-edit"></i>
                                                         </button>

@@ -11,6 +11,7 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Illuminate\Support\Facades\Auth;
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
+use PhpOffice\PhpSpreadsheet\Cell\DataType;
 use PhpOffice\PhpSpreadsheet\Style\Border;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
 
@@ -197,7 +198,7 @@ class ExportController extends Controller
             foreach ($belum as $tagihan) {
                 $sheet->setCellValue("B{$row}", $no);
                 $sheet->setCellValue("C{$row}", $tagihan->nama);
-                $sheet->setCellValue("D{$row}", $tagihan->no_kk);
+                $sheet->setCellValueExplicit("D{$row}", $tagihan->no_kk, DataType::TYPE_STRING);
                 $sheet->setCellValue("E{$row}", 'Rp ' . number_format($tagihan->nominal, 2, ',', '.'));
                 $sheet->setCellValue("F{$row}", $tagihan->jenis);
                 $sheet->setCellValue("G{$row}", $tagihan->tgl_tagih);
@@ -256,7 +257,7 @@ class ExportController extends Controller
             foreach ($sudah as $tagihan) {
                 $sheet->setCellValue("K{$row2}", $no2);
                 $sheet->setCellValue("L{$row2}", $tagihan->nama);
-                $sheet->setCellValue("M{$row2}", $tagihan->no_kk);
+                $sheet->setCellValueExplicit("M{$row2}", $tagihan->no_kk, DataType::TYPE_STRING);
                 $sheet->setCellValue("N{$row2}", 'Rp ' . number_format($tagihan->nominal, 2, ',', '.'));
                 $sheet->setCellValue("O{$row2}", $tagihan->jenis);
                 $sheet->setCellValue("P{$row2}", $tagihan->tgl_tagih);
@@ -338,7 +339,7 @@ class ExportController extends Controller
             foreach ($pemasukan as $trx) {
                 $sheet->setCellValue("B{$row}", $no);
                 $sheet->setCellValue("C{$row}", $trx->rt);
-                $sheet->setCellValue("D{$row}", $trx->tanggal);
+                $sheet->setCellValue("D{$row}", date('d/m/Y', strtotime($trx->tanggal)));
                 $sheet->setCellValue("E{$row}", 'Rp ' . number_format($trx->nominal, 2, ',', '.'));
                 $sheet->setCellValue("F{$row}", $trx->nama_transaksi);
                 $sheet->setCellValue("G{$row}", $trx->keterangan);
@@ -394,7 +395,7 @@ class ExportController extends Controller
             foreach ($pengeluaran as $trx) {
                 $sheet->setCellValue("J{$row2}", $no2);
                 $sheet->setCellValue("K{$row2}", $trx->rt);
-                $sheet->setCellValue("L{$row2}", $trx->tanggal);
+                $sheet->setCellValue("L{$row2}", date('d/m/Y', strtotime($trx->tanggal)));
                 $sheet->setCellValue("M{$row2}", 'Rp ' . number_format($trx->nominal, 2, ',', '.'));
                 $sheet->setCellValue("N{$row2}", $trx->nama_transaksi);
                 $sheet->setCellValue("O{$row2}", $trx->keterangan);

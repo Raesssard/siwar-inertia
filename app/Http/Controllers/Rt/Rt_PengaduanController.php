@@ -43,9 +43,9 @@ class Rt_PengaduanController extends Controller
             $pengaduan_rt_saya->where('level', $request->kategori);
         }
 
-        $rt_pengaduan = $pengaduan_rt_saya->orderBy('created_at', 'desc')->get();
+        $pengaduan = $pengaduan_rt_saya->orderBy('created_at', 'desc')->get();
 
-        $total_pengaduan_rt = Pengaduan::whereHas(
+        $total_pengaduan = Pengaduan::whereHas(
             'warga.kartuKeluarga.rukunTetangga',
             function ($aduan) use ($pengaduan_rt) {
                 $aduan->where('level', 'rt')
@@ -53,7 +53,7 @@ class Rt_PengaduanController extends Controller
             }
         )->count();
 
-        $total_pengaduan_rt_filtered = $rt_pengaduan->count();
+        $total_pengaduan_filtered = $pengaduan->count();
 
         $list_bulan = [
             'januari',
@@ -82,11 +82,11 @@ class Rt_PengaduanController extends Controller
             ->distinct()
             ->pluck('level');
 
-        return Inertia::render('RT/Pengaduan', [
+        return Inertia::render('Pengaduan', [
             'title' => $title,
-            'rt_pengaduan' => $rt_pengaduan,
-            'total_pengaduan_rt' => $total_pengaduan_rt,
-            'total_pengaduan_rt_filtered' => $total_pengaduan_rt_filtered,
+            'pengaduan' => $pengaduan,
+            'total_pengaduan' => $total_pengaduan,
+            'total_pengaduan_filtered' => $total_pengaduan_filtered,
             'list_bulan' => $list_bulan,
             'list_tahun' => $list_tahun,
             'list_level' => $list_level,

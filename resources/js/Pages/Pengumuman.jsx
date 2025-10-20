@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useRef } from "react"
 import Layout from "@/Layouts/Layout"
 import { Head, Link, usePage, useForm } from "@inertiajs/react"
-import { DetailPengumuman } from "../Component/Modal"
-import { FilterPengumuman } from "../Component/Filter"
+import { DetailPengumuman } from "./Component/Modal"
+import { FilterPengumuman } from "./Component/Filter"
 import Masonry from "react-masonry-css"
-import FileDisplay from "../Component/FileDisplay"
+import FileDisplay from "./Component/FileDisplay"
 import { FormatWaktu, splitWaktu } from "./Pengaduan"
 
 export default function Pengumuman() {
@@ -40,6 +40,7 @@ export default function Pengumuman() {
     }, {})
 
     const role = props.auth?.currentRole
+    const user = props.auth?.user
 
     const modalDetail = (item) => {
         setSelected(item)
@@ -194,11 +195,11 @@ export default function Pengumuman() {
                         </div>
                     </div>
                 ))}
-
                 <DetailPengumuman
                     selectedData={selected}
                     detailShow={showModal}
                     onClose={() => setShowModal(false)}
+                    userData={user}
                     role={role}
                 />
             </div>
