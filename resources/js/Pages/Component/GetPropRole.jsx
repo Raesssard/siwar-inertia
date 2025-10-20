@@ -293,11 +293,6 @@ export function getRwLinks() {
             icon: "users",
         },
         {
-            href: "/rw/warga",
-            text: "Data Warga",
-            icon: "users",
-        },
-        {
             href: "/rw/kartu_keluarga",
             text: "Data Kartu Keluarga",
             icon: "id-card",

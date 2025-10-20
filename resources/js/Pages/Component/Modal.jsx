@@ -2236,7 +2236,7 @@ export function TambahEditKK({ show, onClose, dataKK = null, kategoriIuran, daft
   );
 }
 
-export function DetailKK({ selectedData, detailShow, onClose, role }) {
+export function DetailKK({ selectedData, detailShow, onClose, role, userData }) {
     if (!detailShow || !selectedData) return null
 
     const [selectedFile, setSelectedFile] = useState(null)
@@ -2362,6 +2362,7 @@ export function DetailKK({ selectedData, detailShow, onClose, role }) {
                                     <p><strong>Alamat</strong> : {selectedData.alamat ?? '-'}</p>
                                     <p><strong>RT/RW</strong> :{" "}
                                         {selectedData.rukun_tetangga.nomor_rt ?? '-'}/{selectedData.rw.nomor_rw ?? '-'}
+                                    </p>
                                     <p>
                                         <strong>Nama Kepala Keluarga</strong> :{" "}
                                         {kepala?.nama ?? "-"}
@@ -2516,18 +2517,10 @@ export function DetailKK({ selectedData, detailShow, onClose, role }) {
                                                                       .toUpperCase() +
                                                                   data.status_hubungan_dalam_keluarga.slice(1)
                                                                 : "-"}
-                                                        </td>
-                                                        <td className="text-center">{data.nama_ayah ?? '-'}</td>
-                                                        <td className="text-center">{data.nama_ibu ?? '-'}</td>
-                                                        <td className="text-center">{data.status_warga.charAt(0).toUpperCase() + data.status_warga.slice(1) ?? '-'}</td>
-                                                        <td className="text-center">
-                                                            <button className="btn btn-success btn-sm" onClick={() => modalDetail(data)} style={{ fontSize: "0.5rem" }}>
-                                                                <i className="fas fa-info"></i>
-                                                            </button>
-                                                        </td>
+                                                        </td>                                                        
                                                         <td className="text-center">
                                                             {data.kewarganegaraan ?? "WNI"}
-                                                        </td>
+                                                        </td>                                                        
                                                         <td className="text-center">
                                                             {data.no_paspor ?? "-"}
                                                         </td>
@@ -2536,61 +2529,44 @@ export function DetailKK({ selectedData, detailShow, onClose, role }) {
                                                                 data.no_kitap ?? "-"
                                                             }`}
                                                         </td>
-                                                        <td className="text-center">
-                                                            {data.nama_ayah ?? "-"}
-                                                        </td>
-                                                        <td className="text-center">
-                                                            {data.nama_ibu ?? "-"}
-                                                        </td>
-                                                        <td className="text-center">
-                                                            {data.status_warga
-                                                                ? data.status_warga.charAt(0).toUpperCase() +
-                                                                  data.status_warga.slice(1)
-                                                                : "-"}
-                                                        </td>
+                                                        <td className="text-center">{data.nama_ayah ?? '-'}</td>
+                                                        <td className="text-center">{data.nama_ibu ?? '-'}</td>
+                                                        <td className="text-center">{data.status_warga.charAt(0).toUpperCase() + data.status_warga.slice(1) ?? '-'}</td>
+                                                        <td className="text-center space-x-1">
+                                                        {/* Detail */}
+                                                        <button
+                                                            onClick={() => modalDetail(data)}
+                                                            className="inline-flex items-center justify-center rounded-md bg-green-500 hover:bg-green-600 text-white px-2 py-1 text-xs transition-all"
+                                                        >
+                                                            <i className="fas fa-info"></i>
+                                                        </button>
+
+                                                        {/* Role khusus RW */}
                                                         <Role role="rw">
-                                                            <td className="text-center">
-                                                                <button
-                                                                    className="btn btn-warning btn-sm me-1"
-                                                                    onClick={() =>
-                                                                        router.visit(
-                                                                            route("rw.warga.edit", data.id)
-                                                                        )
-                                                                    }
-                                                                >
-                                                                    <i className="bi bi-pencil-square"></i>
-                                                                </button>
-                                                                <button
-                                                                    className="btn btn-danger btn-sm"
-                                                                    onClick={() => {
-                                                                        if (
-                                                                            confirm(
-                                                                                `Hapus warga ${data.nama}?`
-                                                                            )
-                                                                        ) {
-                                                                            router.delete(
-                                                                                route(
-                                                                                    "rw.warga.destroy",
-                                                                                    data.id
-                                                                                ),
-                                                                                {
-                                                                                    onSuccess: () =>
-                                                                                        alert(
-                                                                                            "Warga berhasil dihapus"
-                                                                                        ),
-                                                                                    onError: () =>
-                                                                                        alert(
-                                                                                            "Gagal menghapus warga"
-                                                                                        ),
-                                                                                }
-                                                                            )
-                                                                        }
-                                                                    }}
-                                                                >
-                                                                    <i className="bi bi-trash"></i>
-                                                                </button>
-                                                            </td>
+                                                            {/* Edit */}
+                                                            <button
+                                                            onClick={() => router.visit(route("rw.warga.edit", data.id))}
+                                                            className="inline-flex items-center justify-center rounded-md bg-yellow-500 hover:bg-yellow-600 text-white px-2 py-1 text-xs transition-all"
+                                                            >
+                                                            <i className="bi bi-pencil-square"></i>
+                                                            </button>
+
+                                                            {/* Hapus */}
+                                                            <button
+                                                            onClick={() => {
+                                                                if (confirm(`Hapus warga ${data.nama}?`)) {
+                                                                router.delete(route("rw.warga.destroy", data.id), {
+                                                                    onSuccess: () => alert("Warga berhasil dihapus"),
+                                                                    onError: () => alert("Gagal menghapus warga"),
+                                                                });
+                                                                }
+                                                            }}
+                                                            className="inline-flex items-center justify-center rounded-md bg-red-500 hover:bg-red-600 text-white px-2 py-1 text-xs transition-all"
+                                                            >
+                                                            <i className="bi bi-trash"></i>
+                                                            </button>
                                                         </Role>
+                                                        </td>
                                                     </tr>
                                                 ))
                                         ) : (
