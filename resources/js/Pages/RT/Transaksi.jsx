@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react"
 import { formatRupiah, formatTanggal } from "../Component/GetPropRole"
 import Swal from "sweetalert2"
 import { FilterTransaksi } from "../Component/Filter"
-import { EditTransaksi, TambahTransaksi } from "../Component/Modal"
+import { EditTransaksi, PilihTransaksi, TambahTransaksi, TambahTransaksiPerKk } from "../Component/Modal"
 
 export default function Transaksi() {
     const {
@@ -12,19 +12,30 @@ export default function Transaksi() {
         transaksi: transaksiFromServer,
         daftar_tahun,
         daftar_bulan,
+        list_kk,
     } = usePage().props
     const { props } = usePage()
     const role = props.auth?.currentRole
     const user = props.auth?.user
     const [transaksiList, setTransaksiList] = useState(transaksiFromServer.data || [])
     const [selected, setSelected] = useState(null)
+    const [showModalPilih, setShowModalPilih] = useState(false)
     const [showModalTambah, setShowModalTambah] = useState(false)
+    const [showModalTambahPerKk, setShowModalTambahPerKk] = useState(false)
     const [showModalEdit, setShowModalEdit] = useState(false)
     const { get, data, setData } = useForm({
         search: '',
         tahun: '',
         bulan: '',
     })
+
+    const toggleTambah = (pilihan) => {
+        if (pilihan === 'perKk') {
+            setShowModalTambahPerKk(true)
+        } else {
+            setShowModalTambah(true)
+        }
+    }
 
     const modalEdit = (tableData) => {
         setSelected(tableData)
@@ -66,8 +77,7 @@ export default function Transaksi() {
                         setTransaksiList(prev => prev.filter(item => item.id !== id))
                     })
                     .catch(() => {
-                        console.log(`/${role}/tagihan/${id}, ini rutenya salah mas🗿`)
-                        console.log(id)
+                        console.log(`/${role}/transaksi/${id}, ini rutenya salah mas🗿`)
                         Swal.fire("Gagal!", "Terjadi kesalahan saat menghapus data.", "error")
                     })
             }
@@ -87,7 +97,7 @@ export default function Transaksi() {
                 daftar_bulan={daftar_bulan}
                 filter={filter}
                 resetFilter={resetFilter}
-                tambahShow={() => setShowModalTambah(true)}
+                tambahShow={() => setShowModalPilih(true)}
                 role={role}
             />
             <div className="table-container">
@@ -177,6 +187,20 @@ export default function Transaksi() {
                     </div>
                 )}
             </div>
+            <PilihTransaksi
+                show={showModalPilih}
+                togglePilih={toggleTambah}
+                onClose={() => setShowModalPilih(false)}
+            />
+            <TambahTransaksiPerKk
+                listKK={list_kk}
+                tambahShow={showModalTambahPerKk}
+                onClose={() => setShowModalTambahPerKk(false)}
+                onAdded={(transaksiBaru) => {
+                    setTransaksiList(prev => [transaksiBaru, ...prev])
+                }}
+                role={role}
+            />
             <TambahTransaksi
                 tambahShow={showModalTambah}
                 onClose={() => setShowModalTambah(false)}
@@ -189,7 +213,6 @@ export default function Transaksi() {
                 editShow={showModalEdit}
                 onClose={() => setShowModalEdit(false)}
                 onUpdated={(updated) => {
-                    console.log(updated)
                     setSelected(updated)
                     setTransaksiList(prev =>
                         prev.map(item =>

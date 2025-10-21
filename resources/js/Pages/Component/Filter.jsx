@@ -89,7 +89,7 @@ export function FilterPengaduan({ data, setData, list_tahun, list_bulan, list_le
 
 export function FilterPengumuman({ data, setData, daftar_tahun, list_bulan, daftar_kategori, filter, resetFilter, tambahShow, role }) {
     return (
-        <form onSubmit={filter} className="form-filter row g-2 pl-3 pb-2 mb-2 w-100">
+        <form onSubmit={filter} className="form-filter row g-2 pl-3 pb-2 w-100">
             <div className="col-md-5 col-12 pr-1 mb-auto">
                 <div className="input-group input-group-sm" style={{ height: "3.5rem" }}>
                     <input
@@ -166,14 +166,6 @@ export function FilterPengumuman({ data, setData, daftar_tahun, list_bulan, daft
                 <Link href={`/${role}/pengumuman`} onClick={resetFilter} className="btn-input btn btn-secondary btn-sm flex-fill p-0" title="Reset">
                     <i className="fas fa-undo"></i>
                 </Link>
-                <Role role={['rt', 'rw']}>
-                    <div className="w-100 text-end">
-                        <button type="button" onClick={() => tambahShow()} className="btn-input btn btn-sm btn-success">
-                            <i className="fas fa-plus mr-2"></i>
-                            Buat Pengumuman
-                        </button>
-                    </div>
-                </Role>
             </div>
         </form>
     )

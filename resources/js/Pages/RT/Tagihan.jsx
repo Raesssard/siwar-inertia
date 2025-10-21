@@ -63,7 +63,6 @@ export default function Tagihan() {
                     })
                     .catch(() => {
                         console.log(`/${role}/tagihan/${id}, ini rutenya salah mas🗿`)
-                        console.log(id)
                         Swal.fire("Gagal!", "Terjadi kesalahan saat menghapus data.", "error")
                     })
             }
@@ -278,7 +277,6 @@ export default function Tagihan() {
                                 item.id === updated.id ? updated : item
                             )
                         )
-                        console.log(tagihanManualList)
                     } else {
 
                         setTagihanOtomatisList(prev =>
@@ -286,7 +284,6 @@ export default function Tagihan() {
                                 item.id === updated.id ? updated : item
                             )
                         )
-                        console.log(tagihanOtomatisList)
                     }
                 }}
                 role={role}

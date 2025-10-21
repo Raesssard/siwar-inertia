@@ -75,7 +75,7 @@ export function splitWaktu({ createdAt }) {
         return "Minggu ini"
     } else if (!sameWeek && sameMonth) {
         return "Bulan ini"
-    } else if (lastMonth || diffDays < 60) {
+    } else if (lastMonth) {
         return "Bulan lalu"
     } else {
         const namaBulan = created.toLocaleString("id-ID", { month: "long" })
@@ -129,6 +129,36 @@ export default function Pengaduan() {
         groups[kategori].push(item)
         return groups
     }, {})
+
+    const order = [
+        "Hari ini",
+        "Kemarin",
+        "Minggu ini",
+        "Bulan ini",
+        "Bulan lalu"
+    ]
+
+    const sortedGroup = Object.entries(groupByWaktu).sort(([a], [b]) => {
+        const indexA = order.indexOf(a)
+        const indexB = order.indexOf(b)
+        if (indexA !== -1 && indexB !== -1) return indexA - indexB
+
+        if (indexA !== -1) return -1
+        if (indexB !== -1) return 1
+
+        const [bulanA, tahunA] = a.split(" ")
+        const [bulanB, tahunB] = b.split(" ")
+        const monthOrder = [
+            "januari", "februari", "maret", "april", "mei", "juni",
+            "juli", "agustus", "september", "oktober", "november", "desember"
+        ]
+
+        const tA = parseInt(tahunA)
+        const tB = parseInt(tahunB)
+        if (tA !== tB) return tB - tA
+        return monthOrder.indexOf(bulanB.toLowerCase()) - monthOrder.indexOf(bulanA.toLowerCase())
+    })
+
 
     useEffect(() => {
         setTotal(total_pengaduan)
@@ -216,13 +246,13 @@ export default function Pengaduan() {
                 </div>
             </div>
             <div className="col-12">
-                {Object.entries(groupByWaktu).map(([kategori, items]) => (
+                {pengaduanList.length ? sortedGroup.map(([kategori, items]) => (
                     <div key={kategori}>
                         <div className="text-muted mb-3 mt-3 mx-4 w-100">
                             {kategori}
                         </div>
                         <div ref={cardBodyRef} className="card-body pengaduan">
-                            {items.length ? (
+                            {items.length && (
                                 <>
                                     <Masonry
                                         breakpointCols={breakpointColumnsObj}
@@ -303,12 +333,14 @@ export default function Pengaduan() {
                                         </button>
                                     )}
                                 </>
-                            ) : (
-                                <span className="d-block w-100 text-muted text-center">Tidak ada pengaduan</span>
                             )}
                         </div>
                     </div>
-                ))}
+                )) : (
+                    <div ref={cardBodyRef} className="card-body pengaduan">
+                        <span className="d-block w-100 text-muted text-center">Tidak ada pengaduan</span>
+                    </div>
+                )}
                 <DetailPengaduan
                     selectedData={selected}
                     detailShow={showModalDetail}
