@@ -13,6 +13,7 @@ export function FormatWaktu({ createdAt }) {
     const created = new Date(createdAt)
     const diffMs = now - created
     const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24))
+    const diffWeek = Math.floor(diffMs / (1000 * 60 * 60 * 24 * 7))
 
     if (diffDays < 1) {
         const diffHours = Math.floor(diffMs / (1000 * 60 * 60))
@@ -23,8 +24,12 @@ export function FormatWaktu({ createdAt }) {
         return "baru saja"
     }
 
+    if (diffDays < 8) {
+        return `${diffWeek} minggu yang lalu`
+    }
+
     if (diffDays < 30) {
-        return `${diffDays} hari yang lalu`
+        return `${diffWeek} minggu yang lalu`
     }
 
     return (
