@@ -78,7 +78,6 @@ export default function Iuran() {
                         }
                     })
                     .catch(() => {
-                        console.log(id)
                         Swal.fire("Gagal!", "Terjadi kesalahan saat menghapus data.", "error")
                     })
             }

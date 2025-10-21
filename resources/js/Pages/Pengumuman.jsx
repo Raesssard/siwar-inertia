@@ -6,6 +6,7 @@ import { FilterPengumuman } from "./Component/Filter"
 import Masonry from "react-masonry-css"
 import FileDisplay from "./Component/FileDisplay"
 import { FormatWaktu, splitWaktu } from "./Pengaduan"
+import Role from "./Component/Role"
 
 export default function Pengumuman() {
     const {
@@ -44,6 +45,36 @@ export default function Pengumuman() {
         groups[kategori].push(item)
         return groups
     }, {})
+
+    const order = [
+        "Hari ini",
+        "Kemarin",
+        "Minggu ini",
+        "Bulan ini",
+        "Bulan lalu"
+    ]
+
+    const sortedGroup = Object.entries(groupByWaktu).sort(([a], [b]) => {
+        const indexA = order.indexOf(a)
+        const indexB = order.indexOf(b)
+        if (indexA !== -1 && indexB !== -1) return indexA - indexB
+
+        if (indexA !== -1) return -1
+        if (indexB !== -1) return 1
+
+        const [bulanA, tahunA] = a.split(" ")
+        const [bulanB, tahunB] = b.split(" ")
+        const monthOrder = [
+            "januari", "februari", "maret", "april", "mei", "juni",
+            "juli", "agustus", "september", "oktober", "november", "desember"
+        ]
+
+        const tA = parseInt(tahunA)
+        const tB = parseInt(tahunB)
+        if (tA !== tB) return tB - tA
+        return monthOrder.indexOf(bulanB.toLowerCase()) - monthOrder.indexOf(bulanA.toLowerCase())
+    })
+
 
     const role = props.auth?.currentRole
     const user = props.auth?.user
@@ -135,23 +166,33 @@ export default function Pengumuman() {
                 tambahShow={() => setShowModalTambah(true)}
                 role={role}
             />
-            <div className="d-flex justify-content-between align-items-center mb-3 mx-4 w-100">
-                <div className="d-flex align-items-center gap-1">
+            <div className="d-flex align-items-center mx-4 w-100">
+                <div className="d-flex align-items-center gap-1 mr-auto">
                     <i className="fas fa-bullhorn me-2 text-primary"></i>
                     <span className="fw-semibold text-dark">
                         {totalFiltered ?? 0} Pengumuman
                     </span>
                 </div>
 
-                <div className="text-muted">
-                    Menampilkan {totalFiltered} dari total {total} data
-                </div>
+                <Role role={['rt', 'rw']}>
+                    <div className="">
+                        <button type="button" onClick={() => setShowModalTambah(true)} className="btn-input btn btn-sm btn-success">
+                            <i className="fas fa-plus mr-2"></i>
+                            Buat Pengumuman
+                        </button>
+                    </div>
+                </Role>
             </div>
             <div className="col-12">
-                {pengumumanList.length ? Object.entries(groupByWaktu).map(([kategori, items]) => (
+                {pengumumanList.length ? sortedGroup.map(([kategori, items]) => (
                     <div key={kategori}>
-                        <div className="text-muted mb-3 mt-3 mx-4 w-100">
-                            {kategori}
+                        <div className="d-flex align-items-center w-100">
+                            <div className="text-muted mb-3 mt-3 mx-4">
+                                {kategori}
+                            </div>
+                            <div className="text-muted mr-4 ml-auto">
+                                Menampilkan {items.length} dari total {total} Pengumuman
+                            </div>
                         </div>
                         <div ref={cardBodyRef} className="card-body pengumuman">
                             {items.length && (

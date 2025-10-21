@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Rt;
 
 use App\Http\Controllers\Controller;
+use App\Models\Kartu_keluarga;
 use App\Models\Pengeluaran;
 use App\Models\Transaksi;
 use App\Models\Rukun_tetangga;
@@ -19,13 +20,14 @@ class Rt_transaksiController extends Controller
         $title = "Transaksi";
 
         /** @var User $user */
-        $idRt = Auth::user()->rukunTetangga->nomor_rt;
+        $noRt = Auth::user()->rukunTetangga->nomor_rt;
+        $idRt = Auth::user()->rukunTetangga->id;
 
         $search = $request->input('search');
         $tahun = $request->input('tahun');
         $bulan = $request->input('bulan');
 
-        $query = Transaksi::where('rt', $idRt)
+        $query = Transaksi::where('rt', $noRt)
             ->when($search, fn($q) => $q->where('nama_transaksi', 'like', '%' . $search . '%'))
             ->when($tahun, fn($q) => $q->whereYear('tanggal', $tahun))
             ->when($bulan, fn($q) => $q->whereMonth('tanggal', $bulan));
@@ -58,11 +60,14 @@ class Rt_transaksiController extends Controller
             );
         }
 
+        $list_kk = Kartu_keluarga::where('id_rt', $idRt)->get();
+
         return Inertia::render('RT/Transaksi', [
             'title' => $title,
             'transaksi' => $transaksi,
             'daftar_tahun' => $daftar_tahun,
             'daftar_bulan' => $daftar_bulan,
+            'list_kk' => $list_kk,
         ]);
     }
 
@@ -77,8 +82,15 @@ class Rt_transaksiController extends Controller
             'keterangan' => 'nullable|string',
         ]);
 
+        $no_kk = null;
+
+        if ($request->filled('no_kk')) {
+            $no_kk = $request->no_kk;
+        }
+
         $dataYangDimasukin = [
             'tagihan_id' => null,
+            'no_kk' => $no_kk,
             'rt' => $noRt,
             'tanggal' => $request->tanggal,
             'nama_transaksi' => $request->nama_transaksi,

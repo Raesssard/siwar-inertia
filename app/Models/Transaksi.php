@@ -14,6 +14,7 @@ class Transaksi extends Model
 
     protected $fillable = [
         'tagihan_id',
+        'no_kk',
         'rt',
         'tanggal',
         'jenis',
@@ -30,5 +31,10 @@ class Transaksi extends Model
     public function tagihan(): BelongsTo
     {
         return $this->belongsTo(Tagihan::class, 'tagihan_id', 'id');
+    }
+
+    public function kartuKeluarga(): BelongsTo
+    {
+        return $this->belongsTo(Kartu_keluarga::class, 'no_kk', 'no_kk');
     }
 }

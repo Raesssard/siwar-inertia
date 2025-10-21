@@ -415,3 +415,8 @@ embed.pdf-preview {
 button:disabled {
     cursor: not-allowed !important;
 }
+
+button.btn.transaksi:hover {
+    background: #4e73df !important;
+    color: white !important;
+}
