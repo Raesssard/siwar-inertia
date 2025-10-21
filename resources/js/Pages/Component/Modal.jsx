@@ -2409,22 +2409,19 @@ export function DetailKK({ selectedData, detailShow, onClose, role, userData }) 
                                 DAFTAR ANGGOTA KELUARGA
                             </h6>
                             <div className="table-responsive">
-                                <Role role="rw">
+                                {(role === "rw" || role === "admin") && (
                                     <div className="d-flex justify-content-end mb-3">
                                         <button
                                             className="btn btn-primary btn-sm"
-                                            onClick={() =>
-                                                router.visit(
-                                                    route("rw.warga.create", {
-                                                        no_kk: selectedData.no_kk,
-                                                    })
-                                                )
-                                            }
+                                            onClick={() => {
+                                                const routeName = role === "admin" ? "admin.warga.create" : "rw.warga.create";
+                                                router.visit(route(routeName, { no_kk: selectedData.no_kk }));
+                                            }}
                                         >
                                             <i className="bi bi-person-plus"></i> Tambah Warga
                                         </button>
                                     </div>
-                                </Role>
+                                )}
                                 <table className="table table-bordered table-striped table-sm align-middle">
                                     <thead className="table-success text-center small">
                                         <tr>
@@ -2541,31 +2538,37 @@ export function DetailKK({ selectedData, detailShow, onClose, role, userData }) 
                                                             <i className="fas fa-info"></i>
                                                         </button>
 
-                                                        {/* Role khusus RW */}
-                                                        <Role role="rw">
-                                                            {/* Edit */}
-                                                            <button
-                                                            onClick={() => router.visit(route("rw.warga.edit", data.id))}
-                                                            className="inline-flex items-center justify-center rounded-md bg-yellow-500 hover:bg-yellow-600 text-white px-2 py-1 text-xs transition-all"
-                                                            >
-                                                            <i className="bi bi-pencil-square"></i>
-                                                            </button>
+                                                        {/* Role khusus RW dan Admin */}
+                                                        {(role === "rw" || role === "admin") && (
+                                                            <>
+                                                                {/* Edit */}
+                                                                <button
+                                                                    onClick={() => {
+                                                                        const routeName = role === "admin" ? "admin.warga.edit" : "rw.warga.edit";
+                                                                        router.visit(route(routeName, data.id));
+                                                                    }}
+                                                                    className="inline-flex items-center justify-center rounded-md bg-yellow-500 hover:bg-yellow-600 text-white px-2 py-1 text-xs transition-all"
+                                                                >
+                                                                    <i className="bi bi-pencil-square"></i>
+                                                                </button>
 
-                                                            {/* Hapus */}
-                                                            <button
-                                                            onClick={() => {
-                                                                if (confirm(`Hapus warga ${data.nama}?`)) {
-                                                                router.delete(route("rw.warga.destroy", data.id), {
-                                                                    onSuccess: () => alert("Warga berhasil dihapus"),
-                                                                    onError: () => alert("Gagal menghapus warga"),
-                                                                });
-                                                                }
-                                                            }}
-                                                            className="inline-flex items-center justify-center rounded-md bg-red-500 hover:bg-red-600 text-white px-2 py-1 text-xs transition-all"
-                                                            >
-                                                            <i className="bi bi-trash"></i>
-                                                            </button>
-                                                        </Role>
+                                                                {/* Hapus */}
+                                                                <button
+                                                                    onClick={() => {
+                                                                        if (confirm(`Hapus warga ${data.nama}?`)) {
+                                                                            const routeName = role === "admin" ? "admin.warga.destroy" : "rw.warga.destroy";
+                                                                            router.delete(route(routeName, data.id), {
+                                                                                onSuccess: () => alert("Warga berhasil dihapus"),
+                                                                                onError: () => alert("Gagal menghapus warga"),
+                                                                            });
+                                                                        }
+                                                                    }}
+                                                                    className="inline-flex items-center justify-center rounded-md bg-red-500 hover:bg-red-600 text-white px-2 py-1 text-xs transition-all"
+                                                                >
+                                                                    <i className="bi bi-trash"></i>
+                                                                </button>
+                                                            </>
+                                                        )}
                                                         </td>
                                                     </tr>
                                                 ))
