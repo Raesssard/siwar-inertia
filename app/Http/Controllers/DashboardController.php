@@ -40,6 +40,10 @@ class DashboardController extends Controller
             $data = array_merge(
                 $data,
                 [
+                    'jumlah_kk' => Kartu_keluarga::count(),
+                    'jumlah_warga' => Warga::count(),
+                    'jumlah_warga_penduduk' => Warga::where('status_warga', 'penduduk')->count(),
+                    'jumlah_warga_pendatang' => Warga::where('status_warga', 'pendatang')->count(),
                     'jumlah_rt' => Rt::count(),
                     'jumlah_rw' => Rw::count(),
                     'jumlah_golongan' => Kategori_golongan::count(),
