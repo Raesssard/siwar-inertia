@@ -73,6 +73,7 @@ class RwWargaController extends Controller
 
         return Inertia::render('FormWarga', [
             'title' => $title,
+            'role' => 'rw',
             'warga' => null,
             'noKK' => $noKK,
             'wargaList' => $wargaList,
@@ -137,8 +138,9 @@ class RwWargaController extends Controller
     {
         $title = 'Edit Data Warga';
         $warga = Warga::findOrFail($id);
-        return Inertia::render('Rw/FormWarga', [
+        return Inertia::render('FormWarga', [
             'title' => $title,
+            'role' => 'rw',
             'warga' => $warga,
         ]);
     }

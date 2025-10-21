@@ -61,6 +61,7 @@ class AdminWargaController extends Controller
 
         return Inertia::render('FormWarga', [
             'title' => $title,
+            'role' => 'admin',
             'warga' => null,
             'noKK' => $noKK,
             'wargaList' => $wargaList,
@@ -125,8 +126,9 @@ class AdminWargaController extends Controller
         $warga = Warga::findOrFail($id);
         $daftarKK = Kartu_keluarga::select('no_kk', 'alamat')->orderBy('no_kk')->get();
 
-        return Inertia::render('Admin/FormWarga', [
+        return Inertia::render('FormWarga', [
             'title' => $title,
+            'role' => 'admin',
             'warga' => $warga,
             'daftarKK' => $daftarKK,
         ]);

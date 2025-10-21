@@ -197,11 +197,6 @@ export function getAdminLinks() {
             icon: "id-card",
         },
         {
-            href: "/admin/warga",
-            text: "Data Warga",
-            icon: "users",
-        },
-        {
             href: "/admin/rw",
             text: "RW",
             icon: "house-user",
