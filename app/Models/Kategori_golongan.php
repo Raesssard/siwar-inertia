@@ -3,9 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Kategori_golongan extends Model
 {
+    use SoftDeletes;
     // Nama tabel
     protected $table = 'kategori_golongan';
 

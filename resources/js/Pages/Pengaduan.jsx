@@ -233,23 +233,20 @@ export default function Pengaduan() {
                 tambahShow={() => setShowModalTambah(true)}
                 role={role}
             />
-            <div className="d-flex justify-content-between align-items-center mb-3 mx-4 w-100">
-                <div className="d-flex align-items-center gap-1">
-                    <i className="fas fa-paper-plane me-2 text-primary"></i>
-                    <span className="fw-semibold text-dark">
-                        {totalFiltered ?? 0} Pengaduan
-                    </span>
-                </div>
-
-                <div className="text-muted">
-                    Menampilkan {totalFiltered} dari total {total} data
-                </div>
+            <div className="d-flex align-items-center mx-3 mb-4 mt-0 w-100">
+                <i className="fas fa-paper-plane me-2 text-primary"></i>
+                {totalFiltered} Pengaduan
             </div>
             <div className="col-12">
                 {pengaduanList.length ? sortedGroup.map(([kategori, items]) => (
                     <div key={kategori}>
-                        <div className="text-muted mb-3 mt-3 mx-4 w-100">
-                            {kategori}
+                        <div className="d-flex align-items-center w-100">
+                            <div className="text-muted mb-3 mt-3 mx-4">
+                                {kategori}
+                            </div>
+                            <div className="text-muted mr-4 ml-auto">
+                                Menampilkan {items.length} dari total {total} Pengumuman
+                            </div>
                         </div>
                         <div ref={cardBodyRef} className="card-body pengaduan">
                             {items.length && (

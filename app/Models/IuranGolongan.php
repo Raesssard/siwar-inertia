@@ -4,9 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class IuranGolongan extends Model
 {
+    use SoftDeletes;
+
     protected $table = 'iuran_golongan';
     protected $fillable = [
         'id_iuran',

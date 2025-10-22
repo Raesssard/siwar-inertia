@@ -166,16 +166,11 @@ export default function Pengumuman() {
                 tambahShow={() => setShowModalTambah(true)}
                 role={role}
             />
-            <div className="d-flex align-items-center mx-4 w-100">
-                <div className="d-flex align-items-center gap-1 mr-auto">
-                    <i className="fas fa-bullhorn me-2 text-primary"></i>
-                    <span className="fw-semibold text-dark">
-                        {totalFiltered ?? 0} Pengumuman
-                    </span>
-                </div>
-
-                <Role role={['rt', 'rw']}>
-                    <div className="">
+            <div className="d-flex align-items-center mx-3 mt-0 w-100">
+                <i className="fas fa-bullhorn me-2 text-primary"></i>
+                {totalFiltered} Pengumuman
+                <Role role={['rt', 'rw', 'sekretaris']}>
+                    <div className="ml-auto mb-3">
                         <button type="button" onClick={() => setShowModalTambah(true)} className="btn-input btn btn-sm btn-success">
                             <i className="fas fa-plus mr-2"></i>
                             Buat Pengumuman

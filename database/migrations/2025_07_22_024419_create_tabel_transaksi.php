@@ -24,6 +24,7 @@ return new class extends Migration
             $table->timestamps();
 
             $table->foreign('no_kk')->references('no_kk')->on('kartu_keluarga')->onDelete('cascade');
+            $table->softDeletes();
         });
     }
 

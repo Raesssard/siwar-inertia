@@ -34,6 +34,7 @@ return new class extends Migration
             $table->string('password');
             $table->rememberToken(); // supaya login via Auth jalan
             $table->timestamps();
+            $table->softDeletes();
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {

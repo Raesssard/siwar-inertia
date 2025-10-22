@@ -18,6 +18,7 @@ return new class extends Migration
             $table->date('akhir_jabatan');
             $table->enum('status', ['aktif', 'nonaktif'])->default('aktif');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

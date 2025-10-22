@@ -22,6 +22,7 @@ return new class extends Migration
             $table->enum('level', ['rt', 'rw']);
             $table->enum('konfirmasi_rw', ['belum', 'menunggu', 'sudah']);
             $table->timestamps();
+            $table->softDeletes();
 
             $table->foreign('nik_warga')->references('nik')->on('warga')->onDelete('no action');
         });

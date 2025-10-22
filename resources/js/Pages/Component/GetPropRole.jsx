@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Children } from "react";
 
 export function formatRupiah(angka, withDecimals = false) {
     if (angka == null || isNaN(angka)) return "Rp. 0";
@@ -24,7 +24,10 @@ export function getWargaCards({ ...rest }) {
             href: "/warga/kk",
             color: "info",
             title: "Lihat Kartu Keluarga",
-            value: null,
+            value: <p style={{
+                fontSize: '0.75rem',
+            }}>
+                <strong>No. KK: </strong>{rest.kk.no_kk}<br /><strong>Kepala Keluarga: </strong>{rest.kk.kepala_keluarga.nama}</p>,
             icon: "id-card",
         },
         {
@@ -439,6 +442,27 @@ export function getRtLinks() {
             icon: "id-card",
         },
         {
+            text: "Manajemen Keuangan",
+            icon: "wallet",
+            children: [
+                {
+                    href: "/rt/iuran",
+                    text: "Iuran",
+                    icon: "file-invoice-dollar",
+                },
+                {
+                    href: "/rt/tagihan",
+                    text: "Tagihan",
+                    icon: "hand-holding-usd",
+                },
+                {
+                    href: "/rt/transaksi",
+                    text: "Transaksi",
+                    icon: "money-bill-wave",
+                },
+            ],
+        },
+        {
             href: "/rt/pengumuman",
             text: "Pengumuman",
             icon: "comments",
@@ -447,21 +471,6 @@ export function getRtLinks() {
             href: "/rt/pengaduan",
             text: "Pengaduan",
             icon: "comment-dots",
-        },
-        {
-            href: "/rt/iuran",
-            text: "Iuran",
-            icon: "file-invoice-dollar",
-        },
-        {
-            href: "/rt/tagihan",
-            text: "Tagihan",
-            icon: "hand-holding-usd",
-        },
-        {
-            href: "/rt/transaksi",
-            text: "Transaksi",
-            icon: "money-bill-wave",
         },
     ];
 }

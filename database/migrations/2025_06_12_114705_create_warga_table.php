@@ -55,6 +55,7 @@ return new class extends Migration
             $table->string('tujuan_pindah')->nullable();
 
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

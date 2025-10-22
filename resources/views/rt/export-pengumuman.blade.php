@@ -63,17 +63,26 @@
             {{ \Carbon\Carbon::parse($pengumuman->tanggal)->translatedFormat('d F Y') }}
         </div>
         <div class="tanggal">Oleh:
-            {{
-                $pengumuman->id_rw && $pengumuman->id_rt
-                    ? 'RW ' . $pengumuman->rw->nomor_rw . '/RT ' . $pengumuman->rukunTetangga->nomor_rt
-                    : 'RW ' . $pengumuman->rw->nomor_rw
-            }}
+            {{ $pengumuman->id_rw && $pengumuman->id_rt
+                ? 'RW ' . $pengumuman->rw->nomor_rw . '/RT ' . $pengumuman->rukunTetangga->nomor_rt
+                : 'RW ' . $pengumuman->rw->nomor_rw }}
         </div>
     </div>
 
     <div class="isi">
         {!! nl2br(e($pengumuman->isi)) !!}
     </div>
+
+    @if (!empty($lampiranHtml))
+        <div class="lampiran">
+            <h4>Lampiran</h4>
+            @foreach ($lampiranHtml as $html)
+                <div class="lampiran-item" style="page-break-before: always;">
+                    {!! $html !!}
+                </div>
+            @endforeach
+        </div>
+    @endif
 </body>
 
 </html>

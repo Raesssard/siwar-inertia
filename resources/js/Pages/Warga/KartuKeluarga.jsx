@@ -19,11 +19,11 @@ export default function KartuKeluarga() {
             </Layout>
         )
     }
-
-    const kepala = kartuKeluarga.warga?.find(
-        (w) =>
-            w.status_hubungan_dalam_keluarga?.toLowerCase() === "kepala keluarga"
-    )
+    // ini gk usah, soalnya ada helper di model kartuKeluarganya
+    // const kepala = kartuKeluarga.warga?.find(
+    //     (w) =>
+    //         w.status_hubungan_dalam_keluarga?.toLowerCase() === "kepala keluarga"
+    // )
 
     return (
         <Layout>
@@ -60,7 +60,7 @@ export default function KartuKeluarga() {
 
                         <div className="kk-info-grid col g-3 mb-4 small">
                             <div className="col">
-                                <p className="mb-1 text-left"><strong>Kepala Keluarga</strong> : {kepala.nama ?? '-'}
+                                <p className="mb-1 text-left"><strong>Kepala Keluarga</strong> : {kartuKeluarga.kepala_keluarga.nama ?? '-'}
                                 </p>
                                 <p className="mb-1 text-left"><strong>Alamat</strong> : {kartuKeluarga.alamat ?? '-'}</p>
                                 <p className="mb-1 text-left"><strong>
@@ -177,7 +177,7 @@ export default function KartuKeluarga() {
                                     Kepala Keluarga
                                 </p>
                                 <p className="mb-0">
-                                    <strong>{kepala.nama ?? '_____________________'}</strong>
+                                    <strong>{kartuKeluarga.kepala_keluarga.nama ?? '_____________________'}</strong>
                                 </p>
                                 <p style={{
                                     fontSize: "0.8rem",
