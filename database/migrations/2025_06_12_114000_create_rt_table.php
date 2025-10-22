@@ -23,6 +23,7 @@ return new class extends Migration
             $table->unsignedBigInteger('id_rw'); // 🔹 wilayah RW administratif
             $table->foreign('id_rw')->references('id')->on('rw')->onDelete('cascade');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

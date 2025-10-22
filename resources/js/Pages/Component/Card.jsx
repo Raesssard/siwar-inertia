@@ -10,7 +10,7 @@ export function StatCard({ href, color, title, value, icon }) {
                     <div className="card-body dashboard">
                         <div className="row no-gutters align-items-center">
                             {/* Text */}
-                            <div className="col mr-2">
+                            <div className="col mr-2" style={{ zIndex: 20 }}>
                                 <div
                                     className={`text-xs font-weight-bold text-${color} text-uppercase ${value ? "mb-1" : ""} text-align-start`}
                                 >
@@ -21,8 +21,12 @@ export function StatCard({ href, color, title, value, icon }) {
                                 </div>
                             </div>
                             {/* Icon */}
-                            <div className="col-auto">
-                                <i className={`fas fa-${icon} fa-3x text-gray-400`} style={{ fontSize: '3rem' }}></i>
+                            <div className="col-auto" style={{
+                                position: "absolute",
+                                zIndex: 10,
+                                width: '100%',
+                            }}>
+                                <i className={`fas fa-${icon} fa-3x text-gray-400`} style={{ marginLeft: 'auto', marginRight: '1.25rem', fontSize: '3rem' }}></i>
                             </div>
                         </div>
                     </div>

@@ -18,6 +18,7 @@ return new class extends Migration
             $table->integer('nominal');
             $table->integer('periode');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

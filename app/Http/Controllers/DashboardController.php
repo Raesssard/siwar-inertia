@@ -18,6 +18,7 @@ use App\Models\Tagihan;
 use App\Models\Transaksi;
 use App\Models\Warga;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 
 class DashboardController extends Controller
 {
@@ -96,9 +97,12 @@ class DashboardController extends Controller
 
             $total_saldo_akhir = $pemasukan - $pengeluaran;
 
+            $kk = Kartu_keluarga::where('no_kk', $user->warga->no_kk)->with('kepalaKeluarga')->first();
+
             $data = array_merge(
                 $data,
                 [
+                    'kk' => $kk,
                     'jumlah_pengumuman' => $jumlah_pengumuman,
                     'total_tagihan' => $total_tagihan,
                     'jumlah_tagihan' => $jumlah_tagihan,
@@ -167,55 +171,55 @@ class DashboardController extends Controller
         }
 
         if ($role === 'rw') {
-                    $id_rw = Auth::user()->id_rw;
-                    $id_rt = Auth::user()->id_rt;
-                    $user = Auth::user();
+            $id_rw = Auth::user()->id_rw;
+            $id_rt = Auth::user()->id_rt;
+            $user = Auth::user();
 
-                    $pengaduan_rw = $user->rw->nomor_rw;
+            $pengaduan_rw = $user->rw->nomor_rw;
 
-                    $pengaduan_rw_saya = Pengaduan::WhereHas('warga.kartuKeluarga.rw', function ($aduan) use ($pengaduan_rw) {
-                        $aduan->where('konfirmasi_rw', '!=', 'belum')->where('nomor_rw', $pengaduan_rw);
-                    })->count();
+            $pengaduan_rw_saya = Pengaduan::WhereHas('warga.kartuKeluarga.rw', function ($aduan) use ($pengaduan_rw) {
+                $aduan->where('konfirmasi_rw', '!=', 'belum')->where('nomor_rw', $pengaduan_rw);
+            })->count();
 
-                    $jumlah_warga = Warga::count();
-                    $jumlah_kk = Kartu_keluarga::count();
+            $jumlah_warga = Warga::count();
+            $jumlah_kk = Kartu_keluarga::count();
 
-                    $pengumuman_rw = Pengumuman::where('id_rw', $id_rw)
-                        ->whereNull('id_rt')
-                        ->count();
+            $pengumuman_rw = Pengumuman::where('id_rw', $id_rw)
+                ->whereNull('id_rt')
+                ->count();
 
-                    $pengumuman_rt = Pengumuman::where('id_rw', $id_rw)
-                        ->where('id_rt', $id_rt)
-                        ->count();
+            $pengumuman_rt = Pengumuman::where('id_rw', $id_rw)
+                ->where('id_rt', $id_rt)
+                ->count();
 
-                    $jumlah_rt = Rt::count();
+            $jumlah_rt = Rt::count();
 
-                    // Total pemasukan dari iuran yang sudah dibayar
-                    $total_pemasukan_iuran = Tagihan::where('status_bayar', 'sudah_bayar')
-                        ->sum('nominal');
+            // Total pemasukan dari iuran yang sudah dibayar
+            $total_pemasukan_iuran = Tagihan::where('status_bayar', 'sudah_bayar')
+                ->sum('nominal');
 
-                    // Total pemasukan & pengeluaran dari tabel transaksi
-                    $total_pemasukan_transaksi = Transaksi::where('jenis', 'pemasukan')->sum('nominal');
-                    $total_pengeluaran = Transaksi::where('jenis', 'pengeluaran')->sum('nominal');
+            // Total pemasukan & pengeluaran dari tabel transaksi
+            $total_pemasukan_transaksi = Transaksi::where('jenis', 'pemasukan')->sum('nominal');
+            $total_pengeluaran = Transaksi::where('jenis', 'pengeluaran')->sum('nominal');
 
-                    // Total pemasukan keseluruhan
-                    $total_pemasukan = $total_pemasukan_iuran + $total_pemasukan_transaksi;
+            // Total pemasukan keseluruhan
+            $total_pemasukan = $total_pemasukan_iuran + $total_pemasukan_transaksi;
 
-                    // Saldo akhir
-                    $total_saldo_akhir = $total_pemasukan - $total_pengeluaran;
+            // Saldo akhir
+            $total_saldo_akhir = $total_pemasukan - $total_pengeluaran;
 
-                    // Total iuran masuk bulan ini
-                    $total_iuran_bulan_ini = Tagihan::where('status_bayar', 'sudah_bayar')
-                        ->whereMonth('updated_at', Carbon::now()->month)
-                        ->whereYear('updated_at', Carbon::now()->year)
-                        ->sum('nominal');
+            // Total iuran masuk bulan ini
+            $total_iuran_bulan_ini = Tagihan::where('status_bayar', 'sudah_bayar')
+                ->whereMonth('updated_at', Carbon::now()->month)
+                ->whereYear('updated_at', Carbon::now()->year)
+                ->sum('nominal');
 
-                    $title = 'Dashboard';
-                    $jumlah_warga_penduduk = Warga::where('status_warga', 'penduduk')->count();
-                    $jumlah_warga_pendatang = Warga::where('status_warga', 'pendatang')->count();
+            $title = 'Dashboard';
+            $jumlah_warga_penduduk = Warga::where('status_warga', 'penduduk')->count();
+            $jumlah_warga_pendatang = Warga::where('status_warga', 'pendatang')->count();
 
-                    $nik = Auth::user()->nik;
-                    $pengaduan = $pengaduan_rw_saya;
+            $nik = Auth::user()->nik;
+            $pengaduan = $pengaduan_rw_saya;
 
             $data = array_merge(
                 $data,

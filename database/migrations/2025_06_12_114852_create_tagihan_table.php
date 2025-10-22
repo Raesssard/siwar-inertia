@@ -29,6 +29,7 @@ return new class extends Migration
             $table->string('bukti_transfer')->nullable();
 
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

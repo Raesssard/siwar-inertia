@@ -1,12 +1,12 @@
 import React, { useEffect, useRef, useState } from "react"
 import { Link, useForm, usePage, router } from "@inertiajs/react"
 import logo from '../../../../public/img/logo.png'
-import axios from "axios"
 import { FormatWaktu } from "../Pengaduan"
 import { SidebarLink } from "./SidebarLink"
 import { formatTanggal, getAdminLinks, getRtLinks, getWargaLinks, getRwLinks, formatRupiah } from "./GetPropRole"
 import Role from "./Role"
 import Swal from "sweetalert2"
+import { route } from "ziggy-js"
 
 export function ModalSidebar({ modalIsOpen, modalShow }) {
     const { url } = usePage()
@@ -1152,7 +1152,7 @@ export function DetailPengaduan({ selectedData, detailShow, onClose, onUpdated, 
                                             ) : (role.includes('rt') || role.includes('rw')) ? (
                                                 <div className="d-flex justify-between">
                                                     <h5 className="fw-bold mb-1 mt-2">{selectedData.judul}</h5>
-                                                    <Role role={selectedData.level === 'rt' ? "rt" : "rw"}>
+                                                    <Role role={selectedData.level === 'rt' ? ["rt", "sekretaris"] : ["rw", "sekretaris"]}>
                                                         {(selectedData.konfirmasi_rw === 'sudah') && (
                                                             <input type="checkbox"
                                                                 name="selesai"
@@ -1454,7 +1454,7 @@ export function DetailPengaduan({ selectedData, detailShow, onClose, onUpdated, 
                                                             onChange={(e) => setData("isi_komentar", e.target.value)}
                                                             title="Masukkan Pesan"
                                                         />
-                                                        <Role role={['rt', 'rw']}>
+                                                        <Role role={['rt', 'rw', 'sekretaris']}>
                                                             <input
                                                                 ref={fileInputRef}
                                                                 type="file"
@@ -2259,11 +2259,6 @@ export function DetailKK({ selectedData, detailShow, onClose, role, userData }) 
         return () => document.removeEventListener("keydown", handleEsc)
     }, [onClose])
 
-    const kepala = selectedData.warga?.find(
-        (w) =>
-            w.status_hubungan_dalam_keluarga?.toLowerCase() === "kepala keluarga"
-    )
-
     const handleFileChange = (e) => {
         const file = e.target.files[0]
         if (!file) return
@@ -2324,7 +2319,6 @@ export function DetailKK({ selectedData, detailShow, onClose, role, userData }) 
                     className="modal-dialog modal-xl modal-dialog-scrollable modal-dialog-centered"
                     style={{
                         maxWidth: "80%",
-                        margin: "auto",
                     }}
                     onClick={(e) => e.stopPropagation()}
                 >
@@ -2357,22 +2351,10 @@ export function DetailKK({ selectedData, detailShow, onClose, role, userData }) 
 
                             <div className="kk-info-grid mb-2">
                                 <div className="kk-info-item">
-                                    <p><strong>Nama Kepala Keluarga</strong> : {kepala?.nama ?? '-'}</p>
+                                    <p><strong>Nama Kepala Keluarga</strong> : {selectedData.kepala_keluarga.nama ?? '-'}</p>
                                     <p><strong>Alamat</strong> : {selectedData.alamat ?? '-'}</p>
                                     <p><strong>RT/RW</strong> :{" "}
                                         {selectedData.rukun_tetangga.nomor_rt ?? '-'}/{selectedData.rw.nomor_rw ?? '-'}
-                                    </p>
-                                    <p>
-                                        <strong>Nama Kepala Keluarga</strong> :{" "}
-                                        {kepala?.nama ?? "-"}
-                                    </p>
-                                    <p>
-                                        <strong>Alamat</strong> : {selectedData.alamat ?? "-"}
-                                    </p>
-                                    <p>
-                                        <strong>RT/RW</strong> :{" "}
-                                        {selectedData.rukun_tetangga.nomor_rt ?? "-"}/
-                                        {selectedData.rw.nomor_rw ?? "-"}
                                     </p>
                                     <p>
                                         <strong>Desa/Kelurahan</strong> :{" "}
@@ -2529,13 +2511,14 @@ export function DetailKK({ selectedData, detailShow, onClose, role, userData }) 
                                                         <td className="text-center">{data.nama_ibu ?? '-'}</td>
                                                         <td className="text-center">{data.status_warga.charAt(0).toUpperCase() + data.status_warga.slice(1) ?? '-'}</td>
                                                         <td className="text-center space-x-1">
-                                                        {/* Detail */}
-                                                        <button
-                                                            onClick={() => modalDetail(data)}
-                                                            className="inline-flex items-center justify-center rounded-md bg-green-500 hover:bg-green-600 text-white px-2 py-1 text-xs transition-all"
-                                                        >
-                                                            <i className="fas fa-info"></i>
-                                                        </button>
+                                                            {/* Detail */}
+                                                            <button
+                                                                onClick={() => modalDetail(data)}
+                                                                className="inline-flex items-center justify-center rounded-md bg-green-500 hover:bg-green-600 text-white px-2 py-2 text-xs transition-all"
+                                                                style={{ borderRadius: '0.25rem' }}
+                                                            >
+                                                                <i className="fas fa-info"></i>
+                                                            </button>
 
                                                         {/* Role khusus RW dan Admin */}
                                                         {(role === "rw" || role === "admin") && (
@@ -2562,7 +2545,8 @@ export function DetailKK({ selectedData, detailShow, onClose, role, userData }) 
                                                                             });
                                                                         }
                                                                     }}
-                                                                    className="inline-flex items-center justify-center rounded-md bg-red-500 hover:bg-red-600 text-white px-2 py-1 text-xs transition-all"
+                                                                    className="inline-flex items-center justify-center rounded-md bg-red-500 hover:bg-red-600 text-white px-2 py-2 text-xs transition-all"
+                                                                    style={{ borderRadius: '0.25rem' }}
                                                                 >
                                                                     <i className="bi bi-trash"></i>
                                                                 </button>
@@ -2999,7 +2983,7 @@ export function DetailPengumuman({ selectedData, detailShow, onClose, onUpdated,
                                             {(userData?.rukun_tetangga?.id === selectedData.id_rt || userData?.rw?.id === selectedData.id_rw) ? (
                                                 <div className="d-flex">
                                                     <h5 className="fw-bold mb-1 mt-2 mr-auto">{selectedData.judul}</h5>
-                                                    <Role role={["rt", "rw"]}>
+                                                    <Role role={["rt", "rw", 'sekretaris']}>
                                                         <button
                                                             className="btn komen btn-primary my-auto px-1"
                                                             title="Export Pengumuman ke PDF"
@@ -3009,7 +2993,7 @@ export function DetailPengumuman({ selectedData, detailShow, onClose, onUpdated,
                                                             <i className="far fa-file-pdf mr-2"></i>
                                                         </button>
                                                     </Role>
-                                                    <Role role={selectedData.rukun_tetangga ? "rt" : "rw"}>
+                                                    <Role role={selectedData.rukun_tetangga ? ["rt", "sekretaris"] : ["rw", "sekretaris"]}>
                                                         <button onClick={toggleEdit} title="Edit Pengumuman">
                                                             <i className="far fa-edit"></i>
                                                         </button>
@@ -3302,7 +3286,7 @@ export function DetailPengumuman({ selectedData, detailShow, onClose, onUpdated,
                                                     value={data.isi_komentar}
                                                     onChange={(e) => setData("isi_komentar", e.target.value)}
                                                 />
-                                                <Role role={['rt', 'rw']}>
+                                                <Role role={['rt', 'rw', 'sekretaris']}>
                                                     <input
                                                         ref={fileInputRef}
                                                         type="file"
@@ -3541,7 +3525,11 @@ export function EditPengumuman({ toggle, onUpdated, onDeleted, pengumuman, role 
                                 name="file"
                                 className="d-none"
                                 onChange={handleFileChange}
+                                accept=".doc,.docx,.xls,.xlsx,.pdf"
                             />
+                            <small className="text-muted d-block mt-2">
+                                Dokumen (Opsional, Max 2MB: .doc, .docx, .pdf)
+                            </small>
                             <button
                                 type="button"
                                 className="edit-file btn btn-outline-primary m-0"
@@ -3553,14 +3541,14 @@ export function EditPengumuman({ toggle, onUpdated, onDeleted, pengumuman, role 
                                     Upload File
                                 </small>
                             </button>
-                            {pengumuman?.dokumen_name && !data.file && (
+                            {pengumuman?.dokumen_name && !data.dokumen && (
                                 <small className="text-muted d-block mt-2">
                                     File lama: {pengumuman.dokumen_name}
                                 </small>
                             )}
-                            {data.file && (
+                            {data.dokumen && (
                                 <small className="text-success d-block mt-2">
-                                    File dipilih: {data.file.name}
+                                    File dipilih: {data.dokumen.name}
                                 </small>
                             )}
                         </div>
@@ -3783,7 +3771,11 @@ export function TambahPengumuman({ tambahShow, onClose, onAdded, role }) {
                                                     name="dokumen"
                                                     className="d-none"
                                                     onChange={handleFileChange}
+                                                    accept=".doc,.docx,.xls,.xlsx,.pdf"
                                                 />
+                                                <small className="text-muted d-block mt-2">
+                                                    Dokumen (Opsional, Max 2MB: .doc, .docx, .pdf)
+                                                </small>
                                                 <button
                                                     type="button"
                                                     className="edit-file btn btn-outline-primary m-0"
@@ -3795,7 +3787,7 @@ export function TambahPengumuman({ tambahShow, onClose, onAdded, role }) {
                                                         Upload File
                                                     </small>
                                                 </button>
-                                                {data.file && (
+                                                {data.dokumen && (
                                                     <small className="text-success d-block mt-2">
                                                         File dipilih: {data.dokumen.name}
                                                     </small>
@@ -3820,7 +3812,7 @@ export function TambahPengumuman({ tambahShow, onClose, onAdded, role }) {
     )
 }
 
-export function DetailWarga({ selectData, detailShow, onClose, userData }) {
+export function DetailWarga({ selectData, detailShow, onClose }) {
     if (!detailShow || !selectData) return null
 
     useEffect(() => {
@@ -3847,12 +3839,16 @@ export function DetailWarga({ selectData, detailShow, onClose, userData }) {
                     onClick={(e) => e.stopPropagation()}
                 >
                     <div className="modal-content shadow border-0">
+                        <div className="modal-header bg-success text-white">
+                            <h5 className="modal-title text-white">Detail Warga</h5>
+                        </div>
+
                         <div className="modal-body kk d-block p-4">
-                            <div className="kk-header w-100">
+                            {/* <div className="kk-header w-100">
                                 <div className="kk-header-main-title">
                                     <h4>Detail Warga</h4>
                                 </div>
-                            </div>
+                            </div> */}
 
                             <div className="kk-info-grid mb-2">
                                 <div className="kk-info-item">
@@ -4100,35 +4096,41 @@ export function TambahIuran({ tambahShow, onClose, onAdded, role, golongan, rt =
                                                             <label>
                                                                 {g.jenis === "umkm"
                                                                     ? g.jenis.toUpperCase()
-                                                                    : g.jenis.charAt(0).toUpperCase() + g.jenis.slice(1)}
-                                                            </label>
-                                                            <input
-                                                                type="number"
-                                                                className="form-control"
-                                                                onInput={(e) => {
-                                                                    if (e.target.value.length > 8) {
-                                                                        e.target.value = e.target.value.slice(0, 8);
-                                                                    }
-                                                                }}
-                                                                onChange={(e) => handleNominalChange(g.id, e.target.value)}
-                                                                required
-                                                            />
+                                                                    : g.jenis.charAt(0).toUpperCase() + g.jenis.slice(1)}</label>
+                                                                <input
+                                                                    type="number"
+                                                                    className="tambah-judul form-control"
+                                                                    onInput={(e) => {
+                                                                        if (e.target.value.length > 8 || e.target.value.length < 0) {
+                                                                            e.target.value = e.target.value.slice(0, 8);
+                                                                        }
+                                                                    }}
+                                                                    onChange={(e) => handleNominalChange(g.id, e.target.value)}
+                                                                    required
+                                                                />
+                                                            </div>
+                                                            {/* <div className="w-100">
+                                                                <label>Periode</label>
+                                                                <select
+                                                                    name="periode"
+                                                                    className="tambah-judul form-control"
+                                                                    onChange={(e) => handlePeriodeChange(g.id, e.target.value)}
+                                                                    required
+                                                                    style={{
+                                                                        border: '0',
+                                                                        borderBottom: '1px solid lightgray',
+                                                                        borderRadius: '0',
+                                                                        width: '100%',
+                                                                    }}
+                                                                >
+                                                                    {items}
+                                                                </select>
+                                                            </div> */}
                                                         </div>
-                                                        <div className="w-100">
-                                                            <label>Periode</label>
-                                                            <select
-                                                                className="form-control"
-                                                                onChange={(e) => handlePeriodeChange(g.id, e.target.value)}
-                                                                required
-                                                            >
-                                                                {items}
-                                                            </select>
-                                                        </div>
-                                                    </div>
-                                                );
-                                            })}
-                                        </div>
-                                    )}
+                                                    )
+                                                })}
+                                            </div>
+                                        )}
 
                                     <button type="submit" className="btn btn-primary mt-2">
                                         <i className="fas fa-save mr-2"></i> Simpan
@@ -4730,8 +4732,10 @@ export function TambahTransaksi({ tambahShow, onClose, onAdded, role }) {
 
         axios.post(`/${role}/transaksi`, formData)
             .then(res => {
-                if (onAdded) {
-                    onAdded(res.data.transaksi)
+                console.log('RESPON:', res.data)
+
+                if (onAdded && res.data.transaksi) {
+                    onAdded(res.data.transaksi, res.data.jenis)
                 }
                 setData({
                     tanggal: "",
@@ -4859,8 +4863,10 @@ export function TambahTransaksiPerKk({ listKK, tambahShow, onClose, onAdded, rol
 
         axios.post(`/${role}/transaksi`, formData)
             .then(res => {
-                if (onAdded) {
-                    onAdded(res.data.transaksi)
+                console.log('RESPON:', res.data)
+
+                if (onAdded && res.data.transaksi) {
+                    onAdded(res.data.transaksi, res.data.jenis)
                 }
                 setData({
                     tanggal: "",
@@ -5035,7 +5041,7 @@ export function PilihTransaksi({ show, togglePilih, onClose }) {
                                             height: '2.5rem'
                                         }}
                                     >
-                                        <i className="fas fa-save mr-2"></i>
+                                        <i className="far fa-user mr-2"></i>
                                         Transaksi Warga
                                     </button>
                                     <button type="button"
@@ -5051,7 +5057,7 @@ export function PilihTransaksi({ show, togglePilih, onClose }) {
                                             height: '2.5rem'
                                         }}
                                     >
-                                        <i className="fas fa-save mr-2"></i>
+                                        <i className="far fa-envelope mr-2"></i>
                                         Transaksi Umum
                                     </button>
                                 </div>
@@ -5095,7 +5101,7 @@ export function EditTransaksi({ editShow, onClose, onUpdated, role, selectedData
 
         axios.post(`/${role}/transaksi/${selectedData.id}`, formData)
             .then((res) => {
-                if (onUpdated) onUpdated(res.data.transaksi)
+                if (onUpdated) onUpdated(res.data.transaksi, res.data.jenis)
                 setData({
                     tanggal: "",
                     nama_transaksi: "",

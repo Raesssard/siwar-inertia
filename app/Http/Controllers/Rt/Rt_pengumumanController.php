@@ -9,6 +9,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Dompdf\Dompdf;
 use Dompdf\Options;
+use PhpOffice\PhpWord\IOFactory as WordIO;
+use PhpOffice\PhpSpreadsheet\IOFactory as ExcelIO;
+use Intervention\Image\Facades\Image;
+use setasign\Fpdi\Fpdi;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\View;
@@ -145,7 +149,7 @@ class Rt_pengumumanController extends Controller
             'judul' => 'required',
             'isi' => 'required',
             'kategori' => 'required',
-            'dokumen' => 'nullable|file|mimes:jpg,jpeg,png,gif,mp4,mov,avi,mkv,doc,docx,pdf|max:20480',
+            'dokumen' => 'nullable|file|mimes:doc,docx,xls,xlsx,pdf|max:20480',
         ]);
 
         $dokumenPath = null;
@@ -212,7 +216,7 @@ class Rt_pengumumanController extends Controller
             'judul' => 'required|string|max:255',
             'kategori' => 'required|string|max:255',
             'isi' => 'required|string',
-            'dokumen' => 'nullable|file|mimes:jpg,jpeg,png,gif,mp4,mov,avi,mkv,doc,docx,pdf|max:20480',
+            'dokumen' => 'nullable|file|mimes:doc,docx,xls,xlsx,pdf|max:20480',
             'hapus_dokumen_lama' => 'nullable|boolean',
         ]);
 
@@ -303,9 +307,56 @@ class Rt_pengumumanController extends Controller
     {
         $pengumuman = Pengumuman::findOrFail($id);
 
+        $lampiranHtml = [];
 
-        $html = View::make('rt.export-pengumuman', compact('pengumuman'))->render();
+        $pathData = $pengumuman->dokumen_path;
 
+        if (is_string($pathData)) {
+            $decoded = json_decode($pathData, true);
+            $lampiranFiles = $decoded ?: [$pathData];
+        } elseif (is_array($pathData)) {
+            $lampiranFiles = $pathData;
+        } else {
+            $lampiranFiles = [];
+        }
+
+        foreach ($lampiranFiles as $file) {
+            $path = storage_path("app/public/{$file}");
+            $ext = strtolower(pathinfo($path, PATHINFO_EXTENSION));
+
+            switch ($ext) {
+                case 'doc':
+                case 'docx':
+                    $phpWord = WordIO::load($path);
+                    $writer = WordIO::createWriter($phpWord, 'HTML');
+                    ob_start();
+                    $writer->save('php://output');
+                    $lampiranHtml[] = ob_get_clean();
+                    break;
+
+                case 'xls':
+                case 'xlsx':
+                    $spreadsheet = ExcelIO::load($path);
+                    $writer = new \PhpOffice\PhpSpreadsheet\Writer\Html($spreadsheet);
+                    ob_start();
+                    $writer->save('php://output');
+                    $lampiranHtml[] = ob_get_clean();
+                    break;
+
+                case 'pdf':
+                    $lampiranHtml[] = "<p><b>Lampiran PDF:</b> <a href='" . asset("storage/{$file}") . "'>{$file}</a></p>";
+                    break;
+
+                default:
+                    $lampiranHtml[] = "<p>Tipe file tidak dikenali: {$file}</p>";
+                    break;
+            }
+        }
+
+        $html = View::make('rt.export-pengumuman', [
+            'pengumuman' => $pengumuman,
+            'lampiranHtml' => $lampiranHtml
+        ])->render();
 
         $options = new Options();
         $options->set('isHtml5ParserEnabled', true);

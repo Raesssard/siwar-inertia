@@ -1,7 +1,6 @@
 import React from "react"
 import { Link } from "@inertiajs/react"
 import Role from "./Role"
-import axios from "axios"
 
 export function FilterPengaduan({ data, setData, list_tahun, list_bulan, list_level, filter, resetFilter, tambahShow, role }) {
     return (
@@ -64,7 +63,7 @@ export function FilterPengaduan({ data, setData, list_tahun, list_bulan, list_le
                     ))}
                 </select>
 
-                <button type="submit" className="btn-input btn btn-sm btn-primary flex-fill" title="Filter">
+                <button type="submit" className="btn-input btn btn-sm btn-primary flex-fill" title="Filter" style={{ maxWidth: '3rem' }}>
                     <i className="fas fa-filter"></i>
                 </button>
                 <Link
@@ -73,6 +72,7 @@ export function FilterPengaduan({ data, setData, list_tahun, list_bulan, list_le
                     className="btn-input btn btn-secondary btn-sm flex-fill my-auto"
                     title="Reset"
                     onClick={resetFilter}
+                    style={{ maxWidth: '3rem' }}
                 >
                     <i className="fas fa-undo"></i>
                 </Link>
@@ -87,7 +87,7 @@ export function FilterPengaduan({ data, setData, list_tahun, list_bulan, list_le
     )
 }
 
-export function FilterPengumuman({ data, setData, daftar_tahun, list_bulan, daftar_kategori, filter, resetFilter, tambahShow, role }) {
+export function FilterPengumuman({ data, setData, daftar_tahun, list_bulan, daftar_kategori, filter, resetFilter, role }) {
     return (
         <form onSubmit={filter} className="form-filter row g-2 pl-3 pb-2 w-100">
             <div className="col-md-5 col-12 pr-1 mb-auto">
@@ -160,10 +160,10 @@ export function FilterPengumuman({ data, setData, daftar_tahun, list_bulan, daft
                     <option value="rw">Pengumuman RW</option>
                 </select>
 
-                <button type="submit" className="btn-input btn btn-sm btn-primary flex-fill p-0" title="Filter Pengumuman">
+                <button type="submit" className="btn-input btn btn-sm btn-primary flex-fill p-0" title="Filter Pengumuman" style={{ width: '3rem' }}>
                     <i className="fas fa-filter"></i>
                 </button>
-                <Link href={`/${role}/pengumuman`} onClick={resetFilter} className="btn-input btn btn-secondary btn-sm flex-fill p-0" title="Reset">
+                <Link href={`/${role}/pengumuman`} onClick={resetFilter} className="btn-input btn btn-secondary btn-sm flex-fill p-0" title="Reset" style={{ width: '3rem' }}>
                     <i className="fas fa-undo"></i>
                 </Link>
             </div>

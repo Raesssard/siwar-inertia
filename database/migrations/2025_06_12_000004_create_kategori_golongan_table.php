@@ -12,6 +12,7 @@ return new class extends Migration
             $table->id();
             $table->string('jenis')->unique(); // ubah dari enum ke string agar bisa bebas
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
