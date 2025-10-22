@@ -2390,22 +2390,19 @@ export function DetailKK({ selectedData, detailShow, onClose, role, userData }) 
                                 DAFTAR ANGGOTA KELUARGA
                             </h6>
                             <div className="table-responsive">
-                                <Role role="rw">
+                                {(role === "rw" || role === "admin") && (
                                     <div className="d-flex justify-content-end mb-3">
                                         <button
                                             className="btn btn-primary btn-sm"
-                                            onClick={() =>
-                                                router.visit(
-                                                    route("rw.warga.create", {
-                                                        no_kk: selectedData.no_kk,
-                                                    })
-                                                )
-                                            }
+                                            onClick={() => {
+                                                const routeName = role === "admin" ? "admin.warga.create" : "rw.warga.create";
+                                                router.visit(route(routeName, { no_kk: selectedData.no_kk }));
+                                            }}
                                         >
                                             <i className="bi bi-person-plus"></i> Tambah Warga
                                         </button>
                                     </div>
-                                </Role>
+                                )}
                                 <table className="table table-bordered table-striped table-sm align-middle">
                                     <thead className="table-success text-center small">
                                         <tr>
@@ -2437,7 +2434,7 @@ export function DetailKK({ selectedData, detailShow, onClose, role, userData }) 
                                     </thead>
                                     <tbody className="small">
                                         {selectedData?.warga &&
-                                            selectedData.warga.length > 0 ? (
+                                        selectedData.warga.length > 0 ? (
                                             selectedData.warga
                                                 .sort((a, b) => {
                                                     const getRank = (hubungan) => {
@@ -2466,7 +2463,7 @@ export function DetailKK({ selectedData, detailShow, onClose, role, userData }) 
                                                         <td className="text-center">
                                                             {data.jenis_kelamin
                                                                 ? data.jenis_kelamin.charAt(0).toUpperCase() +
-                                                                data.jenis_kelamin.slice(1)
+                                                                  data.jenis_kelamin.slice(1)
                                                                 : "-"}
                                                         </td>
                                                         <td>{data.tempat_lahir ?? "-"}</td>
@@ -2488,26 +2485,27 @@ export function DetailKK({ selectedData, detailShow, onClose, role, userData }) 
                                                         <td className="text-center">
                                                             {data.status_perkawinan
                                                                 ? data.status_perkawinan.charAt(0).toUpperCase() +
-                                                                data.status_perkawinan.slice(1)
+                                                                  data.status_perkawinan.slice(1)
                                                                 : "-"}
                                                         </td>
                                                         <td className="text-center">
                                                             {data.status_hubungan_dalam_keluarga
                                                                 ? data.status_hubungan_dalam_keluarga
-                                                                    .charAt(0)
-                                                                    .toUpperCase() +
-                                                                data.status_hubungan_dalam_keluarga.slice(1)
+                                                                      .charAt(0)
+                                                                      .toUpperCase() +
+                                                                  data.status_hubungan_dalam_keluarga.slice(1)
                                                                 : "-"}
-                                                        </td>
+                                                        </td>                                                        
                                                         <td className="text-center">
                                                             {data.kewarganegaraan ?? "WNI"}
-                                                        </td>
+                                                        </td>                                                        
                                                         <td className="text-center">
                                                             {data.no_paspor ?? "-"}
                                                         </td>
                                                         <td className="text-center">
-                                                            {`${data.no_kitas ?? "-"} / ${data.no_kitap ?? "-"
-                                                                }`}
+                                                            {`${data.no_kitas ?? "-"} / ${
+                                                                data.no_kitap ?? "-"
+                                                            }`}
                                                         </td>
                                                         <td className="text-center">{data.nama_ayah ?? '-'}</td>
                                                         <td className="text-center">{data.nama_ibu ?? '-'}</td>
@@ -2522,13 +2520,16 @@ export function DetailKK({ selectedData, detailShow, onClose, role, userData }) 
                                                                 <i className="fas fa-info"></i>
                                                             </button>
 
-                                                            {/* Role khusus RW */}
-                                                            <Role role="rw">
+                                                        {/* Role khusus RW dan Admin */}
+                                                        {(role === "rw" || role === "admin") && (
+                                                            <>
                                                                 {/* Edit */}
                                                                 <button
-                                                                    onClick={() => router.visit(route("rw.warga.edit", data.id))}
-                                                                    className="inline-flex items-center justify-center rounded-md bg-yellow-500 hover:bg-yellow-600 text-white px-2 py-2 text-xs transition-all"
-                                                                    style={{ borderRadius: '0.25rem' }}
+                                                                    onClick={() => {
+                                                                        const routeName = role === "admin" ? "admin.warga.edit" : "rw.warga.edit";
+                                                                        router.visit(route(routeName, data.id));
+                                                                    }}
+                                                                    className="inline-flex items-center justify-center rounded-md bg-yellow-500 hover:bg-yellow-600 text-white px-2 py-1 text-xs transition-all"
                                                                 >
                                                                     <i className="bi bi-pencil-square"></i>
                                                                 </button>
@@ -2537,7 +2538,8 @@ export function DetailKK({ selectedData, detailShow, onClose, role, userData }) 
                                                                 <button
                                                                     onClick={() => {
                                                                         if (confirm(`Hapus warga ${data.nama}?`)) {
-                                                                            router.delete(route("rw.warga.destroy", data.id), {
+                                                                            const routeName = role === "admin" ? "admin.warga.destroy" : "rw.warga.destroy";
+                                                                            router.delete(route(routeName, data.id), {
                                                                                 onSuccess: () => alert("Warga berhasil dihapus"),
                                                                                 onError: () => alert("Gagal menghapus warga"),
                                                                             });
@@ -2548,7 +2550,8 @@ export function DetailKK({ selectedData, detailShow, onClose, role, userData }) 
                                                                 >
                                                                     <i className="bi bi-trash"></i>
                                                                 </button>
-                                                            </Role>
+                                                            </>
+                                                        )}
                                                         </td>
                                                     </tr>
                                                 ))
@@ -3904,166 +3907,194 @@ export function DetailWarga({ selectData, detailShow, onClose }) {
     )
 }
 
-export function TambahIuran({ tambahShow, onClose, onAdded, role, golongan }) {
+export function TambahIuran({ tambahShow, onClose, onAdded, role, golongan, rt = [] }) {
     const [data, setData] = useState({
+        id_rt: "",
         nama: "",
         tgl_tagih: "",
         tgl_tempo: "",
         jenis: "manual",
         nominal: "",
         periode: "",
-    })
-    const [golonganList, setGolonganList] = useState([])
+    });
+
+    const [golonganList, setGolonganList] = useState([]);
 
     useEffect(() => {
-        setGolonganList(golongan)
-        const defaults = {}
+        setGolonganList(golongan);
+        const defaults = {};
         golongan.forEach(g => {
-            defaults[`periode_${g.id}`] = "1"
-        })
-        setData(prev => ({ ...prev, ...defaults }))
-    }, [golongan])
+            defaults[`periode_${g.id}`] = "1";
+        });
+        setData(prev => ({ ...prev, ...defaults }));
+    }, [golongan]);
 
     const handleChange = (e) => {
-        setData({ ...data, [e.target.name]: e.target.value })
-    }
+        setData({ ...data, [e.target.name]: e.target.value });
+    };
 
     const handleNominalChange = (id, value) => {
-        setData({ ...data, [`nominal_${id}`]: value })
-    }
+        setData({ ...data, [`nominal_${id}`]: value });
+    };
 
     const handlePeriodeChange = (id, value) => {
-        setData({ ...data, [`periode_${id}`]: value })
-    }
+        setData({ ...data, [`periode_${id}`]: value });
+    };
 
     const handleSubmit = (e) => {
-        e.preventDefault()
+        e.preventDefault();
         axios.post(`/${role}/iuran`, data)
             .then(res => {
-                if (onAdded) {
-                    onAdded(res.data.iuran)
-                }
+                if (onAdded) onAdded(res.data.iuran);
                 setData({
+                    id_rt: "",
                     nama: "",
                     tgl_tagih: "",
                     tgl_tempo: "",
                     jenis: "manual",
                     nominal: "",
                     periode: "",
-                })
-                onClose()
+                });
+                onClose();
             })
-    }
+            .catch(err => {
+                console.error(err);
+                alert("Gagal menyimpan iuran!");
+            });
+    };
 
     useEffect(() => {
         const handleEsc = (e) => {
-            if (e.key === "Escape") onClose()
-        }
+            if (e.key === "Escape") onClose();
+        };
+        document.addEventListener("keydown", handleEsc);
+        return () => document.removeEventListener("keydown", handleEsc);
+    }, [onClose]);
 
-        document.addEventListener("keydown", handleEsc)
-        return () => document.removeEventListener("keydown", handleEsc)
-    }, [onClose])
-
-    if (!tambahShow) return null
+    if (!tambahShow) return null;
 
     return (
-        <>
+        <div
+            className="modal fade show"
+            tabIndex="-1"
+            style={{
+                display: "block",
+                backgroundColor: "rgba(0,0,0,0.5)"
+            }}
+            onClick={onClose}
+        >
             <div
-                className="modal fade show"
-                tabIndex="-1"
-                style={{
-                    display: "block",
-                    backgroundColor: "rgba(0,0,0,0.5)"
-                }}
-                onClick={() => {
-                    onClose()
-                }}
+                className="modal-dialog modal-dialog-scrollable modal-dialog-centered"
+                onClick={(e) => e.stopPropagation()}
             >
-                <div
-                    className="modal-dialog modal-dialog-scrollable modal-dialog-centered"
-                    onClick={(e) => e.stopPropagation()}
-                >
-                    <div className="modal-content shadow-lg border-0">
-                        <div className="modal-body p-0 m-0">
-                            <div className="d-flex tambah-body flex-column" style={{ width: "100%", maxHeight: "80vh", overflowY: "auto" }}>
-                                <div className="p-3">
-                                    <form onSubmit={handleSubmit} className="h-100">
+                <div className="modal-content shadow-lg border-0">
+                    <div className="modal-body p-0 m-0">
+                        <div className="d-flex tambah-body flex-column" style={{ width: "100%", maxHeight: "80vh", overflowY: "auto" }}>
+                            <div className="p-3">
+                                <form onSubmit={handleSubmit} className="h-100">
+                                    {/* Hanya tampil jika role = RW */}
+                                    <Role role="rw">
                                         <div className="mb-3">
-                                            <label className="form-label">Nama Iuran</label>
-                                            <input
-                                                name="nama"
-                                                type="text"
-                                                className="tambah-judul form-control"
-                                                onChange={handleChange}
-                                                required
-                                            />
-                                        </div>
-
-                                        <div className="mb-3">
-                                            <label className="form-label">Tanggal Tagih</label>
-                                            <input
-                                                name="tgl_tagih"
-                                                type="date"
-                                                className="tambah-kategori form-control"
-                                                onChange={handleChange}
-                                                required
-                                            />
-                                        </div>
-
-                                        <div className="mb-3">
-                                            <label className="form-label">Tanggal Tempo</label>
-                                            <input
-                                                name="tgl_tempo"
-                                                type="date"
-                                                className="tambah-kategori form-control"
-                                                onChange={handleChange}
-                                                required
-                                            />
-                                        </div>
-
-                                        <div className="mb-3">
-                                            <label className="form-label">Jenis Iuran: </label>
+                                            <label className="form-label">Pilih RT</label>
                                             <select
-                                                name="jenis"
-                                                className="edit-tujuan form-select"
-                                                value={data.jenis}
+                                                name="id_rt"
+                                                className="form-select"
+                                                value={data.id_rt}
                                                 onChange={handleChange}
+                                                required
                                             >
-                                                <option value="manual">Manual</option>
-                                                <option value="otomatis">Otomatis</option>
+                                                <option value="">-- Pilih RT --</option>
+                                                {rt.length > 0 ? (
+                                                    rt.map((item) => (
+                                                        <option key={item.id} value={item.id}>
+                                                            RT {item.nomor_rt}
+                                                        </option>
+                                                    ))
+                                                ) : (
+                                                    <option value="">Tidak ada RT</option>
+                                                )}
                                             </select>
                                         </div>
+                                    </Role>
 
-                                        {data.jenis === "manual" && (
-                                            <div className="mb-3">
-                                                <label className="form-label">Nominal Iuran</label>
-                                                <input
-                                                    type="number"
-                                                    name="nominal"
-                                                    className="tambah-judul form-control"
-                                                    onChange={handleChange}
-                                                    onInput={(e) => {
-                                                        if (e.target.value.length > 8 || e.target.value.length < 0) {
-                                                            e.target.value = e.target.value.slice(0, 8);
-                                                        }
-                                                    }}
-                                                />
-                                            </div>
-                                        )}
+                                    <div className="mb-3">
+                                        <label className="form-label">Nama Iuran</label>
+                                        <input
+                                            name="nama"
+                                            type="text"
+                                            className="tambah-judul form-control"
+                                            onChange={handleChange}
+                                            required
+                                        />
+                                    </div>
 
-                                        {data.jenis === "otomatis" && (
-                                            <div className="mb-3">
-                                                <h4 className="mb-3">Nominal per Golongan:</h4>
-                                                {golonganList.map((g) => {
-                                                    let items = []
-                                                    for (let i = 1; i <= 12; i++) {
-                                                        items.push(<option value={i} key={i}>{i} Bulan</option>)
+                                    <div className="mb-3">
+                                        <label className="form-label">Tanggal Tagih</label>
+                                        <input
+                                            name="tgl_tagih"
+                                            type="date"
+                                            className="form-control"
+                                            onChange={handleChange}
+                                            required
+                                        />
+                                    </div>
+
+                                    <div className="mb-3">
+                                        <label className="form-label">Tanggal Tempo</label>
+                                        <input
+                                            name="tgl_tempo"
+                                            type="date"
+                                            className="form-control"
+                                            onChange={handleChange}
+                                            required
+                                        />
+                                    </div>
+
+                                    <div className="mb-3">
+                                        <label className="form-label">Jenis Iuran</label>
+                                        <select
+                                            name="jenis"
+                                            className="form-select"
+                                            value={data.jenis}
+                                            onChange={handleChange}
+                                        >
+                                            <option value="manual">Manual</option>
+                                            <option value="otomatis">Otomatis</option>
+                                        </select>
+                                    </div>
+
+                                    {data.jenis === "manual" && (
+                                        <div className="mb-3">
+                                            <label className="form-label">Nominal Iuran</label>
+                                            <input
+                                                type="number"
+                                                name="nominal"
+                                                className="form-control"
+                                                onChange={handleChange}
+                                                onInput={(e) => {
+                                                    if (e.target.value.length > 8) {
+                                                        e.target.value = e.target.value.slice(0, 8);
                                                     }
+                                                }}
+                                                required
+                                            />
+                                        </div>
+                                    )}
 
-                                                    return (
-                                                        <div key={g.id} className="mb-3 d-flex col gap-3">
-                                                            <div className="w-100">
-                                                                <label>{g.jenis === 'umkm'
+                                    {data.jenis === "otomatis" && (
+                                        <div className="mb-3">
+                                            <h5 className="mb-3">Nominal per Golongan:</h5>
+                                            {golonganList.map((g) => {
+                                                const items = [];
+                                                for (let i = 1; i <= 12; i++) {
+                                                    items.push(<option value={i} key={i}>{i} Bulan</option>);
+                                                }
+
+                                                return (
+                                                    <div key={g.id} className="mb-3 d-flex col gap-3">
+                                                        <div className="w-100">
+                                                            <label>
+                                                                {g.jenis === "umkm"
                                                                     ? g.jenis.toUpperCase()
                                                                     : g.jenis.charAt(0).toUpperCase() + g.jenis.slice(1)}</label>
                                                                 <input
@@ -4101,19 +4132,17 @@ export function TambahIuran({ tambahShow, onClose, onAdded, role, golongan }) {
                                             </div>
                                         )}
 
-                                        <button type="submit" className="btn btn-primary ml-auto mt-auto">
-                                            <i className="fas fa-save mr-2"></i>
-                                            Simpan
-                                        </button>
-                                    </form>
-                                </div>
+                                    <button type="submit" className="btn btn-primary mt-2">
+                                        <i className="fas fa-save mr-2"></i> Simpan
+                                    </button>
+                                </form>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </>
-    )
+        </div>
+    );
 }
 
 export function EditIuranOtomatis({ editShow, onClose, onUpdated, role, golongan, iuran, iuranGol }) {

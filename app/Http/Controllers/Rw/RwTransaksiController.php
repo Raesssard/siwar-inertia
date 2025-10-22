@@ -3,152 +3,125 @@
 namespace App\Http\Controllers\Rw;
 
 use App\Http\Controllers\Controller;
-use App\Models\Rt;
 use App\Models\Transaksi;
+use App\Models\Rt;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Validator;
-use App\Exports\TransaksiExport;
-use Maatwebsite\Excel\Facades\Excel;
+use Inertia\Inertia;
 
 class RwTransaksiController extends Controller
 {
-    /**
-     * Menampilkan daftar transaksi dengan filter.
-     */
     public function index(Request $request)
     {
-        $title = 'Data Transaksi Keuangan';
+        $title = "Transaksi RW";
+        $user = Auth::user();
+        $nomorRw = $user->rw->nomor_rw ?? null;
 
-        $query = Transaksi::query();
+        $search = $request->input('search');
+        $tahun = $request->input('tahun');
+        $bulan = $request->input('bulan');
+        $rt = $request->input('rt');
 
-        // Filter pencarian
-        if ($request->filled('search')) {
-            $search = $request->input('search');
-            $query->where(function ($q) use ($search) {
-                $q->where('nama_transaksi', 'like', '%' . $search . '%')
-                  ->orWhere('rt', 'like', '%' . $search . '%')
-                  ->orWhere('keterangan', 'like', '%' . $search . '%');
-            });
-        }
+        // Ambil daftar RT di bawah RW
+        $daftar_rt = Rt::where('id_rw', $user->rw->id ?? null)
+            ->pluck('nomor_rt')
+            ->toArray();
 
-        if ($request->filled('tahun')) {
-            $query->whereYear('tanggal', $request->input('tahun'));
-        }
+        $query = Transaksi::whereIn('rt', $daftar_rt)
+            ->when($search, fn($q) => $q->where('nama_transaksi', 'like', '%' . $search . '%'))
+            ->when($tahun, fn($q) => $q->whereYear('tanggal', $tahun))
+            ->when($bulan, fn($q) => $q->whereMonth('tanggal', $bulan))
+            ->when($rt, fn($q) => $q->where('rt', $rt));
 
-        if ($request->filled('bulan')) {
-            $query->whereMonth('tanggal', $request->input('bulan'));
-        }
-
-        if ($request->filled('rt')) {
-            $query->where('rt', $request->input('rt'));
-        }
-
-        $transaksi = (clone $query)->orderBy('tanggal', 'desc')->get();
-        $paginatedTransaksi = $query->orderBy('tanggal', 'desc')->paginate(10);
+        $transaksi = $query->orderBy('tanggal', 'desc')->paginate(10);
 
         $daftar_tahun = Transaksi::selectRaw('YEAR(tanggal) as tahun')
-                                ->distinct()
-                                ->orderBy('tahun', 'desc')
-                                ->pluck('tahun');
-        $daftar_bulan = range(1, 12);
+            ->distinct()
+            ->orderBy('tahun', 'desc')
+            ->pluck('tahun');
 
-        $rukun_tetangga = Rt::orderBy('rt', 'asc')->pluck('rt', 'rt');
+        $daftar_bulan = [
+            'januari',
+            'februari',
+            'maret',
+            'april',
+            'mei',
+            'juni',
+            'juli',
+            'agustus',
+            'september',
+            'oktober',
+            'november',
+            'desember'
+        ];
 
-        return view('rw.iuran.transaksi', compact(
-            'title',
-            'paginatedTransaksi',
-            'transaksi',
-            'daftar_tahun',
-            'daftar_bulan',
-            'rukun_tetangga'
-        ));
+        return Inertia::render('Rw/Transaksi', [
+            'title' => $title,
+            'transaksi' => $transaksi,
+            'daftar_tahun' => $daftar_tahun,
+            'daftar_bulan' => $daftar_bulan,
+            'daftar_rt' => $daftar_rt,
+        ]);
     }
 
-    /**
-     * Tambah transaksi baru.
-     */
     public function store(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'rt'             => 'required|string|max:10|exists:rukun_tetangga,rt',
-            'tanggal'        => 'required|date',
+        $request->validate([
+            'tanggal' => 'required|date',
             'nama_transaksi' => 'required|string|max:255',
-            'jenis'          => 'required|in:pemasukan,pengeluaran',
-            'nominal'        => 'required|numeric|min:0',
-            'keterangan'     => 'nullable|string|max:500',
+            'nominal' => 'required|numeric|min:0',
+            'keterangan' => 'nullable|string',
+            'rt' => 'required|numeric'
         ]);
 
-        if ($validator->fails()) {
-            return redirect()->back()
-                        ->withErrors($validator)
-                        ->withInput()
-                        ->with('modal_type', 'add');
-        }
+        $data = [
+            'tagihan_id' => null,
+            'rt' => $request->rt,
+            'tanggal' => $request->tanggal,
+            'nama_transaksi' => $request->nama_transaksi,
+            'jenis' => 'pemasukan',
+            'nominal' => $request->nominal,
+            'keterangan' => $request->keterangan,
+        ];
 
-        try {
-            Transaksi::create($validator->validated());
+        $transaksi = Transaksi::create($data);
 
-            return redirect()->route('rw.transaksi.index')->with('success', 'Transaksi berhasil ditambahkan.');
-        } catch (\Exception $e) {
-            Log::error('Gagal menambahkan transaksi:', [
-                'message' => $e->getMessage(),
-                'trace'   => $e->getTraceAsString(),
-            ]);
-            return redirect()->back()->withInput()->with('error', 'Terjadi kesalahan.');
-        }
+        return response()->json([
+            'success' => true,
+            'message' => 'Transaksi RW berhasil dibuat.',
+            'transaksi' => $transaksi
+        ]);
     }
 
-    /**
-     * Update transaksi.
-     */
-    public function update(Request $request, $id)
+    public function update(Request $request, string $id)
     {
-        $transaksi = Transaksi::findOrFail($id);
+        $rw_transaksi = Transaksi::findOrFail($id);
 
-        $validator = Validator::make($request->all(), [
-            'rt'             => 'required|string|max:10|exists:rukun_tetangga,rt',
-            'tanggal'        => 'required|date',
+        $validated = $request->validate([
+            'tanggal' => 'required|date',
             'nama_transaksi' => 'required|string|max:255',
-            'jenis'          => 'required|in:pemasukan,pengeluaran',
-            'nominal'        => 'required|numeric|min:0',
-            'keterangan'     => 'nullable|string|max:500',
+            'nominal' => 'required|numeric|min:0',
+            'keterangan' => 'nullable|string',
         ]);
 
-        if ($validator->fails()) {
-            return redirect()->back()
-                        ->withErrors($validator)
-                        ->withInput()
-                        ->with('modal_type', 'edit')
-                        ->with('edit_item_id', $id);
-        }
+        $rw_transaksi->update($validated);
 
-        try {
-            $transaksi->update($validator->validated());
-
-            return redirect()->route('rw.transaksi.index')->with('success', 'Transaksi berhasil diperbarui.');
-        } catch (\Exception $e) {
-            Log::error('Gagal update transaksi:', [
-                'message' => $e->getMessage(),
-                'trace'   => $e->getTraceAsString(),
-            ]);
-            return redirect()->back()->withInput()->with('error', 'Terjadi kesalahan.');
-        }
+        return response()->json([
+            'success' => true,
+            'message' => 'Transaksi RW berhasil diubah',
+            'transaksi' => $rw_transaksi
+        ]);
     }
 
-    /**
-     * Hapus transaksi.
-     */
-    public function destroy($id)
+    public function destroy(string $id)
     {
-        try {
-            $transaksi = Transaksi::findOrFail($id);
-            $transaksi->delete();
+        $rw_transaksi = Transaksi::findOrFail($id);
+        $rw_transaksi->delete();
 
-            return redirect()->route('rw.transaksi.index')->with('success', 'Transaksi berhasil dihapus.');
-        } catch (\Exception $e) {
-            Log::error('Gagal hapus transaksi:', ['message' => $e->getMessage()]);
-            return redirect()->back()->with('error', 'Terjadi kesalahan.');
-        }
+        return response()->json([
+            'success' => true,
+            'message' => 'Transaksi RW berhasil dihapus.',
+        ]);
     }
 }

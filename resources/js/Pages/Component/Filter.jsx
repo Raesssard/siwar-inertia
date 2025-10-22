@@ -229,10 +229,10 @@ export function FilterTransaksi({ transaksi, data, setData, daftar_tahun, daftar
                     <button
                         className="btn btn-success my-auto mr-3"
                         type="button"
-                        title={!transaksi.length ? "Tidak ada Transaksi yang dapat diexport" : "Export Transaksi ke Excel"}
+                        title={!transaksi?.length ? "Tidak ada Transaksi yang dapat diexport" : "Export Transaksi ke Excel"}
                         style={{ borderRadius: "0.2rem" }}
                         onClick={() => window.location.href = `/${role}/export/transaksi`}
-                        disabled={!transaksi.length}
+                        disabled={!transaksi?.length}
                     >
                         <i className="fas fa-file-excel"></i>
                     </button>
@@ -400,10 +400,10 @@ export function FilterIuran({ iuranManual, iuranOtomatis, data, setData, filter,
                 <button
                     className="btn btn-success my-auto mr-3"
                     type="button"
-                    title={!iuranManual.length && !iuranOtomatis.length ? "Tidak ada Iuran yang dapat diexport" : "Export Iuran ke Excel"}
+                    title={!iuranManual?.length && !iuranOtomatis?.length ? "Tidak ada Iuran yang dapat diexport" : "Export Iuran ke Excel"}
                     style={{ borderRadius: "0.2rem" }}
                     onClick={() => window.location.href = `/${role}/export/iuran`}
-                    disabled={!iuranManual.length && !iuranOtomatis.length}
+                    disabled={!iuranManual?.length && !iuranOtomatis?.length}
                 >
                     <i className="fas fa-file-excel"></i>
                 </button>

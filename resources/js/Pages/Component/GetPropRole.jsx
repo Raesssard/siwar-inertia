@@ -122,6 +122,34 @@ export function getWargaLinks() {
 export function getAdminCards({ ...rest }) {
     return [
         {
+            href: "/admin/kartu_keluarga",
+            color: "info",
+            title: "Jumlah KK",
+            value: rest.jumlah_kk,
+            icon: "clipboard-list",
+        },
+        {
+            href: "/admin/warga",
+            color: "primary",
+            title: "Jumlah Warga",
+            value: rest.jumlah_warga,
+            icon: "users",
+        },
+        {
+            href: "/admin/warga",
+            color: "primary",
+            title: "Jumlah Warga Sebagai Penduduk",
+            value: rest.jumlah_warga_penduduk,
+            icon: "home",
+        },
+        {
+            href: "/admin/warga",
+            color: "primary",
+            title: "Jumlah Warga Sebagai Pendatang",
+            value: rest.jumlah_warga_pendatang,
+            icon: "walking",
+        },
+        {
             href: "/admin/rw",
             color: "success",
             title: "Jumlah RW",
@@ -165,6 +193,11 @@ export function getAdminLinks() {
             href: "/dashboard",
             text: "Dashboard",
             icon: "tachometer-alt",
+        },
+        {
+            href: "/admin/kartu_keluarga",
+            text: "Data Kartu Keluarga",
+            icon: "id-card",
         },
         {
             href: "/admin/rw",
