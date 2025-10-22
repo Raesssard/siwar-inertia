@@ -168,13 +168,14 @@ export default function Topbar({ modalShow }) {
                         data-bs-auto-close="outside"
                     >
                         {/* Ubah password */}
-                        <button
-                            type="button"
-                            className="dropdown-item"
-                            onClick={() => setShowPasswordModal(true)}
-                        >
-                            <i className="fas fa-lock fa-sm fa-fw mr-2 text-gray-400"></i>
-                            Ubah Password
+                        <button>
+                            <Link
+                                href={route("settings")}
+                                className="dropdown-item"
+                            >
+                                <i className="fas fa-cog fa-sm fa-fw mr-2 text-gray-400"></i>
+                                Pengaturan
+                            </Link>
                         </button>
 
                         {/* Ganti akun */}

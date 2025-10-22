@@ -1,0 +1,49 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Inertia\Inertia;
+
+class SettingsController extends Controller
+{
+    public function index()
+    {
+        $user = Auth::user();
+
+        return Inertia::render('Settings', [
+            'auth' => [
+                'user' => $user,
+                'currentRole' => session('current_role', $user->roles->first()->name ?? null),
+            ],
+        ]);
+    }
+
+    public function updatePassword(Request $request)
+    {
+        $request->validate([
+            'current_password' => 'required',
+            'password' => 'required|min:8|confirmed',
+        ], [
+            'current_password.required' => 'Password lama wajib diisi.',
+            'password.required' => 'Password baru wajib diisi.',
+            'password.min' => 'Password baru minimal 8 karakter.',
+            'password.confirmed' => 'Konfirmasi password tidak cocok.',
+        ]);
+
+        $user = Auth::user();
+
+        // Pastikan password lama benar
+        if (!Hash::check($request->current_password, $user->password)) {
+            return back()->withErrors(['current_password' => 'Password lama tidak cocok.']);
+        }
+
+        // Update password user
+        $user->password = Hash::make($request->password);
+        $user->save();
+
+        return redirect()->route('settings')->with('success', 'Password berhasil diperbarui.');
+    }
+}

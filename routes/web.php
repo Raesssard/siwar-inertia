@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\{
     LoginController,
     DashboardController,
+    SettingsController,
 };
 use App\Http\Controllers\Warga\{
     LihatKKController,
@@ -57,6 +58,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/choose-role', [LoginController::class, 'chooseRole'])->name('choose-role');
     Route::post('/choose-role', [LoginController::class, 'setRole'])->name('choose.role');
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/settings', [SettingsController::class, 'index'])->name('settings');
+    Route::put('/settings/password', [SettingsController::class, 'updatePassword'])->name('settings.update-password');
+
 
     /*
     |--------------------------------------------------------------------------

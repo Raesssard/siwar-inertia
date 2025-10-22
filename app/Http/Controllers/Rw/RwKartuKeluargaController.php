@@ -30,7 +30,7 @@ class RwKartuKeluargaController extends Controller
         $idRwUser = $userRwData->id;
         $total_kk = Kartu_keluarga::where('id_rw', $idRwUser)->count();
 
-        $kartu_keluarga = Kartu_keluarga::with(['warga', 'rukunTetangga.rw', 'rw', 'kategoriGolongan'])
+        $kartu_keluarga = Kartu_keluarga::with(['warga.kartuKeluarga.rukunTetangga', 'rukunTetangga.rw', 'rw', 'warga.kartuKeluarga.rw', 'kategoriGolongan'])
             ->where('id_rw', $idRwUser)
             ->when($search, function ($query) use ($search) {
                 $query->where('alamat', 'like', "%{$search}%")

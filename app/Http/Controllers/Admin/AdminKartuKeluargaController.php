@@ -21,7 +21,7 @@ class AdminKartuKeluargaController extends Controller
 
         $total_kk = Kartu_keluarga::count();
 
-        $kartu_keluarga = Kartu_keluarga::with(['warga', 'rukunTetangga.rw', 'rw', 'kategoriGolongan'])
+        $kartu_keluarga = Kartu_keluarga::with(['warga.kartuKeluarga.rukunTetangga', 'rukunTetangga.rw', 'rw', 'warga.kartuKeluarga.rw', 'kategoriGolongan'])
             ->when($search, function ($query) use ($search) {
                 $query->where('alamat', 'like', "%{$search}%")
                     ->orWhere('no_kk', 'like', "%{$search}%")
