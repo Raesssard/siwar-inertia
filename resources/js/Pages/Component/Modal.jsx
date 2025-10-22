@@ -2091,7 +2091,6 @@ export function TambahEditKK({ show, onClose, dataKK = null, kategoriIuran, daft
                                         className="form-select shadow-sm"
                                         value={data.id_rt}
                                         onChange={(e) => setData("id_rt", e.target.value)}
-                                        required
                                     >
                                         <option value="">-- Pilih RT --</option>
                                         {daftarRT.map((rt) => (
@@ -2360,7 +2359,7 @@ export function DetailKK({ selectedData, detailShow, onClose, role, userData }) 
                                     <p><strong>Nama Kepala Keluarga</strong> : {kepala?.nama ?? '-'}</p>
                                     <p><strong>Alamat</strong> : {selectedData.alamat ?? '-'}</p>
                                     <p><strong>RT/RW</strong> :{" "}
-                                        {selectedData.rukun_tetangga.nomor_rt ?? '-'}/{selectedData.rw.nomor_rw ?? '-'}
+                                        {selectedData.rukun_tetangga?.nomor_rt ?? '-'}/{selectedData.rw?.nomor_rw ?? '-'}
                                     </p>
                                     <p>
                                         <strong>Nama Kepala Keluarga</strong> :{" "}
@@ -2371,8 +2370,8 @@ export function DetailKK({ selectedData, detailShow, onClose, role, userData }) 
                                     </p>
                                     <p>
                                         <strong>RT/RW</strong> :{" "}
-                                        {selectedData.rukun_tetangga.nomor_rt ?? "-"}/
-                                        {selectedData.rw.nomor_rw ?? "-"}
+                                        {selectedData.rukun_tetangga?.nomor_rt ?? "-"}/
+                                        {selectedData.rw?.nomor_rw ?? "-"}
                                     </p>
                                     <p>
                                         <strong>Desa/Kelurahan</strong> :{" "}
