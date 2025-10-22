@@ -5,9 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Kartu_keluarga extends Model
 {
+    use SoftDeletes;
+
     protected $table = 'kartu_keluarga';
 
     // Gunakan id auto increment
@@ -48,6 +51,11 @@ class Kartu_keluarga extends Model
     public function tagihan(): HasMany
     {
         return $this->hasMany(Tagihan::class, 'no_kk', 'no_kk');
+    }
+
+    public function transaksi(): HasMany
+    {
+        return $this->hasMany(Transaksi::class, 'no_kk', 'no_kk');
     }
 
     public function warga(): HasMany

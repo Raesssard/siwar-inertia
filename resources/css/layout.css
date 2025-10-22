@@ -420,3 +420,34 @@ button.btn.transaksi:hover {
     background: #4e73df !important;
     color: white !important;
 }
+
+.collapse.show {
+    display: block !important;
+}
+
+ul.ps-3 {
+    margin-left: 1rem;
+}
+
+ul.ps-3 .nav-link {
+    font-size: 0.9rem;
+    color: #cfd2d6 !important;
+}
+
+ul.ps-3 .nav-item.active>.nav-link {
+    color: #fff !important;
+}
+
+.list-unstyled {
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+}
+
+.list-unstyled.open {
+    max-height: 500px;
+    opacity: 1;
+    transform: translateY(0);
+}

@@ -40,6 +40,7 @@ return new class extends Migration
             $table->string('nip_kepala_dukcapil')->nullable();
             $table->string('foto_kk')->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

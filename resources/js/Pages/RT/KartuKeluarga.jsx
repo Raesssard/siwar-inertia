@@ -21,7 +21,7 @@ export default function KartuKeluarga() {
     })
     const [showModal, setShowModal] = useState(false)
     const [selected, setSelected] = useState(null)
-
+console.log(kartu_keluarga)
     const modalDetail = (item) => {
         setSelected(item)
         setShowModal(true)
@@ -76,8 +76,7 @@ export default function KartuKeluarga() {
                                         <td className="text-center">{index + 1}</td>
                                         <td className="text-center">{item.no_kk ?? '-'}</td>
                                         <td className="text-center">
-                                            {item.warga[index]?.status_hubungan_dalam_keluarga === 'kepala keluarga'
-                                                ? item.warga[index]?.nama : '-'}
+                                            {item.kepala_keluarga.nama ?? '-'}
                                         </td>
                                         <td className="text-center">{item.alamat ?? '-'}</td>
                                         <td className="text-center">{item.rukun_tetangga?.nomor_rt ?? '-'}</td>

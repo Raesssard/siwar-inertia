@@ -47,8 +47,8 @@ class RtIuranController extends Controller
         $golongan_list = Kategori_golongan::with('iuranGolongan')->get();
         $title = 'Iuran';
 
-        $iuranOtomatis = (clone $query)->where('jenis', 'otomatis')->orderBy('tgl_tagih', 'desc')->paginate(10);
-        $iuranManual = (clone $query)->where('jenis', 'manual')->orderBy('tgl_tagih', 'desc')->paginate(10);
+        $iuranOtomatis = (clone $query)->where('jenis', 'otomatis')->orderBy('tgl_tagih', 'desc')->paginate(10, ['*'], 'manual_page');
+        $iuranManual = (clone $query)->where('jenis', 'manual')->orderBy('tgl_tagih', 'desc')->paginate(10, ['*'], 'otomatis_page');
 
         return Inertia::render('RT/Iuran', [
             'iuranOtomatis' => $iuranOtomatis,

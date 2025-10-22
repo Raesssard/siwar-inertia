@@ -21,7 +21,7 @@ class LihatKKController extends Controller
         $kartuKeluarga = null;
 
         if ($warga) {
-            $kartuKeluarga = Kartu_keluarga::with('warga', 'rukunTetangga', 'rw')
+            $kartuKeluarga = Kartu_keluarga::with('warga', 'rukunTetangga', 'rw', 'kepalaKeluarga')
                 ->where('no_kk', $warga->no_kk)
                 ->first();
         }

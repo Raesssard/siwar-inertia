@@ -32,7 +32,19 @@ class Rt_transaksiController extends Controller
             ->when($tahun, fn($q) => $q->whereYear('tanggal', $tahun))
             ->when($bulan, fn($q) => $q->whereMonth('tanggal', $bulan));
 
-        $transaksi = $query->orderBy('tanggal', 'desc')->paginate(10);
+        $transaksi = $query
+            ->orderBy('tanggal', 'desc')
+            ->orderBy('created_at', 'desc');
+
+        $allTransaksi = $transaksi->paginate(10);
+
+        $transaksiWarga = (clone $transaksi)
+            ->whereNotNull('no_kk')
+            ->paginate(10, ['*'], 'warga_page');
+
+        $transaksiUmum = (clone $transaksi)
+            ->whereNull('no_kk')
+            ->paginate(10, ['*'], 'umum_page');
 
         $daftar_tahun = Transaksi::selectRaw('YEAR(tanggal) as tahun')
             ->distinct()
@@ -64,7 +76,9 @@ class Rt_transaksiController extends Controller
 
         return Inertia::render('RT/Transaksi', [
             'title' => $title,
-            'transaksi' => $transaksi,
+            'transaksi' => $allTransaksi,
+            'transaksiWarga' => $transaksiWarga,
+            'transaksiUmum' => $transaksiUmum,
             'daftar_tahun' => $daftar_tahun,
             'daftar_bulan' => $daftar_bulan,
             'list_kk' => $list_kk,
@@ -82,15 +96,11 @@ class Rt_transaksiController extends Controller
             'keterangan' => 'nullable|string',
         ]);
 
-        $no_kk = null;
-
-        if ($request->filled('no_kk')) {
-            $no_kk = $request->no_kk;
-        }
+        $isPerKk = $request->filled('no_kk');
 
         $dataYangDimasukin = [
             'tagihan_id' => null,
-            'no_kk' => $no_kk,
+            'no_kk' => $isPerKk ? $request->no_kk : null,
             'rt' => $noRt,
             'tanggal' => $request->tanggal,
             'nama_transaksi' => $request->nama_transaksi,
@@ -104,7 +114,8 @@ class Rt_transaksiController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Transaksi berhasil dibuat.',
-            'transaksi' => $transaksi
+            'transaksi' => $transaksi,
+            'jenis' => $isPerKk ? 'kk' : 'umum',
         ]);
     }
 
@@ -126,19 +137,21 @@ class Rt_transaksiController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Transaksi berhasil diubah',
-            'transaksi' => $rt_transaksi
+            'transaksi' => $rt_transaksi,
+            'jenis' => $rt_transaksi->no_kk ? 'kk' : 'umum',
         ]);
     }
 
     public function destroy(string $id)
     {
         $rt_transaksi = Transaksi::findOrFail($id);
-
+        $jenis = $rt_transaksi->no_kk ? 'kk' : 'umum';
         $rt_transaksi->delete();
 
         return response()->json([
             'success' => true,
             'message' => 'Transaksi berhasil dihapus.',
+            'jenis' => $jenis,
         ]);
     }
 }

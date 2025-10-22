@@ -7,6 +7,14 @@ import { getAdminLinks, getRwLinks, getRtLinks, getWargaLinks } from "../Pages/C
 
 export default function Sidebar({ toggleKeParent }) {
     const [toggle, setToggle] = useState("")
+    const [openMenus, setOpenMenus] = useState({})
+
+    const toggleMenu = (menuName) => {
+        setOpenMenus((prev) => ({
+            ...prev,
+            [menuName]: !prev[menuName],
+        }))
+    }
     const { url, props } = usePage()
     const role = props.auth?.currentRole
 
@@ -63,7 +71,12 @@ export default function Sidebar({ toggleKeParent }) {
                 <hr className="sidebar-divider my-0" />
 
                 {statLinks.map((link, index) => (
-                    <SidebarLink key={index} {...link} />
+                    <SidebarLink
+                        key={index}
+                        {...link}
+                        isOpen={!!openMenus[link.text]}
+                        onToggle={() => toggleMenu(link.text)}
+                    />
                 ))}
 
                 <hr className="sidebar-divider d-none d-md-block" />
