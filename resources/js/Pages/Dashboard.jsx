@@ -1,4 +1,3 @@
-// resources/js/Pages/Dashboard.jsx
 import React from "react";
 import { Head, usePage } from "@inertiajs/react";
 import '../../css/card.css'
@@ -29,14 +28,30 @@ export default function Dashboard() {
 
   return (
     <Layout>
-      {/* diubah lagi, biar keliatan lebih ringkas */}
       <Head title={`${title} - ${role.length <= 2
         ? role.toUpperCase()
         : role.charAt(0).toUpperCase() + role.slice(1)}`}
       />
-        {statCards.map((card, index) => (
+      {statCards[0].kategori ? (
+        <div className="col">
+          {statCards.map((stat, i) => (
+            <div key={i}>
+              <div className="mb-4" style={{ borderBottom: '1px solid lightgray' }}>
+                <p className="w-100 mb-1 ml-2"><span style={{ fontWeight: '600', fontSize: '1.15rem' }}>{stat.kategori}</span></p>
+              </div>
+              <div className="row">
+                {stat.isi?.map((card, index) => (
+                  <StatCard key={index} {...card} />
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        statCards.map((card, index) => (
           <StatCard key={index} {...card} />
-        ))}
-    </Layout> 
+        ))
+      )}
+    </Layout>
   )
 }

@@ -1,30 +1,38 @@
 import '../../css/sidebar.css'
 import logo from '../../../public/img/logo.png'
 import { Link, usePage } from "@inertiajs/react"
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import { SidebarLink } from '../Pages/Component/SidebarLink'
 import { getAdminLinks, getRwLinks, getRtLinks, getWargaLinks } from "../Pages/Component/GetPropRole"
 
-export default function Sidebar({ toggleKeParent }) {
+export default function Sidebar({ toggleKeParent, localStorageHistory }) {
     const [toggle, setToggle] = useState("")
-    const [openMenus, setOpenMenus] = useState({})
+    const [openMenus, setOpenMenus] = useState(() => {
+        const saved = localStorage.getItem("openMenus");
+        return saved ? JSON.parse(saved) : {};
+    })
 
     const toggleMenu = (menuName) => {
-        setOpenMenus((prev) => ({
-            ...prev,
-            [menuName]: !prev[menuName],
-        }))
+        setOpenMenus((prev) => {
+            const updated = { ...prev, [menuName]: !prev[menuName] };
+            localStorage.setItem("openMenus", JSON.stringify(updated));
+            return updated;
+        })
     }
-    const { url, props } = usePage()
+    const { props } = usePage()
     const role = props.auth?.currentRole
 
-    // ✅ Fungsi cek aktif
-    const isActive = (url, pattern, exact = false) => {
-        if (exact) return url === pattern
-        return url.startsWith(pattern)
-    }
+    useEffect(() => {
+        localStorage.setItem("openMenus", JSON.stringify(openMenus));
+    }, [openMenus]);
 
-    // ✅ Toggle sidebar kiri-kanan
+    useEffect(() => {
+        if (localStorageHistory) {
+            localStorage.removeItem("openMenus");
+            setOpenMenus({});
+        }
+    }, [localStorageHistory]);
+
     const toggleSidebar = (e) => {
         e.preventDefault()
         const tgl = !toggle ? "toggled" : ""

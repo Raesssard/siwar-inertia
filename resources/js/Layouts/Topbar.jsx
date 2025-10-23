@@ -4,7 +4,7 @@ import { Inertia } from "@inertiajs/inertia"
 import "../../css/topbar.css"
 import { PasswordModal } from "../Pages/Component/Modal"
 
-export default function Topbar({ modalShow }) {
+export default function Topbar({ modalShow, hapusHistory }) {
     const { props } = usePage()
     const user = props.auth?.user
     const currentRole = props.auth?.currentRole
@@ -93,6 +93,55 @@ export default function Topbar({ modalShow }) {
                 case "pengaduan":
                     judulHalaman = "Pengaduan"
                     break
+                case "warga":
+                    judulHalaman = "Analisis Warga"
+                    break
+                case "keuangan":
+                    judulHalaman = "Analisis Keuangan"
+                    break
+                default:
+                    judulHalaman =
+                        segment.charAt(0).toUpperCase() +
+                        segment.slice(1).replace(/-/g, " ")
+            }
+        }
+    }
+
+    if (currentRole === 'rw') {
+        if (!segment && (url === "/" || url === "/dashboard-main")) {
+            judulHalaman = "Dashboard"
+        } else {
+            switch (segment) {
+                case "rt":
+                    judulHalaman = "Rukun Tetangga"
+                    break
+                case "kartu_keluarga":
+                    judulHalaman = "Data Kartu Keluarga"
+                    break
+                case "dashboard":
+                    judulHalaman = "Dashboard"
+                    break
+                case "pengumuman":
+                    judulHalaman = "Pengumuman"
+                    break
+                case "tagihan":
+                    judulHalaman = "Tagihan Warga"
+                    break
+                case "iuran":
+                    judulHalaman = "Iuran Warga"
+                    break
+                case "transaksi":
+                    judulHalaman = "Transaksi RW"
+                    break
+                case "pengaduan":
+                    judulHalaman = "Pengaduan"
+                    break
+                case "warga":
+                    judulHalaman = "Analisis Warga"
+                    break
+                case "keuangan":
+                    judulHalaman = "Analisis Keuangan"
+                    break
                 default:
                     judulHalaman =
                         segment.charAt(0).toUpperCase() +
@@ -133,7 +182,7 @@ export default function Topbar({ modalShow }) {
     }
 
     return (
-        <nav className="navbar nav-top navbar-expand navbar-light bg-white topbar mb-4 sticky-top shadow">
+        <nav className="navbar nav-top navbar-expand navbar-light bg-white topbar mb-3 sticky-top shadow">
             {/* tombol sidebar mobile */}
             <button
                 className="btn btn-link d-md-none rounded-circle mr-3"
@@ -197,7 +246,10 @@ export default function Topbar({ modalShow }) {
                                                 <button
                                                     type="submit"
                                                     className={`btn-account dropdown-item ${currentRole === rol ? 'active' : ''}`}
-                                                    onClick={() => setSelectedRole(rol)}
+                                                    onClick={() => {
+                                                        setSelectedRole(rol)
+                                                        hapusHistory()
+                                                    }}
                                                     disabled={currentRole === rol}
                                                 >
                                                     <i className="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
@@ -222,6 +274,7 @@ export default function Topbar({ modalShow }) {
                             method="post"
                             as="button"
                             className="dropdown-item"
+                            onClick={() => hapusHistory()}
                         >
                             <i className="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>{" "}
                             Logout

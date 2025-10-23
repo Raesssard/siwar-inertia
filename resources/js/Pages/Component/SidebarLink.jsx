@@ -11,9 +11,7 @@ export function SidebarLink({ href, icon, text, children, isOpen, onToggle }) {
         return url.startsWith(pattern)
     }
 
-    const isAnyChildActive = children?.some((child) => isActive(url, child.href));
-
-    const open = isOpen || isAnyChildActive;
+    const open = isOpen;
 
     return (
         <li className={`nav-item ${isActive(url, href) ? 'active' : ''}`}>

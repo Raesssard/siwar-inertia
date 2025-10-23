@@ -1,11 +1,10 @@
 import React, { useState, useEffect, useRef } from "react"
 import Layout from "@/Layouts/Layout"
-import { Head, Link, usePage, useForm } from "@inertiajs/react"
+import { Head, usePage, useForm } from "@inertiajs/react"
 import Masonry from "react-masonry-css"
 import FileDisplay from "./Component/FileDisplay"
 import { DetailPengaduan, TambahPengaduan } from "./Component/Modal"
 import { FilterPengaduan } from "./Component/Filter"
-import { Inertia } from "@inertiajs/inertia"
 import Role from "./Component/Role"
 
 export function FormatWaktu({ createdAt }) {

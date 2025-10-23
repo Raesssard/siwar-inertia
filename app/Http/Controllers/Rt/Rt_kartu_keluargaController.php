@@ -37,7 +37,6 @@ class Rt_kartu_keluargaController extends Controller
         if (!$rt_id_from_nomor) {
             return redirect()->back()->with('error', 'Tidak dapat menemukan ID RT berdasarkan nomor RT Anda. Mohon hubungi administrator.');
         }
-        $total_kk = Kartu_keluarga::where('id_rt', $rt_id_from_nomor)->count();
 
         $kartu_keluarga = Kartu_keluarga::with(['warga.kartuKeluarga.rukunTetangga', 'rukunTetangga', 'rw', 'warga.kartuKeluarga.rw', 'kategoriGolongan', 'kepalaKeluarga'])
             ->where('id_rt', $rt_id_from_nomor)
@@ -54,20 +53,9 @@ class Rt_kartu_keluargaController extends Controller
             ->paginate(5)
             ->withQueryString();
 
-
-        $kategori_iuran = Kategori_golongan::pluck('jenis', 'id');
-
-        $warga = Warga::whereHas('kartuKeluarga', function ($q) use ($rt_id_from_nomor) {
-            $q->where('id_rt', $rt_id_from_nomor);
-        })
-            ->get();
-
         return Inertia::render('RT/KartuKeluarga', [
             'kartu_keluarga' => $kartu_keluarga,
-            'kategori_iuran' => $kategori_iuran,
-            'warga' => $warga,
             'title' => $title,
-            'total_kk' => $total_kk
         ]);
     }
 

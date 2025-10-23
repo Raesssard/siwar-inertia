@@ -8,9 +8,14 @@ import { usePage } from "@inertiajs/react";
 
 export default function Layout({ children }) {
     const [toggle, setToggle] = useState("");
+    const [history, setHistory] = useState(false)
     const [showSidebar, setShowSidebar] = useState(false);
     const [flashMessage, setFlashMessage] = useState(null);
     const { flash } = usePage().props;
+
+    const toggleLocalStorage = () => {
+        setHistory(true)
+    }
 
     const handleToggle = (t) => {
         setToggle(t);
@@ -38,7 +43,10 @@ export default function Layout({ children }) {
     return (
         <>
             <div id="wrapper">
-                <Sidebar toggleKeParent={handleToggle} />
+                <Sidebar
+                    toggleKeParent={handleToggle}
+                    localStorageHistory={history}
+                />
                 <ModalSidebar
                     modalIsOpen={showSidebar}
                     modalShow={ModalSideShow}
@@ -48,16 +56,18 @@ export default function Layout({ children }) {
                     className={`main-content d-flex flex-column ${toggle}`}
                 >
                     <div id="content">
-                        <Topbar modalShow={ModalSideShow} />
+                        <Topbar
+                            modalShow={ModalSideShow}
+                            hapusHistory={() => toggleLocalStorage()}
+                        />
 
                         {/* 🔹 Flash Message (Success / Error) */}
                         {flashMessage && (
                             <div
-                                className={`position-fixed top-0 end-0 mt-3 me-3 px-4 py-2 rounded shadow-lg text-white fw-semibold z-50 ${
-                                    flashMessage.type === "success"
-                                        ? "bg-success"
-                                        : "bg-danger"
-                                }`}
+                                className={`position-fixed top-0 end-0 mt-3 me-3 px-4 py-2 rounded shadow-lg text-white fw-semibold z-50 ${flashMessage.type === "success"
+                                    ? "bg-success"
+                                    : "bg-danger"
+                                    }`}
                                 style={{
                                     animation: "fadeInOut 3s ease-in-out",
                                     zIndex: 9999,
