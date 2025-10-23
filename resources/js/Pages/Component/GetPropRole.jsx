@@ -27,7 +27,7 @@ export function getWargaCards({ ...rest }) {
             value: <p style={{
                 fontSize: '0.75rem',
             }}>
-                <strong>No. KK: </strong>{rest.kk.no_kk}<br /><strong>Kepala Keluarga: </strong>{rest.kk.kepala_keluarga.nama}</p>,
+                <strong>No. KK</strong>: {rest.kk.no_kk}<br /><strong>Kepala Keluarga</strong>: {rest.kk.kepala_keluarga.nama}</p>,
             icon: "id-card",
         },
         {
@@ -227,64 +227,8 @@ export function getAdminLinks() {
     ];
 }
 
-export function getRwCards({ ...rest }) {
+export function analisisKeuanganRw({ ...rest }) {
     return [
-        {
-            href: "/rw/rt",
-            color: "info",
-            title: "Jumlah RT",
-            value: rest.jumlah_rt,
-            icon: "house-user",
-        },
-        {
-            href: "/rw/kartu_keluarga",
-            color: "info",
-            title: "Jumlah KK",
-            value: rest.jumlah_kk,
-            icon: "clipboard-list",
-        },
-        {
-            href: "/rw/warga",
-            color: "primary",
-            title: "Jumlah Warga",
-            value: rest.jumlah_warga,
-            icon: "users",
-        },
-        {
-            href: "/rw/pengaduan",
-            color: "warning",
-            title: "Pengaduan",
-            value: rest.pengaduan,
-            icon: "paper-plane",
-        },
-        {
-            href: "/rw/pengumuman",
-            color: "warning",
-            title: "Pengumuman RW",
-            value: rest.pengumuman_rw,
-            icon: "comments",
-        },
-        {
-            href: "/rw/pengumuman-rt",
-            color: "warning",
-            title: "Pengumuman RT",
-            value: rest.pengumuman_rt,
-            icon: "clipboard-list",
-        },
-        {
-            href: "/rw/warga",
-            color: "primary",
-            title: "Jumlah Warga Sebagai Penduduk",
-            value: rest.jumlah_warga_penduduk,
-            icon: "home",
-        },
-        {
-            href: "/rw/warga",
-            color: "primary",
-            title: "Jumlah Warga Sebagai Pendatang",
-            value: rest.jumlah_warga_pendatang,
-            icon: "walking",
-        },
         {
             href: "/rw/iuran",
             color: "success",
@@ -316,6 +260,150 @@ export function getRwCards({ ...rest }) {
     ];
 }
 
+export function analisisWargaRw({ ...rest }) {
+    return [
+        {
+            href: "/rw/rt",
+            color: "info",
+            title: "Jumlah RT",
+            value: rest.jumlah_rt,
+            icon: "house-user",
+        },
+        {
+            href: "/rw/kartu_keluarga",
+            color: "info",
+            title: "Jumlah KK",
+            value: rest.jumlah_kk,
+            icon: "clipboard-list",
+        },
+        {
+            href: "/rw/warga",
+            color: "primary",
+            title: "Jumlah Warga",
+            value: rest.jumlah_warga,
+            icon: "users",
+        },
+        {
+            href: "/rw/warga",
+            color: "primary",
+            title: "Jumlah Warga Sebagai Penduduk",
+            value: rest.jumlah_warga_penduduk,
+            icon: "home",
+        },
+        {
+            href: "/rw/warga",
+            color: "primary",
+            title: "Jumlah Warga Sebagai Pendatang",
+            value: rest.jumlah_warga_pendatang,
+            icon: "walking",
+        },
+    ];
+}
+
+export function getRwCards({ ...rest }) {
+    return [
+        {
+            kategori: 'Data Warga',
+            isi: [
+                {
+                    href: "/rw/rt",
+                    color: "info",
+                    title: "Jumlah RT",
+                    value: rest.jumlah_rt,
+                    icon: "house-user",
+                },
+                {
+                    href: "/rw/kartu_keluarga",
+                    color: "info",
+                    title: "Jumlah KK",
+                    value: rest.jumlah_kk,
+                    icon: "clipboard-list",
+                },
+                {
+                    href: "/rw/warga",
+                    color: "primary",
+                    title: "Jumlah Warga",
+                    value: rest.jumlah_warga,
+                    icon: "users",
+                },
+                {
+                    href: "/rw/warga",
+                    color: "primary",
+                    title: "Jumlah Warga Sebagai Penduduk",
+                    value: rest.jumlah_warga_penduduk,
+                    icon: "home",
+                },
+                {
+                    href: "/rw/warga",
+                    color: "primary",
+                    title: "Jumlah Warga Sebagai Pendatang",
+                    value: rest.jumlah_warga_pendatang,
+                    icon: "walking",
+                },
+            ]
+        },
+        {
+            kategori: 'Keuangan',
+            isi: [
+                {
+                    href: "/rw/iuran",
+                    color: "success",
+                    title: "Total Iuran Masuk Bulan Ini",
+                    value: formatRupiah(rest.total_iuran_bulan_ini),
+                    icon: "dollar-sign",
+                },
+                {
+                    href: "/rw/transaksi",
+                    color: "success",
+                    title: "Total Pemasukan",
+                    value: formatRupiah(rest.total_pemasukan),
+                    icon: "dollar-sign",
+                },
+                {
+                    href: "/rw/transaksi",
+                    color: "danger",
+                    title: "Total Pengeluaran",
+                    value: formatRupiah(rest.total_pengeluaran),
+                    icon: "money-bill-wave",
+                },
+                {
+                    href: "/rw/transaksi",
+                    color: "primary",
+                    title: "Saldo Akhir",
+                    value: formatRupiah(rest.total_saldo_akhir),
+                    icon: "wallet",
+                },
+            ]
+        },
+        {
+            kategori: 'Informasi',
+            isi: [
+                {
+                    href: "/rw/pengaduan",
+                    color: "warning",
+                    title: "Pengaduan",
+                    value: rest.pengaduan,
+                    icon: "paper-plane",
+                },
+                {
+                    href: "/rw/pengumuman",
+                    color: "warning",
+                    title: "Pengumuman RW",
+                    value: rest.pengumuman_rw,
+                    icon: "comments",
+                },
+                {
+                    href: "/rw/pengumuman-rt",
+                    color: "warning",
+                    title: "Pengumuman RT",
+                    value: rest.pengumuman_rt,
+                    icon: "clipboard-list",
+                },
+            ]
+        },
+    ];
+}
+
 export function getRwLinks() {
     return [
         {
@@ -324,14 +412,51 @@ export function getRwLinks() {
             icon: "tachometer-alt",
         },
         {
-            href: "/rw/rt",
-            text: "Data RT",
+            text: "Warga",
             icon: "users",
+            children: [
+                {
+                    href: "/rw/analisis/warga",
+                    text: "Analisis Warga",
+                    icon: "eye",
+                },
+                {
+                    href: "/rw/rt",
+                    text: "Data RT",
+                    icon: "users",
+                },
+                {
+                    href: "/rw/kartu_keluarga",
+                    text: "Data Kartu Keluarga",
+                    icon: "id-card",
+                },
+            ],
         },
         {
-            href: "/rw/kartu_keluarga",
-            text: "Data Kartu Keluarga",
-            icon: "id-card",
+            text: "Keuangan",
+            icon: "wallet",
+            children: [
+                {
+                    href: "/rw/analisis/keuangan",
+                    text: "Analisis Keuangan",
+                    icon: "eye",
+                },
+                {
+                    href: "/rw/iuran",
+                    text: "Iuran Warga",
+                    icon: "file-invoice-dollar",
+                },
+                {
+                    href: "/rw/tagihan",
+                    text: "Tagihan Warga",
+                    icon: "file-invoice-dollar",
+                },
+                {
+                    href: "/rw/transaksi",
+                    text: "Transaksi RW",
+                    icon: "money-bill-wave",
+                },
+            ],
         },
         {
             href: "/rw/pengumuman",
@@ -343,25 +468,36 @@ export function getRwLinks() {
             text: "Pengaduan",
             icon: "paper-plane",
         },
-        {
-            href: "/rw/iuran",
-            text: "Iuran Warga",
-            icon: "file-invoice-dollar",
-        },
-        {
-            href: "/rw/tagihan",
-            text: "Tagihan Warga",
-            icon: "file-invoice-dollar",
-        },
-        {
-            href: "/rw/transaksi",
-            text: "Transaksi RW",
-            icon: "money-bill-wave",
-        },
     ];
 }
 
-export function getRtCards({ ...rest }) {
+export function analisisKeuanganRt({ ...rest }) {
+    return [
+        {
+            href: "/rt/transaksi",
+            color: rest.total_pemasukan > 0 ? "success" : "warning",
+            title: "Total Pemasukkan",
+            value: formatRupiah(rest.total_pemasukan),
+            icon: "dollar-sign",
+        },
+        {
+            href: "/rt/transaksi",
+            color: rest.pengeluaran > 0 ? "danger" : "success",
+            title: "Total Pengeluaran",
+            value: formatRupiah(rest.pengeluaran),
+            icon: "donate",
+        },
+        {
+            href: "/rt/transaksi",
+            color: rest.total_saldo_akhir === 0 ? "warning" : rest.total_saldo_akhir > 0 ? "success" : "danger",
+            title: "Total Saldo Akhir",
+            value: formatRupiah(rest.total_saldo_akhir),
+            icon: "wallet",
+        },
+    ]
+}
+
+export function analisisWargaRt({ ...rest }) {
     return [
         {
             href: "/rt/kartu_keluarga",
@@ -391,40 +527,88 @@ export function getRtCards({ ...rest }) {
             value: rest.jumlah_kk,
             icon: "clipboard-list",
         },
+    ]
+}
+
+export function getRtCards({ ...rest }) {
+    return [
         {
-            href: "/rt/pengumuman",
-            color: "warning",
-            title: "Jumlah Pengumuman",
-            value: rest.jumlah_pengumuman,
-            icon: "comments",
+            kategori: 'Data Warga',
+            isi: [
+                {
+                    href: "/rt/kartu_keluarga",
+                    color: "primary",
+                    title: "Jumlah Warga",
+                    value: rest.jumlah_warga,
+                    icon: "users",
+                },
+                {
+                    href: "/rt/kartu_keluarga",
+                    color: "primary",
+                    title: "Jumlah Warga Penduduk",
+                    value: rest.jumlah_warga_penduduk,
+                    icon: "home",
+                },
+                {
+                    href: "/rt/kartu_keluarga",
+                    color: "primary",
+                    title: "Jumlah Warga Pendatang",
+                    value: rest.jumlah_warga_pendatang,
+                    icon: "walking",
+                },
+                {
+                    href: "/rt/kartu_keluarga",
+                    color: "info",
+                    title: "Jumlah Kartu Keluarga",
+                    value: rest.jumlah_kk,
+                    icon: "clipboard-list",
+                },
+            ]
         },
         {
-            href: "/rt/pengaduan",
-            color: "warning",
-            title: "Jumlah Pengaduan",
-            value: rest.pengaduan_rt_saya,
-            icon: "comment-dots",
+            kategori: 'Keuangan',
+            isi: [
+                {
+                    href: "/rt/transaksi",
+                    color: rest.total_pemasukan > 0 ? "success" : "warning",
+                    title: "Total Pemasukkan",
+                    value: formatRupiah(rest.total_pemasukan),
+                    icon: "dollar-sign",
+                },
+                {
+                    href: "/rt/transaksi",
+                    color: rest.pengeluaran > 0 ? "danger" : "success",
+                    title: "Total Pengeluaran",
+                    value: formatRupiah(rest.pengeluaran),
+                    icon: "donate",
+                },
+                {
+                    href: "/rt/transaksi",
+                    color: rest.total_saldo_akhir === 0 ? "warning" : rest.total_saldo_akhir > 0 ? "success" : "danger",
+                    title: "Total Saldo Akhir",
+                    value: formatRupiah(rest.total_saldo_akhir),
+                    icon: "wallet",
+                },
+            ]
         },
         {
-            href: "/rt/transaksi",
-            color: rest.total_pemasukan > 0 ? "success" : "warning",
-            title: "Total Pemasukkan",
-            value: formatRupiah(rest.total_pemasukan),
-            icon: "dollar-sign",
-        },
-        {
-            href: "/rt/transaksi",
-            color: rest.pengeluaran > 0 ? "danger" : "success",
-            title: "Total Pengeluaran",
-            value: formatRupiah(rest.pengeluaran),
-            icon: "donate",
-        },
-        {
-            href: "/rt/transaksi",
-            color: rest.total_saldo_akhir === 0 ? "warning" : rest.total_saldo_akhir > 0 ? "success" : "danger",
-            title: "Total Saldo Akhir",
-            value: formatRupiah(rest.total_saldo_akhir),
-            icon: "wallet",
+            kategori: 'Informasi',
+            isi: [
+                {
+                    href: "/rt/pengumuman",
+                    color: "warning",
+                    title: "Jumlah Pengumuman",
+                    value: rest.jumlah_pengumuman,
+                    icon: "comments",
+                },
+                {
+                    href: "/rt/pengaduan",
+                    color: "warning",
+                    title: "Jumlah Pengaduan",
+                    value: rest.pengaduan_rt_saya,
+                    icon: "comment-dots",
+                },
+            ]
         },
     ]
 }
@@ -437,14 +621,30 @@ export function getRtLinks() {
             icon: "tachometer-alt",
         },
         {
-            href: "/rt/kartu_keluarga",
-            text: "Data Kartu Keluarga",
-            icon: "id-card",
+            text: "Warga",
+            icon: "users",
+            children: [
+                {
+                    href: "/rt/analisis/warga",
+                    text: "Analisis Warga",
+                    icon: "eye",
+                },
+                {
+                    href: "/rt/kartu_keluarga",
+                    text: "Data Kartu Keluarga",
+                    icon: "id-card",
+                },
+            ],
         },
         {
-            text: "Manajemen Keuangan",
+            text: "Keuangan",
             icon: "wallet",
             children: [
+                {
+                    href: "/rt/analisis/keuangan",
+                    text: "Analisis Keuangan",
+                    icon: "eye",
+                },
                 {
                     href: "/rt/iuran",
                     text: "Iuran",

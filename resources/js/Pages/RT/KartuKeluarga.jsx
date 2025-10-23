@@ -8,10 +8,7 @@ import '../../../css/kk.css'
 export default function KartuKeluarga() {
     const {
         kartu_keluarga,
-        kategori_iuran,
-        warga,
         title,
-        total_kk,
     } = usePage().props
     const { props } = usePage()
     const user = props.auth?.user
@@ -21,7 +18,7 @@ export default function KartuKeluarga() {
     })
     const [showModal, setShowModal] = useState(false)
     const [selected, setSelected] = useState(null)
-console.log(kartu_keluarga)
+
     const modalDetail = (item) => {
         setSelected(item)
         setShowModal(true)

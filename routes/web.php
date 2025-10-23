@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\{
+    AnalisisController,
     LoginController,
     DashboardController,
     SettingsController,
@@ -113,6 +114,8 @@ Route::middleware(['auth'])->group(function () {
     |--------------------------------------------------------------------------
     */
     Route::prefix('rw')->as('rw.')->group(function () {
+        Route::get('/analisis/keuangan', [AnalisisController::class, 'index'])->name('analisis');
+        Route::get('/analisis/warga', [AnalisisController::class, 'index'])->name('analisis');
         Route::resource('rt', RwRukunTetanggaController::class)->except(['create', 'edit', 'show']);
         Route::resource('warga', RwWargaController::class);
         Route::get('warga/create', [RwWargaController::class, 'create'])->name('warga.create');
@@ -151,6 +154,8 @@ Route::middleware(['auth'])->group(function () {
     |--------------------------------------------------------------------------
     */
     Route::prefix('rt')->as('rt.')->group(function () {
+        Route::get('/analisis/keuangan', [AnalisisController::class, 'index'])->name('analisis');
+        Route::get('/analisis/warga', [AnalisisController::class, 'index'])->name('analisis');
         Route::resource('kartu_keluarga', Rt_kartu_keluargaController::class)->only('index');
         Route::resource('pengumuman', Rt_pengumumanController::class);
         Route::get('/pengumuman/{id}/export-pdf', [Rt_pengumumanController::class, 'exportPDF'])->name('pengumuman.export.pdf');

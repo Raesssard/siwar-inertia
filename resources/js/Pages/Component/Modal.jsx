@@ -2437,7 +2437,7 @@ export function DetailKK({ selectedData, detailShow, onClose, role, userData }) 
                                     </thead>
                                     <tbody className="small">
                                         {selectedData?.warga &&
-                                        selectedData.warga.length > 0 ? (
+                                            selectedData.warga.length > 0 ? (
                                             selectedData.warga
                                                 .sort((a, b) => {
                                                     const getRank = (hubungan) => {
@@ -2466,7 +2466,7 @@ export function DetailKK({ selectedData, detailShow, onClose, role, userData }) 
                                                         <td className="text-center">
                                                             {data.jenis_kelamin
                                                                 ? data.jenis_kelamin.charAt(0).toUpperCase() +
-                                                                  data.jenis_kelamin.slice(1)
+                                                                data.jenis_kelamin.slice(1)
                                                                 : "-"}
                                                         </td>
                                                         <td>{data.tempat_lahir ?? "-"}</td>
@@ -2488,27 +2488,26 @@ export function DetailKK({ selectedData, detailShow, onClose, role, userData }) 
                                                         <td className="text-center">
                                                             {data.status_perkawinan
                                                                 ? data.status_perkawinan.charAt(0).toUpperCase() +
-                                                                  data.status_perkawinan.slice(1)
+                                                                data.status_perkawinan.slice(1)
                                                                 : "-"}
                                                         </td>
                                                         <td className="text-center">
                                                             {data.status_hubungan_dalam_keluarga
                                                                 ? data.status_hubungan_dalam_keluarga
-                                                                      .charAt(0)
-                                                                      .toUpperCase() +
-                                                                  data.status_hubungan_dalam_keluarga.slice(1)
+                                                                    .charAt(0)
+                                                                    .toUpperCase() +
+                                                                data.status_hubungan_dalam_keluarga.slice(1)
                                                                 : "-"}
-                                                        </td>                                                        
+                                                        </td>
                                                         <td className="text-center">
                                                             {data.kewarganegaraan ?? "WNI"}
-                                                        </td>                                                        
+                                                        </td>
                                                         <td className="text-center">
                                                             {data.no_paspor ?? "-"}
                                                         </td>
                                                         <td className="text-center">
-                                                            {`${data.no_kitas ?? "-"} / ${
-                                                                data.no_kitap ?? "-"
-                                                            }`}
+                                                            {`${data.no_kitas ?? "-"} / ${data.no_kitap ?? "-"
+                                                                }`}
                                                         </td>
                                                         <td className="text-center">{data.nama_ayah ?? '-'}</td>
                                                         <td className="text-center">{data.nama_ibu ?? '-'}</td>
@@ -2523,38 +2522,38 @@ export function DetailKK({ selectedData, detailShow, onClose, role, userData }) 
                                                                 <i className="fas fa-info"></i>
                                                             </button>
 
-                                                        {/* Role khusus RW dan Admin */}
-                                                        {(role === "rw" || role === "admin") && (
-                                                            <>
-                                                                {/* Edit */}
-                                                                <button
-                                                                    onClick={() => {
-                                                                        const routeName = role === "admin" ? "admin.warga.edit" : "rw.warga.edit";
-                                                                        router.visit(route(routeName, data.id));
-                                                                    }}
-                                                                    className="inline-flex items-center justify-center rounded-md bg-yellow-500 hover:bg-yellow-600 text-white px-2 py-1 text-xs transition-all"
-                                                                >
-                                                                    <i className="bi bi-pencil-square"></i>
-                                                                </button>
+                                                            {/* Role khusus RW dan Admin */}
+                                                            <Role role={['rw', 'admin']}>
+                                                                <>
+                                                                    {/* Edit */}
+                                                                    <button
+                                                                        onClick={() => {
+                                                                            const routeName = role === "admin" ? "admin.warga.edit" : "rw.warga.edit";
+                                                                            router.visit(route(routeName, data.id));
+                                                                        }}
+                                                                        className="inline-flex items-center justify-center rounded-md bg-yellow-500 hover:bg-yellow-600 text-white px-2 py-1 text-xs transition-all"
+                                                                    >
+                                                                        <i className="bi bi-pencil-square"></i>
+                                                                    </button>
 
-                                                                {/* Hapus */}
-                                                                <button
-                                                                    onClick={() => {
-                                                                        if (confirm(`Hapus warga ${data.nama}?`)) {
-                                                                            const routeName = role === "admin" ? "admin.warga.destroy" : "rw.warga.destroy";
-                                                                            router.delete(route(routeName, data.id), {
-                                                                                onSuccess: () => alert("Warga berhasil dihapus"),
-                                                                                onError: () => alert("Gagal menghapus warga"),
-                                                                            });
-                                                                        }
-                                                                    }}
-                                                                    className="inline-flex items-center justify-center rounded-md bg-red-500 hover:bg-red-600 text-white px-2 py-2 text-xs transition-all"
-                                                                    style={{ borderRadius: '0.25rem' }}
-                                                                >
-                                                                    <i className="bi bi-trash"></i>
-                                                                </button>
-                                                            </>
-                                                        )}
+                                                                    {/* Hapus */}
+                                                                    <button
+                                                                        onClick={() => {
+                                                                            if (confirm(`Hapus warga ${data.nama}?`)) {
+                                                                                const routeName = role === "admin" ? "admin.warga.destroy" : "rw.warga.destroy";
+                                                                                router.delete(route(routeName, data.id), {
+                                                                                    onSuccess: () => alert("Warga berhasil dihapus"),
+                                                                                    onError: () => alert("Gagal menghapus warga"),
+                                                                                });
+                                                                            }
+                                                                        }}
+                                                                        className="inline-flex items-center justify-center rounded-md bg-red-500 hover:bg-red-600 text-white px-2 py-2 text-xs transition-all"
+                                                                        style={{ borderRadius: '0.25rem' }}
+                                                                    >
+                                                                        <i className="bi bi-trash"></i>
+                                                                    </button>
+                                                                </>
+                                                            </Role>
                                                         </td>
                                                     </tr>
                                                 ))
@@ -4100,19 +4099,19 @@ export function TambahIuran({ tambahShow, onClose, onAdded, role, golongan, rt =
                                                                 {g.jenis === "umkm"
                                                                     ? g.jenis.toUpperCase()
                                                                     : g.jenis.charAt(0).toUpperCase() + g.jenis.slice(1)}</label>
-                                                                <input
-                                                                    type="number"
-                                                                    className="tambah-judul form-control"
-                                                                    onInput={(e) => {
-                                                                        if (e.target.value.length > 8 || e.target.value.length < 0) {
-                                                                            e.target.value = e.target.value.slice(0, 8);
-                                                                        }
-                                                                    }}
-                                                                    onChange={(e) => handleNominalChange(g.id, e.target.value)}
-                                                                    required
-                                                                />
-                                                            </div>
-                                                            {/* <div className="w-100">
+                                                            <input
+                                                                type="number"
+                                                                className="tambah-judul form-control"
+                                                                onInput={(e) => {
+                                                                    if (e.target.value.length > 8 || e.target.value.length < 0) {
+                                                                        e.target.value = e.target.value.slice(0, 8);
+                                                                    }
+                                                                }}
+                                                                onChange={(e) => handleNominalChange(g.id, e.target.value)}
+                                                                required
+                                                            />
+                                                        </div>
+                                                        {/* <div className="w-100">
                                                                 <label>Periode</label>
                                                                 <select
                                                                     name="periode"
@@ -4129,11 +4128,11 @@ export function TambahIuran({ tambahShow, onClose, onAdded, role, golongan, rt =
                                                                     {items}
                                                                 </select>
                                                             </div> */}
-                                                        </div>
-                                                    )
-                                                })}
-                                            </div>
-                                        )}
+                                                    </div>
+                                                )
+                                            })}
+                                        </div>
+                                    )}
 
                                     <button type="submit" className="btn btn-primary mt-2">
                                         <i className="fas fa-save mr-2"></i> Simpan

@@ -1,7 +1,6 @@
 import React, { useState } from "react"
 import "../../css/login.css"
-import { Inertia } from "@inertiajs/inertia"
-import { Head, useForm, usePage } from "@inertiajs/react"
+import { Head, useForm } from "@inertiajs/react"
 import FloatingInput from './Component/FloatingInput'
 import logo from '../../../public/img/logo.png'
 
@@ -59,7 +58,7 @@ export default function Login() {
 
 
                             <button type="submit" className="btn-login btn-primary">
-                                <i className="bi bi-box-arrow-in-right me-2"></i>
+                                <i className="bi bi-box-arrow-in-right mr-2"></i>
                                 {processing ? "Proses..." : "Masuk"}
                             </button>
                         </form>

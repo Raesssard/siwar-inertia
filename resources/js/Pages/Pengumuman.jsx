@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react"
 import Layout from "@/Layouts/Layout"
-import { Head, Link, usePage, useForm } from "@inertiajs/react"
+import { Head, usePage, useForm } from "@inertiajs/react"
 import { DetailPengumuman, TambahPengumuman } from "./Component/Modal"
 import { FilterPengumuman } from "./Component/Filter"
 import Masonry from "react-masonry-css"
