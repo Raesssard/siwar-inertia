@@ -61,12 +61,12 @@ class RwRukunTetanggaController extends Controller
 
         $request->validate([
             'nik' => [
-                'required', 'digits:16',
+                'nullable', 'digits:16',
                 Rule::exists('warga', 'nik'),
                 Rule::unique('rt', 'nik')->where(fn($q) => $q->where('id_rw', $id_rw))
             ],
             'nomor_rt' => ['required', 'regex:/^[0-9]{2}$/'],
-            'nama_ketua_rt' => 'required|string|max:255',
+            'nama_ketua_rt' => 'nullable|string|max:255',
             'mulai_menjabat' => 'required|date',
             'akhir_jabatan' => 'required|date|after:mulai_menjabat',
             'jabatan' => ['required', Rule::in(['ketua', 'sekretaris', 'bendahara'])],

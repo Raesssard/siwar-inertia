@@ -14,7 +14,7 @@ export default function Rw({ rw, filters, nomorRwList, title }) {
     const [form, setForm] = useState({
         nik: "",
         nomor_rw: "",
-        nama_ketua_rw: "",
+        nama_anggota_rw: "",
         mulai_menjabat: "",
         akhir_jabatan: "",
         status: "aktif",
@@ -38,7 +38,7 @@ export default function Rw({ rw, filters, nomorRwList, title }) {
                 setForm({
                     nik: "",
                     nomor_rw: "",
-                    nama_ketua_rw: "",
+                    nama_anggota_rw: "",
                     mulai_menjabat: "",
                     akhir_jabatan: "",
                     status: "aktif",
@@ -73,7 +73,7 @@ export default function Rw({ rw, filters, nomorRwList, title }) {
         setForm({
             nik: rwItem.nik || "",
             nomor_rw: rwItem.nomor_rw || "",
-            nama_ketua_rw: rwItem.nama_ketua_rw || "",
+            nama_anggota_rw: rwItem.nama_anggota_rw || "",
             mulai_menjabat: rwItem.mulai_menjabat || "",
             akhir_jabatan: rwItem.akhir_jabatan || "",
             status: rwItem.status || "aktif",
@@ -178,7 +178,7 @@ export default function Rw({ rw, filters, nomorRwList, title }) {
                                     <td>{rw.from + index}</td>
                                     <td>{item.nik}</td>
                                     <td>{item.nomor_rw}</td>
-                                    <td>{item.nama_ketua_rw}</td>
+                                    <td>{item.nama_anggota_rw}</td>
                                     <td>{item.mulai_menjabat}</td>
                                     <td>{item.akhir_jabatan}</td>
                                     <td>

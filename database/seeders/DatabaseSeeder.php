@@ -21,6 +21,7 @@ class DatabaseSeeder extends Seeder
             AdminSeeder::class,
             WargaSeeder::class,
             PermissionSeeder::class,
+            SettingsSeeder::class,
         ]);
     }
 }

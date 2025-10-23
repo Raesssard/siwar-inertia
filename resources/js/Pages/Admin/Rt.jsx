@@ -13,7 +13,7 @@ export default function Rt({ rukun_tetangga, filters, nomorRtList, rwList, title
     const [form, setForm] = useState({
         nik: "",
         nomor_rt: "",
-        nama_ketua_rt: "",
+        nama_anggota_rt: "",
         mulai_menjabat: "",
         akhir_jabatan: "",
         status: "aktif",
@@ -37,7 +37,7 @@ export default function Rt({ rukun_tetangga, filters, nomorRtList, rwList, title
                 setForm({
                     nik: "",
                     nomor_rt: "",
-                    nama_ketua_rt: "",
+                    nama_anggota_rt: "",
                     mulai_menjabat: "",
                     akhir_jabatan: "",
                     status: "aktif",
@@ -72,7 +72,7 @@ export default function Rt({ rukun_tetangga, filters, nomorRtList, rwList, title
         setForm({
             nik: rtItem.nik || "",
             nomor_rt: rtItem.nomor_rt || "",
-            nama_ketua_rt: rtItem.nama_ketua_rt || "",
+            nama_anggota_rt: rtItem.nama_anggota_rt || "",
             mulai_menjabat: rtItem.mulai_menjabat || "",
             akhir_jabatan: rtItem.akhir_jabatan || "",
             status: rtItem.status || "aktif",
@@ -177,7 +177,7 @@ export default function Rt({ rukun_tetangga, filters, nomorRtList, rwList, title
                                     <td>{rukun_tetangga.from + index}</td>
                                     <td>{item.nik}</td>
                                     <td>{item.nomor_rt}</td>
-                                    <td>{item.nama_ketua_rt}</td>
+                                    <td>{item.nama_anggota_rt}</td>
                                     <td>{item.mulai_menjabat}</td>
                                     <td>{item.akhir_jabatan}</td>
                                     <td>
