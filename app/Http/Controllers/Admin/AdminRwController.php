@@ -10,6 +10,7 @@ use App\Models\Warga;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Hash;
 use Inertia\Inertia;
 
 class AdminRwController extends Controller
@@ -82,7 +83,9 @@ class AdminRwController extends Controller
         // 💾 Simpan RW
         $rw = Rw::create([
             'nik' => $request->nik,
-            'no_kk' => $request->filled('nik') ? optional(Warga::where('nik', $request->nik)->first())->no_kk : null,
+            'no_kk' => $request->filled('nik')
+                ? optional(Warga::where('nik', $request->nik)->first())->no_kk
+                : null,
             'nomor_rw' => $request->nomor_rw,
             'nama_anggota_rw' => $request->nama_anggota_rw,
             'mulai_menjabat' => $request->mulai_menjabat,
@@ -95,7 +98,7 @@ class AdminRwController extends Controller
             $user = User::create([
                 'nik' => $request->nik,
                 'nama' => $request->nama_anggota_rw,
-                'password' => bcrypt('password'),
+                'password' => Hash::make('password'),
                 'id_rw' => $rw->id,
             ]);
 
@@ -150,14 +153,17 @@ class AdminRwController extends Controller
         }
 
         // 🔄 Update RW
-        $rw->update($request->only([
-            'nik',
-            'nomor_rw',
-            'nama_anggota_rw',
-            'mulai_menjabat',
-            'akhir_jabatan',
-            'status',
-        ]));
+        $rw->update([
+            'nik' => $request->nik,
+            'no_kk' => $request->filled('nik')
+                ? optional(Warga::where('nik', $request->nik)->first())->no_kk
+                : null,
+            'nomor_rw' => $request->nomor_rw,
+            'nama_anggota_rw' => $request->nama_anggota_rw,
+            'mulai_menjabat' => $request->mulai_menjabat,
+            'akhir_jabatan' => $request->akhir_jabatan,
+            'status' => $request->status,
+        ]);
 
         // 🔁 Update atau hapus user
         $user = User::where('id_rw', $rw->id)->first();
@@ -172,7 +178,7 @@ class AdminRwController extends Controller
                 $user = User::create([
                     'nik' => $request->nik,
                     'nama' => $request->nama_anggota_rw,
-                    'password' => bcrypt('password'),
+                    'password' => Hash::make('password'),
                     'id_rw' => $rw->id,
                 ]);
             }

@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Models\Warga;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 
@@ -122,19 +123,23 @@ class AdminRtController extends Controller
 
     public function update(Request $request, string $id)
     {
-        $rt = Rt::findOrFail($id);
+        $rw = Rw::findOrFail($id);
 
-        $request->validate([
-            'nik' => ['nullable', Rule::unique('rt')->ignore($id)],
-            'id_rw' => ['nullable', 'exists:rw,id'],
-            'nomor_rt' => ['required', 'regex:/^[0-9]{2}$/'],
-            'nama_anggota_rt' => 'nullable|string|max:255',
+        $validator = Validator::make($request->all(), [
+            'nik' => ['nullable', Rule::unique('rw')->ignore($id)],
+            'nomor_rw' => 'required|string|max:3',
+            'nama_anggota_rw' => 'nullable|string|max:255',
             'mulai_menjabat' => 'nullable|date',
             'akhir_jabatan' => 'nullable|date|after_or_equal:mulai_menjabat',
             'status' => ['nullable', Rule::in(['aktif', 'nonaktif'])],
             'jabatan' => ['nullable', Rule::in(['ketua', 'sekretaris', 'bendahara'])],
         ]);
 
+        if ($validator->fails()) {
+            return back()->withErrors($validator)->withInput();
+        }
+
+        // ✅ Pastikan NIK ada di data warga
         if ($request->filled('nik')) {
             $warga = Warga::where('nik', $request->nik)->first();
             if (!$warga) {
@@ -142,49 +147,49 @@ class AdminRtController extends Controller
             }
         }
 
+        // 🚫 Cegah jabatan ganda aktif
         if ($request->filled('jabatan')) {
-            $existing = Rt::where('nomor_rt', $request->nomor_rt)
-                ->where('id_rw', $request->id_rw)
+            $existing = Rw::where('nomor_rw', $request->nomor_rw)
                 ->where('status', 'aktif')
-                ->where('id', '!=', $rt->id)
+                ->where('id', '!=', $rw->id)
                 ->whereHas('user.roles', fn($q) => $q->where('name', $request->jabatan))
                 ->exists();
 
             if ($existing) {
-                return back()->with('error', "RT {$request->nomor_rt} sudah memiliki {$request->jabatan} aktif!")->withInput();
+                return back()->with('error', "RW {$request->nomor_rw} sudah memiliki {$request->jabatan} aktif!")->withInput();
             }
         }
 
-        $rt->update([
+        // 🔄 Update data RW
+        $rw->update([
             'nik' => $request->nik,
             'no_kk' => $request->filled('nik') ? optional(Warga::where('nik', $request->nik)->first())->no_kk : null,
-            'nomor_rt' => $request->nomor_rt,
-            'nama_anggota_rt' => $request->nama_anggota_rt,
+            'nomor_rw' => $request->nomor_rw,
+            'nama_anggota_rw' => $request->nama_anggota_rw,
             'mulai_menjabat' => $request->mulai_menjabat,
             'akhir_jabatan' => $request->akhir_jabatan,
-            'id_rw' => $request->id_rw,
             'status' => $request->status ?? 'nonaktif',
         ]);
 
-        $user = User::where('id_rt', $rt->id)->first();
+        // 👤 Buat atau update user
+        $user = User::where('id_rw', $rw->id)->first();
 
-        if ($request->filled('nik') && $request->filled('nama_anggota_rt')) {
+        if ($request->filled('nik') && $request->filled('nama_anggota_rw')) {
             if ($user) {
                 $user->update([
                     'nik' => $request->nik,
-                    'nama' => $request->nama_anggota_rt,
+                    'nama' => $request->nama_anggota_rw,
                 ]);
             } else {
                 $user = User::create([
                     'nik' => $request->nik,
-                    'nama' => $request->nama_anggota_rt,
-                    'password' => Hash::make('password'),
-                    'id_rt' => $rt->id,
-                    'id_rw' => $request->id_rw,
+                    'nama' => $request->nama_anggota_rw,
+                    'password' => \Illuminate\Support\Facades\Hash::make('password'),
+                    'id_rw' => $rw->id,
                 ]);
             }
 
-            $roles = ['rt'];
+            $roles = ['rw'];
             if ($request->filled('jabatan') && $request->jabatan !== 'ketua') {
                 $roles[] = $request->jabatan;
             }
@@ -193,7 +198,7 @@ class AdminRtController extends Controller
             if ($user) $user->delete();
         }
 
-        return redirect()->route('admin.rt.index')->with('success', 'RT berhasil diperbarui.');
+        return redirect()->route('admin.rw.index')->with('success', 'Data RW berhasil diperbarui.');
     }
 
     public function destroy(string $id)
