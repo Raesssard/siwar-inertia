@@ -151,24 +151,24 @@ export default function Roles({ roles, permissions, filters, title }) {
                 <table className="table-custom w-full text-left border-collapse">
                     <thead>
                         <tr>
-                            <th>No</th>
-                            <th>Nama Role</th>
-                            <th>Permissions</th>
-                            <th>Aksi</th>
+                            <th className="text-center">No</th>
+                            <th className="text-center">Nama Role</th>
+                            <th className="text-center">Permissions</th>
+                            <th className="text-center">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
                         {roles.data.length > 0 ? (
                             roles.data.map((role, index) => (
                                 <tr key={role.id}>
-                                    <td>{roles.from + index}</td>
-                                    <td>{role.name}</td>
-                                    <td>
+                                    <td className="text-center">{roles.from + index}</td>
+                                    <td className="text-center">{role.name}</td>
+                                    <td className="text-center">
                                         {role.permissions.length > 0
                                             ? `${role.permissions.length} ${role.permissions.length > 1 ? "permissions" : "permission"}`
                                             : "Tidak ada permission"}
                                     </td>
-                                    <td>
+                                    <td className="text-center">
                                         <button
                                             className="btn-custom btn-warning me-1"
                                             onClick={() => openEdit(role)}

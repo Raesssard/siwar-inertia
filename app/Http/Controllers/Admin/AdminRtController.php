@@ -56,6 +56,7 @@ class AdminRtController extends Controller
             'jabatan' => ['nullable', Rule::in(['ketua', 'sekretaris', 'bendahara'])],
         ]);
 
+        // 🔍 Cek NIK valid di data warga
         if ($request->filled('nik')) {
             $warga = Warga::where('nik', $request->nik)->first();
             if (!$warga) {
@@ -63,6 +64,18 @@ class AdminRtController extends Controller
             }
         }
 
+        // 🚦 Batasi jumlah RT per RW
+        $maxRtSetting = \App\Models\Setting::where('key', 'max_rt_per_rw')->first();
+        $maxRtPerRw = $maxRtSetting ? (int)$maxRtSetting->value : 6;
+
+        if ($request->filled('id_rw')) {
+            $rtCount = Rt::where('id_rw', $request->id_rw)->count();
+            if ($rtCount >= $maxRtPerRw) {
+                return back()->with('error', "RW ini sudah memiliki {$maxRtPerRw} RT. Tidak bisa menambah lagi.")->withInput();
+            }
+        }
+
+        // 🚫 Cegah jabatan ganda aktif
         if ($request->filled('jabatan')) {
             $existing = Rt::where('nomor_rt', $request->nomor_rt)
                 ->where('id_rw', $request->id_rw)
@@ -75,6 +88,7 @@ class AdminRtController extends Controller
             }
         }
 
+        // 💾 Simpan data RT
         $rt = Rt::create([
             'nik' => $request->nik,
             'no_kk' => $request->filled('nik') ? optional(Warga::where('nik', $request->nik)->first())->no_kk : null,
@@ -86,7 +100,7 @@ class AdminRtController extends Controller
             'status' => $request->status ?? 'nonaktif',
         ]);
 
-        // 👤 Buat user hanya jika dua-duanya diisi
+        // 👤 Buat user hanya jika dua-duanya (nik & nama) diisi
         if ($request->filled('nik') && $request->filled('nama_anggota_rt')) {
             $user = User::create([
                 'nik' => $request->nik,

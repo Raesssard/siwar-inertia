@@ -118,18 +118,18 @@ export default function Permission({ permissions, filters, title }) {
                 <table className="table-custom">
                     <thead>
                         <tr>
-                            <th>No</th>
-                            <th>Nama Permission</th>
-                            <th>Aksi</th>
+                            <th className="text-center">No</th>
+                            <th className="text-center">Nama Permission</th>
+                            <th className="text-center">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
                         {permissions.data.length > 0 ? (
                             permissions.data.map((item, index) => (
                                 <tr key={item.id}>
-                                    <td>{permissions.from + index}</td>
-                                    <td>{item.name}</td>
-                                    <td>
+                                    <td className="text-center">{permissions.from + index}</td>
+                                    <td className="text-center">{item.name}</td>
+                                    <td className="text-center">
                                         <button
                                             className="btn-custom btn-warning me-1"
                                             onClick={() => openEdit(item)}

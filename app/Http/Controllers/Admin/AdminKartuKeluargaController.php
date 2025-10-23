@@ -6,10 +6,10 @@ use App\Http\Controllers\Controller;
 use App\Models\Kartu_keluarga;
 use App\Models\Kategori_golongan;
 use App\Models\Rt;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
 use Inertia\Inertia;
 
 class AdminKartuKeluargaController extends Controller
@@ -21,7 +21,14 @@ class AdminKartuKeluargaController extends Controller
 
         $total_kk = Kartu_keluarga::count();
 
-        $kartu_keluarga = Kartu_keluarga::with(['warga.kartuKeluarga.rukunTetangga', 'rukunTetangga.rw', 'rw', 'warga.kartuKeluarga.rw', 'kategoriGolongan', 'kepalaKeluarga'])
+        $kartu_keluarga = Kartu_keluarga::with([
+            'warga.kartuKeluarga.rukunTetangga',
+            'rukunTetangga.rw',
+            'rw',
+            'warga.kartuKeluarga.rw',
+            'kategoriGolongan',
+            'kepalaKeluarga'
+        ])
             ->when($search, function ($query) use ($search) {
                 $query->where('alamat', 'like', "%{$search}%")
                     ->orWhere('no_kk', 'like', "%{$search}%")
@@ -54,6 +61,7 @@ class AdminKartuKeluargaController extends Controller
                 'no_registrasi' => 'required|string|max:255',
                 'alamat' => 'required|string',
                 'id_rt' => 'nullable|exists:rt,id',
+                'id_rw' => 'nullable|exists:rw,id',
                 'kelurahan' => 'required|string|max:255',
                 'kecamatan' => 'required|string|max:255',
                 'kabupaten' => 'required|string|max:255',
@@ -67,8 +75,13 @@ class AdminKartuKeluargaController extends Controller
                 'nip_kepala_dukcapil' => 'nullable|string|max:255',
             ]);
 
-            // id_rw dan id_rt NULL di admin
-            $validated['id_rw'] = null;
+            Log::info('Admin Data KK diterima:', $request->all());
+
+            // Jika id_rt diisi, otomatis ambil id_rw dari RT
+            if ($request->filled('id_rt')) {
+                $rt = Rt::find($request->id_rt);
+                $validated['id_rw'] = $rt ? $rt->id_rw : null;
+            }
 
             Kartu_keluarga::create($validated);
 
@@ -96,11 +109,22 @@ class AdminKartuKeluargaController extends Controller
                 'kode_pos' => 'required|string|max:10',
                 'tgl_terbit' => 'required|date',
                 'kategori_iuran' => 'required|exists:kategori_golongan,id',
+                'instansi_penerbit' => 'nullable|string|max:255',
+                'kabupaten_kota_penerbit' => 'nullable|string|max:255',
+                'nama_kepala_dukcapil' => 'nullable|string|max:255',
+                'nip_kepala_dukcapil' => 'nullable|string|max:255',
             ]);
 
-            $validated['id_rw'] = null;
+            // 🔹 Otomatis isi id_rw sesuai RT
+            if ($request->filled('id_rt')) {
+                $rt = Rt::find($request->id_rt);
+                $validated['id_rw'] = $rt ? $rt->id_rw : null;
+            } else {
+                $validated['id_rw'] = null;
+            }
 
             $kk->update($validated);
+
             return back()->with('success', 'Kartu Keluarga berhasil diperbarui!');
         } catch (\Exception $e) {
             Log::error('Admin gagal update KK: ' . $e->getMessage());
@@ -123,5 +147,47 @@ class AdminKartuKeluargaController extends Controller
             Log::error('Admin gagal hapus KK: ' . $e->getMessage());
             return back()->with('error', 'Gagal menghapus data KK.');
         }
+    }
+
+        public function uploadFoto(Request $request, $no_kk)
+    {
+        try {
+            $kartuKeluarga = Kartu_keluarga::where('no_kk', $no_kk)->firstOrFail();
+
+            $request->validate([
+                'kk_file' => 'required|file|mimes:jpeg,png,jpg,pdf|max:5120',
+            ]);
+
+            $file = $request->file('kk_file');
+            $fileName = time() . '_' . Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)) . '.' . $file->getClientOriginalExtension();
+
+            if ($kartuKeluarga->foto_kk) {
+                Storage::disk('public')->delete($kartuKeluarga->foto_kk);
+            }
+
+            $path = $file->storeAs('kartu_keluarga', $fileName, 'public');
+            $kartuKeluarga->update(['foto_kk' => $path]);
+
+            return response()->json([
+                'message' => 'Dokumen berhasil diunggah!',
+                'path' => asset("storage/{$path}")
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Upload KK RW error: ' . $e->getMessage());
+            return response()->json(['error' => 'Upload gagal'], 500);
+        }
+    }
+
+    public function deleteFoto($no_kk)
+    {
+        $kartuKeluarga = Kartu_keluarga::where('no_kk', $no_kk)->firstOrFail();
+
+        if ($kartuKeluarga->foto_kk) {
+            Storage::disk('public')->delete($kartuKeluarga->foto_kk);
+            $kartuKeluarga->update(['foto_kk' => null]);
+            return back()->with('success', 'Dokumen berhasil dihapus!');
+        }
+
+        return back()->with('error', 'Tidak ada dokumen untuk dihapus.');
     }
 }

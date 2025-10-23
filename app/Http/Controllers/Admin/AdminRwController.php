@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Rw;
 use App\Models\User;
 use App\Models\Kartu_keluarga;
+use App\Models\Warga;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
@@ -55,7 +56,6 @@ class AdminRwController extends Controller
                     }
                 },
             ],
-            'no_kk' => 'nullable|string',
             'nomor_rw' => 'required|string|max:3',
             'nama_anggota_rw' => 'nullable|string|max:255',
             'mulai_menjabat' => 'nullable|date',
@@ -82,7 +82,7 @@ class AdminRwController extends Controller
         // 💾 Simpan RW
         $rw = Rw::create([
             'nik' => $request->nik,
-            'no_kk' => $request->no_kk,
+            'no_kk' => $request->filled('nik') ? optional(Warga::where('nik', $request->nik)->first())->no_kk : null,
             'nomor_rw' => $request->nomor_rw,
             'nama_anggota_rw' => $request->nama_anggota_rw,
             'mulai_menjabat' => $request->mulai_menjabat,

@@ -154,46 +154,49 @@ export default function Settings() {
                             </button>
                         </div>
                     </form>
-
-                    {/* 🔧 Pengaturan Sistem */}
-                    <div className="border-bottom mb-4"></div>
-                    <h5 className="fw-semibold mb-3 text-gray-800">
+                    {(role === "rw" || role === "admin") && (
+                    <>
+                        {/* 🔧 Pengaturan Sistem */}
+                        <div className="border-bottom mb-4"></div>
+                        <h5 className="fw-semibold mb-3 text-gray-800">
                         <i className="fas fa-sliders-h text-success me-2"></i> Pengaturan Sistem
-                    </h5>
+                        </h5>
 
-                    <form onSubmit={handleSettingsSubmit}>
+                        <form onSubmit={handleSettingsSubmit}>
                         <div className="mb-3">
                             <label htmlFor="max_rt_per_rw" className="form-label">
-                                <i className="fas fa-home me-2"></i> Maksimal RT per RW
+                            <i className="fas fa-home me-2"></i> Maksimal RT per RW
                             </label>
                             <input
-                                type="number"
-                                id="max_rt_per_rw"
-                                className="form-control"
-                                min={1}
-                                value={settingsData.max_rt_per_rw}
-                                onChange={(e) =>
-                                    setSettingsData("max_rt_per_rw", e.target.value)
-                                }
-                                required
+                            type="number"
+                            id="max_rt_per_rw"
+                            className="form-control"
+                            min={1}
+                            value={settingsData.max_rt_per_rw}
+                            onChange={(e) =>
+                                setSettingsData("max_rt_per_rw", e.target.value)
+                            }
+                            required
                             />
                             {settingsErrors.max_rt_per_rw && (
-                                <div className="text-danger small mt-1">
-                                    {settingsErrors.max_rt_per_rw}
-                                </div>
+                            <div className="text-danger small mt-1">
+                                {settingsErrors.max_rt_per_rw}
+                            </div>
                             )}
                         </div>
 
                         <div className="d-flex justify-content-end gap-2">
                             <button
-                                type="submit"
-                                disabled={settingsProcessing}
-                                className="btn btn-success px-4"
+                            type="submit"
+                            disabled={settingsProcessing}
+                            className="btn btn-success px-4"
                             >
-                                <i className="fas fa-save me-1"></i> Simpan Pengaturan
+                            <i className="fas fa-save me-1"></i> Simpan Pengaturan
                             </button>
                         </div>
-                    </form>
+                        </form>
+                    </>
+                    )}
                 </div>
             </div>
         </Layout>

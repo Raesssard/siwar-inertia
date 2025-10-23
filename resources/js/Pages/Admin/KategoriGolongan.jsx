@@ -130,18 +130,18 @@ export default function KategoriGolongan({ kategori, filters, title }) {
                 <table className="table-custom w-full text-left border-collapse">
                     <thead>
                         <tr>
-                            <th>No</th>
-                            <th>Jenis</th>
-                            <th>Aksi</th>
+                            <th className="text-center">No</th>
+                            <th className="text-center">Jenis</th>
+                            <th className="text-center">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
                         {kategori.data.length > 0 ? (
                             kategori.data.map((item, index) => (
                                 <tr key={item.id}>
-                                    <td>{kategori.from + index}</td>
-                                    <td>{item.jenis}</td>
-                                    <td>
+                                    <td className="text-center">{kategori.from + index}</td>
+                                    <td className="text-center">{item.jenis}</td>
+                                    <td className="text-center">
                                         <button
                                             className="btn-custom btn-warning me-1"
                                             onClick={() => openEdit(item)}

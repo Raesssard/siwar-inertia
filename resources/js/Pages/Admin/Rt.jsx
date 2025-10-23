@@ -160,68 +160,63 @@ export default function Rt({ rukun_tetangga, filters, nomorRtList, rwList, title
                 <table className="table-custom">
                     <thead>
                         <tr>
-                            <th>No</th>
-                            <th>NIK</th>
-                            <th>Nomor RT</th>
-                            <th>Nama Ketua RT</th>
-                            <th>Mulai Menjabat</th>
-                            <th>Akhir Jabatan</th>
-                            <th>Status</th>
-                            <th>Aksi</th>
+                            <th className="text-center">No</th>
+                            <th className="text-center">NIK</th>
+                            <th className="text-center">Nomor RT</th>
+                            <th className="text-center">Nama Anggota RT</th>
+                            <th className="text-center">Mulai Menjabat</th>
+                            <th className="text-center">Akhir Jabatan</th>
+                            <th className="text-center">Status</th>
+                            <th className="text-center">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
                         {rukun_tetangga.data.length > 0 ? (
                             rukun_tetangga.data.map((item, index) => (
                                 <tr key={item.id}>
-                                    <td>{rukun_tetangga.from + index}</td>
-                                    <td>{item.nik}</td>
-                                    <td>{item.nomor_rt}</td>
-                                    <td>{item.nama_anggota_rt}</td>
-                                    <td>{item.mulai_menjabat}</td>
-                                    <td>{item.akhir_jabatan}</td>
-                                    <td>
+                                    <td className="text-center">{rukun_tetangga.from + index}</td>
+                                    <td className="text-center">{item.nik || "-"}</td>
+                                    <td className="text-center">{item.nomor_rt || "-"}</td>
+                                    <td className="text-center">{item.nama_anggota_rt || "-"}</td>
+                                    <td className="text-center">{item.mulai_menjabat || "-"}</td>
+                                    <td className="text-center">{item.akhir_jabatan || "-"}</td>
+                                    <td className="text-center align-middle">
                                         <span
-                                            className={`px-2 py-1 rounded text-sm font-medium ${
-                                                item.status === "aktif"
-                                                    ? "bg-green-100 text-green-700"
-                                                    : "bg-red-100 text-red-700"
+                                            className={`inline-block px-2 py-1 rounded text-sm font-medium ${
+                                            item.status === "aktif"
+                                                ? "bg-green-100 text-green-700"
+                                                : "bg-red-100 text-red-700"
                                             }`}
                                         >
                                             {item.status || "-"}
                                         </span>
-                                    </td>
-                                    <td>
-                                        <button
+                                        </td>
+
+                                    <td className="text-center align-middle">
+                                        <div className="flex items-center justify-center gap-2">
+                                            <button
                                             className={`btn-custom ${
-                                                item.status === "aktif"
-                                                    ? "btn-secondary"
-                                                    : "btn-success"
-                                            } me-1`}
-                                            onClick={() =>
-                                                handleToggleStatus(item.id)
-                                            }
-                                        >
-                                            {item.status === "aktif"
-                                                ? "Nonaktifkan"
-                                                : "Aktifkan"}
-                                        </button>
+                                                item.status === "aktif" ? "btn-secondary" : "btn-success"
+                                            }`}
+                                            onClick={() => handleToggleStatus(item.id)}
+                                            >
+                                            {item.status === "aktif" ? "Nonaktifkan" : "Aktifkan"}
+                                            </button>
 
-                                        <button
-                                            className="btn-custom btn-warning me-1"
+                                            <button
+                                            className="btn-custom btn-warning"
                                             onClick={() => openEdit(item)}
-                                        >
+                                            >
                                             Edit
-                                        </button>
+                                            </button>
 
-                                        <button
+                                            <button
                                             className="btn-custom btn-danger"
-                                            onClick={() =>
-                                                handleDelete(item.id)
-                                            }
-                                        >
+                                            onClick={() => handleDelete(item.id)}
+                                            >
                                             Hapus
-                                        </button>
+                                            </button>
+                                        </div>
                                     </td>
                                 </tr>
                             ))

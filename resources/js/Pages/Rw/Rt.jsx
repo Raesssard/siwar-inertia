@@ -122,7 +122,7 @@ export default function Rt({ rukun_tetangga, title, filters, rukun_tetangga_filt
                             <tr>
                                 <th className="p-3 text-left">No</th>
                                 <th className="p-3 text-left">NIK</th>
-                                <th className="p-3 text-left">Nama Ketua RT</th>
+                                <th className="p-3 text-left">Nama Anggota RT</th>
                                 <th className="p-3 text-left">Nomor RT</th>
                                 <th className="p-3 text-left">Mulai Menjabat</th>
                                 <th className="p-3 text-left">Akhir Jabatan</th>
@@ -136,7 +136,7 @@ export default function Rt({ rukun_tetangga, title, filters, rukun_tetangga_filt
                                     <tr key={rt.id} className="border-t hover:bg-gray-50">
                                         <td className="p-3">{index + 1}</td>
                                         <td className="p-3">{rt.nik}</td>
-                                        <td className="p-3">{rt.nama_ketua_rt}</td>
+                                        <td className="p-3">{rt.nama_anggota_rt}</td>
                                         <td className="p-3">{rt.nomor_rt}</td>
                                         <td className="p-3">{rt.mulai_menjabat?.slice(0, 10)}</td>
                                         <td className="p-3">{rt.akhir_jabatan?.slice(0, 10)}</td>
