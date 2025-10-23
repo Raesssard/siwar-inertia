@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Setting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -45,5 +46,20 @@ class SettingsController extends Controller
         $user->save();
 
         return redirect()->route('settings')->with('success', 'Password berhasil diperbarui.');
+    }
+
+    public function updateSystem(Request $request)
+    {
+        $request->validate([
+            'max_rt_per_rw' => 'required|integer|min:1',
+        ], [
+            'max_rt_per_rw.required' => 'Nilai maksimal RT per RW wajib diisi.',
+            'max_rt_per_rw.integer' => 'Nilai harus berupa angka.',
+            'max_rt_per_rw.min' => 'Minimal 1 RT per RW.',
+        ]);
+
+        Setting::setValue('max_rt_per_rw', $request->max_rt_per_rw, 'Batas maksimal jumlah RT per RW.');
+
+        return redirect()->route('settings')->with('success', 'Pengaturan sistem berhasil diperbarui.');
     }
 }

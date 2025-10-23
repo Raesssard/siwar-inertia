@@ -3,32 +3,54 @@ import { useForm, usePage } from "@inertiajs/react";
 import Layout from "@/Layouts/Layout";
 
 export default function Settings() {
-    const { auth } = usePage().props;
+    const { auth, max_rt_per_rw } = usePage().props;
     const user = auth.user;
     const role = auth.currentRole;
-    console.log("Current Role:", role);
 
-    const { data, setData, put, processing, errors } = useForm({
+    // Form untuk ubah password
+    const {
+        data: passwordData,
+        setData: setPasswordData,
+        put: putPassword,
+        processing: passwordProcessing,
+        errors: passwordErrors,
+    } = useForm({
         current_password: "",
         password: "",
         password_confirmation: "",
     });
 
-    const handleSubmit = (e) => {
+    const handlePasswordSubmit = (e) => {
         e.preventDefault();
-        put(route("settings.update-password"));
+        putPassword(route("settings.update-password"));
+    };
+
+    // Form untuk pengaturan sistem
+    const {
+        data: settingsData,
+        setData: setSettingsData,
+        put: putSettings,
+        processing: settingsProcessing,
+        errors: settingsErrors,
+    } = useForm({
+        max_rt_per_rw: max_rt_per_rw || "",
+    });
+
+    const handleSettingsSubmit = (e) => {
+        e.preventDefault();
+        putSettings(route("settings.update-system"));
     };
 
     return (
-        <Layout title="Pengaturan Akun">
+        <Layout title="Pengaturan Akun & Sistem">
             <div className="col-12 col-md-10 col-lg-8 mx-auto py-5">
                 <div className="bg-white shadow rounded-lg p-4">
                     <h3 className="mb-4 fw-bold text-center">
                         <i className="fas fa-cog me-2 text-primary"></i> Pengaturan Akun
                     </h3>
 
+                    {/* Informasi Akun */}
                     <div className="border-bottom mb-4"></div>
-
                     <div className="mb-4">
                         <h5 className="fw-semibold mb-2 text-gray-800">
                             Informasi Akun
@@ -51,30 +73,29 @@ export default function Settings() {
                         )}
                     </div>
 
+                    {/* Form ubah password */}
                     <div className="border-bottom mb-4"></div>
-
                     <h5 className="fw-semibold mb-3 text-gray-800">
                         <i className="fas fa-key text-primary me-2"></i> Ubah Password
                     </h5>
 
-                    <form onSubmit={handleSubmit}>
+                    <form onSubmit={handlePasswordSubmit}>
                         <div className="mb-3">
                             <label htmlFor="current_password" className="form-label">
                                 <i className="fas fa-lock me-2"></i> Password Lama
                             </label>
                             <input
                                 type="password"
-                                name="current_password"
-                                id="current_password"
                                 className="form-control"
-                                placeholder="Password Lama"
-                                value={data.current_password}
-                                onChange={(e) => setData("current_password", e.target.value)}
+                                value={passwordData.current_password}
+                                onChange={(e) =>
+                                    setPasswordData("current_password", e.target.value)
+                                }
                                 required
                             />
-                            {errors.current_password && (
+                            {passwordErrors.current_password && (
                                 <div className="text-danger small mt-1">
-                                    {errors.current_password}
+                                    {passwordErrors.current_password}
                                 </div>
                             )}
                         </div>
@@ -85,59 +106,91 @@ export default function Settings() {
                             </label>
                             <input
                                 type="password"
-                                name="password"
-                                id="password"
                                 className="form-control"
-                                placeholder="Password Baru"
-                                value={data.password}
-                                onChange={(e) => setData("password", e.target.value)}
+                                value={passwordData.password}
+                                onChange={(e) =>
+                                    setPasswordData("password", e.target.value)
+                                }
                                 required
                                 minLength={8}
                             />
-                            {errors.password && (
+                            {passwordErrors.password && (
                                 <div className="text-danger small mt-1">
-                                    {errors.password}
+                                    {passwordErrors.password}
                                 </div>
                             )}
                         </div>
 
                         <div className="mb-4">
-                            <label htmlFor="password_confirmation" className="form-label">
+                            <label
+                                htmlFor="password_confirmation"
+                                className="form-label"
+                            >
                                 <i className="fas fa-lock me-2"></i> Konfirmasi Password
                             </label>
                             <input
                                 type="password"
-                                name="password_confirmation"
-                                id="password_confirmation"
                                 className="form-control"
-                                placeholder="Konfirmasi Password Baru"
-                                value={data.password_confirmation}
+                                value={passwordData.password_confirmation}
                                 onChange={(e) =>
-                                    setData("password_confirmation", e.target.value)
+                                    setPasswordData("password_confirmation", e.target.value)
                                 }
                                 required
                             />
-                            {errors.password_confirmation && (
+                            {passwordErrors.password_confirmation && (
                                 <div className="text-danger small mt-1">
-                                    {errors.password_confirmation}
+                                    {passwordErrors.password_confirmation}
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="d-flex justify-content-end gap-2 mb-4">
+                            <button
+                                type="submit"
+                                disabled={passwordProcessing}
+                                className="btn btn-primary px-4"
+                            >
+                                <i className="fas fa-save me-1"></i> Simpan Password
+                            </button>
+                        </div>
+                    </form>
+
+                    {/* 🔧 Pengaturan Sistem */}
+                    <div className="border-bottom mb-4"></div>
+                    <h5 className="fw-semibold mb-3 text-gray-800">
+                        <i className="fas fa-sliders-h text-success me-2"></i> Pengaturan Sistem
+                    </h5>
+
+                    <form onSubmit={handleSettingsSubmit}>
+                        <div className="mb-3">
+                            <label htmlFor="max_rt_per_rw" className="form-label">
+                                <i className="fas fa-home me-2"></i> Maksimal RT per RW
+                            </label>
+                            <input
+                                type="number"
+                                id="max_rt_per_rw"
+                                className="form-control"
+                                min={1}
+                                value={settingsData.max_rt_per_rw}
+                                onChange={(e) =>
+                                    setSettingsData("max_rt_per_rw", e.target.value)
+                                }
+                                required
+                            />
+                            {settingsErrors.max_rt_per_rw && (
+                                <div className="text-danger small mt-1">
+                                    {settingsErrors.max_rt_per_rw}
                                 </div>
                             )}
                         </div>
 
                         <div className="d-flex justify-content-end gap-2">
                             <button
-                                type="button"
-                                onClick={() => window.history.back()}
-                                className="btn btn-secondary px-4"
-                            >
-                                <i className="fas fa-arrow-left me-1"></i> Batal
-                            </button>
-                            <button
                                 type="submit"
-                                disabled={processing}
-                                className="btn btn-primary px-4"
+                                disabled={settingsProcessing}
+                                className="btn btn-success px-4"
                             >
-                                <i className="fas fa-save me-1"></i> Simpan Perubahan
+                                <i className="fas fa-save me-1"></i> Simpan Pengaturan
                             </button>
                         </div>
                     </form>
