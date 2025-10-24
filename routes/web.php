@@ -70,6 +70,8 @@ Route::middleware(['auth'])->group(function () {
     */
     Route::prefix('admin')->name('admin.')->group(function () {
         // ✅ RW & RT
+        Route::get('/analisis/warga', [AnalisisController::class, 'index'])->name('analisis');
+        Route::get('/analisis/sistem', [AnalisisController::class, 'index'])->name('analisis');
         Route::resource('rw', AdminRwController::class)->except(['create', 'edit', 'show']);
         Route::put('rw/{id}/toggle-status', [AdminRwController::class, 'toggleStatus'])->name('rw.toggleStatus');
         Route::resource('rt', AdminRtController::class)->except(['create', 'edit', 'show']);

@@ -117,6 +117,13 @@ class AdminWargaController extends Controller
             'tanggal' => Carbon::now()->toDateString(),
         ]);
 
+
+        return response()->json([
+                'success' => true,
+                'message' => 'Tagihan sudah diperbarui.',
+                'warga'=> $warga
+        ]);
+
         return redirect()->route('admin.warga.index')->with('success', 'Warga berhasil ditambahkan.');
     }
 

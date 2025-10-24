@@ -2095,7 +2095,7 @@ export function TambahEditKK({ show, onClose, dataKK = null, kategoriIuran, daft
                                         <option value="">-- Pilih RT --</option>
                                         {daftarRT.map((rt) => (
                                             <option key={rt.id} value={rt.id}>
-                                                RT {rt.nomor_rt} / RW {rt.rw.nomor_rw}
+                                                RT {rt?.nomor_rt} / RW {rt.rw?.nomor_rw}
                                             </option>
                                         ))}
                                     </select>

@@ -2,7 +2,7 @@ import Layout from "@/Layouts/Layout";
 import React from "react";
 import { Head, usePage } from "@inertiajs/react";
 import { StatCard } from "./Component/Card";
-import { analisisKeuanganRt, analisisKeuanganRw, analisisWargaRt, analisisWargaRw } from "./Component/GetPropRole";
+import { analisisKeuanganRt, analisisKeuanganRw, analisisWargaRt, analisisWargaRw, analisisWargaAdmin, analisisSistemAdmin } from "./Component/GetPropRole";
 
 export default function Analisis() {
     const { role, ...rest } = usePage().props
@@ -10,6 +10,12 @@ export default function Analisis() {
     const jenis = usePage().url.split("/").pop()
 
     switch (role) {
+        case "admin":
+            if (jenis === 'warga') {
+                statCards = analisisWargaAdmin(rest);
+            } else if (jenis === 'sistem') {
+                statCards = analisisSistemAdmin(rest);
+            }
         case "rw":
             if (jenis === 'keuangan') {
                 statCards = analisisKeuanganRw(rest);

@@ -37,6 +37,33 @@ class AnalisisController extends Controller
             'role' => $role,
         ];
 
+        if ($role === 'admin') {
+            $jumlah_warga = Warga::count();
+            $jumlah_kk = Kartu_keluarga::count();
+            $jumlah_rt = Rt::count();
+            $jumlah_rw = Rw::count();
+            $jumlah_pengumuman = Pengumuman::count();
+            $jumlah_pengaduan = Pengaduan::count();
+            $jumlah_golongan = Kategori_golongan::count();
+            $jumlah_roles = Role::count();
+            $jumlah_permissions = Permission::count();
+
+            $data = array_merge(
+                $data,
+                [
+                    'jumlah_warga' => $jumlah_warga,
+                    'jumlah_kk' => $jumlah_kk,
+                    'jumlah_rt' => $jumlah_rt,
+                    'jumlah_rw' => $jumlah_rw,
+                    'jumlah_pengumuman' => $jumlah_pengumuman,
+                    'jumlah_pengaduan' => $jumlah_pengaduan,
+                    'jumlah_golongan' => $jumlah_golongan,
+                    'jumlah_roles' => $jumlah_roles,
+                    'jumlah_permissions' => $jumlah_permissions,
+                ]
+            );
+        }
+
         if ($role === 'rt') {
             $rt_user_login_id = Auth::user()->rukunTetangga->id;
             $rwId = Auth::user()->rukunTetangga->id_rw;

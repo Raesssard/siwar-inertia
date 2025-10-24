@@ -119,7 +119,33 @@ export function getWargaLinks() {
     ];
 }
 
-export function getAdminCards({ ...rest }) {
+export function analisisSistemAdmin({ ...rest }) {
+    return [
+        {
+            href: "/admin/kategori-golongan",
+            color: "primary",
+            title: "Jumlah Kategori Golongan",
+            value: rest.jumlah_golongan,
+            icon: "layer-group",
+        },
+        {
+            href: "/admin/roles",
+            color: "warning",
+            title: "Jumlah Roles",
+            value: rest.jumlah_roles,
+            icon: "user-shield",
+        },
+        {
+            href: "/admin/permissions",
+            color: "danger",
+            title: "Jumlah Permissions",
+            value: rest.jumlah_permissions,
+            icon: "key",
+        },
+    ];
+}
+
+export function analisisWargaAdmin({ ...rest }) {
     return [
         {
             href: "/admin/kartu_keluarga",
@@ -163,26 +189,83 @@ export function getAdminCards({ ...rest }) {
             value: rest.jumlah_rt,
             icon: "users",
         },
+    ];
+}
+
+export function getAdminCards({ ...rest }) {
+    return [
         {
-            href: "/admin/kategori-golongan",
-            color: "primary",
-            title: "Jumlah Kategori Golongan",
-            value: rest.jumlah_golongan,
-            icon: "layer-group",
+            kategori: 'Data Warga',
+            isi: [
+                {
+                    href: "/admin/kartu_keluarga",
+                    color: "info",
+                    title: "Jumlah KK",
+                    value: rest.jumlah_kk,
+                    icon: "clipboard-list",
+                },
+                {
+                    href: "/admin/warga",
+                    color: "primary",
+                    title: "Jumlah Warga",
+                    value: rest.jumlah_warga,
+                    icon: "users",
+                },
+                {
+                    href: "/admin/warga",
+                    color: "primary",
+                    title: "Jumlah Warga Sebagai Penduduk",
+                    value: rest.jumlah_warga_penduduk,
+                    icon: "home",
+                },
+                {
+                    href: "/admin/warga",
+                    color: "primary",
+                    title: "Jumlah Warga Sebagai Pendatang",
+                    value: rest.jumlah_warga_pendatang,
+                    icon: "walking",
+                },
+                {
+                    href: "/admin/rw",
+                    color: "success",
+                    title: "Jumlah RW",
+                    value: rest.jumlah_rw,
+                    icon: "house-user",
+                },
+                {
+                    href: "/admin/rt",
+                    color: "info",
+                    title: "Jumlah RT",
+                    value: rest.jumlah_rt,
+                    icon: "users",
+                },
+            ]
         },
         {
-            href: "/admin/roles",
-            color: "warning",
-            title: "Jumlah Roles",
-            value: rest.jumlah_roles,
-            icon: "user-shield",
-        },
-        {
-            href: "/admin/permissions",
-            color: "danger",
-            title: "Jumlah Permissions",
-            value: rest.jumlah_permissions,
-            icon: "key",
+            kategori: 'Pengaturan Sistem',
+            isi: [
+                {
+                    href: "/admin/kategori-golongan",
+                    color: "primary",
+                    title: "Jumlah Kategori Golongan",
+                    value: rest.jumlah_golongan,
+                    icon: "layer-group",
+                },
+                {
+                    href: "/admin/roles",
+                    color: "warning",
+                    title: "Jumlah Roles",
+                    value: rest.jumlah_roles,
+                    icon: "user-shield",
+                },
+                {
+                    href: "/admin/permissions",
+                    color: "danger",
+                    title: "Jumlah Permissions",
+                    value: rest.jumlah_permissions,
+                    icon: "key",
+                },
+            ]
         },
     ];
 }
@@ -195,34 +278,56 @@ export function getAdminLinks() {
             icon: "tachometer-alt",
         },
         {
-            href: "/admin/kartu_keluarga",
-            text: "Data Kartu Keluarga",
-            icon: "id-card",
-        },
-        {
-            href: "/admin/rw",
-            text: "RW",
-            icon: "house-user",
-        },
-        {
-            href: "/admin/rt",
-            text: "RT",
+            text: "Analisis Warga",
             icon: "users",
+            children: [
+                {
+                    href: "/admin/analisis/warga",
+                    text: "Analisis Warga Admin",
+                    icon: "eye",
+                },
+                {
+                    href: "/admin/kartu_keluarga",
+                    text: "Data Kartu Keluarga",
+                    icon: "id-card",
+                },
+                {
+                    href: "/admin/rw",
+                    text: "Data RW",
+                    icon: "house-user",
+                },
+                {
+                    href: "/admin/rt",
+                    text: "Data RT",
+                    icon: "users",
+                },
+            ],
         },
         {
-            href: "/admin/kategori-golongan",
-            text: "Kategori Golongan",
-            icon: "layer-group",
-        },
-        {
-            href: "/admin/roles",
-            text: "Roles",
-            icon: "user-shield",
-        },
-        {
-            href: "/admin/permissions",
-            text: "Permissions",
-            icon: "key",
+            text: "Pengaturan Sistem",
+            icon: "cog",
+            children: [
+                {
+                    href: "/admin/analisis/sistem",
+                    text: "Analisis Sistem",
+                    icon: "cogs",
+                },
+                {
+                    href: "/admin/kategori-golongan",
+                    text: "Kategori Golongan",
+                    icon: "layer-group",
+                },
+                {
+                    href: "/admin/roles",
+                    text: "Roles",
+                    icon: "user-shield",
+                },
+                {
+                    href: "/admin/permissions",
+                    text: "Permissions",
+                    icon: "key",
+                },
+            ],
         },
     ];
 }
