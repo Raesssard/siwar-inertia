@@ -1,15 +1,16 @@
-// resources/js/Pages/Admin/Rw.jsx
-import React, { useState } from "react";
-import Layout from "@/Layouts/Layout";
-import { route } from "ziggy-js";
-import { Head, Link, router, usePage } from "@inertiajs/react";
-import { AddRwModal, EditRwModal } from "@/Pages/Component/Modal";
+import React, { useState } from "react"
+import Layout from "@/Layouts/Layout"
+import { route } from "ziggy-js"
+import { Head, Link, router, usePage } from "@inertiajs/react"
+import { AddRwModal, EditRwModal } from "@/Pages/Component/Modal"
+import "../../../css/kk.css" // biar gaya tabelnya sama
 
 export default function Rw({ rw, filters, nomorRwList, title }) {
     const { props } = usePage()
     const role = props.auth?.currentRole
-    const [showAdd, setShowAdd] = useState(false);
-    const [showEdit, setShowEdit] = useState(null);
+
+    const [showAdd, setShowAdd] = useState(false)
+    const [showEdit, setShowEdit] = useState(null)
 
     const [form, setForm] = useState({
         nik: "",
@@ -18,23 +19,21 @@ export default function Rw({ rw, filters, nomorRwList, title }) {
         mulai_menjabat: "",
         akhir_jabatan: "",
         status: "aktif",
-    });
+    })
 
     const [search, setSearch] = useState({
         keyword: filters?.keyword || "",
         nomor_rw: filters?.nomor_rw || "",
-    });
+    })
 
-    // --- handlers form RW ---
-    const handleChange = (e) => {
-        setForm({ ...form, [e.target.name]: e.target.value });
-    };
+    // --- Form Handlers ---
+    const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value })
 
     const handleAdd = (e) => {
-        e.preventDefault();
+        e.preventDefault()
         router.post(route("admin.rw.store"), form, {
             onSuccess: () => {
-                setShowAdd(false);
+                setShowAdd(false)
                 setForm({
                     nik: "",
                     nomor_rw: "",
@@ -42,89 +41,85 @@ export default function Rw({ rw, filters, nomorRwList, title }) {
                     mulai_menjabat: "",
                     akhir_jabatan: "",
                     status: "aktif",
-                });
+                })
             },
-        });
-    };
+        })
+    }
 
     const handleEdit = (e) => {
-        e.preventDefault();
+        e.preventDefault()
         router.put(route("admin.rw.update", showEdit.id), form, {
             onSuccess: () => setShowEdit(null),
-        });
-    };
+        })
+    }
 
     const handleDelete = (id) => {
         if (confirm("Yakin ingin menghapus data RW ini?")) {
-            router.delete(route("admin.rw.destroy", id));
+            router.delete(route("admin.rw.destroy", id))
         }
-    };
+    }
 
-    // 🔹 Toggle status aktif / nonaktif
     const handleToggleStatus = (id) => {
         if (confirm("Yakin ingin mengubah status RW ini?")) {
-            router.put(route("admin.rw.toggleStatus", id), {}, {
-                preserveScroll: true,
-            });
+            router.put(route("admin.rw.toggleStatus", id), {}, { preserveScroll: true })
         }
-    };
+    }
 
-    const openEdit = (rwItem) => {
+    const openEdit = (item) => {
         setForm({
-            nik: rwItem.nik || "",
-            nomor_rw: rwItem.nomor_rw || "",
-            nama_anggota_rw: rwItem.nama_anggota_rw || "",
-            mulai_menjabat: rwItem.mulai_menjabat || "",
-            akhir_jabatan: rwItem.akhir_jabatan || "",
-            status: rwItem.status || "aktif",
-        });
-        setShowEdit(rwItem);
-    };
+            nik: item.nik || "",
+            nomor_rw: item.nomor_rw || "",
+            nama_anggota_rw: item.nama_anggota_rw || "",
+            mulai_menjabat: item.mulai_menjabat || "",
+            akhir_jabatan: item.akhir_jabatan || "",
+            status: item.status || "aktif",
+        })
+        setShowEdit(item)
+    }
 
-    // --- handlers filter ---
-    const handleSearchChange = (e) => {
-        setSearch({ ...search, [e.target.name]: e.target.value });
-    };
+    // --- Filter ---
+    const handleSearchChange = (e) =>
+        setSearch({ ...search, [e.target.name]: e.target.value })
 
     const applyFilter = (e) => {
-        e.preventDefault();
+        e.preventDefault()
         router.get(route("admin.rw.index"), search, {
             replace: true,
             preserveScroll: true,
-        });
-    };
+        })
+    }
 
     const resetFilter = () => {
-        setSearch({
-            keyword: "",
-            nomor_rw: "",
-        });
-        router.get(route("admin.rw.index"), {}, {
-            replace: true,
-            preserveScroll: true,
-        });
-    };
+        setSearch({ keyword: "", nomor_rw: "" })
+        router.get(route("admin.rw.index"), {}, { replace: true, preserveScroll: true })
+    }
 
     return (
-        <Layout title="Data RW">
-            <Head title={`${title} - ${role.length <= 2
-                ? role.toUpperCase()
-                : role.charAt(0).toUpperCase() + role.slice(1)}`} />
-            {/* Filter */}
-            <form onSubmit={applyFilter} className="filter-form">
+        <Layout>
+            <Head
+                title={`${title} - ${
+                    role.length <= 2
+                        ? role.toUpperCase()
+                        : role.charAt(0).toUpperCase() + role.slice(1)
+                }`}
+            />
+
+            {/* 🔹 Filter Section */}
+            <form onSubmit={applyFilter} className="filter-form mb-4 d-flex align-items-center">
                 <input
                     type="text"
                     name="keyword"
                     placeholder="Cari NIK atau Nama Ketua RW..."
                     value={search.keyword}
                     onChange={handleSearchChange}
+                    className="me-2"
                 />
 
                 <select
                     name="nomor_rw"
                     value={search.nomor_rw}
                     onChange={handleSearchChange}
-                    className="ms-2"
+                    className="me-2"
                 >
                     <option value="">-- Semua Nomor RW --</option>
                     {nomorRwList.map((rwItem, index) => (
@@ -134,54 +129,58 @@ export default function Rw({ rw, filters, nomorRwList, title }) {
                     ))}
                 </select>
 
-                <button type="submit" className="btn-custom btn-secondary ms-2">
+                <button type="submit" className="btn-custom btn-secondary me-2">
                     Filter
                 </button>
                 <button
                     type="button"
                     onClick={resetFilter}
-                    className="btn-custom btn-light bg-gray-300 ms-2"
+                    className="btn-custom btn-light bg-gray-300"
                 >
                     Reset
                 </button>
             </form>
 
-            {/* Table */}
+            {/* 🔹 Table Section */}
             <div className="table-container">
-                <div className="table-header">
+                <div className="table-header d-flex justify-content-between align-items-center">
                     <h4>Data RW</h4>
                     <button
-                        className="btn-custom btn-primary"
+                        className="btn btn-primary btn-sm"
                         onClick={() => setShowAdd(true)}
                     >
                         Tambah RW
                     </button>
                 </div>
 
-                <table className="table-custom">
-                    <thead>
-                        <tr>
-                            <th className="text-center">No</th>
-                            <th className="text-center">NIK</th>
-                            <th className="text-center">Nomor RW</th>
-                            <th className="text-center">Nama Anggota RW</th>
-                            <th className="text-center">Mulai Menjabat</th>
-                            <th className="text-center">Akhir Jabatan</th>
-                            <th className="text-center">Status</th>
-                            <th className="text-center">Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {rw.data.length > 0 ? (
-                            rw.data.map((item, index) => (
-                                <tr key={item.id}>
-                                    <td className="text-center">{rw.from + index}</td>
-                                    <td className="text-center">{item.nik || "-"}</td>
-                                    <td className="text-center">{item.nomor_rw || "-"}</td>
-                                    <td className="text-center">{item.nama_anggota_rw || "-"}</td>
-                                    <td className="text-center">{item.mulai_menjabat || "-"}</td>
-                                    <td className="text-center">{item.akhir_jabatan || "-"}</td>
-                                    <td className="text-center align-middle">
+                <div className="table-scroll">
+                    <table className="table-custom">
+                        <thead>
+                            <tr>
+                                <th className="text-center px-3">No.</th>
+                                <th className="text-center px-3">NIK</th>
+                                <th className="text-center px-3">NOMOR RW</th>
+                                <th className="text-center px-3">NAMA ANGGOTA RW</th>
+                                <th className="text-center px-3">MULAI MENJABAT</th>
+                                <th className="text-center px-3">AKHIR JABATAN</th>
+                                <th className="text-center px-3">STATUS</th>
+                                <th className="text-center px-3">AKSI</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {rw.data.length > 0 ? (
+                                rw.data.map((item, index) => (
+                                    <tr key={item.id}>
+                                        <td className="text-center">{rw.from + index}</td>
+                                        <td className="text-center">{item.nik || "-"}</td>
+                                        <td className="text-center">{item.nomor_rw || "-"}</td>
+                                        <td className="text-center">
+                                            {item.nama_anggota_rw || "-"}
+                                        </td>
+                                        <td className="text-center">{item.mulai_menjabat || "-"}</td>
+                                        <td className="text-center">{item.akhir_jabatan || "-"}</td>
+                                        <td className="text-center align-middle">
                                         <span
                                             className={`inline-block px-2 py-1 rounded text-sm font-medium ${
                                             item.status === "aktif"
@@ -192,78 +191,78 @@ export default function Rw({ rw, filters, nomorRwList, title }) {
                                             {item.status || "-"}
                                         </span>
                                         </td>
+                                        <td className="text-center">
+                                            <div className="d-flex justify-content-center gap-2">
+                                                <button
+                                                    className={`btn btn-sm ${
+                                                        item.status === "aktif"
+                                                            ? "btn-secondary"
+                                                            : "btn-success"
+                                                    }`}
+                                                    onClick={() => handleToggleStatus(item.id)}
+                                                >
+                                                    {item.status === "aktif"
+                                                        ? "Nonaktifkan"
+                                                        : "Aktifkan"}
+                                                </button>
 
-                                    <td className="text-center align-middle">
-                                        <div className="flex items-center justify-center gap-2">
-                                            <button
-                                            className={`btn-custom ${
-                                                item.status === "aktif" ? "btn-secondary" : "btn-success"
-                                            }`}
-                                            onClick={() => handleToggleStatus(item.id)}
-                                            >
-                                            {item.status === "aktif" ? "Nonaktifkan" : "Aktifkan"}
-                                            </button>
+                                                <button
+                                                    className="btn btn-warning btn-sm"
+                                                    onClick={() => openEdit(item)}
+                                                >
+                                                    Edit
+                                                </button>
 
-                                            <button
-                                            className="btn-custom btn-warning"
-                                            onClick={() => openEdit(item)}
-                                            >
-                                            Edit
-                                            </button>
-
-                                            <button
-                                            className="btn-custom btn-danger"
-                                            onClick={() => handleDelete(item.id)}
-                                            >
-                                            Hapus
-                                            </button>
-                                        </div>
+                                                <button
+                                                    className="btn btn-danger btn-sm"
+                                                    onClick={() => handleDelete(item.id)}
+                                                >
+                                                    Hapus
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))
+                            ) : (
+                                <tr>
+                                    <td colSpan="8" className="text-center">
+                                        Tidak ada data
                                     </td>
                                 </tr>
-                            ))
-                        ) : (
-                            <tr>
-                                <td colSpan="8" className="text-center">
-                                    Tidak ada data
-                                </td>
-                            </tr>
-                        )}
-                    </tbody>
-                </table>
+                            )}
+                        </tbody>
+                    </table>
+                </div>
 
-                {/* Pagination */}
+                {/* 🔹 Pagination */}
                 {rw.links && (
                     <div className="pagination-container">
                         <ul className="pagination-custom">
                             {rw.links.map((link, index) => {
-                                let label = link.label;
-                                if (label.includes("Previous")) label = "&lt;";
-                                if (label.includes("Next")) label = "&gt;";
+                                let label = link.label
+                                if (label.includes("Previous")) label = "&lt;"
+                                if (label.includes("Next")) label = "&gt;"
 
                                 return (
                                     <li
                                         key={index}
                                         className={`page-item ${
                                             link.active ? "active" : ""
-                                        } ${
-                                            !link.url ? "disabled" : ""
-                                        }`}
+                                        } ${!link.url ? "disabled" : ""}`}
                                     >
                                         <Link
-                                            href={link.url || "#"}
-                                            dangerouslySetInnerHTML={{
-                                                __html: label,
-                                            }}
+                                            href={link.url || ""}
+                                            dangerouslySetInnerHTML={{ __html: label }}
                                         />
                                     </li>
-                                );
+                                )
                             })}
                         </ul>
                     </div>
                 )}
             </div>
 
-            {/* Modal Tambah */}
+            {/* 🔹 Modal Tambah/Edit */}
             {showAdd && (
                 <AddRwModal
                     form={form}
@@ -273,7 +272,6 @@ export default function Rw({ rw, filters, nomorRwList, title }) {
                 />
             )}
 
-            {/* Modal Edit */}
             {showEdit && (
                 <EditRwModal
                     form={form}
@@ -283,5 +281,5 @@ export default function Rw({ rw, filters, nomorRwList, title }) {
                 />
             )}
         </Layout>
-    );
+    )
 }

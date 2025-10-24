@@ -52,6 +52,8 @@ class AnalisisController extends Controller
                 $data,
                 [
                     'jumlah_warga' => $jumlah_warga,
+                    'jumlah_warga_penduduk' => Warga::where('status_warga', 'penduduk')->count(),
+                    'jumlah_warga_pendatang' => Warga::where('status_warga', 'pendatang')->count(),
                     'jumlah_kk' => $jumlah_kk,
                     'jumlah_rt' => $jumlah_rt,
                     'jumlah_rw' => $jumlah_rw,

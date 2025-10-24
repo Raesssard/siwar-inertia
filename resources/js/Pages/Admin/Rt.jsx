@@ -1,14 +1,17 @@
-import React, { useState } from "react";
-import { Head, Link, router, usePage } from "@inertiajs/react";
-import { route } from "ziggy-js";
-import Layout from "@/Layouts/Layout";
-import { AddRtModal, EditRtModal } from "@/Pages/Component/Modal";
+// resources/js/Pages/Admin/Rt.jsx
+import React, { useState } from "react"
+import Layout from "@/Layouts/Layout"
+import { route } from "ziggy-js"
+import { Head, Link, router, usePage } from "@inertiajs/react"
+import { AddRtModal, EditRtModal } from "@/Pages/Component/Modal"
+import "../../../css/kk.css" // biar tabelnya sama gayanya
 
 export default function Rt({ rukun_tetangga, filters, nomorRtList, rwList, title }) {
     const { props } = usePage()
     const role = props.auth?.currentRole
-    const [showAdd, setShowAdd] = useState(false);
-    const [showEdit, setShowEdit] = useState(null);
+
+    const [showAdd, setShowAdd] = useState(false)
+    const [showEdit, setShowEdit] = useState(null)
 
     const [form, setForm] = useState({
         nik: "",
@@ -17,23 +20,21 @@ export default function Rt({ rukun_tetangga, filters, nomorRtList, rwList, title
         mulai_menjabat: "",
         akhir_jabatan: "",
         status: "aktif",
-    });
+    })
 
     const [search, setSearch] = useState({
         keyword: filters?.keyword || "",
         nomor_rt: filters?.nomor_rt || "",
-    });
+    })
 
-    // --- handler form RT ---
-    const handleChange = (e) => {
-        setForm({ ...form, [e.target.name]: e.target.value });
-    };
+    // --- Form Handlers ---
+    const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value })
 
     const handleAdd = (e) => {
-        e.preventDefault();
+        e.preventDefault()
         router.post(route("admin.rt.store"), form, {
             onSuccess: () => {
-                setShowAdd(false);
+                setShowAdd(false)
                 setForm({
                     nik: "",
                     nomor_rt: "",
@@ -41,89 +42,85 @@ export default function Rt({ rukun_tetangga, filters, nomorRtList, rwList, title
                     mulai_menjabat: "",
                     akhir_jabatan: "",
                     status: "aktif",
-                });
+                })
             },
-        });
-    };
+        })
+    }
 
     const handleEdit = (e) => {
-        e.preventDefault();
+        e.preventDefault()
         router.put(route("admin.rt.update", showEdit.id), form, {
             onSuccess: () => setShowEdit(null),
-        });
-    };
+        })
+    }
 
     const handleDelete = (id) => {
         if (confirm("Yakin ingin menghapus data RT ini?")) {
-            router.delete(route("admin.rt.destroy", id));
+            router.delete(route("admin.rt.destroy", id))
         }
-    };
+    }
 
-    // 🔹 Toggle status aktif / nonaktif
     const handleToggleStatus = (id) => {
         if (confirm("Yakin ingin mengubah status RT ini?")) {
-            router.put(route("admin.rt.toggleStatus", id), {}, {
-                preserveScroll: true,
-            });
+            router.put(route("admin.rt.toggleStatus", id), {}, { preserveScroll: true })
         }
-    };
+    }
 
-    const openEdit = (rtItem) => {
+    const openEdit = (item) => {
         setForm({
-            nik: rtItem.nik || "",
-            nomor_rt: rtItem.nomor_rt || "",
-            nama_anggota_rt: rtItem.nama_anggota_rt || "",
-            mulai_menjabat: rtItem.mulai_menjabat || "",
-            akhir_jabatan: rtItem.akhir_jabatan || "",
-            status: rtItem.status || "aktif",
-        });
-        setShowEdit(rtItem);
-    };
+            nik: item.nik || "",
+            nomor_rt: item.nomor_rt || "",
+            nama_anggota_rt: item.nama_anggota_rt || "",
+            mulai_menjabat: item.mulai_menjabat || "",
+            akhir_jabatan: item.akhir_jabatan || "",
+            status: item.status || "aktif",
+        })
+        setShowEdit(item)
+    }
 
-    // --- handler filter ---
-    const handleSearchChange = (e) => {
-        setSearch({ ...search, [e.target.name]: e.target.value });
-    };
+    // --- Filter Handlers ---
+    const handleSearchChange = (e) =>
+        setSearch({ ...search, [e.target.name]: e.target.value })
 
     const applyFilter = (e) => {
-        e.preventDefault();
+        e.preventDefault()
         router.get(route("admin.rt.index"), search, {
             replace: true,
             preserveScroll: true,
-        });
-    };
+        })
+    }
 
     const resetFilter = () => {
-        setSearch({
-            keyword: "",
-            nomor_rt: "",
-        });
-        router.get(route("admin.rt.index"), {}, {
-            replace: true,
-            preserveScroll: true,
-        });
-    };
+        setSearch({ keyword: "", nomor_rt: "" })
+        router.get(route("admin.rt.index"), {}, { replace: true, preserveScroll: true })
+    }
 
     return (
-        <Layout title="Data RT">
-            <Head title={`${title} - ${role.length <= 2
-                ? role.toUpperCase()
-                : role.charAt(0).toUpperCase() + role.slice(1)}`} />
-            {/* Filter */}
-            <form onSubmit={applyFilter} className="filter-form">
+        <Layout>
+            <Head
+                title={`${title} - ${
+                    role.length <= 2
+                        ? role.toUpperCase()
+                        : role.charAt(0).toUpperCase() + role.slice(1)
+                }`}
+            />
+
+            {/* 🔹 Filter Section */}
+            <form onSubmit={applyFilter} className="filter-form mb-4 d-flex align-items-center">
                 <input
                     type="text"
                     name="keyword"
                     placeholder="Cari NIK atau Nama Ketua RT..."
                     value={search.keyword}
                     onChange={handleSearchChange}
+                    className="me-2"
                 />
 
                 <select
                     name="nomor_rt"
                     value={search.nomor_rt}
                     onChange={handleSearchChange}
-                    className="ms-2"
+                    className="me-2"
                 >
                     <option value="">-- Semua Nomor RT --</option>
                     {nomorRtList.map((rtItem, index) => (
@@ -133,136 +130,142 @@ export default function Rt({ rukun_tetangga, filters, nomorRtList, rwList, title
                     ))}
                 </select>
 
-                <button type="submit" className="btn-custom btn-secondary ms-2">
+                <button type="submit" className="btn-custom btn-secondary me-2">
                     Filter
                 </button>
                 <button
                     type="button"
                     onClick={resetFilter}
-                    className="btn-custom btn-light bg-gray-300 ms-2"
+                    className="btn-custom btn-light bg-gray-300"
                 >
                     Reset
                 </button>
             </form>
 
-            {/* Table */}
+            {/* 🔹 Table Section */}
             <div className="table-container">
-                <div className="table-header">
+                <div className="table-header d-flex justify-content-between align-items-center">
                     <h4>Data RT</h4>
                     <button
-                        className="btn-custom btn-primary"
+                        className="btn btn-primary btn-sm"
                         onClick={() => setShowAdd(true)}
                     >
                         Tambah RT
                     </button>
                 </div>
 
-                <table className="table-custom">
-                    <thead>
-                        <tr>
-                            <th className="text-center">No</th>
-                            <th className="text-center">NIK</th>
-                            <th className="text-center">Nomor RT</th>
-                            <th className="text-center">Nama Anggota RT</th>
-                            <th className="text-center">Mulai Menjabat</th>
-                            <th className="text-center">Akhir Jabatan</th>
-                            <th className="text-center">Status</th>
-                            <th className="text-center">Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {rukun_tetangga.data.length > 0 ? (
-                            rukun_tetangga.data.map((item, index) => (
-                                <tr key={item.id}>
-                                    <td className="text-center">{rukun_tetangga.from + index}</td>
-                                    <td className="text-center">{item.nik || "-"}</td>
-                                    <td className="text-center">{item.nomor_rt || "-"}</td>
-                                    <td className="text-center">{item.nama_anggota_rt || "-"}</td>
-                                    <td className="text-center">{item.mulai_menjabat || "-"}</td>
-                                    <td className="text-center">{item.akhir_jabatan || "-"}</td>
-                                    <td className="text-center align-middle">
-                                        <span
-                                            className={`inline-block px-2 py-1 rounded text-sm font-medium ${
-                                            item.status === "aktif"
-                                                ? "bg-green-100 text-green-700"
-                                                : "bg-red-100 text-red-700"
-                                            }`}
-                                        >
-                                            {item.status || "-"}
-                                        </span>
+                <div className="table-scroll">
+                    <table className="table-custom">
+                        <thead>
+                            <tr>
+                                <th className="text-center px-3">No.</th>
+                                <th className="text-center px-3">NIK</th>
+                                <th className="text-center px-3">NOMOR RT</th>
+                                <th className="text-center px-3">NAMA ANGGOTA RT</th>
+                                <th className="text-center px-3">MULAI MENJABAT</th>
+                                <th className="text-center px-3">AKHIR JABATAN</th>
+                                <th className="text-center px-3">STATUS</th>
+                                <th className="text-center px-3">AKSI</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {rukun_tetangga.data.length > 0 ? (
+                                rukun_tetangga.data.map((item, index) => (
+                                    <tr key={item.id}>
+                                        <td className="text-center">
+                                            {rukun_tetangga.from + index}
                                         </td>
-
-                                    <td className="text-center align-middle">
-                                        <div className="flex items-center justify-center gap-2">
-                                            <button
-                                            className={`btn-custom ${
-                                                item.status === "aktif" ? "btn-secondary" : "btn-success"
-                                            }`}
-                                            onClick={() => handleToggleStatus(item.id)}
+                                        <td className="text-center">{item.nik || "-"}</td>
+                                        <td className="text-center">{item.nomor_rt || "-"}</td>
+                                        <td className="text-center">
+                                            {item.nama_anggota_rt || "-"}
+                                        </td>
+                                        <td className="text-center">{item.mulai_menjabat || "-"}</td>
+                                        <td className="text-center">{item.akhir_jabatan || "-"}</td>
+                                        <td className="text-center align-middle">
+                                            <span
+                                                className={`inline-block px-2 py-1 rounded text-sm font-medium ${
+                                                    item.status === "aktif"
+                                                        ? "bg-green-100 text-green-700"
+                                                        : "bg-red-100 text-red-700"
+                                                }`}
                                             >
-                                            {item.status === "aktif" ? "Nonaktifkan" : "Aktifkan"}
-                                            </button>
+                                                {item.status || "-"}
+                                            </span>
+                                        </td>
+                                        <td className="text-center">
+                                            <div className="d-flex justify-content-center gap-2">
+                                                <button
+                                                    className={`btn btn-sm ${
+                                                        item.status === "aktif"
+                                                            ? "btn-secondary"
+                                                            : "btn-success"
+                                                    }`}
+                                                    onClick={() => handleToggleStatus(item.id)}
+                                                >
+                                                    {item.status === "aktif"
+                                                        ? "Nonaktifkan"
+                                                        : "Aktifkan"}
+                                                </button>
 
-                                            <button
-                                            className="btn-custom btn-warning"
-                                            onClick={() => openEdit(item)}
-                                            >
-                                            Edit
-                                            </button>
+                                                <button
+                                                    className="btn btn-warning btn-sm"
+                                                    onClick={() => openEdit(item)}
+                                                >
+                                                    Edit
+                                                </button>
 
-                                            <button
-                                            className="btn-custom btn-danger"
-                                            onClick={() => handleDelete(item.id)}
-                                            >
-                                            Hapus
-                                            </button>
-                                        </div>
+                                                <button
+                                                    className="btn btn-danger btn-sm"
+                                                    onClick={() => handleDelete(item.id)}
+                                                >
+                                                    Hapus
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))
+                            ) : (
+                                <tr>
+                                    <td colSpan="8" className="text-center">
+                                        Tidak ada data
                                     </td>
                                 </tr>
-                            ))
-                        ) : (
-                            <tr>
-                                <td colSpan="8" className="text-center">
-                                    Tidak ada data
-                                </td>
-                            </tr>
-                        )}
-                    </tbody>
-                </table>
+                            )}
+                        </tbody>
+                    </table>
+                </div>
 
-                {/* Pagination */}
+                {/* 🔹 Pagination */}
                 {rukun_tetangga.links && (
                     <div className="pagination-container">
                         <ul className="pagination-custom">
                             {rukun_tetangga.links.map((link, index) => {
-                                let label = link.label;
-                                if (label.includes("Previous")) label = "&lt;";
-                                if (label.includes("Next")) label = "&gt;";
+                                let label = link.label
+                                if (label.includes("Previous")) label = "&lt;"
+                                if (label.includes("Next")) label = "&gt;"
 
                                 return (
                                     <li
                                         key={index}
                                         className={`page-item ${
                                             link.active ? "active" : ""
-                                        } ${
-                                            !link.url ? "disabled" : ""
-                                        }`}
+                                        } ${!link.url ? "disabled" : ""}`}
                                     >
                                         <Link
-                                            href={link.url || "#"}
-                                            dangerouslySetInnerHTML={{
-                                                __html: label,
-                                            }}
+                                            href={link.url || ""}
+                                            dangerouslySetInnerHTML={{ __html: label }}
                                         />
                                     </li>
-                                );
+                                )
                             })}
                         </ul>
                     </div>
                 )}
             </div>
 
-            {/* Modal Tambah */}
+            {/* 🔹 Modal Tambah/Edit */}
             {showAdd && (
                 <AddRtModal
                     form={form}
@@ -270,11 +273,9 @@ export default function Rt({ rukun_tetangga, filters, nomorRtList, rwList, title
                     handleAdd={handleAdd}
                     onClose={() => setShowAdd(false)}
                     rwList={rwList}
-                    isRw={false}
                 />
             )}
 
-            {/* Modal Edit */}
             {showEdit && (
                 <EditRtModal
                     form={form}
@@ -282,9 +283,8 @@ export default function Rt({ rukun_tetangga, filters, nomorRtList, rwList, title
                     handleEdit={handleEdit}
                     onClose={() => setShowEdit(null)}
                     rwList={rwList}
-                    isRw={false}
                 />
             )}
         </Layout>
-    );
+    )
 }
