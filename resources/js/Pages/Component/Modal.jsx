@@ -206,8 +206,8 @@ export function AddRwModal({ form, handleChange, handleAdd, onClose }) {
                             <input type="text" name="nomor_rw" value={form.nomor_rw || ""} onChange={handleChange} className="w-full border rounded-md p-2" />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium">Nama Ketua RW</label>
-                            <input type="text" name="nama_ketua_rw" value={form.nama_ketua_rw || ""} onChange={handleChange} className="w-full border rounded-md p-2" />
+                            <label className="block text-sm font-medium">Nama Anggota RW</label>
+                            <input type="text" name="nama_anggota_rw" value={form.nama_anggota_rw || ""} onChange={handleChange} className="w-full border rounded-md p-2" />
                         </div>
                         <div>
                             <label className="block text-sm font-medium">Mulai Menjabat</label>
@@ -270,8 +270,8 @@ export function EditRwModal({ form, handleChange, handleEdit, onClose }) {
                             <input type="text" name="nomor_rw" value={form.nomor_rw || ""} onChange={handleChange} className="w-full border rounded-md p-2" />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium">Nama Ketua RW</label>
-                            <input type="text" name="nama_ketua_rw" value={form.nama_ketua_rw || ""} onChange={handleChange} className="w-full border rounded-md p-2" />
+                            <label className="block text-sm font-medium">Nama Anggota RW</label>
+                            <input type="text" name="nama_anggota_rw" value={form.nama_anggota_rw || ""} onChange={handleChange} className="w-full border rounded-md p-2" />
                         </div>
                         <div>
                             <label className="block text-sm font-medium">Mulai Menjabat</label>
@@ -339,13 +339,13 @@ export function AddRtModal({ form, handleChange, handleAdd, onClose, rwList = []
                             />
                         </div>
 
-                        {/* 🔹 Nama Ketua RT */}
+                        {/* 🔹 Nama Anggota RT */}
                         <div>
-                            <label className="block text-sm font-medium">Nama Ketua RT</label>
+                            <label className="block text-sm font-medium">Nama Anggota RT</label>
                             <input
                                 type="text"
-                                name="nama_ketua_rt"
-                                value={form.nama_ketua_rt || ""}
+                                name="nama_anggota_rt"
+                                value={form.nama_anggota_rt || ""}
                                 onChange={handleChange}
                                 className="w-full border rounded-md p-2"
                             />
@@ -403,7 +403,7 @@ export function AddRtModal({ form, handleChange, handleAdd, onClose, rwList = []
                                     <option value="">-- Pilih RW --</option>
                                     {rwList.map((rw) => (
                                         <option key={rw.id} value={rw.id}>
-                                            RW {rw.nomor_rw} - {rw.nama_ketua_rw}
+                                            RW {rw.nomor_rw} - {rw.nama_anggota_rw}
                                         </option>
                                     ))}
                                 </select>
@@ -462,8 +462,8 @@ export function EditRtModal({ form, handleChange, handleEdit, onClose, rwList = 
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium">Nama Ketua RT</label>
-                            <input type="text" name="nama_ketua_rt" value={form.nama_ketua_rt || ""} onChange={handleChange} className="w-full border rounded-md p-2" />
+                            <label className="block text-sm font-medium">Nama Anggota RT</label>
+                            <input type="text" name="nama_anggota_rt" value={form.nama_anggota_rt || ""} onChange={handleChange} className="w-full border rounded-md p-2" />
                         </div>
 
                         {/* 🔹 Jabatan */}
@@ -495,7 +495,7 @@ export function EditRtModal({ form, handleChange, handleEdit, onClose, rwList = 
                                     <option value="">-- Pilih RW --</option>
                                     {rwList.map((rw) => (
                                         <option key={rw.id} value={rw.id}>
-                                            RW {rw.nomor_rw} - {rw.nama_ketua_rw}
+                                            RW {rw.nomor_rw} - {rw.nama_anggota_rw}
                                         </option>
                                     ))}
                                 </select>
@@ -2118,12 +2118,11 @@ export function TambahEditKK({ show, onClose, dataKK = null, kategoriIuran, daft
                                         className="form-select shadow-sm"
                                         value={data.id_rt}
                                         onChange={(e) => setData("id_rt", e.target.value)}
-                                        required
                                     >
                                         <option value="">-- Pilih RT --</option>
                                         {daftarRT.map((rt) => (
                                             <option key={rt.id} value={rt.id}>
-                                                RT {rt.nomor_rt} / RW {rt.rw.nomor_rw}
+                                                RT {rt?.nomor_rt} / RW {rt.rw?.nomor_rw}
                                             </option>
                                         ))}
                                     </select>
@@ -2389,6 +2388,7 @@ export function DetailKK({ selectedData, detailShow, onClose, role, userData }) 
                                     </p>
                                 </div>
                                 <div className="kk-info-item">
+
                                     <p>
                                         <strong>Kecamatan</strong> :{" "}
                                         {selectedData?.kecamatan ?? "-"}
@@ -3029,7 +3029,7 @@ export function DetailPengumuman({ selectedData, detailShow, onClose, onUpdated,
                                             )}
                                             <small className="text-muted">
                                                 <strong>
-                                                    {selectedData.rukun_tetangga ? selectedData.rukun_tetangga.nama_ketua_rt : selectedData.rw.nama_ketua_rw}
+                                                    {selectedData.rukun_tetangga ? selectedData.rukun_tetangga.nama_anggota_rt : selectedData.rw.nama_anggota_rw}
                                                 </strong> • {" "}
                                                 {selectedData.rukun_tetangga && `RT ${selectedData.rukun_tetangga?.nomor_rt}/`}
                                                 RW {selectedData.rw?.nomor_rw}{" "}

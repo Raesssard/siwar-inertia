@@ -7,7 +7,7 @@ export default function FormWarga({
   warga = null,
   noKK,
   onClose,
-  role = "rw",
+  role,
   wargaList = [],
 }) {
   const isEdit = !!warga;

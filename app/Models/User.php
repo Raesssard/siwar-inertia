@@ -20,7 +20,6 @@ class User extends Authenticatable
         'nik',
         'password',
         'nama',
-        'nomor_rw',
         'id_rw',
         'id_rt',
     ];

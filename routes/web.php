@@ -5,6 +5,7 @@ use App\Http\Controllers\{
     AnalisisController,
     LoginController,
     DashboardController,
+    SettingsController,
 };
 use App\Http\Controllers\Warga\{
     LihatKKController,
@@ -56,6 +57,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/choose-role', [LoginController::class, 'chooseRole'])->name('choose-role');
     Route::post('/choose-role', [LoginController::class, 'setRole'])->name('choose.role');
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/settings', [SettingsController::class, 'index'])->name('settings');
+    Route::put('/settings/password', [SettingsController::class, 'updatePassword'])->name('settings.update-password');
+    Route::put('/settings/update-system', [SettingsController::class, 'updateSystem'])->name('settings.update-system');
 
     /*
     |--------------------------------------------------------------------------
@@ -64,6 +68,8 @@ Route::middleware(['auth'])->group(function () {
     */
     Route::prefix('admin')->name('admin.')->group(function () {
         // ✅ RW & RT
+        Route::get('/analisis/warga', [AnalisisController::class, 'index'])->name('analisis');
+        Route::get('/analisis/sistem', [AnalisisController::class, 'index'])->name('analisis');
         Route::resource('rw', AdminRwController::class)->except(['create', 'edit', 'show']);
         Route::put('rw/{id}/toggle-status', [AdminRwController::class, 'toggleStatus'])->name('rw.toggleStatus');
         Route::resource('rt', AdminRtController::class)->except(['create', 'edit', 'show']);

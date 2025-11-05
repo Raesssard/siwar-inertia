@@ -18,7 +18,7 @@ class Rt extends Model
         'nik',
         'no_kk',
         'nomor_rt',
-        'nama_ketua_rt',
+        'nama_anggota_rt',
         'mulai_menjabat',
         'akhir_jabatan',
         'id_rw',
@@ -31,12 +31,16 @@ class Rt extends Model
         'status' => 'aktif',
     ];
 
-    /**
-     * Relasi ke warga (banyak)
-     */
-    public function warga(): HasMany
+    public function warga()
     {
-        return $this->hasMany(Warga::class, 'id_rt');
+        return $this->hasManyThrough(
+            Warga::class,
+            Kartu_keluarga::class,
+            'id_rt',     // foreign key di tabel KK
+            'no_kk',     // foreign key di tabel warga
+            'id',        // local key di RT
+            'no_kk'      // local key di KK
+        );
     }
 
     /**

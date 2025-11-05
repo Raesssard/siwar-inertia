@@ -15,7 +15,6 @@ return new class extends Migration
             $table->id();
             $table->char('nik', 16)->unique();
             $table->string('nama');
-            $table->string('nomor_rw')->nullable();
 
             // Relasi ke RT
             $table->unsignedBigInteger('id_rt')->nullable();
