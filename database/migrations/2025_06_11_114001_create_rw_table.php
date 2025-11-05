@@ -10,12 +10,13 @@ return new class extends Migration
     {
         Schema::create('rw', function (Blueprint $table) {
             $table->id();
-            $table->char('nik', 16)->unique();
+            $table->char('no_kk', 16)->nullable(); 
+            $table->char('nik', 16)->unique()->nullable();
             $table->string('nomor_rw');
-            $table->string('nama_ketua_rw');
-            $table->date('mulai_menjabat');
-            $table->date('akhir_jabatan');
-            $table->enum('status', ['aktif', 'nonaktif'])->default('aktif');
+            $table->string('nama_anggota_rw')->nullable();
+            $table->date('mulai_menjabat')->nullable();
+            $table->date('akhir_jabatan')->nullable();
+            $table->enum('status', ['aktif', 'nonaktif'])->default('aktif')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

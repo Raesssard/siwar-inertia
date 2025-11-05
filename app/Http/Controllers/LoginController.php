@@ -94,38 +94,4 @@ class LoginController extends Controller
 
         return $this->redirectByRole($role, $user);
     }
-
-    public function updatePassword(Request $request)
-    {
-        $request->validate([
-            'current_password' => 'required',
-            'password' => 'required|confirmed|min:6',
-        ], [
-            'current_password.required' => 'Password lama harus diisi.',
-            'password.required' => 'Password baru harus diisi.',
-            'password.confirmed' => 'Password baru tidak cocok.',
-            'password.min' => 'Password minimal 6 karakter.',
-        ]);
-
-        $user = Auth::user();
-
-        // Ensure $user is an instance of User model
-        if (!$user instanceof \App\Models\User) {
-            // Ini lebih baik ditangani di middleware atau guardian
-            return back()->withErrors(['user' => 'User instance not found.'])->withInput();
-        }
-
-        // Cek apakah password lama cocok
-        if (!Hash::check($request->current_password, $user->password)) {
-            // Jika password lama tidak cocok, kembali dengan error dan input lama
-            return back()->withErrors(['current_password' => 'Password lama tidak cocok.'])->withInput();
-        }
-
-        // Hash password baru sebelum disimpan
-        $user->password = bcrypt($request->password);
-        $user->save();
-
-        // Jika berhasil, kembali dengan pesan sukses
-        return back()->with('success', 'Password berhasil diperbarui!');
-    }
 }

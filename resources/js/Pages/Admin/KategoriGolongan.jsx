@@ -1,27 +1,23 @@
 import React, { useState } from "react";
+import Layout from "@/Layouts/Layout";
 import { Head, Link, router, usePage } from "@inertiajs/react";
 import { route } from "ziggy-js";
-import Layout from "@/Layouts/Layout";
 import {
     AddKategoriGolonganModal,
     EditKategoriGolonganModal,
 } from "@/Pages/Component/Modal";
+import "../../../css/kk.css";
 
 export default function KategoriGolongan({ kategori, filters, title }) {
-    const { props } = usePage()
-    const role = props.auth?.currentRole
+    const { props } = usePage();
+    const role = props.auth?.currentRole || "Admin";
     const [showAdd, setShowAdd] = useState(false);
     const [showEdit, setShowEdit] = useState(null);
-
     const [form, setForm] = useState({ jenis: "" });
     const [search, setSearch] = useState({ jenis: filters?.jenis || "" });
 
-    // 🔹 Handle perubahan input form tambah/edit
-    const handleChange = (e) => {
-        setForm({ ...form, [e.target.name]: e.target.value });
-    };
+    const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
-    // 🔹 Tambah kategori baru
     const handleAdd = (e) => {
         e.preventDefault();
         router.post(route("admin.kategori-golongan.store"), form, {
@@ -33,44 +29,30 @@ export default function KategoriGolongan({ kategori, filters, title }) {
         });
     };
 
-    // 🔹 Edit kategori
     const handleEdit = (e) => {
         e.preventDefault();
-
-        if (!showEdit?.id) {
-            alert("ID kategori tidak ditemukan.");
-            return;
-        }
-
-        router.put(
-            route("admin.kategori-golongan.update", showEdit.id),
-            form,
-            {
-                preserveScroll: true,
-                onSuccess: () => setShowEdit(null),
-            }
-        );
+        if (!showEdit?.id) return alert("ID kategori tidak ditemukan.");
+        router.put(route("admin.kategori-golongan.update", showEdit.id), form, {
+            preserveScroll: true,
+            onSuccess: () => setShowEdit(null),
+        });
     };
 
-    // 🔹 Hapus kategori
     const handleDelete = (id) => {
-        if (confirm("Yakin ingin menghapus kategori golongan ini?")) {
+        if (confirm("Yakin ingin menghapus kategori ini?")) {
             router.delete(route("admin.kategori-golongan.destroy", id), {
                 preserveScroll: true,
             });
         }
     };
 
-    // 🔹 Buka modal edit
     const openEdit = (item) => {
-        setForm({ jenis: item.jenis || "" });
-        setShowEdit({ id: item.id, jenis: item.jenis });
+        setForm({ jenis: item.jenis });
+        setShowEdit(item);
     };
 
-    // 🔹 Filter pencarian teks
-    const handleSearchChange = (e) => {
+    const handleSearchChange = (e) =>
         setSearch({ ...search, [e.target.name]: e.target.value });
-    };
 
     const applyFilter = (e) => {
         e.preventDefault();
@@ -89,22 +71,27 @@ export default function KategoriGolongan({ kategori, filters, title }) {
     };
 
     return (
-        <Layout title="Kategori Golongan">
-            <Head title={`${title} - ${role.length <= 2
-                ? role.toUpperCase()
-                : role.charAt(0).toUpperCase() + role.slice(1)}`} />
-            {/* 🔍 Filter pencarian */}
-            <form onSubmit={applyFilter} className="filter-form mb-3 flex gap-2">
+        <Layout>
+            <Head
+                title={`${title} - ${
+                    role.length <= 2
+                        ? role.toUpperCase()
+                        : role.charAt(0).toUpperCase() + role.slice(1)
+                }`}
+            />
+
+            {/* 🔍 Filter */}
+            <form onSubmit={applyFilter} className="filter-form mb-4 d-flex align-items-center">
                 <input
                     type="text"
                     name="jenis"
                     placeholder="Cari jenis golongan..."
                     value={search.jenis}
                     onChange={handleSearchChange}
-                    className="form-control w-auto"
+                    className="me-2"
                 />
-                <button type="submit" className="btn-custom btn-secondary">
-                    Cari
+                <button type="submit" className="btn-custom btn-secondary me-2">
+                    Filter
                 </button>
                 <button
                     type="button"
@@ -115,67 +102,70 @@ export default function KategoriGolongan({ kategori, filters, title }) {
                 </button>
             </form>
 
-            {/* 📋 Tabel Kategori */}
+            {/* 📋 Table Section */}
             <div className="table-container">
-                <div className="table-header flex justify-between items-center mb-3">
-                    <h4>Kategori Golongan</h4>
+                <div className="table-header d-flex justify-content-between align-items-center">
+                    <h4>Manajemen Kategori Golongan</h4>
                     <button
-                        className="btn-custom btn-primary"
+                        className="btn btn-primary btn-sm"
                         onClick={() => setShowAdd(true)}
                     >
                         Tambah Kategori
                     </button>
                 </div>
 
-                <table className="table-custom w-full text-left border-collapse">
-                    <thead>
-                        <tr>
-                            <th>No</th>
-                            <th>Jenis</th>
-                            <th>Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {kategori.data.length > 0 ? (
-                            kategori.data.map((item, index) => (
-                                <tr key={item.id}>
-                                    <td>{kategori.from + index}</td>
-                                    <td>{item.jenis}</td>
-                                    <td>
-                                        <button
-                                            className="btn-custom btn-warning me-1"
-                                            onClick={() => openEdit(item)}
-                                        >
-                                            Edit
-                                        </button>
-                                        <button
-                                            className="btn-custom btn-danger"
-                                            onClick={() => handleDelete(item.id)}
-                                        >
-                                            Hapus
-                                        </button>
+                <div className="table-scroll">
+                    <table className="table-custom">
+                        <thead>
+                            <tr>
+                                <th className="text-center px-3">No.</th>
+                                <th className="text-center px-3">Jenis Golongan</th>
+                                <th className="text-center px-3">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {kategori.data.length > 0 ? (
+                                kategori.data.map((item, index) => (
+                                    <tr key={item.id}>
+                                        <td className="text-center">{kategori.from + index}</td>
+                                        <td className="text-center">{item.jenis}</td>
+                                        <td className="text-center">
+                                            <div className="d-flex justify-content-center gap-2">
+                                                <button
+                                                    className="btn btn-warning btn-sm"
+                                                    onClick={() => openEdit(item)}
+                                                >
+                                                    Edit
+                                                </button>
+                                                <button
+                                                    className="btn btn-danger btn-sm"
+                                                    onClick={() => handleDelete(item.id)}
+                                                >
+                                                    Hapus
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))
+                            ) : (
+                                <tr>
+                                    <td colSpan="3" className="text-center">
+                                        Tidak ada data
                                     </td>
                                 </tr>
-                            ))
-                        ) : (
-                            <tr>
-                                <td colSpan="3" className="text-center py-3">
-                                    Tidak ada data
-                                </td>
-                            </tr>
-                        )}
-                    </tbody>
-                </table>
+                            )}
+                        </tbody>
+                    </table>
+                </div>
 
                 {/* 🔸 Pagination */}
                 {kategori.links && (
-                    <div className="pagination-container mt-3">
-                        <ul className="pagination-custom flex gap-2">
+                    <div className="pagination-container">
+                        <ul className="pagination-custom">
                             {kategori.links.map((link, index) => {
                                 let label = link.label;
                                 if (label.includes("Previous")) label = "&lt;";
                                 if (label.includes("Next")) label = "&gt;";
-
                                 return (
                                     <li
                                         key={index}
@@ -195,7 +185,7 @@ export default function KategoriGolongan({ kategori, filters, title }) {
                 )}
             </div>
 
-            {/* ➕ Modal Tambah */}
+            {/* 🪟 Modals */}
             {showAdd && (
                 <AddKategoriGolonganModal
                     form={form}
@@ -205,7 +195,6 @@ export default function KategoriGolongan({ kategori, filters, title }) {
                 />
             )}
 
-            {/* ✏️ Modal Edit */}
             {showEdit && (
                 <EditKategoriGolonganModal
                     form={form}
