@@ -11190,11 +11190,11 @@ a:focus {
 }
 
 .text-xs {
-  font-size: .7rem;
+  font-size: .7rem !important;
 }
 
 .text-lg {
-  font-size: 1.2rem;
+  font-size: 1.2rem !important;
 }
 
 .text-gray-100 {

@@ -4,7 +4,7 @@ import Role from "./Role"
 
 export function FilterPengaduan({ data, setData, list_tahun, list_bulan, list_level, filter, resetFilter, tambahShow, role }) {
     return (
-        <form onSubmit={filter} className="form-filter row g-2 pl-3 pb-2 mb-2 w-100">
+        <form onSubmit={filter} className="form-filter row g-2 pl-3 pb-2 w-100">
             <div className="col-md-5 col-12">
                 <div className="input-group input-group-sm">
                     <input

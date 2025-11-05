@@ -605,21 +605,21 @@ export function analisisKeuanganRt({ ...rest }) {
 export function analisisWargaRt({ ...rest }) {
     return [
         {
-            href: "/rt/kartu_keluarga",
+            href: "/rt/warga",
             color: "primary",
             title: "Jumlah Warga",
             value: rest.jumlah_warga,
             icon: "users",
         },
         {
-            href: "/rt/kartu_keluarga",
+            href: "/rt/warga",
             color: "primary",
             title: "Jumlah Warga Penduduk",
             value: rest.jumlah_warga_penduduk,
             icon: "home",
         },
         {
-            href: "/rt/kartu_keluarga",
+            href: "/rt/warga",
             color: "primary",
             title: "Jumlah Warga Pendatang",
             value: rest.jumlah_warga_pendatang,
@@ -641,21 +641,21 @@ export function getRtCards({ ...rest }) {
             kategori: 'Data Warga',
             isi: [
                 {
-                    href: "/rt/kartu_keluarga",
+                    href: "/rt/warga",
                     color: "primary",
                     title: "Jumlah Warga",
                     value: rest.jumlah_warga,
                     icon: "users",
                 },
                 {
-                    href: "/rt/kartu_keluarga",
+                    href: "/rt/warga",
                     color: "primary",
                     title: "Jumlah Warga Penduduk",
                     value: rest.jumlah_warga_penduduk,
                     icon: "home",
                 },
                 {
-                    href: "/rt/kartu_keluarga",
+                    href: "/rt/warga",
                     color: "primary",
                     title: "Jumlah Warga Pendatang",
                     value: rest.jumlah_warga_pendatang,
@@ -733,6 +733,11 @@ export function getRtLinks() {
                     href: "/rt/analisis/warga",
                     text: "Analisis Warga",
                     icon: "eye",
+                },
+                {
+                    href: "/rt/warga",
+                    text: "Data Warga",
+                    icon: "user",
                 },
                 {
                     href: "/rt/kartu_keluarga",

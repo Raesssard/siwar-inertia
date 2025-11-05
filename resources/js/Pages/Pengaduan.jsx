@@ -232,7 +232,7 @@ export default function Pengaduan() {
                 tambahShow={() => setShowModalTambah(true)}
                 role={role}
             />
-            <div className="d-flex align-items-center mx-3 mb-4 mt-0 w-100">
+            <div className="d-flex align-items-center ms-3 me-3 mb-3 mt-0 w-100">
                 <i className="fas fa-paper-plane me-2 text-primary"></i>
                 {totalFiltered} Pengaduan
             </div>
@@ -240,7 +240,7 @@ export default function Pengaduan() {
                 {pengaduanList.length ? sortedGroup.map(([kategori, items]) => (
                     <div key={kategori}>
                         <div className="d-flex align-items-center w-100">
-                            <div className="text-muted mb-3 mt-3 mx-4">
+                            <div className="text-muted mb-3 mt-3 ms-4 me-4">
                                 {kategori}
                             </div>
                             <div className="text-muted mr-4 ml-auto">
@@ -291,7 +291,7 @@ export default function Pengaduan() {
                                                         filePath={`/storage/${item.file_path}`}
                                                         judul={item.file_name}
                                                         displayStyle={imgStyle} />
-                                                    <h2 className="font-semibold text-lg mb-2 text-left mx-3">{item.judul}</h2>
+                                                    <h2 className="font-semibold text-lg mb-2 text-left ms-3 me-3">{item.judul}</h2>
                                                     <div className="text-sm text-gray-500 mb-2 d-flex gap-3">
                                                         <span><i className="fas fa-user mr-1"></i>{item.warga.nama}</span>
                                                         <span><i className="fas fa-clock mr-1"></i><FormatWaktu createdAt={item.created_at} /></span>
@@ -304,7 +304,7 @@ export default function Pengaduan() {
                                                         ) : ""}
                                                     </Role>
 
-                                                    <p className="isi-pengaduan text-gray-700 text-sm mb-3 mx-3 line-clamp-3">
+                                                    <p className="isi-pengaduan text-gray-700 text-sm mb-3 ms-3 me-3 line-clamp-3">
                                                         {item.isi.length > 100 ? item.isi.slice(0, 100) + "..." : item.isi}
                                                     </p>
                                                     <Role role="warga">

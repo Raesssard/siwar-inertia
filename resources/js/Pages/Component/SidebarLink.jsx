@@ -23,16 +23,20 @@ export function SidebarLink({ href, icon, text, children, isOpen, onToggle }) {
                         type="button"
                     >
                         <span>
-                            <i className={`fas fa-${icon} mr-2`}></i>
+                            <i className={`fas fa-${icon} me-2`}></i>
                             {text}
                         </span>
-                        <i className={`fas fa-chevron-${open ? "down" : "right"}`}></i>
+                        <i className={`fas fa-chevron-${open ? "down" : "right"}`} style={{
+                            position: 'relative',
+                            right: '0.25rem',
+                            zIndex: 10,
+                        }}></i>
                     </button>
                     <ul className={`list-unstyled ps-3 ${open ? "open" : ""}`}>
                         {children.map((child, idx) => (
                             <li key={idx} className={`nav-item m-0 ${isActive(url, child.href) ? "active" : ""}`}>
                                 <Link className="nav-link" href={child.href}>
-                                    <i className={`fas fa-${child.icon} mr-2`}></i>
+                                    <i className={`fas fa-${child.icon} me-2`}></i>
                                     {child.text}
                                 </Link>
                             </li>
@@ -40,8 +44,8 @@ export function SidebarLink({ href, icon, text, children, isOpen, onToggle }) {
                     </ul>
                 </>
             ) : (
-                <Link className="nav-link" href={href}>
-                    <i className={`fas ${href === "/dashboard" ? "fa-fw" : ""} fa-${icon} mr-2`}></i>
+                <Link className="nav-link " href={href}>
+                    <i className={`fas ${href === "/dashboard" ? "fa-fw" : ""} fa-${icon}`}></i>
                     <span>{text}</span>
                 </Link>
             )}

@@ -45,9 +45,7 @@ use App\Http\Controllers\Rw\{
 };
 use Inertia\Inertia;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', [LoginController::class, 'showLoginForm']);
 
 // 🔹 Auth
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
@@ -169,6 +167,8 @@ Route::middleware(['auth'])->group(function () {
 
         Route::resource('tagihan', Rt_tagihanController::class);
         Route::get('/export/tagihan', [ExportController::class, 'exportTagihan'])->name('tagihan.export');
+
+        Route::resource('warga', Rt_wargaController::class)->only('index');
 
         Route::resource('transaksi', Rt_transaksiController::class);
         Route::get('/export/transaksi', [ExportController::class, 'exportTransaksi'])->name('transaksi.export');
