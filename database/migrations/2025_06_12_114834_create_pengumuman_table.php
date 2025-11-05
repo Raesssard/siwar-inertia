@@ -18,7 +18,8 @@ return new class extends Migration
             $table->string('judul');
             $table->string('kategori');
             $table->text('isi');
-            $table->dateTime('tanggal');
+            $table->dateTime('tanggal')->nullable();
+            $table->string('tempat');
             $table->string('dokumen_path')->nullable(); // Path dokumen
             $table->string('dokumen_name')->nullable(); // Nama asli dokumen (opsional)
             $table->foreignId('id_rw')->nullable()->constrained('rw')->onDelete('cascade');

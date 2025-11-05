@@ -12,7 +12,7 @@ Artisan::command('inspire', function () {
 
 
 Schedule::call(function () {
-    Log::info('Test Scheduler Laravel 12: ' . now());
+    Log::info('Scheduler Laravel 12: ' . now());
 })->everyMinute();
 
 Schedule::command('iuran:generate-tagihan')->everyMinute();

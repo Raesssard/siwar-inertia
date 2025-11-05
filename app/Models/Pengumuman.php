@@ -11,13 +11,13 @@ class Pengumuman extends Model
 {
     use SoftDeletes;
 
-    //
     protected $table = 'pengumuman';
     protected $fillable = [
         'judul',
         'kategori',
         'isi',
         'tanggal',
+        'tempat',
         'id_rt',
         'id_rw',
         'dokumen_path', // Tambahkan ini

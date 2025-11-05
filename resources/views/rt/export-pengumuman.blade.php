@@ -1,88 +1,100 @@
 <!DOCTYPE html>
-<html lang="id">
+<html>
 
 <head>
     <meta charset="UTF-8">
-    <title>Pengumuman</title>
+    <title>Surat Pengumuman</title>
     <style>
         body {
-            font-family: DejaVu Sans, sans-serif;
-            line-height: 1.5;
-        }
-
-        .header {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        .judul {
-            font-size: 18px;
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-
-        .tanggal {
-            font-size: 12px;
-            color: #555;
-            margin-bottom: 20px;
-        }
-
-        .isi {
+            font-family: "Times New Roman", serif;
             font-size: 14px;
-            text-align: justify;
-            margin-bottom: 20px;
         }
 
-        .lampiran {
-            margin-top: 30px;
+        .center {
+            text-align: center;
         }
 
-        .lampiran h4 {
-            font-size: 16px;
-            margin-bottom: 10px;
+        .kop img {
+            width: 80px;
+            float: left;
+            margin-right: 10px
         }
 
-        .lampiran img {
-            max-width: 100%;
-            margin-bottom: 15px;
-            border: 1px solid #ccc;
-            padding: 5px;
+        .kop h2,
+        .kop h3,
+        .kop p {
+            margin: 0;
+            padding: 0;
         }
 
-        .link {
-            font-size: 12px;
-            color: blue;
+        .line {
+            border: 1px solid #000;
+            margin-top: 5px;
+        }
+
+        .ttd {
+            float: right;
+            text-align: center;
+            margin-top: 60px
+        }
+
+        .clear {
+            clear: both;
         }
     </style>
 </head>
 
 <body>
-    <div class="header">
-        <div class="judul">{{ $pengumuman->judul }}</div>
-        <div class="tanggal">Diterbitkan:
-            {{ \Carbon\Carbon::parse($pengumuman->tanggal)->translatedFormat('d F Y') }}
-        </div>
-        <div class="tanggal">Oleh:
-            {{ $pengumuman->id_rw && $pengumuman->id_rt
-                ? 'RW ' . $pengumuman->rw->nomor_rw . '/RT ' . $pengumuman->rukunTetangga->nomor_rt
-                : 'RW ' . $pengumuman->rw->nomor_rw }}
-        </div>
+    <div class="kop center">
+        {{-- sementara pake logo app dlu 🙏 --}}
+        <img src="{{ public_path('img/logo.png') }}">
+        <h2>PEMERINTAH {{ strtoupper($kabupaten) }}</h2>
+        <h3>KECAMATAN {{ strtoupper($kecamatan) }}</h3>
+        <h3>KELURAHAN {{ strtoupper($kelurahan) }}</h3>
+        <p>RT {{ $rt }} / RW {{ $rw }}</p>
     </div>
-
-    <div class="isi">
-        {!! nl2br(e($pengumuman->isi)) !!}
+    <div class="line"></div>
+    <br>
+    <div class="center">
+        <strong><u>{{ $judul }}</u></strong><br>
+        Nomor: {{ $nomor_surat }}
     </div>
-
-    @if (!empty($lampiranHtml))
-        <div class="lampiran">
-            <h4>Lampiran</h4>
-            @foreach ($lampiranHtml as $html)
-                <div class="lampiran-item" style="page-break-before: always;">
-                    {!! $html !!}
-                </div>
-            @endforeach
-        </div>
-    @endif
+    <br>
+    <p>
+        Dengan hormat,<br>
+        Sehubungan dengan {{ $isi_pengumuman }},
+        maka dimohon kepada seluruh warga untuk dapat hadir pada:
+    </p>
+    <table>
+        <tr>
+            <td>Hari / Tanggal</td>
+            <td>:</td>
+            <td>{{ $hari }}, {{ $tanggal }}</td>
+        </tr>
+        <tr>
+            <td>Pukul</td>
+            <td>:</td>
+            <td>{{ $waktu }}</td>
+        </tr>
+        <tr>
+            <td>Tempat</td>
+            <td>:</td>
+            <td>{{ $tempat }}</td>
+        </tr>
+    </table>
+    <br>
+    <p>Demikian pengumuman ini kami sampaikan. Terima kasih.</p>
+    <div class="ttd">
+        {{ $kabupaten }}, {{ $tanggal_surat }}<br>
+        @if ($rt)
+            {{ $penanggung_jawab }} RT {{ $rt }}/RW {{ $rw }}<br><br>
+        @else
+            {{ $penanggung_jawab }} RW {{ $rw }}<br><br>
+        @endif
+        <br><br><br>
+        <u>{{ $nama_penanggung_jawab }}</u><br>
+    </div>
+    <div class="clear"></div>
 </body>
 
 </html>
