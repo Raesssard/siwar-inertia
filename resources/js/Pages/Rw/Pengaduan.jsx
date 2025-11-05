@@ -169,7 +169,7 @@ export default function Pengaduan() {
                                             judul={item.file_name}
                                             displayStyle={imgStyle}
                                         />
-                                        <h2 className="font-semibold text-lg mb-2 text-left mx-3">
+                                        <h2 className="font-semibold text-lg mb-2 text-start mx-3">
                                             {item.judul}
                                         </h2>
                                         <div className="text-sm text-gray-500 mb-2 d-flex gap-3">

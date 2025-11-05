@@ -58,7 +58,7 @@ export default function Login() {
 
 
                             <button type="submit" className="btn-login btn-primary">
-                                <i className="bi bi-box-arrow-in-right mr-2"></i>
+                                <i className="bi bi-box-arrow-in-right me-2"></i>
                                 {processing ? "Proses..." : "Masuk"}
                             </button>
                         </form>

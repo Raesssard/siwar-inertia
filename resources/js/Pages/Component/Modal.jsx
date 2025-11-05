@@ -8,8 +8,31 @@ import Role from "./Role"
 import Swal from "sweetalert2"
 import { route } from "ziggy-js"
 
-export function ModalSidebar({ modalIsOpen, modalShow }) {
-    const { url } = usePage()
+export function ModalSidebar({ modalIsOpen, modalShow, localStorageHistory }) {
+    const [openMenus, setOpenMenus] = useState(() => {
+        const saved = localStorage.getItem("openMenus");
+        return saved ? JSON.parse(saved) : {};
+    })
+
+    const toggleMenu = (menuName) => {
+        setOpenMenus((prev) => {
+            const updated = { ...prev, [menuName]: !prev[menuName] };
+            localStorage.setItem("openMenus", JSON.stringify(updated));
+            return updated;
+        })
+    }
+
+    useEffect(() => {
+        localStorage.setItem("openMenus", JSON.stringify(openMenus));
+    }, [openMenus]);
+
+    useEffect(() => {
+        if (localStorageHistory) {
+            localStorage.removeItem("openMenus");
+            setOpenMenus({});
+        }
+    }, [localStorageHistory]);
+
     const { props } = usePage()
     const role = props.auth?.currentRole
 
@@ -59,7 +82,12 @@ export function ModalSidebar({ modalIsOpen, modalShow }) {
                                 <ul className="navbar-nav sidebar sidebar-dark accordion">
                                     <hr className="sidebar-divider my-0" />
                                     {statLinks.map((link, index) => (
-                                        <SidebarLink key={index} {...link} />
+                                        <SidebarLink
+                                            key={index}
+                                            {...link}
+                                            isOpen={!!openMenus[link.text]}
+                                            onToggle={() => toggleMenu(link.text)}
+                                        />
                                     ))}
                                     <hr className="sidebar-divider d-none d-md-block" />
                                 </ul>
@@ -1362,7 +1390,7 @@ export function DetailPengaduan({ selectedData, detailShow, onClose, onUpdated, 
                                         <div className="komen p-3 border-top">
                                             {((role.includes('rt') || role.includes('rw')) && !isConfirm) ? (
                                                 <button className="btn btn-primary w-100" type="button" onClick={handleConfirm}>
-                                                    <i className="fas fa-check mr-2"></i>
+                                                    <i className="fas fa-check me-2"></i>
                                                     Konfirmasi
                                                 </button>
                                             ) : (
@@ -1708,7 +1736,7 @@ export function EditPengaduan({ toggle, onUpdated, onDeleted, pengaduan }) {
                                 title="Upload File"
                                 onClick={() => document.getElementById('fileInput').click()}
                             >
-                                <i className="fas fa-upload mr-2"></i>
+                                <i className="fas fa-upload me-2"></i>
                                 <small>
                                     Upload File
                                 </small>
@@ -1731,11 +1759,11 @@ export function EditPengaduan({ toggle, onUpdated, onDeleted, pengaduan }) {
                                 onClick={deletePengaduan}
                                 className="btn btn-danger"
                             >
-                                <i className="fas fa-trash mr-2"></i>
+                                <i className="fas fa-trash me-2"></i>
                                 Hapus
                             </button>
                             <button type="submit" className="btn btn-primary">
-                                <i className="fas fa-save mr-2"></i>
+                                <i className="fas fa-save me-2"></i>
                                 Simpan
                             </button>
                         </div>
@@ -1949,7 +1977,7 @@ export function TambahPengaduan({ tambahShow, onClose, onAdded }) {
                                                     title="Upload File"
                                                     onClick={() => document.getElementById('fileInput').click()}
                                                 >
-                                                    <i className="fas fa-upload mr-2"></i>
+                                                    <i className="fas fa-upload me-2"></i>
                                                     <small>
                                                         Upload File
                                                     </small>
@@ -1963,7 +1991,7 @@ export function TambahPengaduan({ tambahShow, onClose, onAdded }) {
 
                                             <div className="d-flex justify-content-end" style={{ marginTop: "auto" }}>
                                                 <button type="submit" className="btn btn-primary">
-                                                    <i className="fas fa-save mr-2"></i>
+                                                    <i className="fas fa-save me-2"></i>
                                                     Simpan
                                                 </button>
                                             </div>
@@ -2281,7 +2309,7 @@ export function DetailKK({ selectedData, detailShow, onClose, role, userData }) 
         formData.append("_method", "PUT")
 
         axios
-            .post(`/rt/kartu_keluarga/${selectedData.no_kk}/upload-foto`, formData)
+            .post(`/rt/kartu_keluarga/${selectedData?.no_kk}/upload-foto`, formData)
             .then((res) => {
                 console.log("Upload sukses:", res.data)
                 alert("Dokumen berhasil diunggah!")
@@ -2297,7 +2325,7 @@ export function DetailKK({ selectedData, detailShow, onClose, role, userData }) 
         if (!window.confirm("Yakin hapus dokumen ini?")) return
 
         axios
-            .delete(`/${role}/kartu_keluarga/${selectedData.no_kk}/delete-foto`)
+            .delete(`/${role}/kartu_keluarga/${selectedData?.no_kk}/delete-foto`)
             .then(() => {
                 alert("Dokumen berhasil dihapus!")
             })
@@ -2332,10 +2360,10 @@ export function DetailKK({ selectedData, detailShow, onClose, role, userData }) 
                                 <div className="kk-header-top-line">
                                     <div className="kk-header-left-space"></div>
                                     <div className="kk-header-right-reg">
-                                        {selectedData.no_registrasi && (
+                                        {selectedData?.no_registrasi && (
                                             <p>
                                                 No. Registrasi:
-                                                <strong>{selectedData.no_registrasi}</strong>
+                                                <strong>{selectedData?.no_registrasi}</strong>
                                             </p>
                                         )}
                                     </div>
@@ -2344,39 +2372,39 @@ export function DetailKK({ selectedData, detailShow, onClose, role, userData }) 
                                 <div className="kk-header-main-title">
                                     <h4>KARTU KELUARGA</h4>
                                     <p className="no-kk-big">
-                                        No. KK: <strong>{selectedData.no_kk}</strong>
+                                        No. KK: <strong>{selectedData?.no_kk}</strong>
                                     </p>
                                 </div>
                             </div>
 
                             <div className="kk-info-grid mb-2">
                                 <div className="kk-info-item">
-                                    <p><strong>Nama Kepala Keluarga</strong> : {selectedData.kepala_keluarga.nama ?? '-'}</p>
-                                    <p><strong>Alamat</strong> : {selectedData.alamat ?? '-'}</p>
+                                    <p><strong>Nama Kepala Keluarga</strong> : {selectedData?.kepala_keluarga?.nama ?? '-'}</p>
+                                    <p><strong>Alamat</strong> : {selectedData?.alamat ?? '-'}</p>
                                     <p><strong>RT/RW</strong> :{" "}
-                                        {selectedData.rukun_tetangga.nomor_rt ?? '-'}/{selectedData.rw.nomor_rw ?? '-'}
+                                        {selectedData?.rukun_tetangga.nomor_rt ?? '-'}/{selectedData?.rw.nomor_rw ?? '-'}
                                     </p>
                                     <p>
                                         <strong>Desa/Kelurahan</strong> :{" "}
-                                        {selectedData.kelurahan ?? "-"}
+                                        {selectedData?.kelurahan ?? "-"}
                                     </p>
                                 </div>
                                 <div className="kk-info-item">
                                     <p>
                                         <strong>Kecamatan</strong> :{" "}
-                                        {selectedData.kecamatan ?? "-"}
+                                        {selectedData?.kecamatan ?? "-"}
                                     </p>
                                     <p>
                                         <strong>Kabupaten/Kota</strong> :{" "}
-                                        {selectedData.kabupaten ?? "-"}
+                                        {selectedData?.kabupaten ?? "-"}
                                     </p>
                                     <p>
                                         <strong>Kode Pos</strong> :{" "}
-                                        {selectedData.kode_pos ?? "-"}
+                                        {selectedData?.kode_pos ?? "-"}
                                     </p>
                                     <p>
                                         <strong>Provinsi</strong> :{" "}
-                                        {selectedData.provinsi ?? "-"}
+                                        {selectedData?.provinsi ?? "-"}
                                     </p>
                                 </div>
                             </div>
@@ -2389,20 +2417,20 @@ export function DetailKK({ selectedData, detailShow, onClose, role, userData }) 
                             <h6 className="fw-bold text-center mb-3 mt-2">
                                 DAFTAR ANGGOTA KELUARGA
                             </h6>
+                            {(role === "rw" || role === "admin") && (
+                                <div className="d-flex justify-content-end mb-3">
+                                    <button
+                                        className="btn btn-primary btn-sm"
+                                        onClick={() => {
+                                            const routeName = role === "admin" ? "admin.warga.create" : "rw.warga.create";
+                                            router.visit(route(routeName, { no_kk: selectedData?.no_kk }));
+                                        }}
+                                    >
+                                        <i className="bi bi-person-plus"></i> Tambah Warga
+                                    </button>
+                                </div>
+                            )}
                             <div className="table-responsive">
-                                {(role === "rw" || role === "admin") && (
-                                    <div className="d-flex justify-content-end mb-3">
-                                        <button
-                                            className="btn btn-primary btn-sm"
-                                            onClick={() => {
-                                                const routeName = role === "admin" ? "admin.warga.create" : "rw.warga.create";
-                                                router.visit(route(routeName, { no_kk: selectedData.no_kk }));
-                                            }}
-                                        >
-                                            <i className="bi bi-person-plus"></i> Tambah Warga
-                                        </button>
-                                    </div>
-                                )}
                                 <table className="table table-bordered table-striped table-sm align-middle">
                                     <thead className="table-success text-center small">
                                         <tr>
@@ -2434,8 +2462,8 @@ export function DetailKK({ selectedData, detailShow, onClose, role, userData }) 
                                     </thead>
                                     <tbody className="small">
                                         {selectedData?.warga &&
-                                            selectedData.warga.length > 0 ? (
-                                            selectedData.warga
+                                            selectedData?.warga.length > 0 ? (
+                                            selectedData?.warga
                                                 .sort((a, b) => {
                                                     const getRank = (hubungan) => {
                                                         if (hubungan === "Kepala Keluarga") return 2
@@ -2621,7 +2649,7 @@ export function DetailKK({ selectedData, detailShow, onClose, role, userData }) 
                                     </div>
                                 )}
 
-                                {selectedData.foto_kk && (
+                                {selectedData?.foto_kk && (
                                     <div className="mt-4">
                                         <h6>Dokumen Saat Ini:</h6>
                                         <div className="d-flex align-items-center gap-3">
@@ -2630,7 +2658,7 @@ export function DetailKK({ selectedData, detailShow, onClose, role, userData }) 
                                                 className="btn btn-outline-primary"
                                                 onClick={() =>
                                                     setViewDoc(
-                                                        `/storage/${selectedData.foto_kk}`
+                                                        `/storage/${selectedData?.foto_kk}`
                                                     )
                                                 }
                                             >
@@ -2710,7 +2738,6 @@ export function DetailKK({ selectedData, detailShow, onClose, role, userData }) 
                 selectData={selected}
                 detailShow={showModal}
                 onClose={() => setShowModal(false)}
-                userData={userData}
             />
         </>
     )
@@ -2981,7 +3008,7 @@ export function DetailPengumuman({ selectedData, detailShow, onClose, onUpdated,
                                         <div className="p-3 border-bottom caption-section">
                                             {(userData?.rukun_tetangga?.id === selectedData.id_rt || userData?.rw?.id === selectedData.id_rw) ? (
                                                 <div className="d-flex">
-                                                    <h5 className="fw-bold mb-1 mt-2 mr-auto">{selectedData.judul}</h5>
+                                                    <h5 className="fw-bold mb-1 mt-2 me-auto">{selectedData.judul}</h5>
                                                     <Role role={["rt", "rw", 'sekretaris']}>
                                                         <button
                                                             className="btn komen btn-primary my-auto px-1"
@@ -2989,7 +3016,7 @@ export function DetailPengumuman({ selectedData, detailShow, onClose, onUpdated,
                                                             style={{ border: "none" }}
                                                             onClick={() => window.location.href = `/${role}/pengumuman/${selectedData.id}/export-pdf`}
                                                         >
-                                                            <i className="far fa-file-pdf mr-2"></i>
+                                                            <i className="far fa-file-pdf me-2"></i>
                                                         </button>
                                                     </Role>
                                                     <Role role={selectedData.rukun_tetangga ? ["rt", "sekretaris"] : ["rw", "sekretaris"]}>
@@ -3535,7 +3562,7 @@ export function EditPengumuman({ toggle, onUpdated, onDeleted, pengumuman, role 
                                 title="Upload File"
                                 onClick={() => document.getElementById('fileInput').click()}
                             >
-                                <i className="fas fa-upload mr-2"></i>
+                                <i className="fas fa-upload me-2"></i>
                                 <small>
                                     Upload File
                                 </small>
@@ -3558,11 +3585,11 @@ export function EditPengumuman({ toggle, onUpdated, onDeleted, pengumuman, role 
                                 onClick={deletePengumuman}
                                 className="btn btn-danger"
                             >
-                                <i className="fas fa-trash mr-2"></i>
+                                <i className="fas fa-trash me-2"></i>
                                 Hapus
                             </button>
                             <button type="submit" className="btn btn-primary">
-                                <i className="fas fa-save mr-2"></i>
+                                <i className="fas fa-save me-2"></i>
                                 Simpan
                             </button>
                         </div>
@@ -3781,7 +3808,7 @@ export function TambahPengumuman({ tambahShow, onClose, onAdded, role }) {
                                                     title="Upload File"
                                                     onClick={() => document.getElementById('fileInput').click()}
                                                 >
-                                                    <i className="fas fa-upload mr-2"></i>
+                                                    <i className="fas fa-upload me-2"></i>
                                                     <small>
                                                         Upload File
                                                     </small>
@@ -3795,7 +3822,7 @@ export function TambahPengumuman({ tambahShow, onClose, onAdded, role }) {
 
                                             <div className="d-flex justify-content-end" style={{ marginTop: "auto" }}>
                                                 <button type="submit" className="btn btn-primary">
-                                                    <i className="fas fa-save mr-2"></i>
+                                                    <i className="fas fa-save me-2"></i>
                                                     Simpan
                                                 </button>
                                             </div>
@@ -4132,7 +4159,7 @@ export function TambahIuran({ tambahShow, onClose, onAdded, role, golongan, rt =
                                     )}
 
                                     <button type="submit" className="btn btn-primary mt-2">
-                                        <i className="fas fa-save mr-2"></i> Simpan
+                                        <i className="fas fa-save me-2"></i> Simpan
                                     </button>
                                 </form>
                             </div>
@@ -4280,8 +4307,8 @@ export function EditIuranOtomatis({ editShow, onClose, onUpdated, role, golongan
                                             </select>
                                         </div>
 
-                                        <button type="submit" className="btn btn-primary ml-auto mt-auto">
-                                            <i className="fas fa-save mr-2"></i>
+                                        <button type="submit" className="btn btn-primary ms-auto mt-auto">
+                                            <i className="fas fa-save me-2"></i>
                                             Simpan
                                         </button>
                                     </form>
@@ -4565,7 +4592,7 @@ export function EditTagihan({ editShow, onClose, onUpdated, role, selectedData }
                                                     value={data.status_bayar === "belum_bayar" && null}
                                                     disabled={data.status_bayar === "belum_bayar"}
                                                 >
-                                                    <i className="fas fa-upload mr-2"></i>
+                                                    <i className="fas fa-upload me-2"></i>
                                                     <small>
                                                         Upload Bukti Transfer
                                                     </small>
@@ -4583,8 +4610,8 @@ export function EditTagihan({ editShow, onClose, onUpdated, role, selectedData }
                                             </div>
                                         )}
 
-                                        <button type="submit" className="btn btn-primary ml-auto mt-auto">
-                                            <i className="fas fa-save mr-2"></i>
+                                        <button type="submit" className="btn btn-primary ms-auto mt-auto">
+                                            <i className="fas fa-save me-2"></i>
                                             Simpan
                                         </button>
                                     </form>
@@ -4647,17 +4674,17 @@ export function DetailTagihan({ selectedData, detailShow, onClose }) {
                                         <p><strong>Tanggal Tagih</strong>: {formatTanggal(selectedData.tgl_tagih)}</p>
                                         <p><strong>Tanggal Tempo</strong>: {formatTanggal(selectedData.tgl_tempo)}</p>
                                         <p><strong>Jenis Tagihan</strong>: {selectedData.jenis === 'manual' ? (
-                                            <span className="badge bg-primary d-flex align-items-center justify-content-center text-white ml-1">Manual</span>
+                                            <span className="badge bg-primary d-flex align-items-center justify-content-center text-white ms-1">Manual</span>
                                         ) : (
-                                            <span className="badge bg-secondary d-flex align-items-center justify-content-center text-white ml-1">Otomatis</span>
+                                            <span className="badge bg-secondary d-flex align-items-center justify-content-center text-white ms-1">Otomatis</span>
                                         )}
                                         </p>
                                     </div>
                                     <div className="kk-info-item">
                                         <p><strong>Status</strong>: {selectedData.status_bayar === 'sudah_bayar' ? (
-                                            <span className="badge bg-success d-flex align-items-center justify-content-center text-white ml-1">Sudah Bayar</span>
+                                            <span className="badge bg-success d-flex align-items-center justify-content-center text-white ms-1">Sudah Bayar</span>
                                         ) : (
-                                            <span className="badge bg-danger d-flex align-items-center justify-content-center text-white ml-1">Belum Bayar</span>
+                                            <span className="badge bg-danger d-flex align-items-center justify-content-center text-white ms-1">Belum Bayar</span>
                                         )}</p>
                                         {selectedData.status_bayar === 'sudah_bayar' && (
                                             <>
@@ -4698,8 +4725,8 @@ export function DetailTagihan({ selectedData, detailShow, onClose }) {
                                         )}
                                     </div>
 
-                                    <button onClick={() => onClose()} className="btn btn-success ml-auto mt-auto">
-                                        <i className="fa-regular fa-circle-check mr-2"></i>
+                                    <button onClick={() => onClose()} className="btn btn-success ms-auto mt-auto">
+                                        <i className="fa-regular fa-circle-check me-2"></i>
                                         Tutup
                                     </button>
                                 </div>
@@ -4826,8 +4853,8 @@ export function TambahTransaksi({ tambahShow, onClose, onAdded, role }) {
                                             ></textarea>
                                         </div>
 
-                                        <button type="submit" className="btn btn-primary ml-auto mt-auto">
-                                            <i className="fas fa-save mr-2"></i>
+                                        <button type="submit" className="btn btn-primary ms-auto mt-auto">
+                                            <i className="fas fa-save me-2"></i>
                                             Simpan
                                         </button>
                                     </form>
@@ -4979,8 +5006,8 @@ export function TambahTransaksiPerKk({ listKK, tambahShow, onClose, onAdded, rol
                                             ></textarea>
                                         </div>
 
-                                        <button type="submit" className="btn btn-primary ml-auto mt-auto">
-                                            <i className="fas fa-save mr-2"></i>
+                                        <button type="submit" className="btn btn-primary ms-auto mt-auto">
+                                            <i className="fas fa-save me-2"></i>
                                             Simpan
                                         </button>
                                     </form>
@@ -5040,7 +5067,7 @@ export function PilihTransaksi({ show, togglePilih, onClose }) {
                                             height: '2.5rem'
                                         }}
                                     >
-                                        <i className="far fa-user mr-2"></i>
+                                        <i className="far fa-user me-2"></i>
                                         Transaksi Warga
                                     </button>
                                     <button type="button"
@@ -5056,7 +5083,7 @@ export function PilihTransaksi({ show, togglePilih, onClose }) {
                                             height: '2.5rem'
                                         }}
                                     >
-                                        <i className="far fa-envelope mr-2"></i>
+                                        <i className="far fa-envelope me-2"></i>
                                         Transaksi Umum
                                     </button>
                                 </div>
@@ -5198,8 +5225,8 @@ export function EditTransaksi({ editShow, onClose, onUpdated, role, selectedData
                                             ></textarea>
                                         </div>
 
-                                        <button type="submit" className="btn btn-primary ml-auto mt-auto">
-                                            <i className="fas fa-save mr-2"></i>
+                                        <button type="submit" className="btn btn-primary ms-auto mt-auto">
+                                            <i className="fas fa-save me-2"></i>
                                             Simpan
                                         </button>
                                     </form>

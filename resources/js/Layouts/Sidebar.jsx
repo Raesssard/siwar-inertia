@@ -27,11 +27,11 @@ export default function Sidebar({ toggleKeParent, localStorageHistory }) {
     }, [openMenus]);
 
     useEffect(() => {
-        if (localStorageHistory) {
+        if (localStorageHistory || toggleKeParent) {
             localStorage.removeItem("openMenus");
             setOpenMenus({});
         }
-    }, [localStorageHistory]);
+    }, [localStorageHistory, toggleKeParent]);
 
     const toggleSidebar = (e) => {
         e.preventDefault()

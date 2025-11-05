@@ -82,15 +82,10 @@ export default function FormWarga({
   // Submit form
   const handleSubmit = (e) => {
     e.preventDefault();
+    isEdit ? put(route(`${baseRoute}.update`, warga.id), data) : post(route(`${baseRoute}.store`), data);
 
-    const action = isEdit
-      ? put(route(`${baseRoute}.update`, warga.id))
-      : post(route(`${baseRoute}.store`));
-
-    action.then(() => {
-      reset();
-      if (onClose) onClose();
-    });
+    reset();
+    if (onClose) onClose();
   };
 
   const inputBase =
@@ -129,6 +124,7 @@ export default function FormWarga({
                 <input
                   type="text"
                   value={data.nik}
+                  maxLength={16}
                   onChange={(e) => setData("nik", e.target.value)}
                   className={inputBase}
                 />

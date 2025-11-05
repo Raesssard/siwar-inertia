@@ -12,7 +12,6 @@ class Rt_wargaController extends Controller
 {
     public function index(Request $request)
     {
-        //
         $title = 'Manajemen Warga';
         $search = $request->search;
         $rt_id = Auth::user()->rukunTetangga->id;
@@ -36,10 +35,9 @@ class Rt_wargaController extends Controller
             ->paginate(5)
             ->withQueryString();
 
-        return Inertia::render('Rt/DataWarga', [
+        return Inertia::render('RT/DataWarga', [
             'title' => $title,
             'warga' => $warga,
-            'search' => $search,
             'total_warga' => $total_warga
         ]);
     }

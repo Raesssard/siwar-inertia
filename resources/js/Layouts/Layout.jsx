@@ -50,6 +50,7 @@ export default function Layout({ children }) {
                 <ModalSidebar
                     modalIsOpen={showSidebar}
                     modalShow={ModalSideShow}
+                    localStorageHistory={history}
                 />
                 <div
                     id="content-wrapper"

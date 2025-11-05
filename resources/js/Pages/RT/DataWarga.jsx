@@ -9,12 +9,10 @@ export default function DataWarga() {
     const {
         title,
         warga,
-        search,
         total_warga
     } = usePage().props
     const { props } = usePage()
     const role = props.auth?.currentRole
-    const user = props.auth?.user
     const { get, data, setData } = useForm({
         search: '',
         jenis_kelamin: ''
@@ -139,10 +137,9 @@ export default function DataWarga() {
                     </div>
                 )}
                 <DetailWarga
-                    selectedData={selected}
+                    selectData={selected}
                     detailShow={showModal}
                     onClose={() => setShowModal(false)}
-                    userData={user}
                 />
             </div>
         </Layout>

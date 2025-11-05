@@ -65,7 +65,7 @@ class RwWargaController extends Controller
         $rw_id = Auth::user()->rw->id ?? null;
 
         $daftarKK = Kartu_keluarga::whereHas('rukunTetangga', function ($q) use ($rw_id) {
-            $q->where('rw_id', $rw_id);
+            $q->where('id_rw', $rw_id);
         })
             ->select('no_kk', 'alamat')
             ->orderBy('no_kk')

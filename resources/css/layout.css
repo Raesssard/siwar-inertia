@@ -76,6 +76,18 @@
         flex-grow: 1;
     }
 
+    .list-unstyled .nav-item .nav-link {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        font-size: 0.6rem !important;
+    }
+
+    .list-unstyled .nav-item .nav-link i {
+        margin: 0 !important;
+    }
+
     .modal-header {
         align-items: flex-start;
         padding-top: 1rem;
@@ -106,6 +118,17 @@
     justify-content: center;
     margin-top: auto;
     height: 60px;
+}
+
+.list-unstyled .nav-item .nav-link {
+    font-size: 0.75rem !important;
+}
+
+ul.toggled li.nav-item a.nav-link{
+        display: flex !important;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
 }
 
 .sticky-footer {

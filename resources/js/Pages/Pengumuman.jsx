@@ -166,12 +166,12 @@ export default function Pengumuman() {
                 tambahShow={() => setShowModalTambah(true)}
                 role={role}
             />
-            <div className="d-flex align-items-center mx-3 mt-0 w-100">
+            <div className="d-flex align-items-center ms-3 me-3 mb-3 mt-0 w-100">
                 <i className="fas fa-bullhorn me-2 text-primary"></i>
                 {totalFiltered} Pengumuman
                 <Role role={['rt', 'rw', 'sekretaris']}>
-                    <div className="ml-auto mb-3">
-                        <button type="button" onClick={() => setShowModalTambah(true)} className="btn-input btn btn-sm btn-success">
+                    <div className="ml-auto">
+                        <button type="button" onClick={() => setShowModalTambah(true)} className="btn-input m-0 btn btn-sm btn-success">
                             <i className="fas fa-plus mr-2"></i>
                             Buat Pengumuman
                         </button>
@@ -182,7 +182,7 @@ export default function Pengumuman() {
                 {pengumumanList.length ? sortedGroup.map(([kategori, items]) => (
                     <div key={kategori}>
                         <div className="d-flex align-items-center w-100">
-                            <div className="text-muted mb-3 mt-3 mx-4">
+                            <div className="text-muted mb-3 mt-3 ms-4 me-4">
                                 {kategori}
                             </div>
                             <div className="text-muted mr-4 ml-auto">
@@ -208,7 +208,7 @@ export default function Pengumuman() {
                                                     judul={item.dokumen_name}
                                                     displayStyle={imgStyle}
                                                 />
-                                                <h2 className="font-semibold text-lg mb-2 text-left mx-3">
+                                                <h2 className="font-semibold text-lg mb-2 text-left ms-3 me-3">
                                                     {item.judul}
                                                 </h2>
                                                 <div className="text-sm text-gray-500 mb-2 d-flex gap-3">
@@ -223,7 +223,7 @@ export default function Pengumuman() {
                                                         <FormatWaktu createdAt={item.created_at} />
                                                     </span>
                                                 </div>
-                                                <p className="isi-pengaduan text-gray-700 text-sm mb-3 mx-3 line-clamp-3">
+                                                <p className="isi-pengaduan text-gray-700 text-sm mb-3 ms-3 me-3 line-clamp-3">
                                                     {item.isi.length > 100
                                                         ? item.isi.slice(0, 100) + "..."
                                                         : item.isi}
