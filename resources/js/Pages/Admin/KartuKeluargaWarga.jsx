@@ -1,24 +1,51 @@
 import Layout from "@/Layouts/Layout"
-import { Head, Link, useForm, usePage } from "@inertiajs/react"
+import { Head, Link, useForm, router, usePage } from "@inertiajs/react"
 import React, { useState } from "react"
 import { FilterKK } from "../Component/Filter"
-import { DetailKK } from "../Component/Modal"
+import { DetailKK, TambahEditKK } from "../Component/Modal"
 import "../../../css/kk.css"
 
 export default function KartuKeluarga() {
-    const { kartu_keluarga, title } = usePage().props
+    const { kartu_keluarga, kategori_iuran, title } = usePage().props
     const { props } = usePage()
     const user = props.auth?.user
     const role = props.auth?.currentRole
 
     const { get, data, setData } = useForm({ search: "" })
+
+    // 🟩 State untuk modal
     const [showModal, setShowModal] = useState(false)
     const [selected, setSelected] = useState(null)
+    const [modalTambah, setModalTambah] = useState(false)
+    const [modalEdit, setModalEdit] = useState(false)
+    const [selectedEdit, setSelectedEdit] = useState(null)
 
     // 🔹 Modal Detail KK
     const modalDetail = (item) => {
         setSelected(item)
         setShowModal(true)
+    }
+
+    // 🔹 Modal Edit
+    const openEditModal = (item) => {
+        setSelectedEdit(item)
+        setModalEdit(true)
+    }
+
+    // 🔹 Hapus KK
+    const hapusKK = (id, no_kk) => {
+        if (confirm(`Yakin ingin menghapus KK dengan nomor ${no_kk}?`)) {
+            router.delete(`/${role}/kartu_keluarga/${id}`, {
+                preserveScroll: true,
+                onSuccess: () => {
+                    alert(`Kartu Keluarga ${no_kk} berhasil dihapus.`)
+                },
+                onError: (errors) => {
+                    console.error(errors)
+                    alert("Terjadi kesalahan saat menghapus data.")
+                },
+            })
+        }
     }
 
     // 🔹 Filter
@@ -51,21 +78,28 @@ export default function KartuKeluarga() {
             <div className="table-container">
                 <div className="table-header d-flex justify-content-between align-items-center">
                     <h4>Data Kartu Keluarga</h4>
-                    <span></span>
+
+                    {/* 🔘 Tombol Tambah KK */}
+                    <button
+                        className="btn btn-success btn-sm"
+                        onClick={() => setModalTambah(true)}
+                    >
+                        <i className="bi bi-plus-circle"></i> Tambah KK
+                    </button>
                 </div>
 
                 <div className="table-scroll">
                     <table className="table-custom">
                         <thead>
                             <tr>
-                                <th className="text-center px-3">No.</th>
-                                <th className="text-center px-3">NOMOR KK</th>
-                                <th className="text-center px-3">KEPALA KELUARGA</th>
-                                <th className="text-center px-3">ALAMAT</th>
-                                <th className="text-center px-3">NOMOR RT</th>
-                                <th className="text-center px-3">NOMOR RW</th>
-                                <th className="text-center px-3">KATEGORI IURAN</th>
-                                <th className="text-center px-3">DETAIL</th>
+                                <th className="text-center">No.</th>
+                                <th className="text-center">NOMOR KK</th>
+                                <th className="text-center">KEPALA KELUARGA</th>
+                                <th className="text-center">ALAMAT</th>
+                                <th className="text-center">NOMOR RT</th>
+                                <th className="text-center">NOMOR RW</th>
+                                <th className="text-center">KATEGORI IURAN</th>
+                                <th className="text-center">AKSI</th>
                             </tr>
                         </thead>
 
@@ -76,13 +110,21 @@ export default function KartuKeluarga() {
                                         <td className="text-center">{index + 1}</td>
                                         <td className="text-center">{item.no_kk ?? "-"}</td>
                                         <td className="text-center">
-                                            {item.kepala_keluarga?.nama ?? "-"}
+                                            {(item.warga ?? [])
+                                                .find(
+                                                    (w) =>
+                                                        w.status_hubungan_dalam_keluarga?.toLowerCase() ===
+                                                        "kepala keluarga"
+                                                )
+                                                ?.nama ?? "-"}
                                         </td>
                                         <td className="text-center">{item.alamat ?? "-"}</td>
                                         <td className="text-center">
                                             {item.rukun_tetangga?.nomor_rt ?? "-"}
                                         </td>
-                                        <td className="text-center">{item.rw?.nomor_rw ?? "-"}</td>
+                                        <td className="text-center">
+                                            {item.rw?.nomor_rw ?? "-"}
+                                        </td>
                                         <td className="text-center">
                                             {item.kategori_golongan?.jenis
                                                 ? item.kategori_golongan.jenis.charAt(0).toUpperCase() +
@@ -91,11 +133,25 @@ export default function KartuKeluarga() {
                                         </td>
                                         <td className="text-center">
                                             <button
-                                                className="btn btn-success btn-sm"
+                                                className="btn btn-success btn-sm me-1"
+                                                title="Detail KK"
                                                 onClick={() => modalDetail(item)}
-                                                title="Lihat Detail KK"
                                             >
                                                 <i className="fas fa-info"></i>
+                                            </button>
+                                            <button
+                                                className="btn btn-warning btn-sm me-1"
+                                                title="Edit KK"
+                                                onClick={() => openEditModal(item)}
+                                            >
+                                                <i className="fas fa-edit"></i>
+                                            </button>
+                                            <button
+                                                className="btn btn-danger btn-sm"
+                                                title="Hapus KK"
+                                                onClick={() => hapusKK(item.id, item.no_kk)}
+                                            >
+                                                <i className="fas fa-trash"></i>
                                             </button>
                                         </td>
                                     </tr>
@@ -133,13 +189,6 @@ export default function KartuKeluarga() {
                                         <Link
                                             href={link.url || ""}
                                             dangerouslySetInnerHTML={{ __html: label }}
-                                            title={`Pergi ke halaman ${
-                                                label === "&lt;"
-                                                    ? "sebelumnya"
-                                                    : label === "&gt;"
-                                                    ? "selanjutnya"
-                                                    : label
-                                            }`}
                                         />
                                     </li>
                                 )
@@ -155,6 +204,25 @@ export default function KartuKeluarga() {
                     onClose={() => setShowModal(false)}
                     role={role}
                     userData={user}
+                />
+
+                {/* 🔹 Modal Tambah */}
+                <TambahEditKK
+                    show={modalTambah}
+                    onClose={() => setModalTambah(false)}
+                    kategoriIuran={kategori_iuran}
+                    daftarRT={props.daftar_rt}
+                    role={role}
+                />
+
+                {/* 🔹 Modal Edit */}
+                <TambahEditKK
+                    show={modalEdit}
+                    onClose={() => setModalEdit(false)}
+                    dataKK={selectedEdit}
+                    kategoriIuran={kategori_iuran}
+                    daftarRT={props.daftar_rt}
+                    role={role}
                 />
             </div>
         </Layout>

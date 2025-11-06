@@ -3,11 +3,11 @@ import { useForm, usePage } from "@inertiajs/react";
 import Layout from "@/Layouts/Layout";
 
 export default function Settings() {
-    const { auth, max_rt_per_rw } = usePage().props;
+    const { auth, settings } = usePage().props;
     const user = auth.user;
     const role = auth.currentRole;
 
-    // Form untuk ubah password
+    // 🔐 Form ubah password
     const {
         data: passwordData,
         setData: setPasswordData,
@@ -25,7 +25,7 @@ export default function Settings() {
         putPassword(route("settings.update-password"));
     };
 
-    // Form untuk pengaturan sistem
+    // ⚙️ Form pengaturan sistem
     const {
         data: settingsData,
         setData: setSettingsData,
@@ -33,7 +33,7 @@ export default function Settings() {
         processing: settingsProcessing,
         errors: settingsErrors,
     } = useForm({
-        max_rt_per_rw: max_rt_per_rw || "",
+        max_rt_per_rw: settings?.max_rt_per_rw || "",
     });
 
     const handleSettingsSubmit = (e) => {
@@ -155,47 +155,63 @@ export default function Settings() {
                         </div>
                     </form>
                     {(role === "rw" || role === "admin") && (
-                    <>
-                        {/* 🔧 Pengaturan Sistem */}
-                        <div className="border-bottom mb-4"></div>
-                        <h5 className="fw-semibold mb-3 text-gray-800">
-                        <i className="fas fa-sliders-h text-success me-2"></i> Pengaturan Sistem
-                        </h5>
+                        <>
+                            {/* 🔧 Pengaturan Sistem */}
+                            <div className="border-bottom mb-4"></div>
 
-                        <form onSubmit={handleSettingsSubmit}>
-                        <div className="mb-3">
-                            <label htmlFor="max_rt_per_rw" className="form-label">
-                            <i className="fas fa-home me-2"></i> Maksimal RT per RW
-                            </label>
-                            <input
-                            type="number"
-                            id="max_rt_per_rw"
-                            className="form-control"
-                            min={1}
-                            value={settingsData.max_rt_per_rw}
-                            onChange={(e) =>
-                                setSettingsData("max_rt_per_rw", e.target.value)
-                            }
-                            required
-                            />
-                            {settingsErrors.max_rt_per_rw && (
-                            <div className="text-danger small mt-1">
-                                {settingsErrors.max_rt_per_rw}
-                            </div>
-                            )}
-                        </div>
+                            <h5 className="fw-semibold mb-3 text-gray-800">
+                                <i className="fas fa-sliders-h text-success me-2"></i>
+                                Pengaturan Sistem
+                            </h5>
 
-                        <div className="d-flex justify-content-end gap-2">
-                            <button
-                            type="submit"
-                            disabled={settingsProcessing}
-                            className="btn btn-success px-4"
-                            >
-                            <i className="fas fa-save me-1"></i> Simpan Pengaturan
-                            </button>
-                        </div>
-                        </form>
-                    </>
+                            <form onSubmit={handleSettingsSubmit}>
+                                {/* 🔹 Input Maksimal RT per RW */}
+                                <div className="mb-3">
+                                    <label htmlFor="max_rt_per_rw" className="form-label">
+                                        <i className="fas fa-home me-2"></i>
+                                        Maksimal RT per RW
+                                    </label>
+
+                                    {/* 🔸 Teks nilai saat ini */}
+                                    <small className="text-muted d-block mb-2">
+                                        Max RT per RW saat ini:{" "}
+                                        <span className="fw-semibold text-dark">
+                                            {settings?.max_rt_per_rw ?? "-"}
+                                        </span>
+                                    </small>
+
+                                    <input
+                                        type="number"
+                                        id="max_rt_per_rw"
+                                        name="max_rt_per_rw"
+                                        className="form-control"
+                                        min={1}
+                                        onChange={(e) =>
+                                            setSettingsData("max_rt_per_rw", e.target.value)
+                                        }
+                                        required
+                                    />
+
+                                    {settingsErrors.max_rt_per_rw && (
+                                        <div className="text-danger small mt-1">
+                                            {settingsErrors.max_rt_per_rw}
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* 🔘 Tombol Simpan */}
+                                <div className="d-flex justify-content-end gap-2">
+                                    <button
+                                        type="submit"
+                                        className="btn btn-success px-4"
+                                        disabled={settingsProcessing}
+                                    >
+                                        <i className="fas fa-save me-1"></i>
+                                        Simpan Pengaturan
+                                    </button>
+                                </div>
+                            </form>
+                        </>
                     )}
                 </div>
             </div>

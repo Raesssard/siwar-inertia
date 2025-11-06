@@ -73,4 +73,16 @@ class AdminRoleController extends Controller
 
         return redirect()->back()->with('success', 'Permission role berhasil diperbarui.');
     }
+    public function editPermissions($id)
+    {
+        $role = Role::with('permissions')->findOrFail($id);
+        $permissions = Permission::orderBy('name')->get();
+        $title = "Atur Permission untuk Role {$role->name}";
+
+        return Inertia::render('Admin/AssignRolesPermission', [
+            'role' => $role,
+            'permissions' => $permissions,
+            'title' => $title,
+        ]);
+    }
 }

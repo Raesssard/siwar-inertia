@@ -167,17 +167,12 @@ export default function Roles({ roles, permissions, filters, title }) {
                                                     Edit
                                                 </button>
 
-                                                <button
+                                                <Link
+                                                    href={route("admin.roles.permissions.edit", item.id)}
                                                     className="btn btn-secondary btn-sm"
-                                                    onClick={() => {
-                                                        setShowPermission(item);
-                                                        setSelectedPerms(
-                                                            item.permissions.map((p) => p.name)
-                                                        );
-                                                    }}
                                                 >
                                                     Permissions
-                                                </button>
+                                                </Link>
 
                                                 <button
                                                     className="btn btn-danger btn-sm"
