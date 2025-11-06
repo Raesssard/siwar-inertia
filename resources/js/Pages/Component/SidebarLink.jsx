@@ -22,13 +22,15 @@ export function SidebarLink({ href, icon, text, children, isOpen, onToggle }) {
                         onClick={onToggle}
                         type="button"
                     >
-                        <span>
+                        <div className="w-100">
                             <i className={`fas fa-${icon} me-2`}></i>
-                            {text}
-                        </span>
+                            <span>
+                                {text}
+                            </span>
+                        </div>
                         <i className={`fas fa-chevron-${open ? "down" : "right"}`} style={{
-                            position: 'relative',
-                            right: '0.25rem',
+                            position: 'absolute',
+                            right: '0.75rem',
                             zIndex: 10,
                         }}></i>
                     </button>
