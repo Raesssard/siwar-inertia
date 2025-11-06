@@ -5,7 +5,6 @@ import { FormatWaktu } from "../Pengaduan"
 import { SidebarLink } from "./SidebarLink"
 import { formatTanggal, getAdminLinks, getRtLinks, getWargaLinks, getRwLinks, formatRupiah } from "./GetPropRole"
 import Role from "./Role"
-import Swal from "sweetalert2"
 import { route } from "ziggy-js"
 
 export function ModalSidebar({ modalIsOpen, modalShow, localStorageHistory }) {
@@ -3347,10 +3346,12 @@ export function DetailPengumuman({ selectedData, detailShow, onClose, onUpdated,
 }
 
 export function EditPengumuman({ toggle, onUpdated, onDeleted, pengumuman, role }) {
-    const { data, setData, put, processing, errors } = useForm({
+    const { data, setData } = useForm({
         judul: pengumuman.judul || "",
         isi: pengumuman.isi || "",
         kategori: pengumuman.kategori || "",
+        tanggal: pengumuman.tanggal || "",
+        tempat: pengumuman.tempat || "",
         dokumen: null,
     }, { forceFormData: true })
 
@@ -3437,6 +3438,8 @@ export function EditPengumuman({ toggle, onUpdated, onDeleted, pengumuman, role 
         formData.append('judul', data.judul)
         formData.append('isi', data.isi)
         formData.append('kategori', data.kategori)
+        formData.append('tanggal', data.tanggal)
+        formData.append('tempat', data.tempat)
         if (data.dokumen) formData.append('dokumen', data.dokumen)
         formData.append('_method', 'PUT')
 
@@ -3533,6 +3536,30 @@ export function EditPengumuman({ toggle, onUpdated, onDeleted, pengumuman, role 
                         </div>
 
                         <div className="mb-3">
+                            <label className="form-label">Tanggal Pelaksanaan</label>
+                            <input
+                                name="tanggal"
+                                type="datetime-local"
+                                className="tambah-kategori form-control"
+                                value={data.tanggal}
+                                onChange={(tanggal) => setData('tanggal', tanggal.target.value)}
+                            />
+                            <small className="mt-1 text-muted">Opsional</small>
+                        </div>
+
+                        <div className="mb-3">
+                            <label className="form-label">Tempat Pelaksanaan</label>
+                            <input
+                                name="tempat"
+                                type="text"
+                                className="tambah-kategori form-control"
+                                value={data.tempat}
+                                onChange={(e) => setData("tempat", e.target.value)}
+                                required
+                            />
+                        </div>
+
+                        <div className="mb-3">
                             <label className="form-label">Isi</label>
                             <textarea
                                 name="isi"
@@ -3610,9 +3637,11 @@ export function EditPengumuman({ toggle, onUpdated, onDeleted, pengumuman, role 
 }
 
 export function TambahPengumuman({ tambahShow, onClose, onAdded, role }) {
-    const { data, setData, put, processing, errors } = useForm({
+    const { data, setData } = useForm({
         judul: "",
         kategori: "",
+        tanggal: "",
+        tempat: "",
         isi: "",
         dokumen: null,
     }, { forceFormData: true })
@@ -3663,6 +3692,8 @@ export function TambahPengumuman({ tambahShow, onClose, onAdded, role }) {
         formData.append('judul', data.judul)
         formData.append('isi', data.isi)
         formData.append('kategori', data.kategori)
+        formData.append('tanggal', data.tanggal)
+        formData.append('tempat', data.tempat)
         if (data.dokumen) formData.append('dokumen', data.dokumen)
 
         axios.post(`/${role}/pengumuman`, formData)
@@ -3673,6 +3704,8 @@ export function TambahPengumuman({ tambahShow, onClose, onAdded, role }) {
                 setData({
                     judul: "",
                     kategori: "",
+                    tanggal: "",
+                    tempat: "",
                     isi: "",
                     dokumen: null,
                 })
@@ -3777,6 +3810,30 @@ export function TambahPengumuman({ tambahShow, onClose, onAdded, role }) {
                                             </div>
 
                                             <div className="mb-3">
+                                                <label className="form-label">Tanggal Pelaksanaan</label>
+                                                <input
+                                                    name="tanggal"
+                                                    type="datetime-local"
+                                                    className="tambah-kategori form-control"
+                                                    value={data.tanggal}
+                                                    onChange={(tanggal) => setData('tanggal', tanggal.target.value)}
+                                                />
+                                                <small className="mt-1 text-muted">Opsional</small>
+                                            </div>
+
+                                            <div className="mb-3">
+                                                <label className="form-label">Tempat Pelaksanaan</label>
+                                                <input
+                                                    name="tempat"
+                                                    type="text"
+                                                    className="tambah-kategori form-control"
+                                                    value={data.tempat}
+                                                    onChange={(e) => setData("tempat", e.target.value)}
+                                                    required
+                                                />
+                                            </div>
+
+                                            <div className="mb-3">
                                                 <label className="form-label">Isi</label>
                                                 <textarea
                                                     ref={isiRef}
@@ -3800,7 +3857,7 @@ export function TambahPengumuman({ tambahShow, onClose, onAdded, role }) {
                                                     accept=".doc,.docx,.xls,.xlsx,.pdf"
                                                 />
                                                 <small className="text-muted d-block mt-2">
-                                                    Dokumen (Opsional, Max 2MB: .doc, .docx, .pdf)
+                                                    Opsional (Dokumen, Max 2MB: .doc, .docx, .pdf)
                                                 </small>
                                                 <button
                                                     type="button"

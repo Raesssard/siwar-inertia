@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Rt;
 use App\Http\Controllers\Controller;
 use App\Models\Pengumuman;
 use App\Models\Rt;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Dompdf\Dompdf;
@@ -89,8 +91,8 @@ class Rt_pengumumanController extends Controller
                     }
                 });
             })
-            ->when($tahun, fn($q) => $q->whereYear('tanggal', $tahun))
-            ->when($bulan, fn($q) => $q->whereMonth('tanggal', $bulan))
+            ->when($tahun, fn($q) => $q->whereYear('created_at', $tahun))
+            ->when($bulan, fn($q) => $q->whereMonth('created_at', $bulan))
             ->when($kategori, fn($q) => $q->where('kategori', $kategori))
             ->when($level, function ($q) use ($request) {
                 if ($request->level === 'rt') {
@@ -99,11 +101,11 @@ class Rt_pengumumanController extends Controller
                     $q->whereNull('id_rt');
                 }
             })
-            ->orderByDesc('tanggal')
+            ->orderByDesc('created_at')
             ->get();
 
         $daftar_tahun = (clone $baseQuery)
-            ->selectRaw('YEAR(tanggal) as tahun')
+            ->selectRaw('YEAR(created_at) as tahun')
             ->distinct()
             ->orderByDesc('tahun')
             ->pluck('tahun');
@@ -149,6 +151,8 @@ class Rt_pengumumanController extends Controller
             'judul' => 'required',
             'isi' => 'required',
             'kategori' => 'required',
+            'tanggal' => 'nullable|date',
+            'tempat' => 'nullable',
             'dokumen' => 'nullable|file|mimes:doc,docx,xls,xlsx,pdf|max:20480',
         ]);
 
@@ -169,7 +173,8 @@ class Rt_pengumumanController extends Controller
             'judul' => $request->judul,
             'isi' => $request->isi,
             'kategori' => $request->kategori,
-            'tanggal' => now(),
+            'tanggal' => Carbon::parse($request->tanggal)->format('Y-m-d H:i:s'),
+            'tempat' => $request->tempat ? $request->tempat : Auth::user()->warga->kartuKeluarga->alamat,
             'id_rt' => $id_rt_user,
             'id_rw' => $id_rw_user,
             'dokumen_path' => $dokumenPath,
@@ -216,6 +221,8 @@ class Rt_pengumumanController extends Controller
             'judul' => 'required|string|max:255',
             'kategori' => 'required|string|max:255',
             'isi' => 'required|string',
+            'tanggal' => 'nullable|date',
+            'tempat' => 'nullable',
             'dokumen' => 'nullable|file|mimes:doc,docx,xls,xlsx,pdf|max:20480',
             'hapus_dokumen_lama' => 'nullable|boolean',
         ]);
@@ -224,7 +231,8 @@ class Rt_pengumumanController extends Controller
             'judul' => $request->judul,
             'kategori' => $request->kategori,
             'isi' => $request->isi,
-            'tanggal' => now(),
+            'tanggal' => $request->tanggal,
+            'tempat' => $request->tempat,
         ];
 
         if ($request->hasFile('dokumen')) {
@@ -305,74 +313,53 @@ class Rt_pengumumanController extends Controller
 
     public function exportPDF($id)
     {
-        $pengumuman = Pengumuman::findOrFail($id);
+        $data = Pengumuman::with(['rukunTetangga', 'rw.kartuKeluarga'])->findOrFail($id);
 
-        $lampiranHtml = [];
+        /** @var User $user */
+        $user = Auth::user();
+        $role = session('active_role') ?? $user->getRoleNames()->first();
+        $rt = $data->rukunTetangga;
+        $rw = $data->rw;
 
-        $pathData = $pengumuman->dokumen_path;
+        $rtNumber = $rt ? str_pad($rt->nomor_rt, 2, '0', STR_PAD_LEFT) : null;
+        $rwNumber = $rw ? str_pad($rw->nomor_rw, 2, '0', STR_PAD_LEFT) : null;
 
-        if (is_string($pathData)) {
-            $decoded = json_decode($pathData, true);
-            $lampiranFiles = $decoded ?: [$pathData];
-        } elseif (is_array($pathData)) {
-            $lampiranFiles = $pathData;
-        } else {
-            $lampiranFiles = [];
-        }
+        $bulanRomawi = [1 => "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII"];
+        $bulan = $bulanRomawi[now()->format('n')];
+        $tahun = now()->year;
 
-        foreach ($lampiranFiles as $file) {
-            $path = storage_path("app/public/{$file}");
-            $ext = strtolower(pathinfo($path, PATHINFO_EXTENSION));
+        $urut = str_pad($data->id, 3, '0', STR_PAD_LEFT);
 
-            switch ($ext) {
-                case 'doc':
-                case 'docx':
-                    $phpWord = WordIO::load($path);
-                    $writer = WordIO::createWriter($phpWord, 'HTML');
-                    ob_start();
-                    $writer->save('php://output');
-                    $lampiranHtml[] = ob_get_clean();
-                    break;
+        $no_surat = $rt
+            ? "$urut/RT$rtNumber/$bulan/$tahun"
+            : "$urut/RW$rwNumber/$bulan/$tahun";
 
-                case 'xls':
-                case 'xlsx':
-                    $spreadsheet = ExcelIO::load($path);
-                    $writer = new \PhpOffice\PhpSpreadsheet\Writer\Html($spreadsheet);
-                    ob_start();
-                    $writer->save('php://output');
-                    $lampiranHtml[] = ob_get_clean();
-                    break;
+        $hari   = Carbon::parse($data->tanggal)->translatedFormat('l');
+        $tanggal = Carbon::parse($data->tanggal)->translatedFormat('d F Y');
+        $waktu  = Carbon::parse($data->tanggal)->format('H:i');
+        $judul = $data->judul;
 
-                case 'pdf':
-                    $lampiranHtml[] = "<p><b>Lampiran PDF:</b> <a href='" . asset("storage/{$file}") . "'>{$file}</a></p>";
-                    break;
+        $kk = $data->rw->kartuKeluarga->where('no_kk', $rt->no_kk)->first();
 
-                default:
-                    $lampiranHtml[] = "<p>Tipe file tidak dikenali: {$file}</p>";
-                    break;
-            }
-        }
-
-        $html = View::make('rt.export-pengumuman', [
-            'pengumuman' => $pengumuman,
-            'lampiranHtml' => $lampiranHtml
-        ])->render();
-
-        $options = new Options();
-        $options->set('isHtml5ParserEnabled', true);
-        $options->set('isRemoteEnabled', true);
-
-        $dompdf = new Dompdf($options);
-        $dompdf->loadHtml($html);
-        $dompdf->setPaper('A4', 'portrait');
-        $dompdf->render();
-
-
-        $filename = 'Pengumuman ' . $pengumuman->judul . '.pdf';
-
-        return response($dompdf->output(), 200)
-            ->header('Content-Type', 'application/pdf')
-            ->header('Content-Disposition', "attachment; filename=\"{$filename}\"");
+        $pdf = Pdf::loadView('rt.export-pengumuman', [
+            'rt' => $data->rukunTetangga->nomor_rt || null,
+            'rw' => $data->rw->nomor_rw,
+            'nama_desa' => 'Nama Desa',
+            'kelurahan' => $kk->kelurahan,
+            'kecamatan' => $kk->kecamatan,
+            'kabupaten' => $kk->kabupaten,
+            'nomor_surat' => $no_surat,
+            'hari' => $hari,
+            'tanggal' => $tanggal,
+            'waktu' => $waktu,
+            'tempat' => $data->tempat,
+            'isi_pengumuman' => $data->isi,
+            'tanggal_surat' => now()->format('d F Y'),
+            'nama_penanggung_jawab' => $user->nama,
+            'penanggung_jawab' => ucfirst($role),
+            'judul' => $judul,
+        ]);
+        return $pdf->download("Surat_Pengumuman_$judul.pdf");
     }
 
     protected function indoToEnglishDay(string $indoDay): ?string
