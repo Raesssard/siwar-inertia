@@ -26,18 +26,16 @@ export default function Sidebar({ toggleKeParent, localStorageHistory }) {
         localStorage.setItem("openMenus", JSON.stringify(openMenus));
     }, [openMenus]);
 
-    useEffect(() => {
-        if (localStorageHistory || toggleKeParent) {
-            localStorage.removeItem("openMenus");
-            setOpenMenus({});
-        }
-    }, [localStorageHistory, toggleKeParent]);
-
     const toggleSidebar = (e) => {
         e.preventDefault()
         const tgl = !toggle ? "toggled" : ""
         setToggle(tgl)
         toggleKeParent(tgl)
+
+        if (!toggle) {
+            localStorage.removeItem("openMenus")
+            setOpenMenus({})
+        }
     }
 
     const rotation = toggle ? 'right' : 'left'
