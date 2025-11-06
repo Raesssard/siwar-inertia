@@ -45,7 +45,6 @@ export default function Layout({ children }) {
             <div id="wrapper">
                 <Sidebar
                     toggleKeParent={handleToggle}
-                    localStorageHistory={history}
                 />
                 <ModalSidebar
                     modalIsOpen={showSidebar}

@@ -272,6 +272,7 @@ export default function Pengumuman() {
                     role={role}
                 />
                 <TambahPengumuman
+                    kategori={daftar_kategori}
                     tambahShow={showModalTambah}
                     onClose={() => setShowModalTambah(false)}
                     onAdded={(newPengumuman) => {
