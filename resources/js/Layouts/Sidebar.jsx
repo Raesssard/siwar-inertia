@@ -5,7 +5,7 @@ import React, { useEffect, useState } from "react"
 import { SidebarLink } from '../Pages/Component/SidebarLink'
 import { getAdminLinks, getRwLinks, getRtLinks, getWargaLinks } from "../Pages/Component/GetPropRole"
 
-export default function Sidebar({ toggleKeParent, localStorageHistory }) {
+export default function Sidebar({ toggleKeParent }) {
     const [toggle, setToggle] = useState("")
     const [openMenus, setOpenMenus] = useState(() => {
         const saved = localStorage.getItem("openMenus");

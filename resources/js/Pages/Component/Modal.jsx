@@ -35,10 +35,6 @@ export function ModalSidebar({ modalIsOpen, modalShow, localStorageHistory }) {
     const { props } = usePage()
     const role = props.auth?.currentRole
 
-    const isActive = (url, pattern) => {
-        return url.startsWith(pattern)
-    }
-
     let statLinks = []
 
     switch (role) {
@@ -3636,7 +3632,7 @@ export function EditPengumuman({ toggle, onUpdated, onDeleted, pengumuman, role 
     )
 }
 
-export function TambahPengumuman({ tambahShow, onClose, onAdded, role }) {
+export function TambahPengumuman({ kategori, tambahShow, onClose, onAdded, role }) {
     const { data, setData } = useForm({
         judul: "",
         kategori: "",
@@ -3800,6 +3796,7 @@ export function TambahPengumuman({ tambahShow, onClose, onAdded, role }) {
                                             <div className="mb-3">
                                                 <label className="form-label">Kategori</label>
                                                 <input
+                                                    list="daftarKategori"
                                                     name="kategori"
                                                     type="text"
                                                     className="tambah-kategori form-control"
@@ -3807,6 +3804,12 @@ export function TambahPengumuman({ tambahShow, onClose, onAdded, role }) {
                                                     onChange={(e) => setData("kategori", e.target.value)}
                                                     required
                                                 />
+                                                {/* sementara pake datalist 🙏*/}
+                                                <datalist id="daftarKategori">
+                                                    {kategori.map((kat, index) => (
+                                                        <option key={index} value={kat} />
+                                                    ))}
+                                                </datalist>
                                             </div>
 
                                             <div className="mb-3">
