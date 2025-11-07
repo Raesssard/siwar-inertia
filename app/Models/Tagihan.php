@@ -20,6 +20,7 @@ class Tagihan extends Model
         'tgl_tempo',
         'jenis',
         'nominal',
+        'nik',
         'no_kk',
         'status_bayar',
         'tgl_bayar',
@@ -40,6 +41,11 @@ class Tagihan extends Model
     public function kartuKeluarga()
     {
         return $this->belongsTo(Kartu_keluarga::class, 'no_kk', 'no_kk');
+    }
+
+    public function warga()
+    {
+        return $this->belongsTo(Warga::class, 'nik', 'nik');
     }
 
     public function iuran()

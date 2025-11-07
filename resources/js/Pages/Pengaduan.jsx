@@ -24,7 +24,7 @@ export function FormatWaktu({ createdAt }) {
     }
 
     if (diffDays < 8) {
-        return `${diffWeek} minggu yang lalu`
+        return `${diffDays} hari yang lalu`
     }
 
     if (diffDays < 30) {

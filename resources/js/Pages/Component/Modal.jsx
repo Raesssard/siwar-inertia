@@ -6,6 +6,7 @@ import { SidebarLink } from "./SidebarLink"
 import { formatTanggal, getAdminLinks, getRtLinks, getWargaLinks, getRwLinks, formatRupiah } from "./GetPropRole"
 import Role from "./Role"
 import { route } from "ziggy-js"
+import { motion, AnimatePresence } from "framer-motion"
 
 export function ModalSidebar({ modalIsOpen, modalShow, localStorageHistory }) {
     const [openMenus, setOpenMenus] = useState(() => {
@@ -2920,6 +2921,21 @@ export function DetailPengumuman({ selectedData, detailShow, onClose, onUpdated,
 
     const fileName = selectedData.dokumen_name?.toLowerCase() || ""
 
+    const date = new Date(selectedData.tanggal?.replace(" ", "T"))
+
+    const tanggalFormatted = date.toLocaleDateString("id-ID", {
+        day: "2-digit",
+        month: "long",
+        year: "numeric",
+    })
+
+    const waktuFormatted = date.toLocaleTimeString("id-ID", {
+        hour: "2-digit",
+        minute: "2-digit",
+    })
+
+    const hariFormatted = date.toLocaleDateString("id-ID", { weekday: "long" })
+
     return (
         <>
             <div
@@ -3035,6 +3051,29 @@ export function DetailPengumuman({ selectedData, detailShow, onClose, onUpdated,
                                                 ref={textRef}
                                                 className={`mt-2 isi-pengumuman ${captionExpanded ? "expanded" : "clamped"}`}
                                             >
+                                                <table className="mb-3">
+                                                    {selectedData.tanggal &&
+                                                        <>
+                                                            <tr>
+                                                                <td><strong>Hari / Tanggal</strong></td>
+                                                                <td><span className="me-2 ms-1">:</span></td>
+                                                                <td>{hariFormatted}, {tanggalFormatted}</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td><strong>Pukul</strong></td>
+                                                                <td><span className="me-2 ms-1">:</span></td>
+                                                                <td>{waktuFormatted}</td>
+                                                            </tr>
+                                                        </>
+                                                    }
+                                                    {selectedData.tempat &&
+                                                        <tr>
+                                                            <td><strong>Tempat</strong></td>
+                                                            <td><span className="me-2 ms-1">:</span></td>
+                                                            <td>{selectedData.tempat}</td>
+                                                        </tr>
+                                                    }
+                                                </table>
                                                 {selectedData.isi}
                                             </p>
                                             {
@@ -3993,71 +4032,95 @@ export function DetailWarga({ selectData, detailShow, onClose }) {
     )
 }
 
-export function TambahIuran({ tambahShow, onClose, onAdded, role, golongan, rt = [] }) {
+export function TambahIuran({ tambahShow, onClose, onAdded, role, golongan, rt = [], nik, no_kk }) {
     const [data, setData] = useState({
         id_rt: "",
         nama: "",
         tgl_tagih: "",
         tgl_tempo: "",
         jenis: "manual",
+        nik: "",
+        no_kk: "",
         nominal: "",
         periode: "",
     });
 
-    const [golonganList, setGolonganList] = useState([]);
+    const [golonganList, setGolonganList] = useState([])
+    const [nikWarga, setNikWarga] = useState([])
+    const [noKkWarga, setNoKkWarga] = useState([])
+    const [perWarga, setPerWarga] = useState(false)
+    const [perKk, setPerKk] = useState(false)
 
     useEffect(() => {
-        setGolonganList(golongan);
-        const defaults = {};
+        setGolonganList(golongan)
+        setNikWarga(nik)
+        setNoKkWarga(no_kk)
+        const defaults = {}
         golongan.forEach(g => {
-            defaults[`periode_${g.id}`] = "1";
-        });
-        setData(prev => ({ ...prev, ...defaults }));
-    }, [golongan]);
+            defaults[`periode_${g.id}`] = "1"
+        })
+        setData(prev => ({ ...prev, ...defaults }))
+    }, [golongan, nik, no_kk])
 
     const handleChange = (e) => {
-        setData({ ...data, [e.target.name]: e.target.value });
-    };
+        setData({ ...data, [e.target.name]: e.target.value })
+    }
 
     const handleNominalChange = (id, value) => {
-        setData({ ...data, [`nominal_${id}`]: value });
-    };
+        setData({ ...data, [`nominal_${id}`]: value })
+    }
 
     const handlePeriodeChange = (id, value) => {
-        setData({ ...data, [`periode_${id}`]: value });
-    };
+        setData({ ...data, [`periode_${id}`]: value })
+    }
+
+    const handleChangeOption = () => {
+        setData({
+            id_rt: "",
+            nama: "",
+            tgl_tagih: "",
+            tgl_tempo: "",
+            jenis: "manual",
+            nik: "",
+            no_kk: "",
+            nominal: "",
+            periode: "",
+        })
+    }
 
     const handleSubmit = (e) => {
-        e.preventDefault();
+        e.preventDefault()
         axios.post(`/${role}/iuran`, data)
             .then(res => {
-                if (onAdded) onAdded(res.data.iuran);
+                if (onAdded) onAdded(res.data.iuran)
                 setData({
                     id_rt: "",
                     nama: "",
                     tgl_tagih: "",
                     tgl_tempo: "",
                     jenis: "manual",
+                    nik: "",
+                    no_kk: "",
                     nominal: "",
                     periode: "",
-                });
-                onClose();
+                })
+                onClose()
             })
             .catch(err => {
-                console.error(err);
-                alert("Gagal menyimpan iuran!");
-            });
-    };
+                console.error(err)
+                alert("Gagal menyimpan iuran!")
+            })
+    }
 
     useEffect(() => {
         const handleEsc = (e) => {
-            if (e.key === "Escape") onClose();
-        };
-        document.addEventListener("keydown", handleEsc);
-        return () => document.removeEventListener("keydown", handleEsc);
-    }, [onClose]);
+            if (e.key === "Escape") onClose()
+        }
+        document.addEventListener("keydown", handleEsc)
+        return () => document.removeEventListener("keydown", handleEsc)
+    }, [onClose])
 
-    if (!tambahShow) return null;
+    if (!tambahShow) return null
 
     return (
         <div
@@ -4075,9 +4138,9 @@ export function TambahIuran({ tambahShow, onClose, onAdded, role, golongan, rt =
             >
                 <div className="modal-content shadow-lg border-0">
                     <div className="modal-body p-0 m-0">
-                        <div className="d-flex tambah-body flex-column" style={{ width: "100%", maxHeight: "80vh", overflowY: "auto" }}>
-                            <div className="p-3">
-                                <form onSubmit={handleSubmit} className="h-100">
+                        <div className="d-flex tambah-body flex-column" style={{ width: "100%", height: "86.5vh", overflowY: "auto" }}>
+                            <div className="p-3 h-100">
+                                <form onSubmit={handleSubmit} className="h-100 d-flex flex-column">
                                     {/* Hanya tampil jika role = RW */}
                                     <Role role="rw">
                                         <div className="mb-3">
@@ -4103,6 +4166,101 @@ export function TambahIuran({ tambahShow, onClose, onAdded, role, golongan, rt =
                                         </div>
                                     </Role>
 
+                                    <div className="d-flex position-relative mb-3 border-bottom">
+                                        {["Semua", "Warga", "Kartu Keluarga"].map((label, i) => (
+                                            <button
+                                                key={label}
+                                                type="button"
+                                                className="btn btn-opsi m-0 flex-fill"
+                                                style={{
+                                                    border: "none",
+                                                    background: "transparent",
+                                                    width: "30%",
+                                                    color:
+                                                        (i === 0 && !perWarga && !perKk) ||
+                                                            (i === 1 && perWarga) ||
+                                                            (i === 2 && perKk)
+                                                            ? "#4e73df"
+                                                            : "gray",
+                                                    fontWeight: "500",
+                                                    position: "relative",
+                                                    paddingBottom: "8px",
+                                                }}
+                                                onClick={() => {
+                                                    setPerWarga(i === 1)
+                                                    setPerKk(i === 2)
+                                                    handleChangeOption()
+                                                }}
+                                            >
+                                                {label}
+                                            </button>
+                                        ))}
+
+                                        {/* garis bawah biru yang geser halus */}
+                                        <motion.div
+                                            layout
+                                            transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                                            className="position-absolute"
+                                            style={{
+                                                height: "2px",
+                                                background: "#4e73df",
+                                                width: "33%",
+                                                bottom: "0",
+                                                left:
+                                                    perWarga ? "34%" : perKk ? "67%" : "0%",
+                                                borderRadius: "2px",
+                                            }}
+                                        />
+                                    </div>
+
+                                    {perWarga && (
+                                        <div className="mb-3">
+                                            <label className="form-label">NIK Warga</label>
+                                            <select
+                                                name="nik"
+                                                type="text"
+                                                className="tambah-judul form-control"
+                                                value={data.nik}
+                                                onChange={handleChange}
+                                                required
+                                                style={{
+                                                    border: '0',
+                                                    borderBottom: '1px solid lightgray',
+                                                    borderRadius: '0',
+                                                }}
+                                            >
+                                                <option value="" selected disabled>Pilih NIK</option>
+                                                {nikWarga.map((warga, index) => (
+                                                    <option value={warga.nik} key={index}>{warga.nik}</option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                    )}
+
+                                    {perKk && (
+                                        <div className="mb-3">
+                                            <label className="form-label">Nomor Kartu Keluarga</label>
+                                            <select
+                                                name="no_kk"
+                                                type="text"
+                                                className="tambah-judul form-control"
+                                                value={data.no_kk}
+                                                onChange={handleChange}
+                                                required
+                                                style={{
+                                                    border: '0',
+                                                    borderBottom: '1px solid lightgray',
+                                                    borderRadius: '0',
+                                                }}
+                                            >
+                                                <option value="" selected disabled>Pilih No. KK</option>
+                                                {noKkWarga.map((kk, index) => (
+                                                    <option value={kk.no_kk} key={index}>{kk.no_kk}</option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                    )}
+
                                     <div className="mb-3">
                                         <label className="form-label">Nama Iuran</label>
                                         <input
@@ -4122,6 +4280,11 @@ export function TambahIuran({ tambahShow, onClose, onAdded, role, golongan, rt =
                                             className="form-control"
                                             onChange={handleChange}
                                             required
+                                            style={{
+                                                border: '0',
+                                                borderBottom: '1px solid lightgray',
+                                                borderRadius: '0',
+                                            }}
                                         />
                                     </div>
 
@@ -4133,6 +4296,11 @@ export function TambahIuran({ tambahShow, onClose, onAdded, role, golongan, rt =
                                             className="form-control"
                                             onChange={handleChange}
                                             required
+                                            style={{
+                                                border: '0',
+                                                borderBottom: '1px solid lightgray',
+                                                borderRadius: '0',
+                                            }}
                                         />
                                     </div>
 
@@ -4140,9 +4308,14 @@ export function TambahIuran({ tambahShow, onClose, onAdded, role, golongan, rt =
                                         <label className="form-label">Jenis Iuran</label>
                                         <select
                                             name="jenis"
-                                            className="form-select"
+                                            className="tambah-judul form-control"
                                             value={data.jenis}
                                             onChange={handleChange}
+                                            style={{
+                                                border: '0',
+                                                borderBottom: '1px solid lightgray',
+                                                borderRadius: '0',
+                                            }}
                                         >
                                             <option value="manual">Manual</option>
                                             <option value="otomatis">Otomatis</option>
@@ -4159,10 +4332,15 @@ export function TambahIuran({ tambahShow, onClose, onAdded, role, golongan, rt =
                                                 onChange={handleChange}
                                                 onInput={(e) => {
                                                     if (e.target.value.length > 8) {
-                                                        e.target.value = e.target.value.slice(0, 8);
+                                                        e.target.value = e.target.value.slice(0, 8)
                                                     }
                                                 }}
                                                 required
+                                                style={{
+                                                    border: '0',
+                                                    borderBottom: '1px solid lightgray',
+                                                    borderRadius: '0',
+                                                }}
                                             />
                                         </div>
                                     )}
@@ -4171,9 +4349,9 @@ export function TambahIuran({ tambahShow, onClose, onAdded, role, golongan, rt =
                                         <div className="mb-3">
                                             <h5 className="mb-3">Nominal per Golongan:</h5>
                                             {golonganList.map((g) => {
-                                                const items = [];
+                                                const items = []
                                                 for (let i = 1; i <= 12; i++) {
-                                                    items.push(<option value={i} key={i}>{i} Bulan</option>);
+                                                    items.push(<option value={i} key={i}>{i} Bulan</option>)
                                                 }
 
                                                 return (
@@ -4188,7 +4366,7 @@ export function TambahIuran({ tambahShow, onClose, onAdded, role, golongan, rt =
                                                                 className="tambah-judul form-control"
                                                                 onInput={(e) => {
                                                                     if (e.target.value.length > 8 || e.target.value.length < 0) {
-                                                                        e.target.value = e.target.value.slice(0, 8);
+                                                                        e.target.value = e.target.value.slice(0, 8)
                                                                     }
                                                                 }}
                                                                 onChange={(e) => handleNominalChange(g.id, e.target.value)}
@@ -4218,7 +4396,7 @@ export function TambahIuran({ tambahShow, onClose, onAdded, role, golongan, rt =
                                         </div>
                                     )}
 
-                                    <button type="submit" className="btn btn-primary mt-2">
+                                    <button type="submit" className="btn btn-primary mt-auto" style={{ width: '25%' }}>
                                         <i className="fas fa-save me-2"></i> Simpan
                                     </button>
                                 </form>
@@ -4228,7 +4406,7 @@ export function TambahIuran({ tambahShow, onClose, onAdded, role, golongan, rt =
                 </div>
             </div>
         </div>
-    );
+    )
 }
 
 export function EditIuranOtomatis({ editShow, onClose, onUpdated, role, golongan, iuran, iuranGol }) {
@@ -4303,7 +4481,9 @@ export function EditIuranOtomatis({ editShow, onClose, onUpdated, role, golongan
                                             <input
                                                 name="nama"
                                                 type="text"
-                                                value={golongan.jenis}
+                                                value={
+                                                    golongan.jenis.charAt(0).toUpperCase() + golongan.jenis.slice(1)
+                                                }
                                                 className="tambah-judul form-control"
                                                 disabled
                                             />

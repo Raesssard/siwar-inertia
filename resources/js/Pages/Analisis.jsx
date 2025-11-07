@@ -7,7 +7,10 @@ import { analisisKeuanganRt, analisisKeuanganRw, analisisWargaRt, analisisWargaR
 export default function Analisis() {
     const { role, ...rest } = usePage().props
     let statCards = [];
-    const jenis = usePage().url.split("/").pop()
+    function getJenisFromUrl(url) {
+        return url.split("/").pop();
+    }
+    const jenis = getJenisFromUrl(usePage().url);
 
     switch (role) {
         case "admin":
@@ -16,6 +19,7 @@ export default function Analisis() {
             } else if (jenis === 'sistem') {
                 statCards = analisisSistemAdmin(rest);
             }
+            break;
         case "rw":
             if (jenis === 'keuangan') {
                 statCards = analisisKeuanganRw(rest);

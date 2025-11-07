@@ -1,29 +1,36 @@
-import React, { useState, useEffect } from "react";
-import "../../css/layout.css";
-import Sidebar from "./Sidebar";
-import Footer from "./Footer";
-import Topbar from "./Topbar";
-import { ModalSidebar } from "../Pages/Component/Modal";
-import { usePage } from "@inertiajs/react";
+import React, { useState, useEffect } from "react"
+import "../../css/layout.css"
+import Sidebar from "./Sidebar"
+import Footer from "./Footer"
+import Topbar from "./Topbar"
+import { ModalSidebar } from "../Pages/Component/Modal"
+import { usePage } from "@inertiajs/react"
 
 export default function Layout({ children }) {
-    const [toggle, setToggle] = useState("");
+    const [toggle, setToggle] = useState(() => {
+        return localStorage.getItem("sidebarCollapsed") === "true" ? "toggled" : ""
+    })
     const [history, setHistory] = useState(false)
-    const [showSidebar, setShowSidebar] = useState(false);
-    const [flashMessage, setFlashMessage] = useState(null);
-    const { flash } = usePage().props;
+    const [showSidebar, setShowSidebar] = useState(false)
+    const [flashMessage, setFlashMessage] = useState(null)
+    const { flash } = usePage().props
 
     const toggleLocalStorage = () => {
         setHistory(true)
+        setToggle("")
+        localStorage.removeItem("sidebarCollapsed")
+        localStorage.removeItem("openMenus")
+
+        setTimeout(() => setHistory(false), 200)
     }
 
     const handleToggle = (t) => {
-        setToggle(t);
-    };
+        setToggle(t)
+    }
 
     const ModalSideShow = (condition) => {
-        setShowSidebar(condition);
-    };
+        setShowSidebar(condition)
+    }
 
     // 🔹 Tampilkan flash message ketika ada dari server
     useEffect(() => {
@@ -31,20 +38,21 @@ export default function Layout({ children }) {
             const message = {
                 type: flash.success ? "success" : "error",
                 text: flash.success || flash.error,
-            };
-            setFlashMessage(message);
+            }
+            setFlashMessage(message)
 
             // Hilangkan otomatis setelah 3 detik
-            const timer = setTimeout(() => setFlashMessage(null), 3000);
-            return () => clearTimeout(timer);
+            const timer = setTimeout(() => setFlashMessage(null), 3000)
+            return () => clearTimeout(timer)
         }
-    }, [flash]);
+    }, [flash])
 
     return (
         <>
             <div id="wrapper">
                 <Sidebar
                     toggleKeParent={handleToggle}
+                    localStorageHistory={history}
                 />
                 <ModalSidebar
                     modalIsOpen={showSidebar}
@@ -95,5 +103,5 @@ export default function Layout({ children }) {
                 }
             `}</style>
         </>
-    );
+    )
 }
