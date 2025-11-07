@@ -9,6 +9,7 @@ use App\Models\Kartu_keluarga;
 use App\Models\Kategori_golongan;
 use App\Models\Rukun_tetangga;
 use App\Models\Tagihan;
+use App\Models\Warga;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth; // Tetap diperlukan jika ada filter iuran per RT
@@ -50,10 +51,30 @@ class RtIuranController extends Controller
         $iuranOtomatis = (clone $query)->where('jenis', 'otomatis')->orderBy('tgl_tagih', 'desc')->paginate(10, ['*'], 'manual_page');
         $iuranManual = (clone $query)->where('jenis', 'manual')->orderBy('tgl_tagih', 'desc')->paginate(10, ['*'], 'otomatis_page');
 
+        $nik_list = Warga::whereHas('kartuKeluarga', function ($q) use ($user) {
+            if ($user->hasRole('rt')) {
+                $q->where('id_rt', $user->id_rt);
+            } elseif ($user->hasRole('rw')) {
+                $q->where('id_rw', $user->id_rw);
+            }
+        })->select('nik')
+            ->get();
+
+        $no_kk_list = Warga::whereHas('kartuKeluarga', function ($q) use ($user) {
+            if ($user->hasRole('rt')) {
+                $q->where('id_rt', $user->id_rt);
+            } elseif ($user->hasRole('rw')) {
+                $q->where('id_rw', $user->id_rw);
+            }
+        })->select('no_kk')
+            ->get();
+
         return Inertia::render('RT/Iuran', [
             'iuranOtomatis' => $iuranOtomatis,
             'iuranManual' => $iuranManual,
             'golongan_list' => $golongan_list,
+            'nik_list' => $nik_list,
+            'no_kk_list' => $no_kk_list,
             'title' => $title,
         ]);
     }
@@ -64,6 +85,8 @@ class RtIuranController extends Controller
         $user = Auth::user();
 
         $request->validate([
+            'nik' => 'nullable',
+            'no_kk' => 'nullable',
             'nama' => 'required|string|max:255',
             'tgl_tagih' => 'required|date',
             'tgl_tempo' => 'required|date',
@@ -90,44 +113,81 @@ class RtIuranController extends Controller
             ? Kartu_keluarga::where('id_rt', $iuran->id_rt)->get()
             : Kartu_keluarga::where('id_rw', $iuran->id_rw)->get();
 
+        $kkSelected = Kartu_keluarga::where('no_kk', $request->no_kk)->first();
+        $wargaSelected = Warga::where('nik', $request->nik)->first();
 
-        // Manual
         if ($request->jenis === 'manual') {
-            foreach ($kkList as $kk) {
-                Tagihan::create([
-                    'nama' => $iuran->nama,
-                    'nominal' => $iuran->nominal,
-                    'tgl_tagih' => $iuran->tgl_tagih,
-                    'tgl_tempo' => $iuran->tgl_tempo,
-                    'jenis' => 'manual',
-                    'no_kk' => $kk->no_kk,
-                    'status_bayar' => 'belum_bayar',
-                    'id_iuran' => $iuran->id,
-                ]);
+            if (!empty($request->no_kk)) {
+                if ($kkSelected) {
+                    Tagihan::create([
+                        'nama' => $iuran->nama,
+                        'nominal' => $iuran->nominal,
+                        'tgl_tagih' => $iuran->tgl_tagih,
+                        'tgl_tempo' => $iuran->tgl_tempo,
+                        'jenis' => 'manual',
+                        'no_kk' => $kkSelected->no_kk,
+                        'status_bayar' => 'belum_bayar',
+                        'id_iuran' => $iuran->id,
+                    ]);
+                }
+            } elseif (!empty($request->nik)) {
+                if ($wargaSelected) {
+                    Tagihan::create([
+                        'nama' => $iuran->nama,
+                        'nominal' => $iuran->nominal,
+                        'tgl_tagih' => $iuran->tgl_tagih,
+                        'tgl_tempo' => $iuran->tgl_tempo,
+                        'jenis' => 'manual',
+                        'nik' => $wargaSelected->nik,
+                        'status_bayar' => 'belum_bayar',
+                        'id_iuran' => $iuran->id,
+                    ]);
+                }
+            } else {
+                foreach ($kkList as $kk) {
+                    Tagihan::create([
+                        'nama' => $iuran->nama,
+                        'nominal' => $iuran->nominal,
+                        'tgl_tagih' => $iuran->tgl_tagih,
+                        'tgl_tempo' => $iuran->tgl_tempo,
+                        'jenis' => 'manual',
+                        'no_kk' => $kk->no_kk,
+                        'status_bayar' => 'belum_bayar',
+                        'id_iuran' => $iuran->id,
+                    ]);
+                }
             }
         }
 
-        // Otomatis
         if ($request->jenis === 'otomatis') {
             // Simpan nominal per golongan
-            $golonganList = Kategori_golongan::all(); // ambil semua golongan
+            $golonganList = Kategori_golongan::all();
 
             foreach ($golonganList as $golongan) {
                 $nominal = $request->input("nominal_{$golongan->id}");
-                $periode = $request->input("periode_{$golongan->id}", $request->periode ?? 1);
+                $periode = $request->input("periode_{$golongan->id}", 1);
                 if ($nominal !== null) {
                     IuranGolongan::create([
                         'id_iuran' => $iuran->id,
-                        'id_golongan' => $golongan->id, // pakai id_golongan
+                        'id_golongan' => $golongan->id,
                         'nominal' => $nominal,
                         'periode' => $periode,
                     ]);
                 }
             }
 
-            // Buat tagihan untuk semua KK sesuai RT/RW
             $iuranNominals = IuranGolongan::where('id_iuran', $iuran->id)
                 ->pluck('nominal', 'id_golongan');
+
+            // Tentukan target (semua KK / 1 KK / 1 warga)
+            if ($request->filled('no_kk')) {
+                $kkList = Kartu_keluarga::where('no_kk', $request->no_kk)->get();
+            } elseif ($request->filled('nik')) {
+                $warga = Warga::where('nik', $request->nik)->first();
+                if ($warga) {
+                    $kkList = Kartu_keluarga::where('no_kk', $warga->no_kk)->get();
+                }
+            }
 
             foreach ($kkList as $kk) {
                 $nominalTagihan = $iuranNominals[$kk->kategori_iuran] ?? 0;

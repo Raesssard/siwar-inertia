@@ -8,6 +8,7 @@ use App\Models\Kartu_keluarga;
 use App\Models\Tagihan;
 use App\Models\RukunTetangga;
 use App\Models\Transaksi;
+use App\Models\Warga;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -45,8 +46,17 @@ class Rt_tagihanController extends Controller
             'iuran',
             'kartuKeluarga',
             'kartuKeluarga.warga',
+            'warga'
         ])
             ->whereHas('kartuKeluarga', function ($q) use ($idRt, $idRw, $user) {
+                if ($user->hasRole('rt')) {
+                    $q->where('id_rt', $idRt);
+                }
+                if ($user->hasRole('rw')) {
+                    $q->where('id_rw', $idRw);
+                }
+            })
+            ->orWhereHas('warga.kartuKeluarga', function ($q) use ($idRt, $idRw, $user) {
                 if ($user->hasRole('rt')) {
                     $q->where('id_rt', $idRt);
                 }

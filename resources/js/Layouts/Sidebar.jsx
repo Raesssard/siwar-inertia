@@ -5,32 +5,46 @@ import React, { useEffect, useState } from "react"
 import { SidebarLink } from '../Pages/Component/SidebarLink'
 import { getAdminLinks, getRwLinks, getRtLinks, getWargaLinks } from "../Pages/Component/GetPropRole"
 
-export default function Sidebar({ toggleKeParent }) {
-    const [toggle, setToggle] = useState("")
+export default function Sidebar({ toggleKeParent, localStorageHistory }) {
+    const [toggle, setToggle] = useState(() => {
+        return localStorage.getItem("sidebarCollapsed") === "true" ? "toggled" : ""
+    })
     const [openMenus, setOpenMenus] = useState(() => {
-        const saved = localStorage.getItem("openMenus");
-        return saved ? JSON.parse(saved) : {};
+        const saved = localStorage.getItem("openMenus")
+        return saved ? JSON.parse(saved) : {}
     })
 
     const toggleMenu = (menuName) => {
         setOpenMenus((prev) => {
-            const updated = { ...prev, [menuName]: !prev[menuName] };
-            localStorage.setItem("openMenus", JSON.stringify(updated));
-            return updated;
+            const updated = { ...prev, [menuName]: !prev[menuName] }
+            localStorage.setItem("openMenus", JSON.stringify(updated))
+            return updated
         })
     }
     const { props } = usePage()
     const role = props.auth?.currentRole
 
     useEffect(() => {
-        localStorage.setItem("openMenus", JSON.stringify(openMenus));
-    }, [openMenus]);
+        localStorage.setItem("openMenus", JSON.stringify(openMenus))
+    }, [openMenus])
+
+    useEffect(() => {
+        if (localStorageHistory) {
+            localStorage.removeItem("openMenus")
+            localStorage.removeItem("sidebarCollapsed")
+            setOpenMenus({})
+            setToggle("")
+        }
+    }, [localStorageHistory])
 
     const toggleSidebar = (e) => {
         e.preventDefault()
-        const tgl = !toggle ? "toggled" : ""
-        setToggle(tgl)
-        toggleKeParent(tgl)
+        const newToggle = toggle === "" ? "toggled" : "";
+
+        setToggle(newToggle);
+        toggleKeParent(newToggle);
+
+        localStorage.setItem("sidebarCollapsed", newToggle === "toggled");
 
         if (!toggle) {
             localStorage.removeItem("openMenus")
@@ -38,7 +52,7 @@ export default function Sidebar({ toggleKeParent }) {
         }
     }
 
-    const rotation = toggle ? 'right' : 'left'
+    const rotation = toggle === "toggled" ? "right" : "left"
     let statLinks = []
 
     switch (role) {
