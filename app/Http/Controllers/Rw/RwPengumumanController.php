@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Rw;
 use App\Http\Controllers\Controller;
 use App\Models\Pengumuman;
 use App\Models\Rw;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -101,10 +102,12 @@ class RwPengumumanController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'judul' => 'required|string|max:255',
-            'isi' => 'required|string',
-            'kategori' => 'required|string|max:255',
-            'dokumen' => 'nullable|file|mimes:jpg,jpeg,png,gif,mp4,mov,avi,mkv,doc,docx,pdf|max:20480',
+            'judul' => 'required',
+            'isi' => 'required',
+            'kategori' => 'required',
+            'tanggal' => 'nullable|date',
+            'tempat' => 'nullable',
+            'dokumen' => 'nullable|file|mimes:doc,docx,xls,xlsx,pdf|max:20480',
         ]);
 
         $path = null;
@@ -120,7 +123,8 @@ class RwPengumumanController extends Controller
             'judul' => $request->judul,
             'isi' => $request->isi,
             'kategori' => $request->kategori,
-            'tanggal' => now(),
+            'tanggal' => Carbon::parse($request->tanggal)->format('Y-m-d H:i:s'),
+            'tempat' => $request->tempat ? $request->tempat : Auth::user()->warga->kartuKeluarga->alamat,
             'id_rw' => Auth::user()->id_rw,
             'dokumen_path' => $path,
             'dokumen_name' => $name,
