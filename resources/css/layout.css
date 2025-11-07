@@ -124,11 +124,11 @@
     font-size: 0.75rem !important;
 }
 
-ul.toggled li.nav-item a.nav-link{
-        display: flex !important;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
+ul.toggled li.nav-item a.nav-link {
+    display: flex !important;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
 
 .sticky-footer {
@@ -473,4 +473,12 @@ ul.ps-3 .nav-item.active>.nav-link {
     max-height: 500px;
     opacity: 1;
     transform: translateY(0);
+}
+
+.btn-opsi:focus,
+.btn-opsi:focus-visible,
+.btn-opsi:hover,
+.btn-opsi.btn-outline-primary:not(:disabled):not(.disabled):active {
+    outline: none !important;
+    box-shadow: none !important;
 }

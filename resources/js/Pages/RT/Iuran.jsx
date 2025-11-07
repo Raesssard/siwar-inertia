@@ -11,6 +11,8 @@ export default function Iuran() {
         iuranOtomatis: iuranOtomatisFromServer,
         iuranManual: iuranManualFromServer,
         golongan_list,
+        nik_list,
+        no_kk_list,
         title,
     } = usePage().props
     const [selected, setSelected] = useState(null)
@@ -270,14 +272,16 @@ export default function Iuran() {
                         </ul>
                     </div>
                 )}
-                <TambahIuran
-                    tambahShow={showModalTambah}
-                    onClose={() => setShowModalTambah(false)}
-                    onAdded={handleAdded}
-                    role={role}
-                    golongan={golongan_list}
-                />
             </div>
+            <TambahIuran
+                tambahShow={showModalTambah}
+                onClose={() => setShowModalTambah(false)}
+                onAdded={handleAdded}
+                role={role}
+                golongan={golongan_list}
+                nik={nik_list}
+                no_kk={no_kk_list}
+            />
             <EditIuranOtomatis
                 editShow={showModalEdit}
                 onClose={() => setShowModalEdit(false)}

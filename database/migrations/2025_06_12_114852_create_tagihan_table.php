@@ -19,13 +19,15 @@ return new class extends Migration
             $table->date('tgl_tempo');
             $table->enum('jenis', ['otomatis', 'manual'])->default('manual');
 
-            $table->char('no_kk', 16);
+            $table->char('nik', 16)->nullable();
+            $table->foreign('nik')->references('nik')->on('warga')->onDelete('cascade');
+            $table->char('no_kk', 16)->nullable();
             $table->foreign('no_kk')->references('no_kk')->on('kartu_keluarga')->onDelete('cascade');
 
             $table->enum('status_bayar', ['sudah_bayar', 'belum_bayar'])->default('belum_bayar');
             $table->date('tgl_bayar')->nullable(); // dari dateTime diubah jadi date, biar bisa diambil sama si input date 👍👍👍
             $table->foreignId('id_iuran')->constrained('iuran')->onDelete('cascade');
-            $table->enum('kategori_pembayaran',['transfer', 'tunai'])->nullable();
+            $table->enum('kategori_pembayaran', ['transfer', 'tunai'])->nullable();
             $table->string('bukti_transfer')->nullable();
 
             $table->timestamps();

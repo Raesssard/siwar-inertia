@@ -27,7 +27,6 @@ class Rt_pengumumanController extends Controller
      */
     public function index(Request $request)
     {
-        Log::info("Data yg masuk: ", $request->all());
         $search = $request->input('search');
         $tahun = $request->input('tahun');
         $bulan = $request->input('bulan');
