@@ -24,6 +24,7 @@ class Tagihan extends Model
         'no_kk',
         'status_bayar',
         'tgl_bayar',
+        'nominal_bayar',
         'id_iuran',
         'kategori_pembayaran',
         'bukti_transfer',

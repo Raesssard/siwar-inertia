@@ -4702,11 +4702,23 @@ export function EditTagihan({ editShow, onClose, onUpdated, role, selectedData }
         tgl_bayar: "",
         nominal_bayar: "",
         kategori_pembayaran: "",
-        bukti_transfer: "",
+        bukti_transfer: null,
     })
     const [buktiLama, setBuktiLama] = useState(null)
     const [previewBuktiTransfer, setPreviewBuktiTransfer] = useState(null)
     const fileInputRef = useRef(null)
+
+    useEffect(() => {
+        if (data.status_bayar === 'belum_bayar') {
+            setData({
+                ...data,
+                tgl_bayar: "",
+                nominal_bayar: "",
+                kategori_pembayaran: "tunai",
+                bukti_transfer: null,
+            })
+        }
+    }, [data.status_bayar])
 
     const handleFileChange = (e) => {
         const selectedFile = e.target.files[0]
@@ -4895,10 +4907,10 @@ export function EditTagihan({ editShow, onClose, onUpdated, role, selectedData }
                                         </div>
 
                                         <div className="mb-3">
-                                            <label className="form-label">Nominal Bayar</label>
+                                            <label className="form-label">Nominal</label>
                                             <input
                                                 type="number"
-                                                name="nominal_bayar"
+                                                name="nominal"
                                                 value={selectedData.nominal}
                                                 className="form-control"
                                                 onInput={(e) => {
@@ -4928,7 +4940,8 @@ export function EditTagihan({ editShow, onClose, onUpdated, role, selectedData }
                                                         e.target.value = e.target.value.slice(0, 8)
                                                     }
                                                 }}
-                                                required
+                                                required={data.status_bayar === "sudah_bayar"}
+                                                disabled={data.status_bayar === "belum_bayar"}
                                                 style={{
                                                     border: '0',
                                                     borderBottom: '1px solid lightgray',

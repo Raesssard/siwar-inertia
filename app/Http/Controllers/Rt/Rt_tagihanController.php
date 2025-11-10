@@ -113,7 +113,7 @@ class Rt_tagihanController extends Controller
         $validated = $request->validate([
             'status_bayar' => 'required|in:sudah_bayar,belum_bayar',
             'tgl_bayar' => 'nullable|date',
-            'nominal_bayar' => 'required|numeric|min:0',
+            'nominal_bayar' => 'nullable|numeric|min:0',
             'kategori_pembayaran' => 'nullable|in:transfer,tunai',
             'bukti_transfer' => 'nullable|file|mimes:jpg,jpeg,png|max:20480',
         ]);
