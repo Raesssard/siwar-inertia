@@ -23,6 +23,8 @@ class RwPengaduanController extends Controller
 
         // 🔹 Ambil SEMUA pengaduan di wilayah RW ini (baik RT maupun RW)
         $pengaduan = Pengaduan::query()
+            ->where('konfirmasi_rw', 'menunggu')
+            ->orWhere('konfirmasi_rw', 'sudah')
             ->whereHas('warga.kartuKeluarga.rw', fn($q) => $q->where('id', $rw->id))
             ->with([
                 'warga',
@@ -40,8 +42,18 @@ class RwPengaduanController extends Controller
         $total_pengaduan = Pengaduan::whereHas('warga.kartuKeluarga.rw', fn($q) => $q->where('id', $rw->id))->count();
 
         $list_bulan = [
-            'januari', 'februari', 'maret', 'april', 'mei', 'juni',
-            'juli', 'agustus', 'september', 'oktober', 'november', 'desember'
+            'januari',
+            'februari',
+            'maret',
+            'april',
+            'mei',
+            'juni',
+            'juli',
+            'agustus',
+            'september',
+            'oktober',
+            'november',
+            'desember'
         ];
 
         $list_tahun = Pengaduan::selectRaw('YEAR(created_at) as tahun')
@@ -111,8 +123,23 @@ class RwPengaduanController extends Controller
             }
         }
 
+        $isi_komentar = $request->input('isi_komentar');
+
+        $komentar = $pengaduan->komentar()->create([
+            'user_id' => Auth::id(),
+            'isi_komentar' => $isi_komentar
+        ]);
+
+        $komentar->load('user');
+
         return response()->json([
-            'pengaduan' => $pengaduan->fresh(['warga', 'komentar.user']),
+            'pengaduan' => $pengaduan->fresh([
+                'warga',
+                'komentar.user',
+                'warga.kartuKeluarga.rukunTetangga',
+                'warga.kartuKeluarga.rw'
+            ]),
+            'komentar' => $komentar
         ]);
     }
 
