@@ -25,7 +25,10 @@ export default function AssignRolesPermission({ role, permissions, title }) {
             { permissions: selectedPerms },
             {
                 preserveScroll: true,
-                onSuccess: () => alert("✅ Permission berhasil diperbarui!"),
+                onSuccess: () => {
+                    router.visit(route("admin.roles.index")); // ⬅️ kembali ke halaman daftar role
+                },
+                onError: () => alert("❌ Gagal memperbarui permission!"),
             }
         );
     };
@@ -42,6 +45,21 @@ export default function AssignRolesPermission({ role, permissions, title }) {
 
         return groups;
     }, [permissions]);
+
+    // 🔍 Filter permission berdasarkan pencarian
+    const filteredGroups = useMemo(() => {
+        if (!search) return groupedPermissions;
+
+        const result = {};
+        Object.entries(groupedPermissions).forEach(([group, perms]) => {
+            const filtered = perms.filter((p) =>
+                p.name.toLowerCase().includes(search.toLowerCase())
+            );
+            if (filtered.length > 0) result[group] = filtered;
+        });
+
+        return result;
+    }, [search, groupedPermissions]);
 
     return (
         <Layout>
