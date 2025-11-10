@@ -160,7 +160,12 @@ class Rt_tagihanController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Tagihan sudah diperbarui.',
-                'tagihan' => $tagihan->load(['transaksi', 'kartuKeluarga.warga']),
+                'tagihan' => $tagihan->load([
+                    'transaksi',
+                    'iuran',
+                    'kartuKeluarga.warga',
+                    'warga'
+                ]),
                 'iuran' => $iuran
             ]);
         } catch (Exception $e) {

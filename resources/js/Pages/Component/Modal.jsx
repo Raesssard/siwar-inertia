@@ -6,7 +6,7 @@ import { SidebarLink } from "./SidebarLink"
 import { formatTanggal, getAdminLinks, getRtLinks, getWargaLinks, getRwLinks, formatRupiah } from "./GetPropRole"
 import Role from "./Role"
 import { route } from "ziggy-js"
-import { motion, AnimatePresence } from "framer-motion"
+import { motion } from "framer-motion"
 
 export function ModalSidebar({ modalIsOpen, modalShow, localStorageHistory }) {
     const [openMenus, setOpenMenus] = useState(() => {
@@ -993,9 +993,10 @@ export function DetailPengaduan({ selectedData, detailShow, onClose, onUpdated, 
     }
 
     const handleConfirm = () => {
+        const komen = role === "rw" ? "" : "Sudah diteruskan ke RW untuk ditindaklanjuti"
         axios.put(`/${role}/pengaduan/${selectedData.id}/konfirmasi`, {
             konfirmasi_rw: 'menunggu',
-            isi_komentar: "Sudah diteruskan ke RW untuk ditindaklanjuti"
+            ...(role === "rt" ? { isi_komentar: komen } : {})
         })
             .then(res => {
                 const newKomentar = res.data.komentar;
@@ -1217,9 +1218,9 @@ export function DetailPengaduan({ selectedData, detailShow, onClose, onUpdated, 
                                             {komentar.length > 0 ? (
                                                 komentar.map((komen, i) => (
                                                     <div key={i} className="mb-3">
-                                                        <small className="fw-bold"><strong>{komen.user?.nama}</strong></small>{" "}
+                                                        <small className="fw-bold"><strong>{komen?.user?.nama}</strong></small>{" "}
                                                         <small className="text-muted">
-                                                            • <FormatWaktu createdAt={komen.created_at} />
+                                                            • <FormatWaktu createdAt={komen?.created_at} />
                                                         </small>
                                                         {(komen.file_path && komen.file_name) && (
                                                             <div
@@ -4140,7 +4141,7 @@ export function TambahIuran({ tambahShow, onClose, onAdded, role, golongan, rt =
                     <div className="modal-body p-0 m-0">
                         <div className="d-flex tambah-body flex-column" style={{ width: "100%", height: "86.5vh", overflowY: "auto" }}>
                             <div className="p-3 h-100">
-                                <form onSubmit={handleSubmit} className="h-100 d-flex flex-column">
+                                <form onSubmit={handleSubmit} className="h-100 d-flex flex-column" id="iuran">
                                     {/* Hanya tampil jika role = RW */}
                                     <Role role="rw">
                                         <div className="mb-3">
@@ -4346,7 +4347,7 @@ export function TambahIuran({ tambahShow, onClose, onAdded, role, golongan, rt =
                                     )}
 
                                     {data.jenis === "otomatis" && (
-                                        <div className="mb-3">
+                                        <>
                                             <h5 className="mb-3">Nominal per Golongan:</h5>
                                             {golonganList.map((g) => {
                                                 const items = []
@@ -4393,15 +4394,16 @@ export function TambahIuran({ tambahShow, onClose, onAdded, role, golongan, rt =
                                                     </div>
                                                 )
                                             })}
-                                        </div>
+                                        </>
                                     )}
-
-                                    <button type="submit" className="btn btn-primary mt-auto" style={{ width: '25%' }}>
-                                        <i className="fas fa-save me-2"></i> Simpan
-                                    </button>
                                 </form>
                             </div>
                         </div>
+                    </div>
+                    <div className="modal-footer border-top mt-0" style={{ position: "sticky", zIndex: '10' }}>
+                        <button type="submit" form="iuran" className="btn btn-primary" style={{ width: "25%" }}>
+                            <i className="fas fa-save me-2"></i> Simpan
+                        </button>
                     </div>
                 </div>
             </div>
