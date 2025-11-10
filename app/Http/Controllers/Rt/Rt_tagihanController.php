@@ -3,12 +3,8 @@
 namespace App\Http\Controllers\Rt;
 
 use App\Http\Controllers\Controller;
-use App\Models\Iuran;
 use App\Models\Kartu_keluarga;
 use App\Models\Tagihan;
-use App\Models\RukunTetangga;
-use App\Models\Transaksi;
-use App\Models\Warga;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -44,33 +40,37 @@ class Rt_tagihanController extends Controller
         // Base query (untuk dipakai manual & otomatis)
         $baseQuery = Tagihan::with([
             'iuran',
-            'kartuKeluarga',
             'kartuKeluarga.warga',
+            'kartuKeluarga.kepalaKeluarga',
             'warga'
         ])
-            ->whereHas('kartuKeluarga', function ($q) use ($idRt, $idRw, $user) {
-                if ($user->hasRole('rt')) {
-                    $q->where('id_rt', $idRt);
-                }
-                if ($user->hasRole('rw')) {
-                    $q->where('id_rw', $idRw);
-                }
-            })
-            ->orWhereHas('warga.kartuKeluarga', function ($q) use ($idRt, $idRw, $user) {
-                if ($user->hasRole('rt')) {
-                    $q->where('id_rt', $idRt);
-                }
-                if ($user->hasRole('rw')) {
-                    $q->where('id_rw', $idRw);
-                }
+            ->where(function ($query) use ($idRt, $idRw, $user) {
+                $query->whereHas('kartuKeluarga', function ($q) use ($idRt, $idRw, $user) {
+                    if ($user->hasRole('rt')) {
+                        $q->where('id_rt', $idRt);
+                    }
+                    if ($user->hasRole('rw')) {
+                        $q->where('id_rw', $idRw);
+                    }
+                })
+                    ->orWhereHas('warga.kartuKeluarga', function ($q) use ($idRt, $idRw, $user) {
+                        if ($user->hasRole('rt')) {
+                            $q->where('id_rt', $idRt);
+                        }
+                        if ($user->hasRole('rw')) {
+                            $q->where('id_rw', $idRw);
+                        }
+                    });
             });
 
         $tagihanManual = (clone $baseQuery)
             ->where('jenis', 'manual')
             ->when($search, function ($query) use ($search) {
-                $query->where('nama', 'like', '%' . $search . '%')
-                    ->orWhere('nominal', 'like', '%' . $search . '%')
-                    ->orWhere('no_kk', 'like', '%' . $search . '%');
+                $query->where(function ($q) use ($search) {
+                    $q->where('nama', 'like', "%$search%")
+                        ->orWhere('nik', 'like', "%$search%")
+                        ->orWhere('no_kk', 'like', "%$search%");
+                });
             })
             ->when($no_kk_filter, function ($kk) use ($no_kk_filter) {
                 $kk->where('no_kk', $no_kk_filter);
@@ -81,9 +81,11 @@ class Rt_tagihanController extends Controller
         $tagihanOtomatis = (clone $baseQuery)
             ->where('jenis', 'otomatis')
             ->when($search, function ($query) use ($search) {
-                $query->where('nama', 'like', '%' . $search . '%')
-                    ->orWhere('nominal', 'like', '%' . $search . '%')
-                    ->orWhere('no_kk', 'like', '%' . $search . '%');
+                $query->where(function ($q) use ($search) {
+                    $q->where('nama', 'like', "%$search%")
+                        ->orWhere('nik', 'like', "%$search%")
+                        ->orWhere('no_kk', 'like', "%$search%");
+                });
             })
             ->when($no_kk_filter, function ($kk) use ($no_kk_filter) {
                 $kk->where('no_kk', $no_kk_filter);

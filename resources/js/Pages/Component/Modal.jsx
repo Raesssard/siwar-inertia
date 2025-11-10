@@ -4142,30 +4142,6 @@ export function TambahIuran({ tambahShow, onClose, onAdded, role, golongan, rt =
                         <div className="d-flex tambah-body flex-column" style={{ width: "100%", height: "86.5vh", overflowY: "auto" }}>
                             <div className="p-3 h-100">
                                 <form onSubmit={handleSubmit} className="h-100 d-flex flex-column" id="iuran">
-                                    {/* Hanya tampil jika role = RW */}
-                                    <Role role="rw">
-                                        <div className="mb-3">
-                                            <label className="form-label">Pilih RT</label>
-                                            <select
-                                                name="id_rt"
-                                                className="form-select"
-                                                value={data.id_rt}
-                                                onChange={handleChange}
-                                                required
-                                            >
-                                                <option value="">-- Pilih RT --</option>
-                                                {rt.length > 0 ? (
-                                                    rt.map((item) => (
-                                                        <option key={item.id} value={item.id}>
-                                                            RT {item.nomor_rt}
-                                                        </option>
-                                                    ))
-                                                ) : (
-                                                    <option value="">Tidak ada RT</option>
-                                                )}
-                                            </select>
-                                        </div>
-                                    </Role>
 
                                     <div className="d-flex position-relative mb-3 border-bottom">
                                         {["Semua", "Warga", "Kartu Keluarga"].map((label, i) => (
@@ -4197,7 +4173,6 @@ export function TambahIuran({ tambahShow, onClose, onAdded, role, golongan, rt =
                                             </button>
                                         ))}
 
-                                        {/* garis bawah biru yang geser halus */}
                                         <motion.div
                                             layout
                                             transition={{ type: "spring", stiffness: 400, damping: 30 }}
@@ -4214,13 +4189,42 @@ export function TambahIuran({ tambahShow, onClose, onAdded, role, golongan, rt =
                                         />
                                     </div>
 
+                                    <Role role="rw">
+                                        <div className="mb-3">
+                                            <label className="form-label">Pilih RT</label>
+                                            <select
+                                                name="id_rt"
+                                                className="form-control"
+                                                value={data.id_rt}
+                                                onChange={handleChange}
+                                                style={{
+                                                    border: '0',
+                                                    borderBottom: '1px solid lightgray',
+                                                    borderRadius: '0',
+                                                }}
+                                                required
+                                            >
+                                                <option value="">-- Pilih RT --</option>
+                                                {rt.length > 0 ? (
+                                                    rt.map((item) => (
+                                                        <option key={item.id} value={item.id}>
+                                                            RT {item.nomor_rt}
+                                                        </option>
+                                                    ))
+                                                ) : (
+                                                    <option value="">Tidak ada RT</option>
+                                                )}
+                                            </select>
+                                        </div>
+                                    </Role>
+
                                     {perWarga && (
                                         <div className="mb-3">
                                             <label className="form-label">NIK Warga</label>
                                             <select
                                                 name="nik"
                                                 type="text"
-                                                className="tambah-judul form-control"
+                                                className="form-control"
                                                 value={data.nik}
                                                 onChange={handleChange}
                                                 required
@@ -4244,7 +4248,7 @@ export function TambahIuran({ tambahShow, onClose, onAdded, role, golongan, rt =
                                             <select
                                                 name="no_kk"
                                                 type="text"
-                                                className="tambah-judul form-control"
+                                                className="form-control"
                                                 value={data.no_kk}
                                                 onChange={handleChange}
                                                 required

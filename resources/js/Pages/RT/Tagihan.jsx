@@ -117,7 +117,7 @@ export default function Tagihan() {
                                         <td className="text-center">
                                             {
                                                 item.kartu_keluarga
-                                                    ? item.kartu_keluarga?.warga?.nama
+                                                    ? item.kartu_keluarga?.kepala_keluarga?.nama
                                                     : item.warga
                                                         ? item.warga?.nama
                                                         : '-'
@@ -125,8 +125,8 @@ export default function Tagihan() {
 {console.log(item.nik)}
 {console.log(item.no_kk)}
 {console.log(item.no_kk ? item.warga?.no_kk : '-')}
-{console.log(item.warga.no_kk)}
-{console.log(item.warga.nik)}
+{console.log(item.warga?.no_kk)}
+{console.log(item.warga?.nik)}
                                         </td>
                                         <td className="text-center">{formatRupiah(item.nominal) ?? '-'}</td>
                                         <td className="text-center">{formatTanggal(item.tgl_tagih)}</td>
