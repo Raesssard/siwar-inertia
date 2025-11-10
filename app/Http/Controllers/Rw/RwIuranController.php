@@ -9,6 +9,7 @@ use App\Models\Kartu_keluarga;
 use App\Models\Kategori_golongan;
 use App\Models\Tagihan;
 use App\Models\Rt;
+use App\Models\Warga;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -18,6 +19,7 @@ class RwIuranController extends Controller
 {
     public function index(Request $request)
     {
+        /** @var User $user */
         $user = Auth::user();
         $search = $request->input('search');
 
@@ -36,12 +38,31 @@ class RwIuranController extends Controller
         $iuranManual = (clone $query)->where('jenis', 'manual')->orderBy('tgl_tagih', 'desc')->paginate(10);
 
         $rt_list = Rt::where('id_rw', $user->id_rw)->get(['id', 'nomor_rt']);
+        $nik_list = Warga::whereHas('kartuKeluarga', function ($q) use ($user) {
+            if ($user->hasRole('rt')) {
+                $q->where('id_rt', $user->id_rt);
+            } elseif ($user->hasRole('rw')) {
+                $q->where('id_rw', $user->id_rw);
+            }
+        })->select('nik')
+            ->get();
+
+        $no_kk_list = Warga::whereHas('kartuKeluarga', function ($q) use ($user) {
+            if ($user->hasRole('rt')) {
+                $q->where('id_rt', $user->id_rt);
+            } elseif ($user->hasRole('rw')) {
+                $q->where('id_rw', $user->id_rw);
+            }
+        })->select('no_kk')
+            ->get();
 
         return Inertia::render('Rw/Iuran', [
             'iuranOtomatis' => $iuranOtomatis,
             'iuranManual' => $iuranManual,
             'golongan_list' => $golongan_list,
             'rt_list' => $rt_list, // 👈
+            'nik_list' => $nik_list,
+            'no_kk_list' => $no_kk_list,
             'title' => $title,
         ]);
     }

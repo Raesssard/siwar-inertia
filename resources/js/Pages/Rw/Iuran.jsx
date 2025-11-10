@@ -10,8 +10,10 @@ export default function Iuran() {
     const {
         iuranOtomatis: iuranOtomatisFromServer,
         iuranManual: iuranManualFromServer,
-        golongan_list, 
+        golongan_list,
         rt_list,
+        nik_list,
+        no_kk_list,
         title,
     } = usePage().props;
 
@@ -218,6 +220,8 @@ export default function Iuran() {
                 role={role}
                 golongan={golongan_list}
                 rt={rt_list} // ✅ sesuai dengan props di atas
+                nik={nik_list}
+                no_kk={no_kk_list}
             />
             <EditIuranOtomatis
                 editShow={showModalEdit}
