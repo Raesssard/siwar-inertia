@@ -3,7 +3,7 @@ import { Head, Link, useForm, usePage } from "@inertiajs/react"
 import React, { useState } from "react"
 import { FilterIuran } from "../Component/Filter"
 import { formatRupiah, formatTanggal } from "../Component/GetPropRole"
-import { EditIuranOtomatis, TambahIuran } from "../Component/Modal"
+import { EditIuranManual, EditIuranOtomatis, TambahIuran } from "../Component/Modal"
 import Swal from "sweetalert2"
 
 export default function Iuran() {
@@ -22,11 +22,19 @@ export default function Iuran() {
     const [iuranListOtomatis, setIuranListOtomatis] = useState(iuranOtomatisFromServer.data || [])
     const [showModalTambah, setShowModalTambah] = useState(false)
     const [showModalEdit, setShowModalEdit] = useState(false)
+    const [showModalEditManual, setShowModalEditManual] = useState(false)
     const { props } = usePage()
     const role = props.auth?.currentRole
     const { get, data, setData } = useForm({
         search: '',
     })
+
+    const modalEditManual = (item, matched, gol) => {
+        setSelected(item)
+        setSelectedIuran(matched)
+        setSelectedGolongan(gol)
+        setShowModalEditManual(true)
+    }
 
     const modalEdit = (item, matched, gol) => {
         setSelected(item)
@@ -145,7 +153,7 @@ export default function Iuran() {
             />
             <div className="table-container">
                 <div className="table-header">
-                    <h4>Data Iuran Manual</h4>
+                    <h4>Jenis Iuran (Manual)</h4>
                 </div>
                 <div className="table-scroll">
                     <table className="table-custom">
@@ -169,9 +177,18 @@ export default function Iuran() {
                                         <td className="text-center">{formatTanggal(item.tgl_tagih) ?? '-'}</td>
                                         <td className="text-center">{formatTanggal(item.tgl_tempo) ?? '-'}</td>
                                         <td className="text-center">
-                                            <button className="btn btn-sm btn-danger my-auto" title="Hapus Iuran" onClick={() => handleDelete(item.id, item.jenis)}>
-                                                <i className="fa-solid fa-trash"></i>
-                                            </button>
+                                            <div className="d-flex justify-content-center align-items-center gap-2">
+                                                <button
+                                                    className="btn btn-sm btn-warning my-auto"
+                                                    title="Edit Iuran"
+                                                    onClick={() => modalEditManual(item)}
+                                                >
+                                                    <i className="fa-solid fa-pen-to-square"></i>
+                                                </button>
+                                                <button className="btn btn-sm btn-danger my-auto" title="Hapus Iuran" onClick={() => handleDelete(item.id, item.jenis)}>
+                                                    <i className="fa-solid fa-trash"></i>
+                                                </button>
+                                            </div>
                                         </td>
                                     </tr>
                                 ))
@@ -216,7 +233,7 @@ export default function Iuran() {
             </div>
             <div className="table-container">
                 <div className="table-header">
-                    <h4>Data Iuran Otomatis</h4>
+                    <h4>Jenis Iuran (Otomatis)</h4>
                 </div>
                 <div className="table-scroll">
                     <table className="table-custom">
@@ -282,15 +299,25 @@ export default function Iuran() {
                 nik={nik_list}
                 no_kk={no_kk_list}
             />
+            <EditIuranManual
+                editShow={showModalEditManual}
+                onClose={() => setShowModalEditManual(false)}
+                onUpdated={(updated) => {
+                    setSelected(updated)
+                    setIuranListManual(prev =>
+                        prev.map(item =>
+                            item.id === updated.id ? updated : item
+                        )
+                    )
+                }}
+                role={role}
+                iuran={selected}
+            />
             <EditIuranOtomatis
                 editShow={showModalEdit}
                 onClose={() => setShowModalEdit(false)}
                 onUpdated={(updated) => {
                     setSelected(updated)
-                    // setIuranListOtomatis(prev => prev.map(item => ({
-                    //     ...item,
-                    //     iuran_golongan: item.iuran_golongan.filter(g => g.id !== id)
-                    // })))
                     setIuranListOtomatis(prev =>
                         prev.map(item =>
                             item.id === updated.id ? updated : item

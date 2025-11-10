@@ -22,8 +22,6 @@ export default function Tagihan() {
     const { get, data, setData } = useForm({
         search: '',
     })
-    console.log(tagihanOtomatisFromServer)
-    console.log(tagihanManualFromServer)
     const modalEdit = (item) => {
         setSelected(item)
         setShowModalEdit(true)
@@ -96,8 +94,7 @@ export default function Tagihan() {
                                 <th className="px-3 text-center" scope="col">No.</th>
                                 <th className="px-3 text-center" scope="col">Nama Tagihan</th>
                                 <th className="px-3 text-center" scope="col">No. KK</th>
-                                <th className="px-3 text-center" scope="col">NIK</th>
-                                <th className="px-3 text-center" scope="col">Nama</th>
+                                <th className="px-3 text-center" scope="col">Kepala Keluarga</th>
                                 <th className="px-3 text-center" scope="col">Nominal</th>
                                 <th className="px-3 text-center" scope="col">Tanggal Tagih</th>
                                 <th className="px-3 text-center" scope="col">Tanggal Tempo</th>
@@ -113,22 +110,12 @@ export default function Tagihan() {
                                         <td className="text-center">{index + 1}</td>
                                         <td className="text-center">{item.nama ?? '-'}</td>
                                         <td className="text-center">{item.no_kk ? item.no_kk : (item.warga?.no_kk ?? '-')}</td>
-                                        <td className="text-center">{item.nik ? item.nik : (item.warga?.nik ?? '-')}</td>
                                         <td className="text-center">
                                             {
-                                                item.kartu_keluarga
-                                                    ? item.kartu_keluarga?.kepala_keluarga?.nama
-                                                    : item.warga
-                                                        ? item.warga?.nama
-                                                        : '-'
+                                                item.kartu_keluarga?.kepala_keluarga?.nama ?? '-'
                                             }
-{console.log(item.nik)}
-{console.log(item.no_kk)}
-{console.log(item.no_kk ? item.warga?.no_kk : '-')}
-{console.log(item.warga?.no_kk)}
-{console.log(item.warga?.nik)}
                                         </td>
-                                        <td className="text-center">{formatRupiah(item.nominal) ?? '-'}</td>
+                                        <td className="text-right">{formatRupiah(item.nominal) ?? '-'}</td>
                                         <td className="text-center">{formatTanggal(item.tgl_tagih)}</td>
                                         <td className="text-center">{formatTanggal(item.tgl_tempo)}</td>
                                         <td className="text-center">{item.status_bayar === 'sudah_bayar' ? (
@@ -200,7 +187,7 @@ export default function Tagihan() {
                                 <th className="px-3 text-center" scope="col">No.</th>
                                 <th className="px-3 text-center" scope="col">Nama Tagihan</th>
                                 <th className="px-3 text-center" scope="col">No. KK</th>
-                                <th className="px-3 text-center" scope="col">Nama Kepala Keluarga</th>
+                                <th className="px-3 text-center" scope="col">Kepala Keluarga</th>
                                 <th className="px-3 text-center" scope="col">Nominal</th>
                                 <th className="px-3 text-center" scope="col">Tanggal Tagih</th>
                                 <th className="px-3 text-center" scope="col">Tanggal Tempo</th>
@@ -217,9 +204,11 @@ export default function Tagihan() {
                                         <td className="text-center">{item.nama ?? '-'}</td>
                                         <td className="text-center">{item.no_kk ?? '-'}</td>
                                         <td className="text-center">
-                                            {item.kartu_keluarga?.warga?.find(w => w.status_hubungan_dalam_keluarga === 'kepala keluarga')?.nama ?? '-'}
+                                            {
+                                                item.kartu_keluarga?.kepala_keluarga?.nama ?? '-'
+                                            }
                                         </td>
-                                        <td className="text-center">{formatRupiah(item.nominal) ?? '-'}</td>
+                                        <td className="text-right">{formatRupiah(item.nominal) ?? '-'}</td>
                                         <td className="text-center">{formatTanggal(item.tgl_tagih)}</td>
                                         <td className="text-center">{formatTanggal(item.tgl_tempo)}</td>
                                         <td className="text-center">{item.status_bayar === 'sudah_bayar' ? (

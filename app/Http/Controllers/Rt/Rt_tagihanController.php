@@ -113,6 +113,7 @@ class Rt_tagihanController extends Controller
         $validated = $request->validate([
             'status_bayar' => 'required|in:sudah_bayar,belum_bayar',
             'tgl_bayar' => 'nullable|date',
+            'nominal_bayar' => 'required|numeric|min:0',
             'kategori_pembayaran' => 'nullable|in:transfer,tunai',
             'bukti_transfer' => 'nullable|file|mimes:jpg,jpeg,png|max:20480',
         ]);
@@ -131,6 +132,7 @@ class Rt_tagihanController extends Controller
             $tagihan->update([
                 'status_bayar' => $validated['status_bayar'],
                 'tgl_bayar' => $validated['tgl_bayar'] ?? null,
+                'nominal_bayar' => $validated['nominal_bayar'] ?? 0,
                 'kategori_pembayaran' => $validated['kategori_pembayaran'] ?? null,
                 'bukti_transfer' => $buktiPath,
             ]);
@@ -138,10 +140,11 @@ class Rt_tagihanController extends Controller
             if ($validated['status_bayar'] === 'sudah_bayar' && !$tagihan->transaksi) {
                 $tagihan->transaksi()->create([
                     'tagihan_id' => $tagihan->id,
+                    'no_kk' => $tagihan->no_kk,
                     'rt' => $iuran->rt->nomor_rt ?? '-',
                     'tanggal' => $validated['tgl_bayar'] ?? now(),
                     'jenis' => 'pemasukan',
-                    'nominal' => $tagihan->nominal,
+                    'nominal' => $tagihan->nominal_bayar,
                     'nama_transaksi' => 'Pembayaran ' . ($tagihan->nama ?? 'Iuran'),
                     'keterangan' => 'Pembayaran untuk tagihan ' . ($tagihan->nama ?? 'iuran'),
                 ]);
@@ -165,7 +168,7 @@ class Rt_tagihanController extends Controller
                 'tagihan' => $tagihan->load([
                     'transaksi',
                     'iuran',
-                    'kartuKeluarga.warga',
+                    'kartuKeluarga.kepalaKeluarga',
                     'warga'
                 ]),
                 'iuran' => $iuran

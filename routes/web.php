@@ -161,8 +161,9 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/pengumuman/{id}/export-pdf', [Rt_pengumumanController::class, 'exportPDF'])->name('pengumuman.export.pdf');
         Route::post('/pengumuman/{id}/komentar', [Rt_pengumumanController::class, 'komen'])->name('pengumuman.komentar.komen');
 
-        Route::resource('iuran', RtIuranController::class)->except('destroy');
+        Route::resource('iuran', RtIuranController::class)->except(['destroy', 'update']);
         Route::delete('/iuran/{id}/{jenis}', [RtIuranController::class, 'destroy'])->name('iuran.destroy');
+        Route::put('/iuran/{id}/{jenis}', [RtIuranController::class, 'update'])->name('iuran.update');
         Route::get('/export/iuran', [ExportController::class, 'exportIuran'])->name('iuran.export');
 
         Route::resource('tagihan', Rt_tagihanController::class);
