@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Hash;
 use Inertia\Inertia;
+use Spatie\Permission\Models\Role;
 
 class AdminRwController extends Controller
 {
@@ -23,7 +24,7 @@ class AdminRwController extends Controller
         if ($request->filled('keyword')) {
             $query->where(function ($q) use ($request) {
                 $q->where('nik', 'like', '%' . $request->keyword . '%')
-                    ->orWhere('nama_anggota_rw', 'like', '%' . $request->keyword . '%');
+                ->orWhere('nama_anggota_rw', 'like', '%' . $request->keyword . '%');
             });
         }
 
@@ -34,10 +35,19 @@ class AdminRwController extends Controller
         $rw = $query->orderBy('nomor_rw')->paginate(10)->withQueryString();
         $nomorRwList = Rw::select('nomor_rw')->distinct()->orderBy('nomor_rw')->get();
 
+        // 🔹 Ambil role dari database, kecuali role utama
+        $roles = Role::pluck('name')
+            ->filter(fn($r) => !in_array(strtolower($r), ['admin', 'rw', 'rt', 'warga']))
+            ->values();
+
+        // 🔹 Tambahkan manual “Ketua RW” di paling atas
+        $roles = collect(['ketua'])->merge($roles)->values();
+
         return Inertia::render('Admin/Rw', [
             'rw' => $rw,
             'filters' => $request->only(['keyword', 'nomor_rw']),
             'nomorRwList' => $nomorRwList,
+            'roles' => $roles,
             'title' => $title,
         ]);
     }
@@ -62,7 +72,7 @@ class AdminRwController extends Controller
             'mulai_menjabat' => 'nullable|date',
             'akhir_jabatan' => 'nullable|date|after_or_equal:mulai_menjabat',
             'status' => ['nullable', Rule::in(['aktif', 'nonaktif'])],
-            'jabatan' => ['nullable', Rule::in(['ketua', 'sekretaris', 'bendahara'])],
+            'jabatan' => 'nullable|string|max:255',
         ]);
 
         if ($validator->fails()) {
@@ -80,7 +90,7 @@ class AdminRwController extends Controller
             }
         }
 
-        // 💾 Simpan RW
+        // 💾 Simpan data RW
         $rw = Rw::create([
             'nik' => $request->nik,
             'no_kk' => $request->filled('nik')
@@ -102,10 +112,17 @@ class AdminRwController extends Controller
                 'id_rw' => $rw->id,
             ]);
 
+            // Default role selalu 'rw'
             $roles = ['rw'];
+
+            // 💡 Jika jabatan selain ketua, dan role-nya ada di database
             if ($request->filled('jabatan') && $request->jabatan !== 'ketua') {
-                $roles[] = $request->jabatan;
+                if (Role::where('name', $request->jabatan)->exists()) {
+                    $roles[] = $request->jabatan;
+                }
             }
+
+            // 🧠 Sinkronkan semua role (rw + tambahan)
             $user->syncRoles($roles);
         }
 
@@ -133,7 +150,7 @@ class AdminRwController extends Controller
             'mulai_menjabat' => 'nullable|date',
             'akhir_jabatan' => 'nullable|date|after_or_equal:mulai_menjabat',
             'status' => ['nullable', Rule::in(['aktif', 'nonaktif'])],
-            'jabatan' => ['nullable', Rule::in(['ketua', 'sekretaris', 'bendahara'])],
+            'jabatan' => 'nullable|string|max:255',
         ]);
 
         if ($validator->fails()) {
@@ -165,7 +182,7 @@ class AdminRwController extends Controller
             'status' => $request->status,
         ]);
 
-        // 🔁 Update atau hapus user
+        // 👤 Update atau buat user
         $user = User::where('id_rw', $rw->id)->first();
 
         if ($request->filled('nik') && $request->filled('nama_anggota_rw')) {
@@ -183,10 +200,17 @@ class AdminRwController extends Controller
                 ]);
             }
 
+            // Default role selalu 'rw'
             $roles = ['rw'];
+
+            // 💡 Jika jabatan selain ketua dan role-nya ada di database
             if ($request->filled('jabatan') && $request->jabatan !== 'ketua') {
-                $roles[] = $request->jabatan;
+                if (Role::where('name', $request->jabatan)->exists()) {
+                    $roles[] = $request->jabatan;
+                }
             }
+
+            // 🧠 Sinkronkan role (rw + tambahan)
             $user->syncRoles($roles);
         } else {
             if ($user) $user->delete();

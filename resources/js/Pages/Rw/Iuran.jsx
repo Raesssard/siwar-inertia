@@ -139,24 +139,24 @@ export default function Iuran() {
                     <table className="table-custom">
                         <thead>
                             <tr>
-                                <th>No</th>
-                                <th>Nama</th>
-                                <th>Nominal</th>
-                                <th>Tanggal Tagih</th>
-                                <th>Tanggal Tempo</th>
-                                <th>Aksi</th>
+                                <th className="text-center">No</th>
+                                <th className="text-center">Nama</th>
+                                <th className="text-center">Nominal</th>
+                                <th className="text-center">Tanggal Tagih</th>
+                                <th className="text-center">Tanggal Tempo</th>
+                                <th className="text-center">Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
                             {iuranListManual.length ? (
                                 iuranListManual.map((item, i) => (
                                     <tr key={item.id}>
-                                        <td>{i + 1}</td>
-                                        <td>{item.nama}</td>
-                                        <td>{formatRupiah(item.nominal)}</td>
-                                        <td>{formatTanggal(item.tgl_tagih)}</td>
-                                        <td>{formatTanggal(item.tgl_tempo)}</td>
-                                        <td>
+                                        <td className="text-center">{i + 1}</td>
+                                        <td className="text-center">{item.nama}</td>
+                                        <td className="text-center">{formatRupiah(item.nominal)}</td>
+                                        <td className="text-center">{formatTanggal(item.tgl_tagih)}</td>
+                                        <td className="text-center">{formatTanggal(item.tgl_tempo)}</td>
+                                        <td className="text-center">
                                             <button
                                                 className="btn btn-sm btn-danger"
                                                 onClick={() => handleDelete(item.id, item.jenis)}
@@ -187,13 +187,13 @@ export default function Iuran() {
                     <table className="table-custom">
                         <thead>
                             <tr>
-                                <th>No</th>
-                                <th>Nama</th>
-                                <th>Golongan</th>
-                                <th>Nominal</th>
-                                <th>Tanggal Tagih</th>
-                                <th>Tanggal Tempo</th>
-                                <th>Aksi</th>
+                                <th className="text-center">No</th>
+                                <th className="text-center">Nama</th>
+                                <th className="text-center">Golongan</th>
+                                <th className="text-center">Nominal</th>
+                                <th className="text-center">Tanggal Tagih</th>
+                                <th className="text-center">Tanggal Tempo</th>
+                                <th className="text-center">Aksi</th>
                             </tr>
                         </thead>
                         <tbody>

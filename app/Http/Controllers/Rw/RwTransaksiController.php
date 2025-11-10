@@ -70,6 +70,7 @@ class RwTransaksiController extends Controller
         $request->validate([
             'tanggal' => 'required|date',
             'nama_transaksi' => 'required|string|max:255',
+            'jenis' => 'required|string|max:255',
             'nominal' => 'required|numeric|min:0',
             'keterangan' => 'nullable|string',
             'rt' => 'required|numeric'
@@ -80,7 +81,7 @@ class RwTransaksiController extends Controller
             'rt' => $request->rt,
             'tanggal' => $request->tanggal,
             'nama_transaksi' => $request->nama_transaksi,
-            'jenis' => 'pemasukan',
+            'jenis' => $request->jenis,
             'nominal' => $request->nominal,
             'keterangan' => $request->keterangan,
         ];
