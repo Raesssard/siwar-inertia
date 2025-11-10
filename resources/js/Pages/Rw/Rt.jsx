@@ -5,7 +5,7 @@ import { route } from "ziggy-js";
 import { AddRtModal, EditRtModal } from "@/Pages/Component/Modal";
 import "../../../css/kk.css"; // biar tabel dan tombolnya sama gaya
 
-export default function Rt({ rukun_tetangga, filters, rukun_tetangga_filter, title }) {
+export default function Rt({ rukun_tetangga, filters, rukun_tetangga_filter, title, roles }) {
     const { props } = usePage();
     const role = props.auth?.currentRole || "rw";
 
@@ -272,6 +272,7 @@ export default function Rt({ rukun_tetangga, filters, rukun_tetangga_filter, tit
                     handleAdd={handleAdd}
                     onClose={() => setShowAdd(false)}
                     isRw={true}
+                    roles={roles}
                 />
             )}
 
@@ -282,6 +283,7 @@ export default function Rt({ rukun_tetangga, filters, rukun_tetangga_filter, tit
                     handleEdit={handleEdit}
                     onClose={() => setShowEdit(null)}
                     isRw={true}
+                    roles={roles}
                 />
             )}
         </Layout>
