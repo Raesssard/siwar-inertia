@@ -241,21 +241,33 @@ class AdminRwController extends Controller
     {
         $rw = Rw::findOrFail($id);
 
+        // 🔄 Jika sedang aktif → ubah ke nonaktif
         if ($rw->status === 'aktif') {
             $rw->update(['status' => 'nonaktif']);
             return back()->with('success', "RW {$rw->nomor_rw} berhasil dinonaktifkan.");
         }
 
+        // 🔍 Cek apakah ada RW aktif lain dengan nomor sama
         $existingActive = Rw::where('nomor_rw', $rw->nomor_rw)
             ->where('status', 'aktif')
             ->where('id', '!=', $rw->id)
-            ->exists();
+            ->first();
 
         if ($existingActive) {
-            return back()->with('error', "RW {$rw->nomor_rw} lainnya sudah aktif. Nonaktifkan dulu sebelum mengaktifkan yang ini.");
+            // ⏳ Kalau RW lama masih dalam masa jabatan
+            if ($existingActive->akhir_jabatan && $existingActive->akhir_jabatan >= now()->toDateString()) {
+                // Jika jabatan sama, tidak boleh aktif dua-duanya
+                if ($existingActive->jabatan === $rw->jabatan) {
+                    return back()->with('error', "RW {$rw->nomor_rw} dengan jabatan {$rw->jabatan} masih aktif. Nonaktifkan yang lama dulu!");
+                }
+            } else {
+                // 🕒 Kalau masa jabatan lama sudah habis → otomatis nonaktifkan
+                $existingActive->update(['status' => 'nonaktif']);
+            }
         }
 
+        // ✅ Aktifkan RW baru
         $rw->update(['status' => 'aktif']);
-        return back()->with('success', "RW {$rw->nomor_rw} berhasil diaktifkan.");
+        return back()->with('success', "RW {$rw->nomor_rw} dengan jabatan {$rw->jabatan} berhasil diaktifkan.");
     }
 }
