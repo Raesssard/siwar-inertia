@@ -3,9 +3,12 @@
 namespace App\Http\Controllers\Rt;
 
 use App\Http\Controllers\Controller;
+use App\Models\Iuran;
 use App\Models\Kartu_keluarga;
 use App\Models\Tagihan;
+use Carbon\Carbon;
 use Exception;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -42,7 +45,6 @@ class Rt_tagihanController extends Controller
             'iuran',
             'kartuKeluarga.warga',
             'kartuKeluarga.kepalaKeluarga',
-            'warga'
         ])
             ->where(function ($query) use ($idRt, $idRw, $user) {
                 $query->whereHas('kartuKeluarga', function ($q) use ($idRt, $idRw, $user) {
@@ -52,15 +54,7 @@ class Rt_tagihanController extends Controller
                     if ($user->hasRole('rw')) {
                         $q->where('id_rw', $idRw);
                     }
-                })
-                    ->orWhereHas('warga.kartuKeluarga', function ($q) use ($idRt, $idRw, $user) {
-                        if ($user->hasRole('rt')) {
-                            $q->where('id_rt', $idRt);
-                        }
-                        if ($user->hasRole('rw')) {
-                            $q->where('id_rw', $idRw);
-                        }
-                    });
+                });
             });
 
         $tagihanManual = (clone $baseQuery)
@@ -68,7 +62,7 @@ class Rt_tagihanController extends Controller
             ->when($search, function ($query) use ($search) {
                 $query->where(function ($q) use ($search) {
                     $q->where('nama', 'like', "%$search%")
-                        ->orWhere('nik', 'like', "%$search%")
+                        ->orWhere('nominal', 'like', "%$search%")
                         ->orWhere('no_kk', 'like', "%$search%");
                 });
             })
@@ -83,7 +77,7 @@ class Rt_tagihanController extends Controller
             ->when($search, function ($query) use ($search) {
                 $query->where(function ($q) use ($search) {
                     $q->where('nama', 'like', "%$search%")
-                        ->orWhere('nik', 'like', "%$search%")
+                        ->orWhere('nominal', 'like', "%$search%")
                         ->orWhere('no_kk', 'like', "%$search%");
                 });
             })
@@ -93,13 +87,88 @@ class Rt_tagihanController extends Controller
             ->orderBy('tgl_tagih', 'desc')
             ->paginate(10, ['*'], 'otomatis_page');
 
+        $iuran_for_tagihan = Iuran::with(['iuran_golongan', 'iuran_golongan.golongan'])
+            ->whereHas('rw', function ($q) use ($idRw) {
+                $q->where('id_rw', $idRw);
+            })
+            ->where('jenis', 'manual')
+            ->get();
 
         return Inertia::render('RT/Tagihan', [
             'title' => $title,
             'tagihanManual' => $tagihanManual,
             'tagihanOtomatis' => $tagihanOtomatis,
+            'iuran_for_tagihan' => $iuran_for_tagihan,
             'kartuKeluargaForFilter' => $kartuKeluargaForFilter
         ]);
+    }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'nama' => 'required',
+            'nominal' => 'required|numeric|min:0|max:99999999',
+            'tgl_tagih' => 'nullable|date',
+            'no_kk' => 'nullable',
+        ]);
+
+        $iuran = Iuran::findOrFail($request->id_iuran);
+
+        $kkQuery = $iuran->level === 'rt'
+            ? Kartu_keluarga::where('id_rt', $iuran->id_rt)
+            : Kartu_keluarga::where('id_rw', $iuran->id_rw);
+
+        if ($request->no_kk && $request->no_kk !== 'semua') {
+            $kkQuery->where('no_kk', $request->no_kk);
+        }
+
+        $kkList = $kkQuery->get();
+
+        $tgl_tagih = Carbon::parse($request->tgl_tagih ?? $iuran->tgl_tagih);
+        $tgl_tempo = $request->tgl_tagih
+            ? $tgl_tagih->copy()->addDays(
+                Carbon::parse($iuran->tgl_tagih)->diffInDays(Carbon::parse($iuran->tgl_tempo))
+            )
+            : Carbon::parse($iuran->tgl_tempo);
+
+        // tampung semua tagihan di Eloquent Collection
+        $tagihanList = new Collection();
+
+        foreach ($kkList as $kk) {
+            $tagihan = Tagihan::create([
+                'nama' => $request->nama ?? $iuran->nama,
+                'nominal' => $request->nominal ?? $iuran->nominal,
+                'tgl_tagih' => $tgl_tagih,
+                'tgl_tempo' => $tgl_tempo,
+                'jenis' => 'manual',
+                'no_kk' => $kk->no_kk,
+                'status_bayar' => 'belum_bayar',
+                'id_iuran' => $iuran->id,
+            ]);
+
+            $tagihanList->push($tagihan);
+        }
+
+        $iuran->load(['iuran_golongan', 'iuran_golongan.golongan']);
+
+        // Load relasi semua tagihan
+        $tagihanList->load([
+            'transaksi',
+            'iuran',
+            'kartuKeluarga.warga',
+            'kartuKeluarga.kepalaKeluarga',
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => $request->no_kk === 'semua'
+                ? 'Tagihan berhasil dibuat untuk semua KK.'
+                : 'Tagihan berhasil dibuat.',
+            // kalau cuma 1 KK, kirim object tunggal
+            // kalau semua, kirim array
+            'tagihan' => $request->no_kk === 'semua' ? $tagihanList : $tagihanList->first(),
+            'iuran' => $iuran,
+        ], 201);
     }
 
     /**
@@ -169,7 +238,6 @@ class Rt_tagihanController extends Controller
                     'transaksi',
                     'iuran',
                     'kartuKeluarga.kepalaKeluarga',
-                    'warga'
                 ]),
                 'iuran' => $iuran
             ]);

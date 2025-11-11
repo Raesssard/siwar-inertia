@@ -4,11 +4,12 @@ import React, { useState } from "react"
 import { formatRupiah, formatTanggal } from "../Component/GetPropRole"
 import Swal from "sweetalert2"
 import { FilterTagihan } from "../Component/Filter"
-import { EditTagihan } from "../Component/Modal"
+import { EditTagihan, TambahTagihan } from "../Component/Modal"
 
 export default function Tagihan() {
     const {
         title,
+        iuran_for_tagihan,
         tagihanManual: tagihanManualFromServer,
         tagihanOtomatis: tagihanOtomatisFromServer,
         kartuKeluargaForFilter
@@ -16,6 +17,7 @@ export default function Tagihan() {
     const [selected, setSelected] = useState(null)
     const [tagihanManualList, setTagihanManualList] = useState(tagihanManualFromServer.data || [])
     const [tagihanOtomatisList, setTagihanOtomatisList] = useState(tagihanOtomatisFromServer.data || [])
+    const [showModalTambah, setShowModalTambah] = useState(false)
     const [showModalEdit, setShowModalEdit] = useState(false)
     const { props } = usePage()
     const role = props.auth?.currentRole
@@ -82,6 +84,7 @@ export default function Tagihan() {
                 resetFilter={resetFilter}
                 role={role}
                 kk_list={kartuKeluargaForFilter}
+                tambahShow={() => setShowModalTambah(true)}
             />
             <div className="table-container">
                 <div className="table-header">
@@ -115,7 +118,7 @@ export default function Tagihan() {
                                                 item.kartu_keluarga?.kepala_keluarga?.nama ?? '-'
                                             }
                                         </td>
-                                        <td className="text-right">{formatRupiah(item.nominal) ?? '-'}</td>
+                                        <td className="text-end">{formatRupiah(item.nominal) ?? '-'}</td>
                                         <td className="text-center">{formatTanggal(item.tgl_tagih)}</td>
                                         <td className="text-center">{formatTanggal(item.tgl_tempo)}</td>
                                         <td className="text-center">{item.status_bayar === 'sudah_bayar' ? (
@@ -208,7 +211,7 @@ export default function Tagihan() {
                                                 item.kartu_keluarga?.kepala_keluarga?.nama ?? '-'
                                             }
                                         </td>
-                                        <td className="text-right">{formatRupiah(item.nominal) ?? '-'}</td>
+                                        <td className="text-end">{formatRupiah(item.nominal) ?? '-'}</td>
                                         <td className="text-center">{formatTanggal(item.tgl_tagih)}</td>
                                         <td className="text-center">{formatTanggal(item.tgl_tempo)}</td>
                                         <td className="text-center">{item.status_bayar === 'sudah_bayar' ? (
@@ -269,6 +272,20 @@ export default function Tagihan() {
                     </div>
                 )}
             </div>
+            <TambahTagihan
+                tambahShow={showModalTambah}
+                onClose={() => setShowModalTambah(false)}
+                onUpdated={(updated) => {
+                    if (Array.isArray(updated)) {
+                        setTagihanManualList(prev => [...updated, ...prev])
+                    } else {
+                        setTagihanManualList(prev => [updated, ...prev])
+                    }
+                }}
+                role={role}
+                iuran={iuran_for_tagihan}
+                kk_list={kartuKeluargaForFilter}
+            />
             <EditTagihan
                 editShow={showModalEdit}
                 onClose={() => setShowModalEdit(false)}

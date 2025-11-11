@@ -4727,6 +4727,184 @@ export function EditIuranManual({ editShow, onClose, onUpdated, role, iuran }) {
     )
 }
 
+export function TambahTagihan({ tambahShow, onClose, onUpdated, role, iuran, kk_list }) {
+    const { data, setData } = useForm({
+        id_iuran: "",
+        nama: "",
+        nominal: "",
+        tgl_tagih: "",
+        no_kk: "semua",
+    })
+
+    const [iuranSelected, setIuranSelected] = useState({})
+    console.log(data)
+    useEffect(() => {
+        const selected = iuran.find((item) => item.id == data.id_iuran)
+        setIuranSelected(selected || {})
+        if (selected) {
+            setData((prev) => ({
+                ...prev,
+                nama: selected.nama || "",
+                nominal: selected.nominal || "",
+                tgl_tagih: selected.tgl_tagih || "",
+            }))
+        }
+    }, [data.id_iuran])
+
+    const handleSubmit = (e) => {
+        e.preventDefault()
+
+        const formData = new FormData()
+        formData.append('id_iuran', data.id_iuran)
+        formData.append('nama', data.nama)
+        formData.append('nominal', data.nominal)
+        formData.append('tgl_tagih', data.tgl_tagih)
+        formData.append('no_kk', data.no_kk)
+
+        axios.post(`/${role}/tagihan`, formData)
+            .then((res) => {
+                console.log(res)
+                if (onUpdated) onUpdated(res.data.tagihan)
+                setData({
+                    id_iuran: "",
+                    nama: "",
+                    nominal: "",
+                    tgl_tagih: "",
+                    no_kk: "semua",
+                })
+                onClose()
+            })
+            .catch((err) => {
+                console.error(err.response?.data || err)
+                alert("Gagal membuat tagihan! Lihat console untuk detail.")
+            })
+    }
+
+    useEffect(() => {
+        const handleEsc = (e) => {
+            if (e.key === "Escape") onClose()
+        }
+
+        document.addEventListener("keydown", handleEsc)
+        return () => document.removeEventListener("keydown", handleEsc)
+    }, [onClose])
+
+    const isFormComplete = Object.values(data).every(value => value !== "" && value !== null)
+
+    if (!tambahShow) return null
+
+    return (
+        <>
+            <div
+                className="modal fade show"
+                tabIndex="-1"
+                style={{
+                    display: "block",
+                    backgroundColor: "rgba(0,0,0,0.5)"
+                }}
+                onClick={(e) => {
+                    if (e.target === e.currentTarget) onClose()
+                }}
+            >
+                <div
+                    className="modal-dialog modal-dialog-scrollable modal-dialog-centered"
+                    onClick={(e) => e.stopPropagation()}
+                >
+                    <div className="modal-content shadow-lg border-0">
+                        <div className="modal-body p-0 m-0">
+                            <div className="d-flex tambah-body flex-column" style={{ width: "100%", maxHeight: "80vh", overflowY: "auto" }}>
+                                <div className="p-3">
+                                    <form onSubmit={handleSubmit} className="h-100">
+                                        <div className="mb-3">
+                                            <label className="form-label">Nomor Kartu Keluarga</label>
+                                            <select
+                                                name="no_kk"
+                                                value={data.no_kk}
+                                                className="form-control"
+                                                onChange={(e) => setData('no_kk', e.target.value)}
+                                                required
+                                                style={{
+                                                    border: '0',
+                                                    borderBottom: '1px solid lightgray',
+                                                    borderRadius: '0',
+                                                }}
+                                            >
+                                                <option value="semua" selected>Semua Kartu Keluarga</option>
+                                                {kk_list.map((kk) => (
+                                                    <option key={kk.no_kk} value={kk.no_kk}>{kk.no_kk}</option>
+                                                ))}
+                                            </select>
+                                        </div>
+
+                                        <div className="mb-3">
+                                            <label className="form-label">Jenis Iuran</label>
+                                            <select
+                                                name="id_iuran"
+                                                value={data.id_iuran}
+                                                className="form-control"
+                                                onChange={(e) => setData('id_iuran', e.target.value)}
+                                                required
+                                                style={{
+                                                    border: '0',
+                                                    borderBottom: '1px solid lightgray',
+                                                    borderRadius: '0',
+                                                }}
+                                            >
+                                                <option value="" disabled>-- Pilih Iuran --</option>
+                                                {iuran.map((iuran) => (
+                                                    <option key={iuran.id} value={iuran.id}>{iuran.nama}</option>
+                                                ))}
+                                            </select>
+                                        </div>
+
+                                        <div className="mb-3">
+                                            <label className="form-label">Nominal</label>
+                                            <input
+                                                type="number"
+                                                name="nominal"
+                                                value={data.nominal}
+                                                className="form-control"
+                                                onInput={(e) => {
+                                                    if (e.target.value.length > 8) {
+                                                        e.target.value = e.target.value.slice(0, 8)
+                                                    }
+                                                }}
+                                                required
+                                                style={{
+                                                    border: '0',
+                                                    borderBottom: '1px solid lightgray',
+                                                    borderRadius: '0',
+                                                }}
+                                            />
+                                        </div>
+
+                                        <div className="mb-3">
+                                            <label className="form-label">Tanggal Tagih</label>
+                                            <input
+                                                name="tgl_tagih"
+                                                type="date"
+                                                value={data.tgl_tagih}
+                                                className="tambah-kategori form-control"
+                                                onChange={(e) => setData('tgl_tagih', e.target.value)}
+                                                required
+                                            />
+                                        </div>
+
+                                        <button type="submit" className="btn btn-primary ms-auto mt-auto" disabled={!isFormComplete} title={!isFormComplete && 'Harap isi semua data yang ada'}>
+                                            <i className="fas fa-save me-2"></i>
+                                            Simpan
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </>
+    )
+}
+
 export function EditTagihan({ editShow, onClose, onUpdated, role, selectedData }) {
     const { data, setData } = useForm({
         status_bayar: "",

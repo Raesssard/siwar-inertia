@@ -246,7 +246,7 @@ export function FilterTransaksi({ transaksi, data, setData, daftar_tahun, daftar
     )
 }
 
-export function FilterTagihan({ tagihanManual, tagihanOtomatis, data, setData, filter, resetFilter, role, kk_list }) {
+export function FilterTagihan({ tagihanManual, tagihanOtomatis, data, setData, filter, resetFilter, role, kk_list, tambahShow }) {
     return (
         <form onSubmit={filter} className="filter-form form-filter d-flex px-0 g-2 pb-2 mb-2 w-100">
             <div className="col-md-5 col-12 pr-2">
@@ -291,16 +291,21 @@ export function FilterTagihan({ tagihanManual, tagihanOtomatis, data, setData, f
 
             <Role role={['rt', 'rw']}>
                 <button
-                    className="btn btn-success my-auto mr-3 ml-auto"
+                    className="btn btn-success my-auto mr-3"
                     type="button"
                     title={!tagihanManual?.length && !tagihanOtomatis?.length ? "Tidak ada Tagihan yang dapat diexport" : "Export Tagihan ke Excel"}
                     style={{ borderRadius: "0.2rem" }}
                     onClick={() => window.location.href = `/${role}/export/tagihan`}
                     disabled={!tagihanManual?.length && !tagihanOtomatis?.length}
                 >
-                    <i className="fas fa-file-excel mr-2"></i>
-                    Export Tagihan
+                    <i className="fas fa-file-excel"></i>
                 </button>
+                <div className="text-end ml-auto mr-3">
+                    <button type="button" onClick={() => tambahShow()} className="btn-input btn btn-sm btn-success">
+                        <i className="fas fa-plus mr-2"></i>
+                        Tambah Tagihan
+                    </button>
+                </div>
             </Role>
         </form>
     )
@@ -396,7 +401,7 @@ export function FilterIuran({ iuranManual, iuranOtomatis, data, setData, filter,
                 <i className="fas fa-undo"></i>
             </Link>
 
-            <Role role={['rt', 'rw']}>
+            <Role role={['rt', 'rw', 'bendahara']}>
                 <button
                     className="btn btn-success my-auto mr-3"
                     type="button"
@@ -407,12 +412,14 @@ export function FilterIuran({ iuranManual, iuranOtomatis, data, setData, filter,
                 >
                     <i className="fas fa-file-excel"></i>
                 </button>
-                <div className="text-end ml-auto mr-3">
-                    <button type="button" onClick={() => tambahShow()} className="btn-input btn btn-sm btn-success">
-                        <i className="fas fa-plus mr-2"></i>
-                        Tambah Iuran
-                    </button>
-                </div>
+                <Role role={['rw', 'bendahara']}>
+                    <div className="text-end ml-auto mr-3">
+                        <button type="button" onClick={() => tambahShow()} className="btn-input btn btn-sm btn-success">
+                            <i className="fas fa-plus mr-2"></i>
+                            Tambah Iuran
+                        </button>
+                    </div>
+                </Role>
             </Role>
         </form >
     )

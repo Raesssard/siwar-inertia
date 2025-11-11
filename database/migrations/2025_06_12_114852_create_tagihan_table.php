@@ -19,8 +19,6 @@ return new class extends Migration
             $table->date('tgl_tempo');
             $table->enum('jenis', ['otomatis', 'manual'])->default('manual');
 
-            $table->char('nik', 16)->nullable();
-            $table->foreign('nik')->references('nik')->on('warga')->onDelete('cascade');
             $table->char('no_kk', 16)->nullable();
             $table->foreign('no_kk')->references('no_kk')->on('kartu_keluarga')->onDelete('cascade');
 
