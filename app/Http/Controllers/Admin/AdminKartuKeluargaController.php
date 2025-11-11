@@ -42,7 +42,19 @@ class AdminKartuKeluargaController extends Controller
             ->withQueryString();
 
         $kategori_iuran = Kategori_golongan::select('id', 'jenis')->get();
-        $daftar_rt = Rt::select('id', 'nomor_rt', 'id_rw')->with('rw')->get();
+        $daftar_rt = Rt::select('id', 'nomor_rt', 'id_rw')
+            ->with(['rw', 'user.roles'])
+            ->whereHas('user', function ($q) {
+                $q->whereHas('roles', function ($r) {
+                    // Hanya ambil user dengan role utama RT (Ketua RT)
+                    $r->where('name', 'rt');
+                })
+                // Pastikan user tersebut tidak punya role tambahan (sekretaris/bendahara/seksi)
+                ->whereDoesntHave('roles', function ($r) {
+                    $r->whereIn('name', ['sekretaris', 'bendahara', 'seksi']);
+                });
+            })
+            ->get();
 
         return Inertia::render('Admin/KartuKeluargaWarga', [
             'kartu_keluarga' => $kartu_keluarga,
