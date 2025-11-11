@@ -140,7 +140,6 @@ export default function FormWarga({
                 { name: "tanggal_lahir", label: "Tanggal Lahir", type: "date" },
                 { name: "agama", label: "Agama", type: "text" },
                 { name: "pendidikan", label: "Pendidikan", type: "text" },
-                { name: "pekerjaan", label: "Pekerjaan", type: "text" },
               ].map((f) => (
                 <div key={f.name}>
                   <label className="font-medium text-gray-700">{f.label}</label>
@@ -155,7 +154,34 @@ export default function FormWarga({
                   )}
                 </div>
               ))}
-
+              {/* Pekerjaan */}
+              {/* Pekerjaan */}
+              <div>
+                <label className="font-medium text-gray-700">Pekerjaan</label>
+                <select
+                  value={data.pekerjaan}
+                  onChange={(e) => setData("pekerjaan", e.target.value)}
+                  className={inputBase}
+                >
+                  <option value="">Pilih pekerjaan</option>
+                  <option value="pelajar/mahasiswa">Pelajar / Mahasiswa</option>
+                  <option value="pegawai negeri sipil">Pegawai Negeri Sipil (PNS)</option>
+                  <option value="karyawan swasta">Karyawan Swasta</option>
+                  <option value="pekerja lepas harian">Pekerja Lepas Harian</option>
+                  <option value="wirausaha">Wirausaha</option>
+                  <option value="petani">Petani</option>
+                  <option value="nelayan">Nelayan</option>
+                  <option value="tni">TNI</option>
+                  <option value="polri">POLRI</option>
+                  <option value="pensiunan">Pensiunan</option>
+                  <option value="ibu rumah tangga">Ibu Rumah Tangga</option>
+                  <option value="tidak bekerja">Tidak Bekerja</option>
+                  <option value="lainnya">Lainnya</option>
+                </select>
+                {errors.pekerjaan && (
+                  <p className="text-red-500 text-sm">{errors.pekerjaan}</p>
+                )}
+              </div>
               {/* Jenis Kelamin */}
               <div>
                 <label className="font-medium text-gray-700">Jenis Kelamin</label>
