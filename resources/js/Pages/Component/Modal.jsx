@@ -4175,7 +4175,7 @@ export function TambahIuran({ tambahShow, onClose, onAdded, role, golongan, rt =
                                 <form onSubmit={handleSubmit} className="h-100 d-flex flex-column" id="iuran">
 
                                     <div className="d-flex position-relative mb-3 border-bottom">
-                                        {["Semua", "Warga", "Kartu Keluarga"].map((label, i) => (
+                                        {["Semua Kartu Keluarga", "Kartu Keluarga"].map((label, i) => (
                                             <button
                                                 key={label}
                                                 type="button"
@@ -4183,11 +4183,10 @@ export function TambahIuran({ tambahShow, onClose, onAdded, role, golongan, rt =
                                                 style={{
                                                     border: "none",
                                                     background: "transparent",
-                                                    width: "30%",
+                                                    width: "50%",
                                                     color:
-                                                        (i === 0 && !perWarga && !perKk) ||
-                                                            (i === 1 && perWarga) ||
-                                                            (i === 2 && perKk)
+                                                        (i === 0 && !perKk) ||
+                                                            (i === 1 && perKk)
                                                             ? "#4e73df"
                                                             : "gray",
                                                     fontWeight: "500",
@@ -4195,8 +4194,7 @@ export function TambahIuran({ tambahShow, onClose, onAdded, role, golongan, rt =
                                                     paddingBottom: "8px",
                                                 }}
                                                 onClick={() => {
-                                                    setPerWarga(i === 1)
-                                                    setPerKk(i === 2)
+                                                    setPerKk(i === 1)
                                                     handleChangeOption()
                                                 }}
                                             >
@@ -4211,10 +4209,11 @@ export function TambahIuran({ tambahShow, onClose, onAdded, role, golongan, rt =
                                             style={{
                                                 height: "2px",
                                                 background: "#4e73df",
-                                                width: "33%",
+                                                width: "50%",
                                                 bottom: "0",
                                                 left:
-                                                    perWarga ? "34%" : perKk ? "67%" : "0%",
+                                                    // perWarga ? "50%" :
+                                                    perKk ? "50%" : "0%",
                                                 borderRadius: "2px",
                                             }}
                                         />
@@ -4249,7 +4248,7 @@ export function TambahIuran({ tambahShow, onClose, onAdded, role, golongan, rt =
                                         </div>
                                     </Role>
 
-                                    {perWarga && (
+                                    {/* {perWarga && (
                                         <div className="mb-3">
                                             <label className="form-label">NIK Warga</label>
                                             <select
@@ -4271,7 +4270,7 @@ export function TambahIuran({ tambahShow, onClose, onAdded, role, golongan, rt =
                                                 ))}
                                             </select>
                                         </div>
-                                    )}
+                                    )} */}
 
                                     {perKk && (
                                         <div className="mb-3">
@@ -4464,7 +4463,7 @@ export function EditIuranOtomatis({ editShow, onClose, onUpdated, role, golongan
     const handleSubmit = (e) => {
         e.preventDefault()
 
-        axios.put(`/${role}/iuran/${iuranGol.id}`, data)
+        axios.put(`/${role}/iuran/${iuranGol.id}/otomatis`, data)
             .then(res => {
                 if (onUpdated) onUpdated(res.data.iuran)
                 setData({
@@ -4599,16 +4598,158 @@ export function EditIuranOtomatis({ editShow, onClose, onUpdated, role, golongan
     )
 }
 
+export function EditIuranManual({ editShow, onClose, onUpdated, role, iuran }) {
+    const { data, setData } = useForm({
+        nominal: "",
+    })
+
+    useEffect(() => {
+        if (iuran) {
+            setData({
+                nominal: iuran.nominal || "",
+            });
+        }
+    }, [iuran]);
+
+    const handleSubmit = (e) => {
+        e.preventDefault()
+
+        axios.put(`/${role}/iuran/${iuran.id}/manual`, data)
+            .then(res => {
+                if (onUpdated) onUpdated(res.data.iuran)
+                setData({
+                    nominal: "",
+                })
+                onClose()
+            })
+    }
+
+    useEffect(() => {
+        const handleEsc = (e) => {
+            if (e.key === "Escape") onClose()
+        }
+
+        document.addEventListener("keydown", handleEsc)
+        return () => document.removeEventListener("keydown", handleEsc)
+    }, [onClose])
+
+    if (!editShow) return null
+
+    let items = []
+    for (let i = 1; i <= 12; i++) {
+        items.push(<option value={i} key={i}>{i} Bulan</option>)
+    }
+
+    return (
+        <>
+            <div
+                className="modal fade show"
+                tabIndex="-1"
+                style={{
+                    display: "block",
+                    backgroundColor: "rgba(0,0,0,0.5)"
+                }}
+                onClick={() => {
+                    onClose()
+                }}
+            >
+                <div
+                    className="modal-dialog modal-dialog-scrollable modal-dialog-centered"
+                    onClick={(e) => e.stopPropagation()}
+                >
+                    <div className="modal-content shadow-lg border-0">
+                        <div className="modal-body p-0 m-0">
+                            <div className="d-flex tambah-body flex-column" style={{ width: "100%", maxHeight: "80vh", overflowY: "auto" }}>
+                                <div className="p-3">
+                                    <form onSubmit={handleSubmit} className="h-100">
+                                        <div className="mb-3">
+                                            <label className="form-label">Iuran</label>
+                                            <input
+                                                name="nama"
+                                                type="text"
+                                                value={iuran.nama}
+                                                className="tambah-judul form-control"
+                                                disabled
+                                            />
+                                        </div>
+
+                                        <div className="mb-3">
+                                            <label className="form-label">Tanggal Tagih</label>
+                                            <input
+                                                name="tgl_tagih"
+                                                type="date"
+                                                value={iuran.tgl_tagih}
+                                                className="tambah-kategori form-control"
+                                                disabled
+                                            />
+                                        </div>
+
+                                        <div className="mb-3">
+                                            <label className="form-label">Tanggal Tempo</label>
+                                            <input
+                                                name="tgl_tempo"
+                                                type="date"
+                                                value={iuran.tgl_tempo}
+                                                className="tambah-kategori form-control"
+                                                disabled
+                                            />
+                                        </div>
+
+                                        <div className="mb-3">
+                                            <label className="form-label">Nominal Iuran</label>
+                                            <input
+                                                type="number"
+                                                name="nominal"
+                                                value={data.nominal}
+                                                className="tambah-judul form-control"
+                                                onChange={(e) => setData("nominal", e.target.value)}
+                                                onInput={(e) => {
+                                                    if (e.target.value.length > 8) {
+                                                        e.target.value = e.target.value.slice(0, 8);
+                                                    }
+                                                }}
+                                                required
+                                            />
+                                        </div>
+
+                                        <button type="submit" className="btn btn-primary ms-auto mt-auto">
+                                            <i className="fas fa-save me-2"></i>
+                                            Simpan
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </>
+    )
+}
+
 export function EditTagihan({ editShow, onClose, onUpdated, role, selectedData }) {
     const { data, setData } = useForm({
         status_bayar: "",
         tgl_bayar: "",
+        nominal_bayar: "",
         kategori_pembayaran: "",
-        bukti_transfer: "",
+        bukti_transfer: null,
     })
     const [buktiLama, setBuktiLama] = useState(null)
     const [previewBuktiTransfer, setPreviewBuktiTransfer] = useState(null)
     const fileInputRef = useRef(null)
+
+    useEffect(() => {
+        if (data.status_bayar === 'belum_bayar') {
+            setData({
+                ...data,
+                tgl_bayar: "",
+                nominal_bayar: "",
+                kategori_pembayaran: "tunai",
+                bukti_transfer: null,
+            })
+        }
+    }, [data.status_bayar])
 
     const handleFileChange = (e) => {
         const selectedFile = e.target.files[0]
@@ -4635,6 +4776,7 @@ export function EditTagihan({ editShow, onClose, onUpdated, role, selectedData }
             setData({
                 status_bayar: selectedData.status_bayar || "",
                 tgl_bayar: selectedData.tgl_bayar || "",
+                nominal_bayar: selectedData.nominal_bayar || "",
                 kategori_pembayaran: selectedData.kategori_pembayaran || "tunai",
                 bukti_transfer: selectedData.bukti_transfer || null,
             });
@@ -4664,6 +4806,7 @@ export function EditTagihan({ editShow, onClose, onUpdated, role, selectedData }
                 setData({
                     status_bayar: "",
                     tgl_bayar: "",
+                    nominal_bayar: "",
                     kategori_pembayaran: "tunai",
                     bukti_transfer: null,
                 })
@@ -4765,7 +4908,7 @@ export function EditTagihan({ editShow, onClose, onUpdated, role, selectedData }
                                             <label className="form-label">Tanggal bayar</label>
                                             <input
                                                 name="tgl_bayar"
-                                                type="date"
+                                                type="datetime-local"
                                                 value={data.tgl_bayar}
                                                 className="tambah-kategori form-control"
                                                 onChange={(e) => setData('tgl_bayar', e.target.value)}
@@ -4792,6 +4935,50 @@ export function EditTagihan({ editShow, onClose, onUpdated, role, selectedData }
                                                 <option value="tunai">Tunai</option>
                                                 <option value="transfer">Transfer</option>
                                             </select>
+                                        </div>
+
+                                        <div className="mb-3">
+                                            <label className="form-label">Nominal</label>
+                                            <input
+                                                type="number"
+                                                name="nominal"
+                                                value={selectedData.nominal}
+                                                className="form-control"
+                                                onInput={(e) => {
+                                                    if (e.target.value.length > 8) {
+                                                        e.target.value = e.target.value.slice(0, 8)
+                                                    }
+                                                }}
+                                                disabled
+                                                style={{
+                                                    border: '0',
+                                                    borderBottom: '1px solid lightgray',
+                                                    borderRadius: '0',
+                                                }}
+                                            />
+                                        </div>
+
+                                        <div className="mb-3">
+                                            <label className="form-label">Nominal Bayar</label>
+                                            <input
+                                                type="number"
+                                                name="nominal_bayar"
+                                                value={data.nominal_bayar}
+                                                className="form-control"
+                                                onChange={(e) => setData('nominal_bayar', e.target.value)}
+                                                onInput={(e) => {
+                                                    if (e.target.value.length > 8) {
+                                                        e.target.value = e.target.value.slice(0, 8)
+                                                    }
+                                                }}
+                                                required={data.status_bayar === "sudah_bayar"}
+                                                disabled={data.status_bayar === "belum_bayar"}
+                                                style={{
+                                                    border: '0',
+                                                    borderBottom: '1px solid lightgray',
+                                                    borderRadius: '0',
+                                                }}
+                                            />
                                         </div>
 
                                         {data.kategori_pembayaran === 'transfer' && (

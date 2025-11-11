@@ -520,11 +520,11 @@ export function getRwLinks() {
             text: "Warga",
             icon: "users",
             children: [
-                {
-                    href: "/rw/analisis/warga",
-                    text: "Analisis Warga",
-                    icon: "eye",
-                },
+                // {
+                //     href: "/rw/analisis/warga",
+                //     text: "Analisis Warga",
+                //     icon: "eye",
+                // },
                 {
                     href: "/rw/rt",
                     text: "Data RT",
@@ -541,11 +541,11 @@ export function getRwLinks() {
             text: "Keuangan",
             icon: "wallet",
             children: [
-                {
-                    href: "/rw/analisis/keuangan",
-                    text: "Analisis Keuangan",
-                    icon: "eye",
-                },
+                // {
+                //     href: "/rw/analisis/keuangan",
+                //     text: "Analisis Keuangan",
+                //     icon: "eye",
+                // },
                 {
                     href: "/rw/iuran",
                     text: "Iuran Warga",
@@ -650,7 +650,7 @@ export function getRtCards({ ...rest }) {
                 {
                     href: "/rt/warga",
                     color: "primary",
-                    title: "Jumlah Warga Penduduk",
+                    title: "Jumlah Warga Tetap",
                     value: rest.jumlah_warga_penduduk,
                     icon: "home",
                 },
@@ -729,11 +729,11 @@ export function getRtLinks() {
             text: "Warga",
             icon: "users",
             children: [
-                {
-                    href: "/rt/analisis/warga",
-                    text: "Analisis Warga",
-                    icon: "eye",
-                },
+                // {
+                //     href: "/rt/analisis/warga",
+                //     text: "Analisis Warga",
+                //     icon: "eye",
+                // },
                 {
                     href: "/rt/warga",
                     text: "Data Warga",
@@ -750,11 +750,11 @@ export function getRtLinks() {
             text: "Keuangan",
             icon: "wallet",
             children: [
-                {
-                    href: "/rt/analisis/keuangan",
-                    text: "Analisis Keuangan",
-                    icon: "eye",
-                },
+                // {
+                //     href: "/rt/analisis/keuangan",
+                //     text: "Analisis Keuangan",
+                //     icon: "eye",
+                // },
                 {
                     href: "/rt/iuran",
                     text: "Iuran",
