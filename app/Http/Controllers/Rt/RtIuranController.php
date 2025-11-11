@@ -114,50 +114,6 @@ class RtIuranController extends Controller
             : Kartu_keluarga::where('id_rw', $iuran->id_rw)->get();
 
         $kkSelected = Kartu_keluarga::where('no_kk', $request->no_kk)->first();
-        $wargaSelected = Warga::where('nik', $request->nik)->first();
-
-        if ($request->jenis === 'manual') {
-            if (!empty($request->no_kk)) {
-                if ($kkSelected) {
-                    Tagihan::create([
-                        'nama' => $iuran->nama,
-                        'nominal' => $iuran->nominal,
-                        'tgl_tagih' => $iuran->tgl_tagih,
-                        'tgl_tempo' => $iuran->tgl_tempo,
-                        'jenis' => 'manual',
-                        'no_kk' => $kkSelected->no_kk,
-                        'status_bayar' => 'belum_bayar',
-                        'id_iuran' => $iuran->id,
-                    ]);
-                }
-            } elseif (!empty($request->nik)) {
-                if ($wargaSelected) {
-                    Tagihan::create([
-                        'nama' => $iuran->nama,
-                        'nominal' => $iuran->nominal,
-                        'tgl_tagih' => $iuran->tgl_tagih,
-                        'tgl_tempo' => $iuran->tgl_tempo,
-                        'jenis' => 'manual',
-                        'nik' => $wargaSelected->nik,
-                        'status_bayar' => 'belum_bayar',
-                        'id_iuran' => $iuran->id,
-                    ]);
-                }
-            } else {
-                foreach ($kkList as $kk) {
-                    Tagihan::create([
-                        'nama' => $iuran->nama,
-                        'nominal' => $iuran->nominal,
-                        'tgl_tagih' => $iuran->tgl_tagih,
-                        'tgl_tempo' => $iuran->tgl_tempo,
-                        'jenis' => 'manual',
-                        'no_kk' => $kk->no_kk,
-                        'status_bayar' => 'belum_bayar',
-                        'id_iuran' => $iuran->id,
-                    ]);
-                }
-            }
-        }
 
         if ($request->jenis === 'otomatis') {
             // Simpan nominal per golongan
