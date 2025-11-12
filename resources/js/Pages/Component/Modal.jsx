@@ -2411,7 +2411,7 @@ export function DetailKK({ selectedData, detailShow, onClose, role, userData }) 
                                     <p><strong>Nama Kepala Keluarga</strong> : {selectedData?.kepala_keluarga?.nama ?? '-'}</p>
                                     <p><strong>Alamat</strong> : {selectedData?.alamat ?? '-'}</p>
                                     <p><strong>RT/RW</strong> :{" "}
-                                        {selectedData?.rukun_tetangga.nomor_rt ?? '-'}/{selectedData?.rw.nomor_rw ?? '-'}
+                                        {selectedData?.rukun_tetangga?.nomor_rt ?? '-'}/{selectedData?.rw?.nomor_rw ?? '-'}
                                     </p>
                                     <p>
                                         <strong>Desa/Kelurahan</strong> :{" "}
