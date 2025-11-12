@@ -69,10 +69,18 @@ export default function Tagihan() {
                             {tagihanBelumDibayar.data.length > 0 ? (
                                 tagihanBelumDibayar.data.map((item, index) => (
                                     <tr key={item.id}>
-                                        <td className="text-center">{index + 1}</td>
-                                        <td className="text-center">{item.nama}</td>
-                                        <td className="text-center">{formatRupiah(item.nominal)}</td>
-                                        <td className="text-center">{formatTanggal(item.tgl_tempo)}</td>
+                                        <td className="text-center">
+                                            {index + 1}
+                                        </td>
+                                        <td className="text-center">
+                                            {item.nama}
+                                        </td>
+                                        <td className="text-center">
+                                            {formatRupiah(item.nominal)}
+                                        </td>
+                                        <td className="text-center">
+                                            {formatTanggal(item.tgl_tempo)}
+                                        </td>
                                         <td className="text-center">
                                             {item.status_bayar === 'sudah_bayar' ? (
                                                 <span className="badge bg-success text-white">Sudah Bayar</span>
@@ -80,7 +88,9 @@ export default function Tagihan() {
                                                 <span className="badge bg-danger text-white">Belum Bayar</span>
                                             )}
                                         </td>
-                                        <td className="text-center">{item.tgl_bayar ? formatTanggal(item.tgl_bayar) : "-"}</td>
+                                        <td className="text-center">
+                                            {item.tgl_bayar ? formatTanggal(item.tgl_bayar) : "-"}
+                                        </td>
                                         <td className="text-center">
                                             <button className="btn btn-success btn-sm" onClick={() => modalDetail(item)}>
                                                 <i className="fas fa-info"></i>
@@ -149,10 +159,18 @@ export default function Tagihan() {
                             {tagihanSudahDibayar.data.length > 0 ? (
                                 tagihanSudahDibayar.data.map((item, index) => (
                                     <tr key={item.id}>
-                                        <td className="text-center">{index + 1}</td>
-                                        <td className="text-center">{item.nama}</td>
-                                        <td className="text-center">{formatRupiah(item.nominal)}</td>
-                                        <td className="text-center">{formatTanggal(item.tgl_tempo)}</td>
+                                        <td className="text-center">
+                                            {index + 1}
+                                        </td>
+                                        <td className="text-center">
+                                            {item.nama}
+                                        </td>
+                                        <td className="text-center">
+                                            {formatRupiah(item.nominal)}
+                                        </td>
+                                        <td className="text-center">
+                                            {formatTanggal(item.tgl_tempo)}
+                                        </td>
                                         <td className="text-center">
                                             {item.status_bayar === 'sudah_bayar' ? (
                                                 <span className="badge bg-success text-white">Sudah Bayar</span>
@@ -160,7 +178,9 @@ export default function Tagihan() {
                                                 <span className="badge bg-warning text-white">Belum Bayar</span>
                                             )}
                                         </td>
-                                        <td className="text-center">{item.tgl_bayar ? formatTanggal(item.tgl_bayar) : "-"}</td>
+                                        <td className="text-center">
+                                            {item.tgl_bayar ? formatTanggal(item.tgl_bayar) : "-"}
+                                        </td>
                                         <td className="text-center">
                                             <button className="btn btn-success btn-sm" onClick={() => modalDetail(item)}>
                                                 <i className="fas fa-info"></i>
