@@ -2,7 +2,14 @@ import Layout from "@/Layouts/Layout";
 import React from "react";
 import { Head, usePage } from "@inertiajs/react";
 import { StatCard } from "./Component/Card";
-import { analisisKeuanganRt, analisisKeuanganRw, analisisWargaRt, analisisWargaRw, analisisWargaAdmin, analisisSistemAdmin } from "./Component/GetPropRole";
+import {
+    analisisKeuanganRt,
+    analisisKeuanganRw,
+    analisisWargaRt,
+    analisisWargaRw,
+    analisisWargaAdmin,
+    analisisSistemAdmin
+} from "./Component/GetPropRole";
 
 export default function Analisis() {
     const { role, ...rest } = usePage().props

@@ -303,14 +303,14 @@ export default function Transaksi() {
                 }}
                 role={role}
             />
-            <TambahTransaksi
+            {/* <TambahTransaksi
                 tambahShow={showModalTambah}
                 onClose={() => setShowModalTambah(false)}
                 onAdded={(transaksiBaru, jenis) => {
                     if (jenis === 'umum') setTransaksiUmumList(prev => [transaksiBaru, ...prev])
                 }}
                 role={role}
-            />
+            /> */}
             <EditTransaksi
                 editShow={showModalEdit}
                 onClose={() => setShowModalEdit(false)}

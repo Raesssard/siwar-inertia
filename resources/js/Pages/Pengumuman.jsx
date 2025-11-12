@@ -14,7 +14,7 @@ export default function Pengumuman() {
         pengumuman: pengumumanFromServer,
         list_bulan,
         daftar_tahun,
-        daftar_kategori,
+        daftar_kategori: daftarKategoriFromServer,
         total_pengumuman,
         total_pengumuman_filtered,
     } = usePage().props
@@ -27,6 +27,7 @@ export default function Pengumuman() {
     const { props } = usePage()
     const [total, setTotal] = useState(total_pengumuman)
     const [totalFiltered, setTotalFiltered] = useState(total_pengumuman_filtered)
+    const [daftarKategori, setDaftarKategori] = useState(daftarKategoriFromServer)
     const { get, data, setData } = useForm({
         search: '',
         tahun: '',
@@ -34,9 +35,11 @@ export default function Pengumuman() {
         kategori: '',
         level: ''
     })
-
     useEffect(() => {
         setPengumumanList(pengumumanFromServer)
+        setTotal(total_pengumuman)
+        setTotalFiltered(total_pengumuman_filtered)
+        setDaftarKategori(daftarKategoriFromServer)
     }, [pengumumanFromServer])
 
     const groupByWaktu = pengumumanList.reduce((groups, item) => {
@@ -92,11 +95,6 @@ export default function Pengumuman() {
             })
         }
     }
-
-    useEffect(() => {
-        setTotal(total_pengumuman)
-        setTotalFiltered(total_pengumuman_filtered)
-    }, [total_pengumuman, total_pengumuman_filtered, pengumumanFromServer])
 
     useEffect(() => {
         const handleScroll = () => {
@@ -160,7 +158,7 @@ export default function Pengumuman() {
                 setData={setData}
                 daftar_tahun={daftar_tahun}
                 list_bulan={list_bulan}
-                daftar_kategori={daftar_kategori}
+                daftar_kategori={daftarKategori}
                 filter={filter}
                 resetFilter={resetFilter}
                 tambahShow={() => setShowModalTambah(true)}
@@ -272,11 +270,17 @@ export default function Pengumuman() {
                     role={role}
                 />
                 <TambahPengumuman
-                    kategori={daftar_kategori}
+                    kategori={daftarKategori}
                     tambahShow={showModalTambah}
                     onClose={() => setShowModalTambah(false)}
                     onAdded={(newPengumuman) => {
                         setPengumumanList(prev => [newPengumuman, ...prev])
+                        setDaftarKategori(
+                            newPengumuman.kategori
+                                && !daftarKategori.includes(newPengumuman.kategori)
+                                ? [...daftarKategori, newPengumuman.kategori]
+                                : daftarKategori
+                        )
                         setTotal(prev => prev + 1)
                         setTotalFiltered(prev => prev + 1)
                         setSelected(newPengumuman)

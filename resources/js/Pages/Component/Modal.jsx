@@ -7,6 +7,8 @@ import { formatTanggal, getAdminLinks, getRtLinks, getWargaLinks, getRwLinks, fo
 import Role from "./Role"
 import { route } from "ziggy-js"
 import { motion } from "framer-motion"
+import Select from "react-select"
+import CreatableSelect from "react-select/creatable"
 
 export function ModalSidebar({ modalIsOpen, modalShow, localStorageHistory }) {
     const [openMenus, setOpenMenus] = useState(() => {
@@ -3835,7 +3837,27 @@ export function TambahPengumuman({ kategori, tambahShow, onClose, onAdded, role 
 
                                             <div className="mb-3">
                                                 <label className="form-label">Kategori</label>
-                                                <input
+                                                <CreatableSelect
+                                                    placeholder="Pilih atau buat kategori baru..."
+                                                    value={data.kategori ? { value: data.kategori, label: data.kategori } : null}
+                                                    onChange={(selected) => setData("kategori", selected ? selected.value : "")}
+                                                    options={kategori.map((kat) => ({
+                                                        value: kat,
+                                                        label: kat,
+                                                    }))}
+                                                    className="react-select-container"
+                                                    classNamePrefix="react-select"
+                                                    styles={{
+                                                        control: (base) => ({
+                                                            ...base,
+                                                            border: 0,
+                                                            borderBottom: "1px solid lightgray",
+                                                            borderRadius: 0,
+                                                            boxShadow: "none",
+                                                        }),
+                                                    }}
+                                                />
+                                                {/* <input
                                                     list="daftarKategori"
                                                     name="kategori"
                                                     type="text"
@@ -3844,12 +3866,12 @@ export function TambahPengumuman({ kategori, tambahShow, onClose, onAdded, role 
                                                     onChange={(e) => setData("kategori", e.target.value)}
                                                     required
                                                 />
-                                                {/* sementara pake datalist 🙏*/}
+                                                sementara pake datalist 🙏
                                                 <datalist id="daftarKategori">
                                                     {kategori.map((kat, index) => (
                                                         <option key={index} value={kat} />
                                                     ))}
-                                                </datalist>
+                                                </datalist> */}
                                             </div>
 
                                             <div className="mb-3">
@@ -4166,6 +4188,8 @@ export function TambahIuran({ tambahShow, onClose, onAdded, role, golongan, rt =
                                                     setPerKk(i === 1)
                                                     handleChangeOption()
                                                 }}
+                                                disabled={data.jenis === "otomatis"}
+                                                title={data.jenis === "otomatis" ? "Tidak dapat mengubah opsi saat jenis iuran otomatis dipilih" : ""}
                                             >
                                                 {label}
                                             </button>
@@ -4705,11 +4729,8 @@ export function TambahTagihan({ tambahShow, onClose, onUpdated, role, iuran, kk_
         no_kk: "semua",
     })
 
-    const [iuranSelected, setIuranSelected] = useState({})
-    console.log(data)
     useEffect(() => {
         const selected = iuran.find((item) => item.id == data.id_iuran)
-        setIuranSelected(selected || {})
         if (selected) {
             setData((prev) => ({
                 ...prev,
@@ -4786,12 +4807,42 @@ export function TambahTagihan({ tambahShow, onClose, onUpdated, role, iuran, kk_
                                     <form onSubmit={handleSubmit} className="h-100">
                                         <div className="mb-3">
                                             <label className="form-label">Nomor Kartu Keluarga</label>
-                                            <select
+                                            <Select
+                                                options={[
+                                                    { value: "semua", label: "Semua Kartu Keluarga" },
+                                                    ...kk_list.map((kk) => ({
+                                                        value: kk.no_kk,
+                                                        label: kk.no_kk,
+                                                    })),
+                                                ]}
+                                                value={
+                                                    data.no_kk
+                                                        ? { value: data.no_kk, label: data.no_kk === "semua" ? "Semua Kartu Keluarga" : data.no_kk }
+                                                        : null
+                                                }
+                                                onChange={(selected) => setData("no_kk", selected?.value || "")}
+                                                placeholder="Pilih atau ketik nomor KK..."
+                                                isSearchable={true}
+                                                className="react-select-container"
+                                                classNamePrefix="react-select"
+                                                noOptionsMessage={() => "Tidak ada Kartu Keluarga"}
+                                                styles={{
+                                                    control: (base) => ({
+                                                        ...base,
+                                                        border: 0,
+                                                        borderBottom: "1px solid lightgray",
+                                                        borderRadius: 0,
+                                                        boxShadow: "none",
+                                                    }),
+                                                }}
+                                            />
+                                            {/* <select
                                                 name="no_kk"
                                                 value={data.no_kk}
                                                 className="form-control"
                                                 onChange={(e) => setData('no_kk', e.target.value)}
                                                 required
+                                                title="Pilih Kartu Keluarga"
                                                 style={{
                                                     border: '0',
                                                     borderBottom: '1px solid lightgray',
@@ -4799,20 +4850,53 @@ export function TambahTagihan({ tambahShow, onClose, onUpdated, role, iuran, kk_
                                                 }}
                                             >
                                                 <option value="semua" selected>Semua Kartu Keluarga</option>
-                                                {kk_list.map((kk) => (
-                                                    <option key={kk.no_kk} value={kk.no_kk}>{kk.no_kk}</option>
-                                                ))}
-                                            </select>
+                                                {kk_list.length > 0 ?
+                                                    kk_list.map((kk) => (
+                                                        <option key={kk.no_kk} value={kk.no_kk}>{kk.no_kk}</option>
+                                                    )) : (
+                                                        <option value="" title={role === 'rt' && "Tolong hubungi RW anda untuk ditindaklanjuti."} className="text-center" disabled>-- Tidak ada Kartu Keluarga --</option>
+                                                    )}
+                                            </select> */}
                                         </div>
 
                                         <div className="mb-3">
                                             <label className="form-label">Jenis Iuran</label>
-                                            <select
+                                            <Select
+                                                options={iuran.map((item) => ({
+                                                    value: item.id,
+                                                    label: item.nama,
+                                                }))}
+                                                value={
+                                                    data.id_iuran
+                                                        ? {
+                                                            value: data.id_iuran,
+                                                            label: iuran.find((x) => x.id == data.id_iuran)?.nama || "",
+                                                        }
+                                                        : null
+                                                }
+                                                onChange={(selected) => setData("id_iuran", selected?.value || "")}
+                                                placeholder="Pilih jenis iuran..."
+                                                isSearchable={true}
+                                                className="react-select-container"
+                                                classNamePrefix="react-select"
+                                                noOptionsMessage={() => "Tidak ada Iuran"}
+                                                styles={{
+                                                    control: (base) => ({
+                                                        ...base,
+                                                        border: 0,
+                                                        borderBottom: "1px solid lightgray",
+                                                        borderRadius: 0,
+                                                        boxShadow: "none",
+                                                    }),
+                                                }}
+                                            />
+                                            {/* <select
                                                 name="id_iuran"
                                                 value={data.id_iuran}
                                                 className="form-control"
                                                 onChange={(e) => setData('id_iuran', e.target.value)}
                                                 required
+                                                title="Pilih Iuran"
                                                 style={{
                                                     border: '0',
                                                     borderBottom: '1px solid lightgray',
@@ -4820,10 +4904,14 @@ export function TambahTagihan({ tambahShow, onClose, onUpdated, role, iuran, kk_
                                                 }}
                                             >
                                                 <option value="" disabled>-- Pilih Iuran --</option>
-                                                {iuran.map((iuran) => (
-                                                    <option key={iuran.id} value={iuran.id}>{iuran.nama}</option>
-                                                ))}
-                                            </select>
+                                                {iuran.length > 0 ?
+                                                    iuran.map((iuran) => (
+                                                        <option key={iuran.id} value={iuran.id}>{iuran.nama}</option>
+                                                    )) : (
+                                                        <option value="" title={role === 'rt' && "Tolong hubungi RW anda untuk ditindaklanjuti."} className="text-center" disabled>-- Tidak ada iuran yang tersedia --</option>
+                                                    )
+                                                }
+                                            </select> */}
                                         </div>
 
                                         <div className="mb-3">
@@ -4833,6 +4921,7 @@ export function TambahTagihan({ tambahShow, onClose, onUpdated, role, iuran, kk_
                                                 name="nominal"
                                                 value={data.nominal}
                                                 className="form-control"
+                                                onChange={(e) => setData('nominal', e.target.value)}
                                                 onInput={(e) => {
                                                     if (e.target.value.length > 8) {
                                                         e.target.value = e.target.value.slice(0, 8)
