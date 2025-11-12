@@ -6,7 +6,7 @@ import { Head, Link, router, usePage } from "@inertiajs/react"
 import { AddRtModal, EditRtModal } from "@/Pages/Component/Modal"
 import "../../../css/kk.css" // biar tabelnya sama gayanya
 
-export default function Rt({ rukun_tetangga, filters, nomorRtList, rwList, title }) {
+export default function Rt({ rukun_tetangga, filters, nomorRtList, rwList, title, roles }) {
     const { props } = usePage()
     const role = props.auth?.currentRole
 
@@ -273,6 +273,8 @@ export default function Rt({ rukun_tetangga, filters, nomorRtList, rwList, title
                     handleAdd={handleAdd}
                     onClose={() => setShowAdd(false)}
                     rwList={rwList}
+                    isRw={false}
+                    roles={roles}
                 />
             )}
 
@@ -283,6 +285,8 @@ export default function Rt({ rukun_tetangga, filters, nomorRtList, rwList, title
                     handleEdit={handleEdit}
                     onClose={() => setShowEdit(null)}
                     rwList={rwList}
+                    isRw={false}
+                    roles={roles}
                 />
             )}
         </Layout>

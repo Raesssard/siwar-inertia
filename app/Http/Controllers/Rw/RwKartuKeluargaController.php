@@ -45,7 +45,18 @@ class RwKartuKeluargaController extends Controller
             ->withQueryString();
 
         $kategori_iuran = Kategori_golongan::select('id', 'jenis')->get();
-        $daftar_rt = Rt::where('id_rw', $idRwUser)->select('id', 'nomor_rt', 'id_rw')->with('rw')->get();
+        $daftar_rt = Rt::where('id_rw', $idRwUser)
+            ->select('id', 'nomor_rt', 'id_rw')
+            ->with(['rw', 'user.roles'])
+            ->whereHas('user', function ($q) {
+                $q->whereHas('roles', function ($r) {
+                    $r->where('name', 'rt');
+                })
+                ->whereDoesntHave('roles', function ($r) {
+                    $r->whereIn('name', ['sekretaris', 'bendahara', 'seksi']);
+                });
+            })
+            ->get();
 
         return Inertia::render('Rw/KartuKeluarga', [
             'kartu_keluarga' => $kartu_keluarga,

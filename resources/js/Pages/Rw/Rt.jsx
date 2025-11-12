@@ -1,193 +1,233 @@
 import React, { useState } from "react";
-import { Head, Link, router, usePage } from "@inertiajs/react";
 import Layout from "@/Layouts/Layout";
+import { Head, Link, router, usePage } from "@inertiajs/react";
+import { route } from "ziggy-js";
 import { AddRtModal, EditRtModal } from "@/Pages/Component/Modal";
+import "../../../css/kk.css"; // biar tabel dan tombolnya sama gaya
 
-export default function Rt({ rukun_tetangga, title, filters, rukun_tetangga_filter }) {
+export default function Rt({ rukun_tetangga, filters, rukun_tetangga_filter, title, roles }) {
+    const { props } = usePage();
+    const role = props.auth?.currentRole || "rw";
+
     const [showAdd, setShowAdd] = useState(false);
-    const [showEdit, setShowEdit] = useState(false);
+    const [showEdit, setShowEdit] = useState(null);
+
     const [form, setForm] = useState({
         nik: "",
         nomor_rt: "",
-        nama_ketua_rt: "",
+        nama_anggota_rt: "",
         mulai_menjabat: "",
         akhir_jabatan: "",
         status: "aktif",
     });
-    const [filter, setFilter] = useState(filters || { search: "", rt: "" });
 
-    const handleChange = (e) => {
-        setForm({ ...form, [e.target.name]: e.target.value });
-    };
+    const [search, setSearch] = useState({
+        keyword: filters?.keyword || "",
+        nomor_rt: filters?.nomor_rt || "",
+    });
 
-    const handleFilter = (e) => {
-        setFilter({ ...filter, [e.target.name]: e.target.value });
-    };
-
-    const applyFilter = () => {
-        router.get(route("rw.rt.index"), filter, { preserveState: true });
-    };
-
-    const resetFilter = () => {
-        setFilter({ search: "", rt: "" });
-        router.get(route("rw.rt.index"), {}, { preserveState: true });
-    };
+    // 🔹 Handle form input
+    const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
     const handleAdd = (e) => {
         e.preventDefault();
         router.post(route("rw.rt.store"), form, {
-            onSuccess: () => setShowAdd(false),
+            onSuccess: () => {
+                setShowAdd(false);
+                setForm({
+                    nik: "",
+                    nomor_rt: "",
+                    nama_anggota_rt: "",
+                    mulai_menjabat: "",
+                    akhir_jabatan: "",
+                    status: "aktif",
+                });
+            },
         });
     };
 
     const handleEdit = (e) => {
         e.preventDefault();
-        router.put(route("rw.rt.update", form.id), form, {
-            onSuccess: () => setShowEdit(false),
+        router.put(route("rw.rt.update", showEdit.id), form, {
+            onSuccess: () => setShowEdit(null),
         });
     };
 
     const handleDelete = (id) => {
-        if (confirm("Yakin ingin menghapus RT ini?")) {
+        if (confirm("Yakin ingin menghapus data RT ini?")) {
             router.delete(route("rw.rt.destroy", id));
         }
     };
 
     const handleToggleStatus = (id) => {
         if (confirm("Yakin ingin mengubah status RT ini?")) {
-            router.put(route("admin.rt.toggleStatus", id), {}, {
-                preserveScroll: true,
-            });
+            router.put(route("rw.rt.toggleStatus", id), {}, { preserveScroll: true });
         }
     };
 
+    const openEdit = (item) => {
+        setForm({
+            nik: item.nik || "",
+            nomor_rt: item.nomor_rt || "",
+            nama_anggota_rt: item.nama_anggota_rt || "",
+            mulai_menjabat: item.mulai_menjabat || "",
+            akhir_jabatan: item.akhir_jabatan || "",
+            status: item.status || "aktif",
+        });
+        setShowEdit(item);
+    };
+
+    // 🔹 Filter logic
+    const handleSearchChange = (e) =>
+        setSearch({ ...search, [e.target.name]: e.target.value });
+
+    const applyFilter = (e) => {
+        e.preventDefault();
+        router.get(route("rw.rt.index"), search, {
+            replace: true,
+            preserveScroll: true,
+        });
+    };
+
+    const resetFilter = () => {
+        setSearch({ keyword: "", nomor_rt: "" });
+        router.get(route("rw.rt.index"), {}, { replace: true, preserveScroll: true });
+    };
+
     return (
-        <Layout title={title}>
-            <div className="p-6">
-                <div className="flex justify-between items-center mb-4">
-                    <h1 className="text-2xl font-semibold">{title}</h1>
+        <Layout>
+            <Head
+                title={`${title} - ${
+                    role.length <= 2
+                        ? role.toUpperCase()
+                        : role.charAt(0).toUpperCase() + role.slice(1)
+                }`}
+            />
+
+            {/* 🔍 Filter Section */}
+            <form onSubmit={applyFilter} className="filter-form mb-4 d-flex align-items-center">
+                <input
+                    type="text"
+                    name="keyword"
+                    placeholder="Cari NIK atau Nama Ketua RT..."
+                    value={search.keyword}
+                    onChange={handleSearchChange}
+                    className="me-2"
+                />
+
+                <select
+                    name="nomor_rt"
+                    value={search.nomor_rt}
+                    onChange={handleSearchChange}
+                    className="me-2"
+                >
+                    <option value="">-- Semua Nomor RT --</option>
+                    {rukun_tetangga_filter.map((rtItem, index) => (
+                        <option key={index} value={rtItem.nomor_rt || rtItem}>
+                            RT {rtItem.nomor_rt || rtItem}
+                        </option>
+                    ))}
+                </select>
+
+                <button type="submit" className="btn-custom btn-secondary me-2">
+                    Filter
+                </button>
+                <button
+                    type="button"
+                    onClick={resetFilter}
+                    className="btn-custom btn-light bg-gray-300"
+                >
+                    Reset
+                </button>
+            </form>
+
+            {/* 📋 Table Section */}
+            <div className="table-container">
+                <div className="table-header d-flex justify-content-between align-items-center">
+                    <h4>Data RT</h4>
                     <button
-                        onClick={() => {
-                            setForm({ status: "aktif" });
-                            setShowAdd(true);
-                        }}
-                        className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
+                        className="btn btn-primary btn-sm"
+                        onClick={() => setShowAdd(true)}
                     >
-                        + Tambah RT
+                        Tambah RT
                     </button>
                 </div>
 
-                {/* 🔍 Filter Section */}
-                <div className="flex gap-3 mb-5">
-                    <input
-                        type="text"
-                        name="search"
-                        value={filter.search}
-                        onChange={handleFilter}
-                        placeholder="Cari NIK / Nama..."
-                        className="border rounded-md p-2 w-1/3"
-                    />
-                    <select
-                        name="rt"
-                        value={filter.rt}
-                        onChange={handleFilter}
-                        className="border rounded-md p-2"
-                    >
-                        <option value="">Semua RT</option>
-                        {rukun_tetangga_filter.map((rt) => (
-                            <option key={rt.nomor_rt} value={rt.nomor_rt}>
-                                RT {rt.nomor_rt}
-                            </option>
-                        ))}
-                    </select>
-
-                    <button
-                        onClick={applyFilter}
-                        className="bg-blue-500 text-white px-3 py-2 rounded-md hover:bg-blue-600"
-                    >
-                        Terapkan
-                    </button>
-                    <button
-                        onClick={resetFilter}
-                        className="bg-gray-300 text-gray-800 px-3 py-2 rounded-md hover:bg-gray-400"
-                    >
-                        Reset
-                    </button>
-                </div>
-
-                {/* 🔹 Table */}
-                <div className="overflow-x-auto bg-white rounded-xl shadow">
-                    <table className="min-w-full text-sm text-gray-700">
-                        <thead className="bg-gray-100 text-gray-900">
+                <div className="table-scroll">
+                    <table className="table-custom">
+                        <thead>
                             <tr>
-                                <th className="p-3 text-left">No</th>
-                                <th className="p-3 text-left">NIK</th>
-                                <th className="p-3 text-left">Nama Anggota RT</th>
-                                <th className="p-3 text-left">Nomor RT</th>
-                                <th className="p-3 text-left">Mulai Menjabat</th>
-                                <th className="p-3 text-left">Akhir Jabatan</th>
-                                <th className="p-3 text-center">Status</th>
-                                <th className="p-3 text-center">Aksi</th>
+                                <th className="text-center px-3">No.</th>
+                                <th className="text-center px-3">NIK</th>
+                                <th className="text-center px-3">Nomor RT</th>
+                                <th className="text-center px-3">Nama Anggota RT</th>
+                                <th className="text-center px-3">Mulai Menjabat</th>
+                                <th className="text-center px-3">Akhir Jabatan</th>
+                                <th className="text-center px-3">Status</th>
+                                <th className="text-center px-3">Aksi</th>
                             </tr>
                         </thead>
+
                         <tbody>
                             {rukun_tetangga.data.length > 0 ? (
-                                rukun_tetangga.data.map((rt, index) => (
-                                    <tr key={rt.id} className="border-t hover:bg-gray-50">
-                                        <td className="p-3">{index + 1}</td>
-                                        <td className="p-3">{rt.nik}</td>
-                                        <td className="p-3">{rt.nama_anggota_rt}</td>
-                                        <td className="p-3">{rt.nomor_rt}</td>
-                                        <td className="p-3">{rt.mulai_menjabat?.slice(0, 10)}</td>
-                                        <td className="p-3">{rt.akhir_jabatan?.slice(0, 10)}</td>
-                                        <td className="p-3 text-center">
+                                rukun_tetangga.data.map((item, index) => (
+                                    <tr key={item.id}>
+                                        <td className="text-center">
+                                            {rukun_tetangga.from + index}
+                                        </td>
+                                        <td className="text-center">{item.nik || "-"}</td>
+                                        <td className="text-center">{item.nomor_rt || "-"}</td>
+                                        <td className="text-center">
+                                            {item.nama_anggota_rt || "-"}
+                                        </td>
+                                        <td className="text-center">{item.mulai_menjabat || "-"}</td>
+                                        <td className="text-center">{item.akhir_jabatan || "-"}</td>
+                                        <td className="text-center align-middle">
                                             <span
-                                                className={`px-2 py-1 rounded-full text-xs font-semibold ${
-                                                    rt.status === "aktif"
+                                                className={`inline-block px-2 py-1 rounded text-sm font-medium ${
+                                                    item.status === "aktif"
                                                         ? "bg-green-100 text-green-700"
-                                                        : "bg-gray-200 text-gray-700"
+                                                        : "bg-red-100 text-red-700"
                                                 }`}
                                             >
-                                                {rt.status}
+                                                {item.status || "-"}
                                             </span>
                                         </td>
-                                        <td className="p-3 text-center flex justify-center gap-2">
+                                        <td className="text-center">
+                                            <div className="d-flex justify-content-center gap-2">
+                                                <button
+                                                    className={`btn btn-sm ${
+                                                        item.status === "aktif"
+                                                            ? "btn-secondary"
+                                                            : "btn-success"
+                                                    }`}
+                                                    onClick={() => handleToggleStatus(item.id)}
+                                                >
+                                                    {item.status === "aktif"
+                                                        ? "Nonaktifkan"
+                                                        : "Aktifkan"}
+                                                </button>
 
-                                        <button
-                                            className={`btn-custom ${
-                                                rt.status === "aktif"
-                                                    ? "btn-secondary"
-                                                    : "btn-success"
-                                            } me-1`}
-                                            onClick={() =>
-                                                handleToggleStatus(rt.id)
-                                            }
-                                        >
-                                            {rt.status === "aktif"
-                                                ? "Nonaktifkan"
-                                                : "Aktifkan"}
-                                        </button>                                         
-                                            <button
-                                                onClick={() => {
-                                                    setForm(rt);
-                                                    setShowEdit(true);
-                                                }}
-                                                className="px-3 py-1 bg-yellow-400 hover:bg-yellow-500 rounded-md text-white"
-                                            >
-                                                Edit
-                                            </button>
-                                            <button
-                                                onClick={() => handleDelete(rt.id)}
-                                                className="px-3 py-1 bg-red-600 hover:bg-red-700 rounded-md text-white"
-                                            >
-                                                Hapus
-                                            </button>
+                                                <button
+                                                    className="btn btn-warning btn-sm"
+                                                    onClick={() => openEdit(item)}
+                                                >
+                                                    Edit
+                                                </button>
+
+                                                <button
+                                                    className="btn btn-danger btn-sm"
+                                                    onClick={() => handleDelete(item.id)}
+                                                >
+                                                    Hapus
+                                                </button>
+                                            </div>
                                         </td>
                                     </tr>
                                 ))
                             ) : (
                                 <tr>
-                                    <td colSpan="8" className="text-center py-4 text-gray-500">
+                                    <td colSpan="8" className="text-center">
                                         Tidak ada data RT
                                     </td>
                                 </tr>
@@ -196,7 +236,7 @@ export default function Rt({ rukun_tetangga, title, filters, rukun_tetangga_filt
                     </table>
                 </div>
 
-                {/* Pagination */}
+                {/* 🔹 Pagination */}
                 {rukun_tetangga.links && (
                     <div className="pagination-container">
                         <ul className="pagination-custom">
@@ -210,15 +250,11 @@ export default function Rt({ rukun_tetangga, title, filters, rukun_tetangga_filt
                                         key={index}
                                         className={`page-item ${
                                             link.active ? "active" : ""
-                                        } ${
-                                            !link.url ? "disabled" : ""
-                                        }`}
+                                        } ${!link.url ? "disabled" : ""}`}
                                     >
                                         <Link
-                                            href={link.url || "#"}
-                                            dangerouslySetInnerHTML={{
-                                                __html: label,
-                                            }}
+                                            href={link.url || ""}
+                                            dangerouslySetInnerHTML={{ __html: label }}
                                         />
                                     </li>
                                 );
@@ -228,13 +264,15 @@ export default function Rt({ rukun_tetangga, title, filters, rukun_tetangga_filt
                 )}
             </div>
 
+            {/* ➕ Modal Tambah & ✏️ Edit */}
             {showAdd && (
                 <AddRtModal
                     form={form}
                     handleChange={handleChange}
                     handleAdd={handleAdd}
                     onClose={() => setShowAdd(false)}
-                    isRw={true} // Menandakan bahwa ini adalah modal untuk RW
+                    isRw={true}
+                    roles={roles}
                 />
             )}
 
@@ -243,8 +281,9 @@ export default function Rt({ rukun_tetangga, title, filters, rukun_tetangga_filt
                     form={form}
                     handleChange={handleChange}
                     handleEdit={handleEdit}
-                    onClose={() => setShowEdit(false)}
-                    isRw={true} // Menandakan bahwa ini adalah modal untuk RW
+                    onClose={() => setShowEdit(null)}
+                    isRw={true}
+                    roles={roles}
                 />
             )}
         </Layout>

@@ -13,12 +13,15 @@ class SettingsController extends Controller
     public function index()
     {
         $user = Auth::user();
-
+        $settings = [
+            'max_rt_per_rw' => Setting::getValue('max_rt_per_rw'),
+        ];
         return Inertia::render('Settings', [
             'auth' => [
                 'user' => $user,
                 'currentRole' => session('current_role', $user->roles->first()->name ?? null),
             ],
+            'settings' => $settings, // ⬅️ kirim ke frontend
         ]);
     }
 

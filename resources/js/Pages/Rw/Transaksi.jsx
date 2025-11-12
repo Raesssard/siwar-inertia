@@ -98,14 +98,14 @@ export default function Transaksi() {
                     <table className="table-custom">
                         <thead>
                             <tr>
-                                <th>No.</th>
-                                <th>RT</th>
-                                <th>Tanggal</th>
-                                <th>Nama</th>
-                                <th>Jenis</th>
-                                <th>Nominal</th>
-                                <th>Keterangan</th>
-                                <th>Aksi</th>
+                                <th className="text-center">No.</th>
+                                <th className="text-center">RT</th>
+                                <th className="text-center">Tanggal</th>
+                                <th className="text-center">Nama</th>
+                                <th className="text-center">Jenis</th>
+                                <th className="text-center">Nominal</th>
+                                <th className="text-center">Keterangan</th>
+                                <th className="text-center">Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -115,7 +115,7 @@ export default function Transaksi() {
                                         <td className="text-center">{index + 1}</td>
                                         <td className="text-center">{item.rt ?? "-"}</td>
                                         <td className="text-center">{formatTanggal(item.tanggal) ?? "-"}</td>
-                                        <td>{item.nama_transaksi ?? "-"}</td>
+                                        <td className="text-center">{item.nama_transaksi ?? "-"}</td>
                                         <td className="text-center">
                                             {item.jenis === "pemasukan" ? (
                                                 <span className="badge bg-success text-white">Pemasukan</span>
@@ -123,8 +123,8 @@ export default function Transaksi() {
                                                 <span className="badge bg-danger text-white">Pengeluaran</span>
                                             )}
                                         </td>
-                                        <td className="text-right">{formatRupiah(item.nominal) ?? "-"}</td>
-                                        <td>{item.keterangan ?? "-"}</td>
+                                        <td className="text-center">{formatRupiah(item.nominal) ?? "-"}</td>
+                                        <td className="text-center">{item.keterangan ?? "-"}</td>
                                         <td className="text-center">
                                             <div className="d-flex justify-content-center align-items-center gap-2">
                                                 <button className="btn btn-sm btn-warning" title="Edit" onClick={() => modalEdit(item)}>
@@ -152,7 +152,9 @@ export default function Transaksi() {
                 onClose={() => setShowModalTambah(false)}
                 onAdded={(baru) => setTransaksiList(prev => [baru, ...prev])}
                 role="rw"
+                daftarRT={daftar_rt}
             />
+
             <EditTransaksi
                 editShow={showModalEdit}
                 onClose={() => setShowModalEdit(false)}

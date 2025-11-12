@@ -91,6 +91,8 @@ Route::middleware(['auth'])->group(function () {
         Route::resource('roles', AdminRoleController::class)->except(['create', 'edit', 'show']);
         Route::put('roles/{id}/permissions', [AdminRoleController::class, 'updatePermissions'])->name('roles.permissions.update');
         Route::resource('permissions', AdminPermissionController::class)->except(['create', 'edit', 'show']);
+        Route::get('roles/{id}/permissions', [AdminRoleController::class, 'editPermissions'])
+            ->name('roles.permissions.edit');
     });
 
     /*

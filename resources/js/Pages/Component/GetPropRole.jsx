@@ -434,14 +434,14 @@ export function getRwCards({ ...rest }) {
                 {
                     href: "/rw/kartu_keluarga",
                     color: "primary",
-                    title: "Jumlah Warga Sebagai Penduduk",
+                    title: "Jumlah Warga Tetap",
                     value: rest.jumlah_warga_penduduk,
                     icon: "home",
                 },
                 {
                     href: "/rw/kartu_keluarga",
                     color: "primary",
-                    title: "Jumlah Warga Sebagai Pendatang",
+                    title: "Jumlah Warga Pendatang",
                     value: rest.jumlah_warga_pendatang,
                     icon: "walking",
                 },

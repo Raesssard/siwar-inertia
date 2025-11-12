@@ -9,6 +9,7 @@ use App\Models\Rw;
 use App\Models\User;
 use App\Models\Warga;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Role;
 
@@ -35,8 +36,10 @@ class WargaSeeder extends Seeder
             'mulai_menjabat' => now(),
             'akhir_jabatan' => now()->addYears(3),
         ]);
+        // === 5. Ambil jumlah maksimal RT dari setting ===
+        $maxRT = (int) DB::table('settings')->where('key', 'max_rt_per_rw')->value('value') ?? 6;
 
-        // === 4. Buat RT di bawah RW ===
+        // === 4. Buat RT pertama (aktif) ===
         $rt = Rt::create([
             'no_kk' => '1111111111111111',
             'nik' => '0000000000000002',
@@ -48,7 +51,16 @@ class WargaSeeder extends Seeder
             'id_rw' => $rw->id,
         ]);
 
-        // === 5. Buat KK RW ===
+        // === 6. Generate RT sisanya (plain/no data) ===
+        for ($i = 2; $i <= $maxRT; $i++) {
+            Rt::create([
+                'nomor_rt' => str_pad($i, 2, '0', STR_PAD_LEFT),
+                'id_rw' => $rw->id,
+                'status' => 'nonaktif',
+            ]);
+        }
+
+        // === 7. Buat KK RW ===
         $kk_rw = Kartu_keluarga::create([
             'no_kk' => '1234567890123451',
             'no_registrasi' => '3404.0000000',
@@ -68,7 +80,7 @@ class WargaSeeder extends Seeder
             'nip_kepala_dukcapil' => '123456789012345678',
         ]);
 
-        // === 6. Buat KK RT ===
+        // === 8. Buat KK RT ===
         $kk_rt = Kartu_keluarga::create([
             'no_kk' => '1111111111111111',
             'no_registrasi' => '3404.0000001',
@@ -88,7 +100,7 @@ class WargaSeeder extends Seeder
             'nip_kepala_dukcapil' => '123456789012345678',
         ]);
 
-        // === 7. Buat Warga RW ===
+        // === 9. Buat Warga RW ===
         Warga::create([
             'no_kk' => $kk_rw->no_kk,
             'nik' => $rw->nik,
@@ -108,7 +120,7 @@ class WargaSeeder extends Seeder
             'status_warga' => 'penduduk',
         ]);
 
-        // === 8. Buat Warga RT ===
+        // === 10. Buat Warga RT ===
         Warga::create([
             'no_kk' => $kk_rt->no_kk,
             'nik' => $rt->nik,
@@ -128,7 +140,7 @@ class WargaSeeder extends Seeder
             'status_warga' => 'penduduk',
         ]);
 
-        // === 9. Buat akun RW ===
+        // === 11. Buat akun RW ===
         $userRw = User::updateOrCreate(
             ['nik' => $rw->nik],
             [
@@ -139,7 +151,7 @@ class WargaSeeder extends Seeder
         );
         $userRw->syncRoles(['rw']);
 
-        // === 10. Buat akun RT ===
+        // === 12. Buat akun RT ===
         $userRt = User::updateOrCreate(
             ['nik' => $rt->nik],
             [

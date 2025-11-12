@@ -14,41 +14,41 @@ use Inertia\Inertia;
 
 class RwWargaController extends Controller
 {
-    public function index(Request $request)
-    {
-        $title = 'Manajemen Warga';
-        $search = $request->search;
-        $jenis_kelamin = $request->jenis_kelamin;
-        $rw_id = Auth::user()->rw->id;
+    // public function index(Request $request)
+    // {
+    //     $title = 'Manajemen Warga';
+    //     $search = $request->search;
+    //     $jenis_kelamin = $request->jenis_kelamin;
+    //     $rw_id = Auth::user()->rw->id;
 
-        $total_warga = Warga::whereHas('kartuKeluarga.rukunTetangga', function ($query) use ($rw_id) {
-            $query->where('id_rw', $rw_id);
-        })->count();
+    //     $total_warga = Warga::whereHas('kartuKeluarga.rukunTetangga', function ($query) use ($rw_id) {
+    //         $query->where('id_rw', $rw_id);
+    //     })->count();
 
-        $warga = Warga::with(['kartuKeluarga', 'kartuKeluarga.rukunTetangga', 'kartuKeluarga.rw'])
-            ->whereHas('kartuKeluarga.rukunTetangga', function ($query) use ($rw_id) {
-                $query->where('id_rw', $rw_id);
-            })
-            ->when($search, function ($query) use ($search) {
-                $query->where(function ($q) use ($search) {
-                    $q->where('nama', 'like', "%{$search}%")
-                      ->orWhere('nik', 'like', "%{$search}%")
-                      ->orWhere('no_kk', 'like', "%{$search}%");
-                });
-            })
-            ->when($jenis_kelamin, function ($query) use ($jenis_kelamin) {
-                $query->where('jenis_kelamin', $jenis_kelamin);
-            })
-            ->paginate(5)
-            ->withQueryString();
+    //     $warga = Warga::with(['kartuKeluarga', 'kartuKeluarga.rukunTetangga', 'kartuKeluarga.rw'])
+    //         ->whereHas('kartuKeluarga.rukunTetangga', function ($query) use ($rw_id) {
+    //             $query->where('id_rw', $rw_id);
+    //         })
+    //         ->when($search, function ($query) use ($search) {
+    //             $query->where(function ($q) use ($search) {
+    //                 $q->where('nama', 'like', "%{$search}%")
+    //                   ->orWhere('nik', 'like', "%{$search}%")
+    //                   ->orWhere('no_kk', 'like', "%{$search}%");
+    //             });
+    //         })
+    //         ->when($jenis_kelamin, function ($query) use ($jenis_kelamin) {
+    //             $query->where('jenis_kelamin', $jenis_kelamin);
+    //         })
+    //         ->paginate(5)
+    //         ->withQueryString();
 
-        return Inertia::render('Rw/DataWarga', [
-            'title' => $title,
-            'warga' => $warga,
-            'search' => $search,
-            'total_warga' => $total_warga,
-        ]);
-    }
+    //     return Inertia::render('Rw/DataWarga', [
+    //         'title' => $title,
+    //         'warga' => $warga,
+    //         'search' => $search,
+    //         'total_warga' => $total_warga,
+    //     ]);
+    // }
 
     public function create(Request $request)
     {
@@ -131,7 +131,7 @@ class RwWargaController extends Controller
             'tanggal' => Carbon::now()->toDateString(),
         ]);
 
-        return redirect()->route('rw.warga.index')->with('success', 'Warga berhasil ditambahkan.');
+        return redirect()->route('rw.kartuKeluarga.index')->with('success', 'Warga berhasil ditambahkan.');
     }
 
     public function edit($id)
@@ -187,7 +187,7 @@ class RwWargaController extends Controller
 
         $warga->update($validated);
 
-        return redirect()->route('rw.warga.index')->with('success', 'Data warga berhasil diperbarui.');
+        return redirect()->route('rw.kartuKeluarga.index')->with('success', 'Data warga berhasil diperbarui.');
     }
 
     public function destroy($id)
@@ -204,7 +204,7 @@ class RwWargaController extends Controller
 
         $warga->delete();
 
-        return redirect()->route('rw.warga.index')->with('success', 'Warga berhasil dihapus dan dicatat ke history.');
+        return redirect()->route('rw.kartuKeluarga.index')->with('success', 'Warga berhasil dihapus dan dicatat ke history.');
     }
 
     public function getOrangTua($no_kk)

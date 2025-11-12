@@ -185,7 +185,7 @@ export function PasswordModal({ show }) {
     )
 }
 
-export function AddRwModal({ form, handleChange, handleAdd, onClose }) {
+export function AddRwModal({ form, handleChange, handleAdd, onClose, roles = [] }) {
     return (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 fade-in">
             <div className="bg-white rounded-2xl shadow-lg w-full max-w-md animate-scaleIn">
@@ -220,11 +220,20 @@ export function AddRwModal({ form, handleChange, handleAdd, onClose }) {
                         {/* 🔹 Tambahan Jabatan */}
                         <div>
                             <label className="block text-sm font-medium">Jabatan</label>
-                            <select name="jabatan" value={form.jabatan || ""} onChange={handleChange} className="w-full border rounded-md p-2">
+                            <select
+                                name="jabatan"
+                                value={form.jabatan || ""}
+                                onChange={handleChange}
+                                className="w-full border rounded-md p-2"
+                            >
                                 <option value="">Pilih Jabatan</option>
-                                <option value="ketua">Ketua RW</option>
-                                <option value="sekretaris">Sekretaris RW</option>
-                                <option value="bendahara">Bendahara RW</option>
+                                {roles.map((role) => (
+                                    <option key={role} value={role}>
+                                        {role === "ketua"
+                                            ? "Ketua RW"
+                                            : role.charAt(0).toUpperCase() + role.slice(1)}
+                                    </option>
+                                ))}
                             </select>
                         </div>
 
@@ -249,7 +258,7 @@ export function AddRwModal({ form, handleChange, handleAdd, onClose }) {
     )
 }
 
-export function EditRwModal({ form, handleChange, handleEdit, onClose }) {
+export function EditRwModal({ form, handleChange, handleEdit, onClose, roles = [] }) {
     return (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 fade-in">
             <div className="bg-white rounded-2xl shadow-lg w-full max-w-md animate-scaleIn">
@@ -284,11 +293,20 @@ export function EditRwModal({ form, handleChange, handleEdit, onClose }) {
                         {/* 🔹 Tambahan Jabatan */}
                         <div>
                             <label className="block text-sm font-medium">Jabatan</label>
-                            <select name="jabatan" value={form.jabatan || ""} onChange={handleChange} className="w-full border rounded-md p-2">
+                            <select
+                                name="jabatan"
+                                value={form.jabatan || ""}
+                                onChange={handleChange}
+                                className="w-full border rounded-md p-2"
+                            >
                                 <option value="">Pilih Jabatan</option>
-                                <option value="ketua">Ketua RW</option>
-                                <option value="sekretaris">Sekretaris RW</option>
-                                <option value="bendahara">Bendahara RW</option>
+                                {roles.map((role) => (
+                                    <option key={role} value={role}>
+                                        {role === "ketua"
+                                            ? "Ketua RW"
+                                            : role.charAt(0).toUpperCase() + role.slice(1)}
+                                    </option>
+                                ))}
                             </select>
                         </div>
                     </div>
@@ -303,7 +321,7 @@ export function EditRwModal({ form, handleChange, handleEdit, onClose }) {
     )
 }
 
-export function AddRtModal({ form, handleChange, handleAdd, onClose, rwList = [], isRw = false }) {
+export function AddRtModal({ form, handleChange, handleAdd, onClose, rwList = [], isRw = false, roles = [] }) {
     return (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 fade-in">
             <div className="bg-white rounded-2xl shadow-lg w-full max-w-md animate-scaleIn">
@@ -359,10 +377,14 @@ export function AddRtModal({ form, handleChange, handleAdd, onClose, rwList = []
                                 onChange={handleChange}
                                 className="w-full border rounded-md p-2"
                             >
-                                <option value="">-- Pilih Jabatan --</option>
-                                <option value="ketua">Ketua RT</option>
-                                <option value="sekretaris">Sekretaris</option>
-                                <option value="bendahara">Bendahara</option>
+                                <option value="">Pilih Jabatan</option>
+                                {roles.map((role) => (
+                                    <option key={role} value={role}>
+                                        {role === "ketua"
+                                            ? "Ketua RT"
+                                            : role.charAt(0).toUpperCase() + role.slice(1)}
+                                    </option>
+                                ))}
                             </select>
                         </div>
 
@@ -439,7 +461,7 @@ export function AddRtModal({ form, handleChange, handleAdd, onClose, rwList = []
     );
 }
 
-export function EditRtModal({ form, handleChange, handleEdit, onClose, rwList = [], isRw = false }) {
+export function EditRtModal({ form, handleChange, handleEdit, onClose, rwList = [], isRw = false, roles = [] }) {
     return (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 fade-in">
             <div className="bg-white rounded-2xl shadow-lg w-full max-w-md animate-scaleIn">
@@ -468,11 +490,20 @@ export function EditRtModal({ form, handleChange, handleEdit, onClose, rwList = 
                         {/* 🔹 Jabatan */}
                         <div>
                             <label className="block text-sm font-medium">Jabatan</label>
-                            <select name="jabatan" value={form.jabatan || ""} onChange={handleChange} className="w-full border rounded-md p-2">
-                                <option value="">-- Pilih Jabatan --</option>
-                                <option value="ketua">Ketua RT</option>
-                                <option value="sekretaris">Sekretaris</option>
-                                <option value="bendahara">Bendahara</option>
+                            <select
+                                name="jabatan"
+                                value={form.jabatan || ""}
+                                onChange={handleChange}
+                                className="w-full border rounded-md p-2"
+                            >
+                                <option value="">Pilih Jabatan</option>
+                                {roles.map((role) => (
+                                    <option key={role} value={role}>
+                                        {role === "ketua"
+                                            ? "Ketua RT"
+                                            : role.charAt(0).toUpperCase() + role.slice(1)}
+                                    </option>
+                                ))}
                             </select>
                         </div>
 
@@ -2400,7 +2431,7 @@ export function DetailKK({ selectedData, detailShow, onClose, role, userData }) 
                                     <p><strong>Nama Kepala Keluarga</strong> : {selectedData?.kepala_keluarga?.nama ?? '-'}</p>
                                     <p><strong>Alamat</strong> : {selectedData?.alamat ?? '-'}</p>
                                     <p><strong>RT/RW</strong> :{" "}
-                                        {selectedData?.rukun_tetangga.nomor_rt ?? '-'}/{selectedData?.rw.nomor_rw ?? '-'}
+                                        {selectedData?.rukun_tetangga?.nomor_rt ?? '-'}/{selectedData?.rw?.nomor_rw ?? '-'}
                                     </p>
                                     <p>
                                         <strong>Desa/Kelurahan</strong> :{" "}
@@ -5466,133 +5497,169 @@ export function DetailTagihan({ selectedData, detailShow, onClose }) {
     )
 }
 
-export function TambahTransaksi({ tambahShow, onClose, onAdded, role }) {
+export function TambahTransaksi({ tambahShow, onClose, onAdded, role, daftarRT = [] }) {
     const { data, setData } = useForm({
         tanggal: "",
         nama_transaksi: "",
+        jenis: "",
         nominal: "",
         keterangan: "",
-    })
+        rt: "",
+    });
 
     const handleSubmit = (e) => {
-        e.preventDefault()
+        e.preventDefault();
 
-        const formData = new FormData()
-        formData.append('tanggal', data.tanggal)
-        formData.append('nama_transaksi', data.nama_transaksi)
-        formData.append('nominal', data.nominal)
-        formData.append('keterangan', data.keterangan)
+        const formData = new FormData();
+        formData.append('tanggal', data.tanggal);
+        formData.append('nama_transaksi', data.nama_transaksi);
+        formData.append('jenis', data.jenis);
+        formData.append('nominal', data.nominal);
+        formData.append('keterangan', data.keterangan);
+        formData.append('rt', data.rt);
 
         axios.post(`/${role}/transaksi`, formData)
             .then(res => {
-                console.log('RESPON:', res.data)
+                console.log('RESPON:', res.data);
 
                 if (onAdded && res.data.transaksi) {
-                    onAdded(res.data.transaksi, res.data.jenis)
+                    onAdded(res.data.transaksi, res.data.jenis);
                 }
+
                 setData({
                     tanggal: "",
                     nama_transaksi: "",
+                    jenis: "",
                     nominal: "",
                     keterangan: "",
-                })
-                onClose()
+                    rt: "",
+                });
+
+                onClose();
             })
-    }
+            .catch(err => {
+                console.error(err.response?.data || err.message);
+            });
+    };
 
     useEffect(() => {
         const handleEsc = (e) => {
-            if (e.key === "Escape") onClose()
-        }
+            if (e.key === "Escape") onClose();
+        };
+        document.addEventListener("keydown", handleEsc);
+        return () => document.removeEventListener("keydown", handleEsc);
+    }, [onClose]);
 
-        document.addEventListener("keydown", handleEsc)
-        return () => document.removeEventListener("keydown", handleEsc)
-    }, [onClose])
-
-    if (!tambahShow) return null
+    if (!tambahShow) return null;
 
     return (
-        <>
+        <div
+            className="modal fade show"
+            tabIndex="-1"
+            style={{
+                display: "block",
+                backgroundColor: "rgba(0,0,0,0.5)"
+            }}
+            onClick={onClose}
+        >
             <div
-                className="modal fade show"
-                tabIndex="-1"
-                style={{
-                    display: "block",
-                    backgroundColor: "rgba(0,0,0,0.5)"
-                }}
-                onClick={() => {
-                    onClose()
-                }}
+                className="modal-dialog modal-dialog-scrollable modal-dialog-centered"
+                onClick={(e) => e.stopPropagation()}
             >
-                <div
-                    className="modal-dialog modal-dialog-scrollable modal-dialog-centered"
-                    onClick={(e) => e.stopPropagation()}
-                >
-                    <div className="modal-content shadow-lg border-0">
-                        <div className="modal-body p-0 m-0">
-                            <div className="d-flex tambah-body flex-column" style={{ width: "100%", maxHeight: "80vh", overflowY: "auto" }}>
-                                <div className="p-3">
-                                    <form onSubmit={handleSubmit} className="h-100">
-                                        <div className="mb-3">
-                                            <label className="form-label">Nama Transaksi</label>
-                                            <input
-                                                name="nama_transaksi"
-                                                type="text"
-                                                className="tambah-judul form-control"
-                                                onChange={(huruf) => setData('nama_transaksi', huruf.target.value)}
-                                                required
-                                            />
-                                        </div>
+                <div className="modal-content shadow-lg border-0">
+                    <div className="modal-body p-0 m-0">
+                        <div className="d-flex tambah-body flex-column" style={{ width: "100%", maxHeight: "80vh", overflowY: "auto" }}>
+                            <div className="p-3">
+                                <form onSubmit={handleSubmit} className="h-100">
+                                    <div className="mb-3">
+                                        <label className="form-label">Nama Transaksi</label>
+                                        <input
+                                            name="nama_transaksi"
+                                            type="text"
+                                            className="form-control"
+                                            onChange={(e) => setData('nama_transaksi', e.target.value)}
+                                            required
+                                        />
+                                    </div>
 
-                                        <div className="mb-3">
-                                            <label className="form-label">Tanggal Transaksi</label>
-                                            <input
-                                                name="tanggal"
-                                                type="date"
-                                                className="tambah-kategori form-control"
-                                                onChange={(tanggal) => setData('tanggal', tanggal.target.value)}
-                                                required
-                                            />
-                                        </div>
+                                    <div className="mb-3">
+                                        <label className="form-label">Tanggal Transaksi</label>
+                                        <input
+                                            name="tanggal"
+                                            type="date"
+                                            className="form-control"
+                                            onChange={(e) => setData('tanggal', e.target.value)}
+                                            required
+                                        />
+                                    </div>
 
-                                        <div className="mb-3">
-                                            <label className="form-label">Nominal Transaksi</label>
-                                            <input
-                                                type="text"
-                                                name="nominal"
-                                                className="tambah-judul form-control"
-                                                onChange={(nominal) => setData('nominal', nominal.target.value)}
-                                                onInput={(e) => {
-                                                    if (e.target.value.length > 8) {
-                                                        e.target.value = e.target.value.slice(0, 8);
-                                                    }
-                                                }}
-                                            />
-                                        </div>
+                                    <div className="mb-3">
+                                        <label className="form-label">Jenis Transaksi</label>
+                                        <select
+                                            name="jenis"
+                                            className="form-select"
+                                            value={data.jenis}
+                                            onChange={(e) => setData('jenis', e.target.value)}
+                                            required
+                                        >
+                                            <option value="">-- Pilih Jenis --</option>
+                                            <option value="pemasukan">Pemasukan</option>
+                                            <option value="pengeluaran">Pengeluaran</option>
+                                        </select>
+                                    </div>
 
-                                        <div className="mb-3">
-                                            <label className="form-label">Keterangan</label>
-                                            <textarea
-                                                name="keterangan"
-                                                className="edit-isi form-control"
-                                                rows="3"
-                                                onChange={(e) => setData("keterangan", e.target.value)}
-                                            ></textarea>
-                                        </div>
+                                    <div className="mb-3">
+                                        <label className="form-label">Nominal Transaksi</label>
+                                        <input
+                                            type="number"
+                                            name="nominal"
+                                            className="form-control"
+                                            onChange={(e) => setData('nominal', e.target.value)}
+                                            maxLength="8"
+                                            required
+                                        />
+                                    </div>
 
-                                        <button type="submit" className="btn btn-primary ms-auto mt-auto">
-                                            <i className="fas fa-save me-2"></i>
-                                            Simpan
-                                        </button>
-                                    </form>
-                                </div>
+                                    <div className="mb-3">
+                                        <label className="form-label">RT</label>
+                                        <select
+                                            name="rt"
+                                            className="form-select"
+                                            value={data.rt}
+                                            onChange={(e) => setData('rt', e.target.value)}
+                                            required
+                                        >
+                                            <option value="">-- Pilih RT --</option>
+                                            {daftarRT.map((nomor, i) => (
+                                                <option key={i} value={nomor}>
+                                                    RT {nomor}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
+
+                                    <div className="mb-3">
+                                        <label className="form-label">Keterangan</label>
+                                        <textarea
+                                            name="keterangan"
+                                            className="form-control"
+                                            rows="3"
+                                            onChange={(e) => setData("keterangan", e.target.value)}
+                                        ></textarea>
+                                    </div>
+
+                                    <button type="submit" className="btn btn-primary ms-auto mt-auto">
+                                        <i className="fas fa-save me-2"></i>
+                                        Simpan
+                                    </button>
+                                </form>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </>
-    )
+        </div>
+    );
 }
 
 export function TambahTransaksiPerKk({ listKK, tambahShow, onClose, onAdded, role }) {

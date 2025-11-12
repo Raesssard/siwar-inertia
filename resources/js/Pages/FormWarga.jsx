@@ -82,10 +82,18 @@ export default function FormWarga({
   // Submit form
   const handleSubmit = (e) => {
     e.preventDefault();
-    isEdit ? put(route(`${baseRoute}.update`, warga.id), data) : post(route(`${baseRoute}.store`), data);
 
-    reset();
-    if (onClose) onClose();
+    const action = isEdit
+      ? put(route(`${baseRoute}.update`, warga.id), {
+          onSuccess: () => {
+            router.visit(route(`${kkRoute}.index`));
+          },
+        })
+      : post(route(`${baseRoute}.store`), {
+          onSuccess: () => {
+            router.visit(route(`${kkRoute}.index`));
+          },
+        });
   };
 
   const inputBase =
@@ -113,11 +121,13 @@ export default function FormWarga({
                 <input
                   type="text"
                   value={data.no_kk}
-                  readOnly
-                  className={`${inputBase} bg-gray-100 cursor-not-allowed`}
+                  onChange={(e) => setData("no_kk", e.target.value)}
+                  className={inputBase}
                 />
+                {errors.no_kk && (
+                  <p className="text-red-500 text-sm">{errors.no_kk}</p>
+                )}
               </div>
-
               {/* NIK */}
               <div>
                 <label className="font-medium text-gray-700">NIK</label>
@@ -140,7 +150,6 @@ export default function FormWarga({
                 { name: "tanggal_lahir", label: "Tanggal Lahir", type: "date" },
                 { name: "agama", label: "Agama", type: "text" },
                 { name: "pendidikan", label: "Pendidikan", type: "text" },
-                { name: "pekerjaan", label: "Pekerjaan", type: "text" },
               ].map((f) => (
                 <div key={f.name}>
                   <label className="font-medium text-gray-700">{f.label}</label>
@@ -155,7 +164,34 @@ export default function FormWarga({
                   )}
                 </div>
               ))}
-
+              {/* Pekerjaan */}
+              {/* Pekerjaan */}
+              <div>
+                <label className="font-medium text-gray-700">Pekerjaan</label>
+                <select
+                  value={data.pekerjaan}
+                  onChange={(e) => setData("pekerjaan", e.target.value)}
+                  className={inputBase}
+                >
+                  <option value="">Pilih pekerjaan</option>
+                  <option value="pelajar/mahasiswa">Pelajar / Mahasiswa</option>
+                  <option value="pegawai negeri sipil">Pegawai Negeri Sipil (PNS)</option>
+                  <option value="karyawan swasta">Karyawan Swasta</option>
+                  <option value="pekerja lepas harian">Pekerja Lepas Harian</option>
+                  <option value="wirausaha">Wirausaha</option>
+                  <option value="petani">Petani</option>
+                  <option value="nelayan">Nelayan</option>
+                  <option value="tni">TNI</option>
+                  <option value="polri">POLRI</option>
+                  <option value="pensiunan">Pensiunan</option>
+                  <option value="ibu rumah tangga">Ibu Rumah Tangga</option>
+                  <option value="tidak bekerja">Tidak Bekerja</option>
+                  <option value="lainnya">Lainnya</option>
+                </select>
+                {errors.pekerjaan && (
+                  <p className="text-red-500 text-sm">{errors.pekerjaan}</p>
+                )}
+              </div>
               {/* Jenis Kelamin */}
               <div>
                 <label className="font-medium text-gray-700">Jenis Kelamin</label>

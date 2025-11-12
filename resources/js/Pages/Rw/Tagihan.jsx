@@ -89,16 +89,16 @@ export default function Tagihan() {
                     <table className="table-custom">
                         <thead>
                             <tr>
-                                <th>No.</th>
-                                <th>Nama Tagihan</th>
-                                <th>No. KK</th>
-                                <th>Nama Kepala Keluarga</th>
-                                <th>Nominal</th>
-                                <th>Tanggal Tagih</th>
-                                <th>Tanggal Tempo</th>
-                                <th>Status</th>
-                                <th>Tanggal Bayar</th>
-                                <th>Aksi</th>
+                                <th className="text-center">No.</th>
+                                <th className="text-center">Nama Tagihan</th>
+                                <th className="text-center">No. KK</th>
+                                <th className="text-center">Nama Kepala Keluarga</th>
+                                <th className="text-center">Nominal</th>
+                                <th className="text-center">Tanggal Tagih</th>
+                                <th className="text-center">Tanggal Tempo</th>
+                                <th className="text-center">Status</th>
+                                <th className="text-center">Tanggal Bayar</th>
+                                <th className="text-center">Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -151,16 +151,16 @@ export default function Tagihan() {
                     <table className="table-custom">
                         <thead>
                             <tr>
-                                <th>No.</th>
-                                <th>Nama Tagihan</th>
-                                <th>No. KK</th>
-                                <th>Nama Kepala Keluarga</th>
-                                <th>Nominal</th>
-                                <th>Tanggal Tagih</th>
-                                <th>Tanggal Tempo</th>
-                                <th>Status</th>
-                                <th>Tanggal Bayar</th>
-                                <th>Aksi</th>
+                                <th className="text-center">No.</th>
+                                <th className="text-center">Nama Tagihan</th>
+                                <th className="text-center">No. KK</th>
+                                <th className="text-center">Nama Kepala Keluarga</th>
+                                <th className="text-center">Nominal</th>
+                                <th className="text-center">Tanggal Tagih</th>
+                                <th className="text-center">Tanggal Tempo</th>
+                                <th className="text-center">Status</th>
+                                <th className="text-center">Tanggal Bayar</th>
+                                <th className="text-center">Aksi</th>
                             </tr>
                         </thead>
                         <tbody>

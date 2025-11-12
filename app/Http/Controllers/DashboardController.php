@@ -187,9 +187,9 @@ class DashboardController extends Controller
             $pengumuman_rw = Pengumuman::where('id_rw', $id_rw)
                 ->whereNull('id_rt')
                 ->count();
-
+      
             $pengumuman_rt = Pengumuman::where('id_rw', $id_rw)
-                ->where('id_rt', $id_rt)
+                ->whereNotNull('id_rt')
                 ->count();
 
             $jumlah_rt = Rt::count();

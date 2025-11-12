@@ -9,6 +9,7 @@ class SettingsSeeder extends Seeder
 {
     public function run(): void
     {
+        // Tambah setting maksimal RT
         DB::table('settings')->insert([
             'key' => 'max_rt_per_rw',
             'value' => '6',
