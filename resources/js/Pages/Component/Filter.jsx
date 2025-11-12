@@ -190,8 +190,7 @@ export function FilterTransaksi({ transaksi, data, setData, daftar_tahun, daftar
                 </div>
             </div>
 
-
-            <div className="d-flex flex-wrap gap-2" style={{ width: "55%" }}>
+            <div className="d-flex flex-wrap gap-2" style={role === 'warga' ? { maxWidth: "3rem", minWidth: "3rem" } : null}>
                 <select
                     name="tahun"
                     value={data.tahun}
@@ -225,23 +224,25 @@ export function FilterTransaksi({ transaksi, data, setData, daftar_tahun, daftar
                 <Link href={`/${role}/transaksi`} onClick={resetFilter} className="btn-input btn btn-secondary btn-sm flex-fill p-0 mx-0" title="Reset" style={{ maxWidth: "3rem", minWidth: "3rem" }}>
                     <i className="fas fa-undo"></i>
                 </Link>
-                <Role role={['rt', 'rw']}>
-                    <button
-                        className="btn btn-success my-auto mr-3"
-                        type="button"
-                        title={!transaksi?.length ? "Tidak ada Transaksi yang dapat diexport" : "Export Transaksi ke Excel"}
-                        style={{ borderRadius: "0.2rem" }}
-                        onClick={() => window.location.href = `/${role}/export/transaksi`}
-                        disabled={!transaksi?.length}
-                    >
-                        <i className="fas fa-file-excel"></i>
-                    </button>
+            </div>
+            <Role role={['rt', 'rw']}>
+                <button
+                    className="btn btn-success my-auto mr-3"
+                    type="button"
+                    title={!transaksi?.length ? "Tidak ada Transaksi yang dapat diexport" : "Export Transaksi ke Excel"}
+                    style={{ borderRadius: "0.2rem" }}
+                    onClick={() => window.location.href = `/${role}/export/transaksi`}
+                    disabled={!transaksi?.length}
+                >
+                    <i className="fas fa-file-excel"></i>
+                </button>
+                <div className="text-end ml-auto mr-3">
                     <button type="button" onClick={() => tambahShow()} className="btn-input btn btn-sm btn-success">
                         <i className="fas fa-plus mr-2"></i>
                         Buat Transaksi
                     </button>
-                </Role>
-            </div>
+                </div>
+            </Role>
         </form>
     )
 }

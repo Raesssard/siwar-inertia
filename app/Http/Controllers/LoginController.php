@@ -33,7 +33,13 @@ class LoginController extends Controller
                 return $this->redirectByRole($role, $user);
             }
 
-            // Kalau punya banyak role → pilih role dulu
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'choose_role' => true,
+                    'roles' => $user->roles->pluck('name'),
+                ]);
+            }
+
             return Inertia::location(route('choose-role'));
         }
 
@@ -87,11 +93,10 @@ class LoginController extends Controller
         $role = $request->input('role');
 
         if (!$user->hasRole($role)) {
-            return redirect()->route('choose-role')->with('error', 'Role tidak valid.');
+            return response()->json(['error' => 'Role tidak valid.'], 400);
         }
 
         session(['active_role' => $role]);
-
-        return $this->redirectByRole($role, $user);
+        return response()->json(['success' => true]);
     }
 }

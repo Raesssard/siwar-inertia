@@ -3,6 +3,8 @@ import { usePage, Link } from "@inertiajs/react"
 import { Inertia } from "@inertiajs/inertia"
 import "../../css/topbar.css"
 import { PasswordModal } from "../Pages/Component/Modal"
+import Swal from "sweetalert2"
+import { router } from '@inertiajs/react'
 
 export default function Topbar({ modalShow, hapusHistory }) {
     const { props } = usePage()
@@ -21,6 +23,48 @@ export default function Topbar({ modalShow, hapusHistory }) {
             Inertia.post("/choose-role", { role: selectedRole })
         }
     }
+
+    const handleLogout = () => {
+        Swal.fire({
+            title: "Yakin logout dari akun ini?",
+            text: "Anda akan diarahkan ke halaman login.",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#d33",
+            cancelButtonColor: "#3085d6",
+            confirmButtonText: "Ya, logout",
+            cancelButtonText: "Batal",
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // tampilkan loading SweetAlert
+                Swal.fire({
+                    title: "Sedang logout...",
+                    text: "Mohon tunggu sebentar.",
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading()
+                    }
+                })
+
+                // kirim request logout via Inertia
+                router.post(route('logout'), {}, {
+                    onSuccess: () => {
+                        Swal.close()
+                        Inertia.visit(route('login')) // redirect manual kalau perlu
+                    },
+                    onError: (error) => {
+                        Swal.fire({
+                            icon: "error",
+                            title: "Gagal logout!",
+                            text: "Terjadi kesalahan saat logout. Silakan coba lagi.",
+                        })
+                        console.error("Error during logout:", error)
+                    }
+                })
+            }
+        })
+    }
+
 
     function accountChange(e) {
         e.preventDefault()
@@ -217,7 +261,7 @@ export default function Topbar({ modalShow, hapusHistory }) {
                         data-bs-auto-close="outside"
                     >
                         {/* Ubah password */}
-                        <button>
+                        <button className="w-100">
                             <Link
                                 href={route("settings")}
                                 className="dropdown-item"
@@ -270,22 +314,23 @@ export default function Topbar({ modalShow, hapusHistory }) {
                         <div className="dropdown-divider"></div>
 
                         {/* Tombol logout */}
-                        <Link
-                            href="/logout"
-                            method="post"
-                            as="button"
+                        <button
+                            type="button"
                             className="dropdown-item"
-                            onClick={() => hapusHistory()}
+                            onClick={() => {
+                                hapusHistory()
+                                handleLogout()
+                            }}
                         >
                             <i className="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>{" "}
                             Logout
-                        </Link>
+                        </button>
                     </div>
                 </li>
             </ul>
 
-            {/* Modal password */}
-            {showPasswordModal && <PasswordModal show={modalHandler} />}
+            {/* Modal password; gk kepake soalnya ada di settings */}
+            {/* {showPasswordModal && <PasswordModal show={modalHandler} />} */}
         </nav>
     )
 }

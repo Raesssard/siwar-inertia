@@ -249,6 +249,7 @@ export default function Pengumuman() {
                     </div>
                 )}
                 <DetailPengumuman
+                    kategori={daftarKategori}
                     selectedData={selected}
                     detailShow={showModalDetail}
                     onClose={() => setShowModalDetail(false)}

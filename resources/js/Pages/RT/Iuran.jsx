@@ -111,7 +111,7 @@ export default function Iuran() {
                         <td className="text-center">{formatRupiah(matched.nominal)}</td>
                         <td className="text-center">{formatTanggal(item.tgl_tagih) ?? '-'}</td>
                         <td className="text-center">{formatTanggal(item.tgl_tempo) ?? '-'}</td>
-                        <td className="text-center">
+                        {/* <td className="text-center">
                             <div className="d-flex justify-content-center align-items-center gap-2">
                                 <button
                                     className="btn btn-sm btn-warning my-auto"
@@ -128,7 +128,7 @@ export default function Iuran() {
                                     <i className="fa-solid fa-trash"></i>
                                 </button>
                             </div>
-                        </td>
+                        </td> */}
                     </tr>
                 )
             })
@@ -164,7 +164,7 @@ export default function Iuran() {
                                 <th className="px-3 text-center" scope="col">Nominal</th>
                                 <th className="px-3 text-center" scope="col">Tanggal Tagih</th>
                                 <th className="px-3 text-center" scope="col">Tanggal Tempo</th>
-                                <th className="px-3 text-center" scope="col">Aksi</th>
+                                {/* <th className="px-3 text-center" scope="col">Aksi</th> */}
                             </tr>
                         </thead>
                         <tbody>
@@ -176,7 +176,7 @@ export default function Iuran() {
                                         <td className="text-center">{formatRupiah(item.nominal) ?? '-'}</td>
                                         <td className="text-center">{formatTanggal(item.tgl_tagih) ?? '-'}</td>
                                         <td className="text-center">{formatTanggal(item.tgl_tempo) ?? '-'}</td>
-                                        <td className="text-center">
+                                        {/* <td className="text-center">
                                             <div className="d-flex justify-content-center align-items-center gap-2">
                                                 <button
                                                     className="btn btn-sm btn-warning my-auto"
@@ -189,12 +189,12 @@ export default function Iuran() {
                                                     <i className="fa-solid fa-trash"></i>
                                                 </button>
                                             </div>
-                                        </td>
+                                        </td> */}
                                     </tr>
                                 ))
                             ) : (
                                 <tr>
-                                    <td colSpan="6" className="text-center">
+                                    <td colSpan="5" className="text-center">
                                         Tidak ada data
                                     </td>
                                 </tr>
@@ -245,7 +245,7 @@ export default function Iuran() {
                                 <th className="px-3 text-center" scope="col">Nominal</th>
                                 <th className="px-3 text-center" scope="col">Tanggal Tagih</th>
                                 <th className="px-3 text-center" scope="col">Tanggal Tempo</th>
-                                <th className="px-3 text-center" scope="col">Aksi</th>
+                                {/* <th className="px-3 text-center" scope="col">Aksi</th> */}
                             </tr>
                         </thead>
                         <tbody>
@@ -253,7 +253,7 @@ export default function Iuran() {
                                 rows
                             ) : (
                                 <tr>
-                                    <td colSpan="7" className="text-center">
+                                    <td colSpan="6" className="text-center">
                                         Tidak ada data
                                     </td>
                                 </tr>
@@ -290,7 +290,7 @@ export default function Iuran() {
                     </div>
                 )}
             </div>
-            <TambahIuran
+            {/* <TambahIuran
                 tambahShow={showModalTambah}
                 onClose={() => setShowModalTambah(false)}
                 onAdded={handleAdded}
@@ -328,7 +328,7 @@ export default function Iuran() {
                 golongan={selectedGolongan}
                 iuranGol={selectedIuran}
                 iuran={selected}
-            />
+            /> */}
         </Layout>
     )
 }

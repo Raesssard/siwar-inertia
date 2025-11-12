@@ -113,7 +113,6 @@ class RtIuranController extends Controller
             ? Kartu_keluarga::where('id_rt', $iuran->id_rt)->get()
             : Kartu_keluarga::where('id_rw', $iuran->id_rw)->get();
 
-        $kkSelected = Kartu_keluarga::where('no_kk', $request->no_kk)->first();
 
         if ($request->jenis === 'otomatis') {
             // Simpan nominal per golongan
@@ -134,16 +133,6 @@ class RtIuranController extends Controller
 
             $iuranNominals = IuranGolongan::where('id_iuran', $iuran->id)
                 ->pluck('nominal', 'id_golongan');
-
-            // Tentukan target (semua KK / 1 KK / 1 warga)
-            if ($request->filled('no_kk')) {
-                $kkList = Kartu_keluarga::where('no_kk', $request->no_kk)->get();
-            } elseif ($request->filled('nik')) {
-                $warga = Warga::where('nik', $request->nik)->first();
-                if ($warga) {
-                    $kkList = Kartu_keluarga::where('no_kk', $warga->no_kk)->get();
-                }
-            }
 
             foreach ($kkList as $kk) {
                 $nominalTagihan = $iuranNominals[$kk->kategori_iuran] ?? 0;
@@ -168,14 +157,6 @@ class RtIuranController extends Controller
             'message' => 'Iuran berhasil dibuat beserta tagihannya.',
             'iuran' => $iuran
         ]);
-    }
-
-    public function edit(string $id)
-    {
-        $iuran = Iuran::with('iuran_golongan')->findOrFail($id);
-        $golongan_list = Kartu_keluarga::select('golongan')->distinct()->pluck('golongan');
-
-        return view('rt.iuran.edit', compact('iuran', 'golongan_list'));
     }
 
     public function update(Request $request, string $id, $jenis)
