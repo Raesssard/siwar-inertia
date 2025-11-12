@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Admin\AdminKartuKeluargaController;
 use App\Models\Warga;
 use App\Models\Kartu_keluarga;
 use App\Models\HistoryWarga;
@@ -124,7 +125,7 @@ class AdminWargaController extends Controller
                 'warga'=> $warga
         ]);
 
-        return redirect()->route('admin.KartuKeluarga.index')->with('success', 'Warga berhasil ditambahkan.');
+        return redirect()->route('admin.Kartu_keluarga.index')->with('success', 'Warga berhasil ditambahkan.');
     }
 
     public function edit($id)
@@ -181,9 +182,19 @@ class AdminWargaController extends Controller
             'tujuan_pindah' => 'nullable|string',
         ]);
 
+        $kkExists = Kartu_keluarga::where('no_kk', $validated['no_kk'])->exists();
+        if (!$kkExists) {
+            return back()->with('error', 'Nomor KK tujuan belum terdaftar di sistem.');
+        }
+
+        // 🔄 Jika no_kk berubah, simpan no_kk lama
+        if ($warga->no_kk !== $validated['no_kk']) {
+            $validated['no_kk_lama'] = $warga->no_kk;
+        }
+        
         $warga->update($validated);
 
-        return redirect()->route('admin.kartuKeluarga.index')->with('success', 'Data warga berhasil diperbarui.');
+        return redirect()->route('admin.kartu_keluarga.index')->with('success', 'Data warga berhasil diperbarui.');
     }
 
     public function destroy($id)
@@ -200,6 +211,6 @@ class AdminWargaController extends Controller
 
         $warga->delete();
 
-        return redirect()->route('admin.kartuKeluarga.index')->with('success', 'Warga berhasil dihapus dan dicatat ke history.');
+        return redirect()->route('admin.kartu_keluarga.index')->with('success', 'Warga berhasil dihapus dan dicatat ke history.');
     }
 }

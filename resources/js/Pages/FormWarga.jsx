@@ -82,10 +82,18 @@ export default function FormWarga({
   // Submit form
   const handleSubmit = (e) => {
     e.preventDefault();
-    isEdit ? put(route(`${baseRoute}.update`, warga.id), data) : post(route(`${baseRoute}.store`), data);
 
-    reset();
-    if (onClose) onClose();
+    const action = isEdit
+      ? put(route(`${baseRoute}.update`, warga.id), {
+          onSuccess: () => {
+            router.visit(route(`${kkRoute}.index`));
+          },
+        })
+      : post(route(`${baseRoute}.store`), {
+          onSuccess: () => {
+            router.visit(route(`${kkRoute}.index`));
+          },
+        });
   };
 
   const inputBase =
@@ -113,11 +121,13 @@ export default function FormWarga({
                 <input
                   type="text"
                   value={data.no_kk}
-                  readOnly
-                  className={`${inputBase} bg-gray-100 cursor-not-allowed`}
+                  onChange={(e) => setData("no_kk", e.target.value)}
+                  className={inputBase}
                 />
+                {errors.no_kk && (
+                  <p className="text-red-500 text-sm">{errors.no_kk}</p>
+                )}
               </div>
-
               {/* NIK */}
               <div>
                 <label className="font-medium text-gray-700">NIK</label>
