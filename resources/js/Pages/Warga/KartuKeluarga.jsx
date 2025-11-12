@@ -19,11 +19,6 @@ export default function KartuKeluarga() {
             </Layout>
         )
     }
-    // ini gk usah, soalnya ada helper di model kartuKeluarganya
-    // const kepala = kartuKeluarga.warga?.find(
-    //     (w) =>
-    //         w.status_hubungan_dalam_keluarga?.toLowerCase() === "kepala keluarga"
-    // )
 
     return (
         <Layout>
@@ -60,20 +55,31 @@ export default function KartuKeluarga() {
 
                         <div className="kk-info-grid col g-3 mb-4 small">
                             <div className="kk-info-item">
-                                <p className="mb-1 text-start"><strong>Kepala Keluarga</strong> : {kartuKeluarga.kepala_keluarga.nama ?? '-'}
+                                <p className="mb-1 text-start">
+                                    <strong>Kepala Keluarga</strong> : {kartuKeluarga.kepala_keluarga.nama ?? '-'}
                                 </p>
-                                <p className="mb-1 text-start"><strong>Alamat</strong> : {kartuKeluarga.alamat ?? '-'}</p>
-                                <p className="mb-1 text-start"><strong>Desa/Kelurahan</strong> : {kartuKeluarga.kelurahan ?? '-'}</p>
-                                <p className="mb-1 text-start"><strong>Kecamatan</strong> : {kartuKeluarga.kecamatan ?? '-'}</p>
+                                <p className="mb-1 text-start">
+                                    <strong>Alamat</strong> : {kartuKeluarga.alamat ?? '-'}
+                                </p>
+                                <p className="mb-1 text-start">
+                                    <strong>Desa/Kelurahan</strong> : {kartuKeluarga.kelurahan ?? '-'}
+                                </p>
+                                <p className="mb-1 text-start">
+                                    <strong>Kecamatan</strong> : {kartuKeluarga.kecamatan ?? '-'}
+                                </p>
                                 <p className="mb-1 text-start">
                                     <strong>RT/RW</strong> : {kartuKeluarga.rukun_tetangga.nomor_rt ?? '-'}/{kartuKeluarga.rw.nomor_rw ?? '-'}
                                 </p>
                             </div>
                             <div className="kk-info-item">
-                                <p className="mb-1 text-start"><strong>Kabupaten/Kota</strong> : {kartuKeluarga.kabupaten ?? '-'}</p>
-                                <p className="mb-1 text-start"><strong>Kode Pos</strong> : {kartuKeluarga.kode_pos ?? '-'}
+                                <p className="mb-1 text-start">
+                                    <strong>Kabupaten/Kota</strong> : {kartuKeluarga.kabupaten ?? '-'}
                                 </p>
-                                <p className="mb-1 text-start"><strong>Provinsi</strong> : {kartuKeluarga.provinsi ?? '-'}
+                                <p className="mb-1 text-start">
+                                    <strong>Kode Pos</strong> : {kartuKeluarga.kode_pos ?? '-'}
+                                </p>
+                                <p className="mb-1 text-start">
+                                    <strong>Provinsi</strong> : {kartuKeluarga.provinsi ?? '-'}
                                 </p>
                             </div>
                         </div>
@@ -127,28 +133,60 @@ export default function KartuKeluarga() {
                                                 })
                                                 .map((data, index) => (
                                                     <tr key={index}>
-                                                        <td className="text-center">{index + 1}</td>
-                                                        <td className="text-center">{data.nama ?? '-'}</td>
-                                                        <td className="text-center">{data.nik ?? '-'}</td>
-                                                        <td className="text-center">{data.jenis_kelamin ?? '-'}</td>
-                                                        <td className="text-center">{data.tempat_lahir ?? '-'}</td>
+                                                        <td className="text-center">
+                                                            {index + 1}
+                                                        </td>
+                                                        <td className="text-center">
+                                                            {data.nama ?? '-'}
+                                                        </td>
+                                                        <td className="text-center">
+                                                            {data.nik ?? '-'}
+                                                        </td>
+                                                        <td className="text-center">
+                                                            {data.jenis_kelamin ?? '-'}
+                                                        </td>
+                                                        <td className="text-center">
+                                                            {data.tempat_lahir ?? '-'}
+                                                        </td>
                                                         <td className="text-center">
                                                             {formatTanggal(data.tanggal_lahir)}
                                                         </td>
-                                                        <td className="text-center">{data.agama ?? '-'}</td>
-                                                        <td className="text-center">{data.pendidikan ?? '-'}</td>
-                                                        <td className="text-center">{data.pekerjaan ?? '-'}</td>
-                                                        <td className="text-center">{data.golongan_darah ?? '-'}</td>
-                                                        <td className="text-center">{data.status_perkawinan ?? '-'}</td>
-                                                        <td className="text-center">{data.status_hubungan_dalam_keluarga ?? '-'}</td>
-                                                        <td className="text-center">{data.kewarganegaraan ?? 'WNI'}</td>
-                                                        <td className="text-center">{data.no_paspor ?? '-'}</td>
+                                                        <td className="text-center">
+                                                            {data.agama ?? '-'}
+                                                        </td>
+                                                        <td className="text-center">
+                                                            {data.pendidikan ?? '-'}
+                                                        </td>
+                                                        <td className="text-center">
+                                                            {data.pekerjaan ?? '-'}
+                                                        </td>
+                                                        <td className="text-center">
+                                                            {data.golongan_darah ?? '-'}
+                                                        </td>
+                                                        <td className="text-center">
+                                                            {data.status_perkawinan ?? '-'}
+                                                        </td>
+                                                        <td className="text-center">
+                                                            {data.status_hubungan_dalam_keluarga ?? '-'}
+                                                        </td>
+                                                        <td className="text-center">
+                                                            {data.kewarganegaraan ?? 'WNI'}
+                                                        </td>
+                                                        <td className="text-center">
+                                                            {data.no_paspor ?? '-'}
+                                                        </td>
                                                         <td className="text-center">
                                                             {`${data.no_kitas ?? '-'} / ${data.no_kitap ?? '-'}`}
                                                         </td>
-                                                        <td className="text-center">{data.nama_ayah ?? '-'}</td>
-                                                        <td className="text-center">{data.nama_ibu ?? '-'}</td>
-                                                        <td className="text-center">{data.status_warga ?? '-'}</td>
+                                                        <td className="text-center">
+                                                            {data.nama_ayah ?? '-'}
+                                                        </td>
+                                                        <td className="text-center">
+                                                            {data.nama_ibu ?? '-'}
+                                                        </td>
+                                                        <td className="text-center">
+                                                            {data.status_warga ?? '-'}
+                                                        </td>
                                                     </tr>
                                                 ))
                                         ) : (

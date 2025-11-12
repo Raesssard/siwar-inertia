@@ -88,7 +88,7 @@ export default function Tagihan() {
             />
             <div className="table-container">
                 <div className="table-header">
-                    <h4>Data Tagihan Manual</h4>
+                    <h4>Tagihan Manual</h4>
                 </div>
                 <div className="table-scroll">
                     <table className="table-custom">
@@ -181,7 +181,7 @@ export default function Tagihan() {
             </div>
             <div className="table-container">
                 <div className="table-header">
-                    <h4>Data Tagihan Otomatis</h4>
+                    <h4>Tagihan Otomatis</h4>
                 </div>
                 <div className="table-scroll">
                     <table className="table-custom">
@@ -298,7 +298,6 @@ export default function Tagihan() {
                             )
                         )
                     } else {
-
                         setTagihanOtomatisList(prev =>
                             prev.map(item =>
                                 item.id === updated.id ? updated : item

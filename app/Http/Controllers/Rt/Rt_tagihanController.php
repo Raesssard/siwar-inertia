@@ -15,8 +15,6 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
-use function Laravel\Prompts\search;
-
 class Rt_tagihanController extends Controller
 {
     /**
@@ -131,7 +129,6 @@ class Rt_tagihanController extends Controller
             )
             : Carbon::parse($iuran->tgl_tempo);
 
-        // tampung semua tagihan di Eloquent Collection
         $tagihanList = new Collection();
 
         foreach ($kkList as $kk) {
@@ -151,7 +148,6 @@ class Rt_tagihanController extends Controller
 
         $iuran->load(['iuran_golongan', 'iuran_golongan.golongan']);
 
-        // Load relasi semua tagihan
         $tagihanList->load([
             'transaksi',
             'iuran',
@@ -164,8 +160,6 @@ class Rt_tagihanController extends Controller
             'message' => $request->no_kk === 'semua'
                 ? 'Tagihan berhasil dibuat untuk semua KK.'
                 : 'Tagihan berhasil dibuat.',
-            // kalau cuma 1 KK, kirim object tunggal
-            // kalau semua, kirim array
             'tagihan' => $request->no_kk === 'semua' ? $tagihanList : $tagihanList->first(),
             'iuran' => $iuran,
         ], 201);
