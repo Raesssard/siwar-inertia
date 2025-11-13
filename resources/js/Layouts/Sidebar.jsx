@@ -21,8 +21,10 @@ export default function Sidebar({ toggleKeParent, localStorageHistory }) {
             return updated
         })
     }
+
     const { props } = usePage()
     const role = props.auth?.currentRole
+    const permissions = props.auth?.permissions || []
 
     useEffect(() => {
         localStorage.setItem("openMenus", JSON.stringify(openMenus))
@@ -39,12 +41,12 @@ export default function Sidebar({ toggleKeParent, localStorageHistory }) {
 
     const toggleSidebar = (e) => {
         e.preventDefault()
-        const newToggle = toggle === "" ? "toggled" : "";
+        const newToggle = toggle === "" ? "toggled" : ""
 
-        setToggle(newToggle);
-        toggleKeParent(newToggle);
+        setToggle(newToggle)
+        toggleKeParent(newToggle)
 
-        localStorage.setItem("sidebarCollapsed", newToggle === "toggled");
+        localStorage.setItem("sidebarCollapsed", newToggle === "toggled")
 
         if (!toggle) {
             localStorage.removeItem("openMenus")
@@ -55,6 +57,7 @@ export default function Sidebar({ toggleKeParent, localStorageHistory }) {
     const rotation = toggle === "toggled" ? "right" : "left"
     let statLinks = []
 
+    // 🔹 Ambil menu sesuai role
     switch (role) {
         case "admin":
             statLinks = getAdminLinks()
@@ -71,6 +74,22 @@ export default function Sidebar({ toggleKeParent, localStorageHistory }) {
         default:
             statLinks = []
     }
+
+    // 🔥 Filter link berdasarkan permission user
+    const filteredLinks = statLinks
+        .map(link => {
+            if (link.children) {
+                const filteredChildren = link.children.filter(child =>
+                    !child.permission || permissions.includes(child.permission)
+                )
+                return { ...link, children: filteredChildren }
+            }
+            if (!link.permission || permissions.includes(link.permission)) {
+                return link
+            }
+            return null
+        })
+        .filter(Boolean)
 
     return (
         <>
@@ -90,7 +109,7 @@ export default function Sidebar({ toggleKeParent, localStorageHistory }) {
 
                 <hr className="sidebar-divider my-0" />
 
-                {statLinks.map((link, index) => (
+                {filteredLinks.map((link, index) => (
                     <SidebarLink
                         key={index}
                         {...link}

@@ -44,6 +44,7 @@ use App\Http\Controllers\Rw\{
     RwTransaksiController,
 };
 use Inertia\Inertia;
+use App\Http\Middleware\CheckPermission;
 
 Route::get('/', [LoginController::class, 'showLoginForm']);
 
@@ -66,33 +67,89 @@ Route::middleware(['auth'])->group(function () {
     | ADMIN
     |--------------------------------------------------------------------------
     */
-    Route::prefix('admin')->name('admin.')->group(function () {
-        // ✅ RW & RT
-        Route::get('/analisis/warga', [AnalisisController::class, 'index'])->name('analisis');
-        Route::get('/analisis/sistem', [AnalisisController::class, 'index'])->name('analisis');
-        Route::resource('rw', AdminRwController::class)->except(['create', 'edit', 'show']);
-        Route::put('rw/{id}/toggle-status', [AdminRwController::class, 'toggleStatus'])->name('rw.toggleStatus');
-        Route::resource('rt', AdminRtController::class)->except(['create', 'edit', 'show']);
-        Route::put('rt/{id}/toggle-status', [AdminRtController::class, 'toggleStatus'])->name('rt.toggleStatus');
+    Route::prefix('admin')
+            ->name('admin.')
+            ->middleware(['auth']) // pastikan user login
+            ->group(function () {
 
-        // ✅ Kartu Keluarga
-        Route::resource('kartu_keluarga', AdminKartuKeluargaController::class)->except(['create', 'edit', 'show']);
-        Route::put('kartu_keluarga/{rt_kartu_keluarga}/upload-foto', [AdminKartuKeluargaController::class, 'uploadFoto'])->name('kartu_keluarga.upload_foto');
-        Route::delete('kartu_keluarga/{rt_kartu_keluarga}/delete-foto', [AdminKartuKeluargaController::class, 'deleteFoto'])->name('kartu_keluarga.delete_foto');
-        Route::get('kartu_keluarga/{rt_kartu_keluarga}/upload-form', [AdminKartuKeluargaController::class, 'uploadForm'])->name('kartu_keluarga.upload_form');
+        // 📊 Analisis
+        // Route::get('/analisis/warga', [AnalisisController::class, 'index'])
+        //     ->middleware(CheckPermission::class . ':dashboard.admin')
+        //     ->name('analisis.warga');
 
-        // ✅ WARGA
-        Route::resource('warga', AdminWargaController::class);
-        Route::get('warga/create', [AdminWargaController::class, 'create'])->name('warga.create');
-        Route::get('warga/{id}/edit', [AdminWargaController::class, 'edit'])->name('warga.edit');
+        // Route::get('/analisis/sistem', [AnalisisController::class, 'index'])
+        //     ->middleware(CheckPermission::class . ':dashboard.admin')
+        //     ->name('analisis.sistem');
 
-        // ✅ Role, Permission, Kategori Golongan
-        Route::resource('kategori-golongan', AdminKategoriGolonganController::class)->except(['create', 'edit', 'show']);
-        Route::resource('roles', AdminRoleController::class)->except(['create', 'edit', 'show']);
-        Route::put('roles/{id}/permissions', [AdminRoleController::class, 'updatePermissions'])->name('roles.permissions.update');
-        Route::resource('permissions', AdminPermissionController::class)->except(['create', 'edit', 'show']);
+        // 🏠 RW
+        Route::resource('rw', AdminRwController::class)
+            ->except(['create', 'edit', 'show'])
+            ->middleware(CheckPermission::class . ':view.rw');
+
+        Route::put('rw/{id}/toggle-status', [AdminRwController::class, 'toggleStatus'])
+            ->middleware(CheckPermission::class . ':toggle.rw')
+            ->name('rw.toggleStatus');
+
+        // 👥 RT
+        Route::resource('rt', AdminRtController::class)
+            ->except(['create', 'edit', 'show'])
+            ->middleware(CheckPermission::class . ':view.rt');
+
+        Route::put('rt/{id}/toggle-status', [AdminRtController::class, 'toggleStatus'])
+            ->middleware(CheckPermission::class . ':toggle.rt')
+            ->name('rt.toggleStatus');
+
+        // 🧾 Kartu Keluarga
+        Route::resource('kartu_keluarga', AdminKartuKeluargaController::class)
+            ->except(['create', 'edit', 'show'])
+            ->middleware(CheckPermission::class . ':view.kartu_keluarga');
+
+        Route::put('kartu_keluarga/{id}/upload-foto', [AdminKartuKeluargaController::class, 'uploadFoto'])
+            ->middleware(CheckPermission::class . ':edit.kartu_keluarga')
+            ->name('kartu_keluarga.upload_foto');
+
+        Route::delete('kartu_keluarga/{id}/delete-foto', [AdminKartuKeluargaController::class, 'deleteFoto'])
+            ->middleware(CheckPermission::class . ':edit.kartu_keluarga')
+            ->name('kartu_keluarga.delete_foto');
+
+        Route::get('kartu_keluarga/{id}/upload-form', [AdminKartuKeluargaController::class, 'uploadForm'])
+            ->middleware(CheckPermission::class . ':edit.kartu_keluarga')
+            ->name('kartu_keluarga.upload_form');
+
+        // 👨‍👩‍👧‍👦 Warga
+        Route::resource('warga', AdminWargaController::class)
+            ->middleware(CheckPermission::class . ':view.warga');
+
+        Route::get('warga/create', [AdminWargaController::class, 'create'])
+            ->middleware(CheckPermission::class . ':create.warga')
+            ->name('warga.create');
+
+        Route::get('warga/{id}/edit', [AdminWargaController::class, 'edit'])
+            ->middleware(CheckPermission::class . ':edit.warga')
+            ->name('warga.edit');
+
+        // ⚙️ Kategori Golongan
+        Route::resource('kategori-golongan', AdminKategoriGolonganController::class)
+            ->except(['create', 'edit', 'show'])
+            ->middleware(CheckPermission::class . ':view.kategori_golongan');
+
+        // 🧩 Roles
+        Route::resource('roles', AdminRoleController::class)
+            ->except(['create', 'edit', 'show'])
+            ->middleware(CheckPermission::class . ':view.role');
+
         Route::get('roles/{id}/permissions', [AdminRoleController::class, 'editPermissions'])
+            ->middleware(CheckPermission::class . ':assign.permissions.to.role')
             ->name('roles.permissions.edit');
+
+        Route::put('roles/{id}/permissions', [AdminRoleController::class, 'updatePermissions'])
+            ->middleware(CheckPermission::class . ':assign.permissions.to.role')
+            ->name('roles.permissions.update');
+
+        // 🔑 Permissions
+        Route::resource('permissions', AdminPermissionController::class)
+            ->except(['create', 'edit', 'show'])
+            ->middleware(CheckPermission::class . ':view.permission');
     });
 
     /*

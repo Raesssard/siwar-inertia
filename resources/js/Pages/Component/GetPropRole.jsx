@@ -232,6 +232,7 @@ export function getAdminCards({ ...rest }) {
                     title: "Jumlah KK",
                     value: rest.jumlah_kk,
                     icon: "clipboard-list",
+                    permission: "view.kartu_keluarga",
                 },
                 {
                     href: "/admin/warga",
@@ -239,6 +240,7 @@ export function getAdminCards({ ...rest }) {
                     title: "Jumlah Warga",
                     value: rest.jumlah_warga,
                     icon: "users",
+                    permission: "view.warga",
                 },
                 {
                     href: "/admin/warga",
@@ -246,6 +248,7 @@ export function getAdminCards({ ...rest }) {
                     title: "Jumlah Warga Sebagai Penduduk",
                     value: rest.jumlah_warga_penduduk,
                     icon: "home",
+                    permission: "view.warga",
                 },
                 {
                     href: "/admin/warga",
@@ -253,6 +256,7 @@ export function getAdminCards({ ...rest }) {
                     title: "Jumlah Warga Sebagai Pendatang",
                     value: rest.jumlah_warga_pendatang,
                     icon: "walking",
+                    permission: "view.warga",
                 },
                 {
                     href: "/admin/rw",
@@ -260,6 +264,7 @@ export function getAdminCards({ ...rest }) {
                     title: "Jumlah RW",
                     value: rest.jumlah_rw,
                     icon: "house-user",
+                    permission: "view.rw",
                 },
                 {
                     href: "/admin/rt",
@@ -267,6 +272,7 @@ export function getAdminCards({ ...rest }) {
                     title: "Jumlah RT",
                     value: rest.jumlah_rt,
                     icon: "users",
+                    permission: "view.rt",
                 },
             ]
         },
@@ -279,6 +285,7 @@ export function getAdminCards({ ...rest }) {
                     title: "Jumlah Kategori Golongan",
                     value: rest.jumlah_golongan,
                     icon: "layer-group",
+                    permission: "view.kategori_golongan",
                 },
                 {
                     href: "/admin/roles",
@@ -286,6 +293,7 @@ export function getAdminCards({ ...rest }) {
                     title: "Jumlah Roles",
                     value: rest.jumlah_roles,
                     icon: "user-shield",
+                    permission: "view.role",
                 },
                 {
                     href: "/admin/permissions",
@@ -293,6 +301,7 @@ export function getAdminCards({ ...rest }) {
                     title: "Jumlah Permissions",
                     value: rest.jumlah_permissions,
                     icon: "key",
+                    permission: "view.permission",
                 },
             ]
         },
@@ -305,30 +314,29 @@ export function getAdminLinks() {
             href: "/dashboard",
             text: "Dashboard",
             icon: "tachometer-alt",
+            permission: "dashboard.admin",
         },
         {
             text: "Analisis Warga",
             icon: "users",
             children: [
-                // {
-                //     href: "/admin/analisis/warga",
-                //     text: "Analisis Warga Admin",
-                //     icon: "eye",
-                // },
                 {
                     href: "/admin/kartu_keluarga",
                     text: "Data Kartu Keluarga",
                     icon: "id-card",
+                    permission: "view.kartu_keluarga",
                 },
                 {
                     href: "/admin/rw",
                     text: "Data RW",
                     icon: "house-user",
+                    permission: "view.rw",
                 },
                 {
                     href: "/admin/rt",
                     text: "Data RT",
                     icon: "users",
+                    permission: "view.rt",
                 },
             ],
         },
@@ -336,25 +344,23 @@ export function getAdminLinks() {
             text: "Pengaturan Sistem",
             icon: "cog",
             children: [
-                // {
-                //     href: "/admin/analisis/sistem",
-                //     text: "Analisis Sistem",
-                //     icon: "cogs",
-                // },
                 {
                     href: "/admin/kategori-golongan",
                     text: "Kategori Golongan",
                     icon: "layer-group",
+                    permission: "view.kategori_golongan",
                 },
                 {
                     href: "/admin/roles",
                     text: "Roles",
                     icon: "user-shield",
+                    permission: "view.role",
                 },
                 {
                     href: "/admin/permissions",
                     text: "Permissions",
                     icon: "key",
+                    permission: "view.permission",
                 },
             ],
         },
