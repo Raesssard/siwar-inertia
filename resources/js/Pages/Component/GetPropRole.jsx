@@ -21,70 +21,99 @@ export function formatTanggal(tanggal) {
 export function getWargaCards({ ...rest }) {
     return [
         {
-            href: "/warga/kk",
-            color: "info",
-            title: "Lihat Kartu Keluarga",
-            value: <p style={{
-                fontSize: '0.75rem',
-            }}>
-                <strong>No. KK</strong>: {rest.kk.no_kk}<br /><strong>Kepala Keluarga</strong>: {rest.kk.kepala_keluarga.nama}</p>,
-            icon: "id-card",
+            kategori: 'Informasi',
+            isi: [
+                {
+                    href: "/warga/kk",
+                    color: "info",
+                    title: "Lihat Kartu Keluarga",
+                    value: <p style={{
+                        fontSize: '0.75rem',
+                    }}>
+                        <strong>No. KK</strong>: {rest.kk.no_kk}<br /><strong>Kepala Keluarga</strong>: {rest.kk.kepala_keluarga.nama}</p>,
+                    icon: "id-card",
+                },
+                {
+                    href: "/warga/pengumuman",
+                    color: "warning",
+                    title: "Jumlah Pengumuman",
+                    value: rest.jumlah_pengumuman,
+                    icon: "comments",
+                },
+                {
+                    href: "/warga/pengaduan",
+                    color: "warning",
+                    title: "Pengaduan",
+                    value: rest.pengaduan,
+                    icon: "paper-plane",
+                },
+            ]
         },
         {
-            href: "/warga/pengumuman",
-            color: "warning",
-            title: "Jumlah Pengumuman",
-            value: rest.jumlah_pengumuman,
-            icon: "comments",
+            kategori: 'Tagihan',
+            isi: [
+                {
+                    href: "/warga/tagihan",
+                    color: rest.jumlah_tagihan < 1 ? 'success' : 'danger',
+                    title: "Tagihan",
+                    value: rest.jumlah_tagihan,
+                    icon: "money-check-alt",
+                },
+                {
+                    href: "/warga/tagihan",
+                    color: rest.total_tagihan < 1 ? 'success' : 'danger',
+                    title: "Total Tagihan",
+                    value: formatRupiah(rest.total_tagihan),
+                    icon: "hand-holding-usd",
+                },
+                {
+                    href: "/warga/tagihan",
+                    color: rest.jumlah_tagihan_sudah_bayar < 1 ? 'warning' : 'success',
+                    title: "Tagihan yang Sudah Dibayar",
+                    value: rest.jumlah_tagihan_sudah_bayar,
+                    icon: "money-check-alt",
+                },
+                {
+                    href: "/warga/tagihan",
+                    color: rest.total_tagihan_sudah_bayar < 1 ? 'warning' : 'success',
+                    title: "Total Tagihan yang Sudah Dibayar",
+                    value: formatRupiah(rest.total_tagihan_sudah_bayar),
+                    icon: "hand-holding-usd",
+                },
+            ]
         },
         {
-            href: "/warga/pengaduan",
-            color: "warning",
-            title: "Pengaduan",
-            value: rest.pengaduan,
-            icon: "paper-plane",
-        },
-        {
-            href: "/warga/tagihan",
-            color: rest.jumlah_tagihan < 1 ? 'success' : 'danger',
-            title: "Tagihan",
-            value: rest.jumlah_tagihan,
-            icon: "money-check-alt",
-        },
-        {
-            href: "/warga/tagihan",
-            color: rest.total_tagihan < 1 ? 'success' : 'danger',
-            title: "Total Tagihan",
-            value: formatRupiah(rest.total_tagihan),
-            icon: "hand-holding-usd",
-        },
-        {
-            href: "/dashboard",
-            color: "primary",
-            title: "Transaksi",
-            value: rest.jumlah_transaksi,
-            icon: "money-bill-wave",
-        },
-        {
-            href: "/dashboard",
-            color: rest.pemasukan < 1 ? 'warning' : 'success',
-            title: "Pemasukan",
-            value: formatRupiah(rest.pemasukan),
-            icon: "dollar-sign",
-        },
-        {
-            href: "/dashboard",
-            color: rest.pengeluaran < 1 ? 'success' : 'danger',
-            title: "Pengeluaran",
-            value: formatRupiah(rest.pengeluaran),
-            icon: "donate",
-        },
-        {
-            href: "/dashboard",
-            color: "primary",
-            title: "Total Saldo",
-            value: formatRupiah(rest.total_saldo_akhir),
-            icon: "wallet",
+            kategori: 'Keuangan RT/RW',
+            isi: [
+                {
+                    href: "/dashboard",
+                    color: "primary",
+                    title: "Transaksi",
+                    value: rest.jumlah_transaksi,
+                    icon: "money-bill-wave",
+                },
+                {
+                    href: "/dashboard",
+                    color: rest.pemasukan < 1 ? 'warning' : 'success',
+                    title: "Pemasukan",
+                    value: formatRupiah(rest.pemasukan),
+                    icon: "dollar-sign",
+                },
+                {
+                    href: "/dashboard",
+                    color: rest.pengeluaran < 1 ? 'success' : 'danger',
+                    title: "Pengeluaran",
+                    value: formatRupiah(rest.pengeluaran),
+                    icon: "donate",
+                },
+                {
+                    href: "/dashboard",
+                    color: "primary",
+                    title: "Total Saldo",
+                    value: formatRupiah(rest.total_saldo_akhir),
+                    icon: "wallet",
+                },
+            ]
         },
     ];
 }

@@ -3,6 +3,8 @@ import { Inertia } from "@inertiajs/inertia"
 import { Head } from "@inertiajs/react"
 import '../../css/choose-role.css'
 
+// dah gk kepake lagi btw
+
 export default function ChooseRole({ roles }) {
     const [selectedRole, setSelectedRole] = useState("")
 

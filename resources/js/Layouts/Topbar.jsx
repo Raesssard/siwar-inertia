@@ -15,7 +15,10 @@ export default function Topbar({ modalShow, hapusHistory }) {
     // const [showPasswordModal, setShowPasswordModal] = useState(false)
     const [gantiAkun, setGantiAkun] = useState(false)
     const [selectedRole, setSelectedRole] = useState("")
-
+    function getNameFromUrl(url) {
+        return url.split("/").pop();
+    }
+    const isSettingsPage = getNameFromUrl(usePage().url) === "settings"
     // const modalHandler = (showModal) => setShowPasswordModal(showModal)
 
     function submit(e) {
@@ -282,14 +285,18 @@ export default function Topbar({ modalShow, hapusHistory }) {
                         data-bs-auto-close="outside"
                     >
                         {/* Ubah password */}
-                        <button className="w-100">
-                            <Link
-                                href={route("settings")}
-                                className="dropdown-item"
-                            >
-                                <i className="fas fa-cog fa-sm fa-fw mr-2 text-gray-400"></i>
-                                Pengaturan
-                            </Link>
+                        <button className="dropdown-item"
+                            disabled={isSettingsPage}
+                            type="button"
+                            onClick={() => {
+                                // setShowPasswordModal(true)
+                                router.visit(route('settings'), {
+                                    preserveScroll: true,
+                                })
+                            }}
+                        >
+                            <i className="fas fa-cog fa-sm fa-fw mr-2 text-gray-400"></i>
+                            Pengaturan
                         </button>
 
                         {/* Ganti akun */}

@@ -11,6 +11,8 @@ import {
     analisisSistemAdmin
 } from "./Component/GetPropRole";
 
+// btw, ini dah gk kepake lagi
+
 export default function Analisis() {
     const { role, ...rest } = usePage().props
     let statCards = [];
