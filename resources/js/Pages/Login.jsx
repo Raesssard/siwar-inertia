@@ -1,13 +1,13 @@
 import React, { useState } from "react"
 import "../../css/login.css"
-import { Head, useForm } from "@inertiajs/react"
+import { Head, useForm, usePage } from "@inertiajs/react"
 import Swal from "sweetalert2"
 import axios from "axios"
 import FloatingInput from './Component/FloatingInput'
 import logo from '../../../public/img/logo.png'
 
 export default function Login() {
-    const { data, setData, post, processing, errors } = useForm({
+    const { data, setData, processing } = useForm({
         nik: '',
         password: '',
         remember: false,
@@ -73,12 +73,16 @@ export default function Login() {
                         })
                     },
                 })
-            } else {
-                window.location.href = "/dashboard";
+            } else if (res.data?.redirect) {
+                window.location.href = res.data.redirect
             }
         } catch (err) {
             console.error(err)
-            Swal.fire("Gagal", "NIK atau kata sandi salah.", "error")
+            Swal.fire({
+                icon: "error",
+                title: "Gagal Login",
+                text: err.response?.data?.error || "NIK atau kata sandi salah.",
+            })
         }
     }
 
@@ -127,16 +131,6 @@ export default function Login() {
                                     Ingat saya
                                 </label>
                             </div>
-
-                            {(errors?.nik || errors?.password) &&
-                                (<div className="alert mt-2">
-                                    NIK atau kata sandi salah.
-                                    <button type="button" className="custom-close" onClick={(e) => e.target.parentElement.remove()}>
-                                        ×
-                                    </button>
-                                </div>)
-                            }
-
 
                             <button type="submit" className="btn-login btn-primary">
                                 <i className="bi bi-box-arrow-in-right me-2"></i>

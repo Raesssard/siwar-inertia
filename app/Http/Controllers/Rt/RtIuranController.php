@@ -69,7 +69,7 @@ class RtIuranController extends Controller
         })->select('no_kk')
             ->get();
 
-        return Inertia::render('RT/Iuran', [
+        return Inertia::render('Iuran', [
             'iuranOtomatis' => $iuranOtomatis,
             'iuranManual' => $iuranManual,
             'golongan_list' => $golongan_list,

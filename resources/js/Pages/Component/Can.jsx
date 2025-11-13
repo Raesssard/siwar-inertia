@@ -1,9 +1,20 @@
-import { usePage } from '@inertiajs/react';
+import { usePage } from '@inertiajs/react'
 
 export default function Can({ permission, children }) {
-  const { auth } = usePage().props;
-  const permissions = auth?.permissions;
+  const { auth } = usePage().props || {}
+  const permissions = auth?.permissions || []
 
-  if (!permissions?.includes(permission)) return null;
-  return children;
+  const requiredPermissions = Array.isArray(permission)
+    ? permission
+    : [permission]
+
+  const hasPermission = requiredPermissions.some(p =>
+    permissions.includes(p)
+  )
+
+  if (!hasPermission) {
+    return null
+  }
+
+  return <>{children}</>
 }
