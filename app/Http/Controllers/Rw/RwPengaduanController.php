@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Pengaduan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 
 class RwPengaduanController extends Controller
@@ -116,19 +117,21 @@ class RwPengaduanController extends Controller
             $pengaduan->update(['konfirmasi_rw' => 'sudah']);
         } else {
             // level = 'rt'
-            if ($role === 'rt' && $pengaduan->konfirmasi_rw === 'belum') {
+            if ($role === 'rt' && $pengaduan->konfirmasi_rw === 'belum' && $pengaduan->level === 'rt') {
                 $pengaduan->update(['konfirmasi_rw' => 'menunggu']);
-            } elseif ($role === 'rw' && $pengaduan->konfirmasi_rw === 'menunggu') {
+            } elseif ($role === 'rw' && $pengaduan->konfirmasi_rw === 'menunggu' && $pengaduan->level === 'rt') {
                 $pengaduan->update(['konfirmasi_rw' => 'sudah']);
             }
         }
 
-        $isi_komentar = $request->input('isi_komentar');
+        if ($role === 'rt') {
+            $isi_komentar = $request->input('isi_komentar');
 
-        $komentar = $pengaduan->komentar()->create([
-            'user_id' => Auth::id(),
-            'isi_komentar' => $isi_komentar
-        ]);
+            $komentar = $pengaduan->komentar()->create([
+                'user_id' => Auth::id(),
+                'isi_komentar' => $isi_komentar
+            ]);
+        }
 
         $komentar->load('user');
 
@@ -140,6 +143,16 @@ class RwPengaduanController extends Controller
                 'warga.kartuKeluarga.rw'
             ]),
             'komentar' => $komentar
+        ]);
+    }
+
+    public function baca(Request $request, $id)
+    {
+        $pengaduan = Pengaduan::findOrFail($id);
+
+        $pengaduan->update([
+            'status' => 'diproses',
+            'konfirmasi_rw' => 'sudah',
         ]);
     }
 

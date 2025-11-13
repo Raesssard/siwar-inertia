@@ -10,6 +10,7 @@ export default function Login() {
     const { data, setData, post, processing, errors } = useForm({
         nik: '',
         password: '',
+        remember: false,
     })
 
     const handleSubmit = async (e) => {
@@ -112,6 +113,20 @@ export default function Login() {
                                 icon="bi-lock"
                                 toggleable
                             />
+
+                            <div className="form-check mt-3 mb-3 text-start">
+                                <input
+                                    type="checkbox"
+                                    className="form-check-input"
+                                    id="remember"
+                                    checked={data.remember}
+                                    onChange={(e) => setData('remember', e.target.checked)}
+                                    style={{ backgroundColor: '#4e73df' }}
+                                />
+                                <label htmlFor="remember" className="form-check-label">
+                                    Ingat saya
+                                </label>
+                            </div>
 
                             {(errors?.nik || errors?.password) &&
                                 (<div className="alert mt-2">

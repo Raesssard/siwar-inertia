@@ -48,7 +48,7 @@ export default function Pengumuman() {
         groups[kategori].push(item)
         return groups
     }, {})
-
+    console.log(daftarKategori)
     const order = [
         "Hari ini",
         "Kemarin",
@@ -255,6 +255,12 @@ export default function Pengumuman() {
                     onClose={() => setShowModalDetail(false)}
                     onUpdated={(updated) => {
                         setSelected(updated)
+                        setDaftarKategori(prev => {
+                            if (!prev.includes(updated.kategori)) {
+                                return [...prev, updated.kategori]
+                            }
+                            return prev
+                        })
                         setPengumumanList(prev =>
                             prev.map(item =>
                                 item.id === updated.id ? updated : item

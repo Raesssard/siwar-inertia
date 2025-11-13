@@ -1020,7 +1020,6 @@ export function DetailPengaduan({ selectedData, detailShow, onClose, onUpdated, 
                 }
             })
             .catch(err => {
-
                 console.error(err)
             })
     }
@@ -1418,7 +1417,7 @@ export function DetailPengaduan({ selectedData, detailShow, onClose, onUpdated, 
                                             )}
                                         </div>
                                         <div className="komen p-3 border-top">
-                                            {((role.includes('rt') || role.includes('rw')) && !isConfirm) ? (
+                                            {((role.includes('rt') || role.includes('rw')) && !isConfirm && selectedData.level === 'rt') ? (
                                                 <button className="btn btn-primary w-100" type="button" onClick={handleConfirm}>
                                                     <i className="fas fa-check me-2"></i>
                                                     Konfirmasi
@@ -3922,6 +3921,7 @@ export function TambahPengumuman({ kategori, tambahShow, onClose, onAdded, role 
                                                             boxShadow: "none",
                                                         }),
                                                     }}
+                                                    required
                                                 />
                                             </div>
 
@@ -3945,7 +3945,6 @@ export function TambahPengumuman({ kategori, tambahShow, onClose, onAdded, role 
                                                     className="tambah-kategori form-control"
                                                     value={data.tempat}
                                                     onChange={(e) => setData("tempat", e.target.value)}
-                                                    required
                                                 />
                                             </div>
 

@@ -172,7 +172,7 @@ class Rt_pengumumanController extends Controller
             'judul' => $request->judul,
             'isi' => $request->isi,
             'kategori' => $request->kategori,
-            'tanggal' => Carbon::parse($request->tanggal)->format('Y-m-d H:i:s'),
+            'tanggal' => $request->tanggal ? Carbon::parse($request->tanggal)->format('Y-m-d H:i:s') : null,
             'tempat' => $request->tempat ? $request->tempat : Auth::user()->warga->kartuKeluarga->alamat,
             'id_rt' => $id_rt_user,
             'id_rw' => $id_rw_user,

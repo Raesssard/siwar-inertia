@@ -90,6 +90,21 @@ class DashboardController extends Controller
                 })
                 ->sum('nominal');
 
+            $jumlah_tagihan_sudah_bayar = Tagihan::where('status_bayar', 'sudah_bayar')
+                ->whereIn('no_kk', function ($kk) use ($nik) {
+                    $kk->select('no_kk')
+                        ->from('warga')
+                        ->where('nik', $nik);
+                })->count();
+
+            $total_tagihan_sudah_bayar = Tagihan::where('status_bayar', 'sudah_bayar')
+                ->whereIn('no_kk', function ($kk) use ($nik) {
+                    $kk->select('no_kk')
+                        ->from('warga')
+                        ->where('nik', $nik);
+                })
+                ->sum('nominal');
+
             $transaksi = Transaksi::where('rt', $user->warga->kartuKeluarga->rukunTetangga->nomor_rt);
             $pemasukan = (clone $transaksi)->where('jenis', 'pemasukan')->sum('nominal');
             $pengeluaran = (clone $transaksi)->where('jenis', 'pengeluaran')->sum('nominal');
@@ -106,6 +121,8 @@ class DashboardController extends Controller
                     'jumlah_pengumuman' => $jumlah_pengumuman,
                     'total_tagihan' => $total_tagihan,
                     'jumlah_tagihan' => $jumlah_tagihan,
+                    'total_tagihan_sudah_bayar' => $total_tagihan_sudah_bayar,
+                    'jumlah_tagihan_sudah_bayar' => $jumlah_tagihan_sudah_bayar,
                     'jumlah_transaksi' => $jumlah_transaksi,
                     'pemasukan' => $pemasukan,
                     'pengeluaran' => $pengeluaran,

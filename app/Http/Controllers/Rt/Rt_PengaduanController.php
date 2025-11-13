@@ -153,6 +153,15 @@ class Rt_PengaduanController extends Controller
             ->with('success', 'Pengaduan berhasil diperbarui.');
     }
 
+    public function baca(Request $request, $id)
+    {
+        $pengaduan = Pengaduan::findOrFail($id);
+
+        $pengaduan->update([
+            'status' => 'diproses',
+        ]);
+    }
+
     public function komen(Request $request, $id)
     {
         $request->validate([

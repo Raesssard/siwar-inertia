@@ -6,6 +6,7 @@ import FileDisplay from "./Component/FileDisplay"
 import { DetailPengaduan, TambahPengaduan } from "./Component/Modal"
 import { FilterPengaduan } from "./Component/Filter"
 import Role from "./Component/Role"
+import { Inertia } from "@inertiajs/inertia"
 
 export function FormatWaktu({ createdAt }) {
     const now = new Date()
@@ -111,6 +112,32 @@ export default function Pengaduan() {
     const modalDetail = (item) => {
         setSelected(item)
         setShowModalDetail(true)
+
+        if (role === 'rw' && item.status === 'belum' && item.konfirmasi_rw === 'menunggu') {
+            Inertia.post(`/rw/pengaduan/${item.id}/baca`, {
+                onSuccess: () => {
+                    setPengaduanList(prev =>
+                        prev.map(p =>
+                            p.id === item.id ? { ...p, status: 'diproses' } : p
+                        )
+                    )
+                },
+                preserveScroll: true,
+                preserveState: true
+            })
+        } else if (role === 'rt' && item.status === 'belum' && item.konfirmasi_rw === 'sudah') {
+            Inertia.post(`/rt/pengaduan/${item.id}/baca`, {
+                onSuccess: () => {
+                    setPengaduanList(prev =>
+                        prev.map(p =>
+                            p.id === item.id ? { ...p, status: 'diproses' } : p
+                        )
+                    )
+                },
+                preserveScroll: true,
+                preserveState: true
+            })
+        }
     }
 
     const scrollToTop = () => {
@@ -259,7 +286,7 @@ export default function Pengaduan() {
                                             const labelMap = {
                                                 belum: "Belum dibaca",
                                                 diproses_menunggu: "Menunggu konfirmasi RW",
-                                                diproses_sudah: "Sudah dikonfirmasi",
+                                                diproses_sudah: "Sedang diproses",
                                                 diproses_default: "Sedang diproses",
                                                 selesai: "Selesai"
                                             }
@@ -286,7 +313,11 @@ export default function Pengaduan() {
                                             const label = labelMap[key] || "Status tidak diketahui"
 
                                             return (
-                                                <div key={index} className="card-clickable d-flex justify-content-center align-items-center flex-column" onClick={() => modalDetail(item)}>
+                                                <div
+                                                    key={index}
+                                                    className="card-clickable d-flex justify-content-center align-items-center flex-column"
+                                                    onClick={() => modalDetail(item)}
+                                                >
                                                     <FileDisplay
                                                         filePath={`/storage/${item.file_path}`}
                                                         judul={item.file_name}

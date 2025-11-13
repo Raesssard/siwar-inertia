@@ -489,3 +489,8 @@ ul.ps-3 .nav-item.active>.nav-link {
 .react-select__menu {
   z-index: 9999;
 }
+
+input[type="checkbox"] {
+  accent-color: #4e73df; /* warna biru Bootstrap */
+}
+
