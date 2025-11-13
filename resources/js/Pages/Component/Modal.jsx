@@ -4788,6 +4788,7 @@ export function TambahTagihan({ tambahShow, onClose, onUpdated, role, iuran, kk_
     })
 
     useEffect(() => {
+        if (!iuran || iuran.length === 0) return
         const selected = iuran.find((item) => item.id == data.id_iuran)
         if (selected) {
             setData((prev) => ({
@@ -4797,7 +4798,7 @@ export function TambahTagihan({ tambahShow, onClose, onUpdated, role, iuran, kk_
                 tgl_tagih: selected.tgl_tagih || "",
             }))
         }
-    }, [data.id_iuran])
+    }, [data.id_iuran, iuran])
 
     const handleSubmit = (e) => {
         e.preventDefault()
@@ -4920,7 +4921,7 @@ export function TambahTagihan({ tambahShow, onClose, onUpdated, role, iuran, kk_
                                         <div className="mb-3">
                                             <label className="form-label">Jenis Iuran</label>
                                             <Select
-                                                options={iuran.map((item) => ({
+                                                options={iuran?.map((item) => ({
                                                     value: item.id,
                                                     label: item.nama,
                                                 }))}
@@ -4928,7 +4929,7 @@ export function TambahTagihan({ tambahShow, onClose, onUpdated, role, iuran, kk_
                                                     data.id_iuran
                                                         ? {
                                                             value: data.id_iuran,
-                                                            label: iuran.find((x) => x.id == data.id_iuran)?.nama || "",
+                                                            label: iuran?.find((x) => x.id == data.id_iuran)?.nama || "",
                                                         }
                                                         : null
                                                 }

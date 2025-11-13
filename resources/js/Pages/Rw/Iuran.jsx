@@ -3,7 +3,7 @@ import { Head, Link, useForm, usePage } from "@inertiajs/react";
 import React, { useState } from "react";
 import { FilterIuran } from "../Component/Filter";
 import { formatRupiah, formatTanggal } from "../Component/GetPropRole";
-import { EditIuranOtomatis, TambahIuran } from "../Component/Modal";
+import { EditIuranOtomatis, TambahIuran, EditIuranManual } from "../Component/Modal";
 import Swal from "sweetalert2";
 
 export default function Iuran() {
@@ -24,6 +24,7 @@ export default function Iuran() {
     const [iuranListManual, setIuranListManual] = useState(iuranManualFromServer.data || []);
     const [showModalTambah, setShowModalTambah] = useState(false);
     const [showModalEdit, setShowModalEdit] = useState(false);
+    const [showModalEditManual, setShowModalEditManual] = useState(false); // ✅ Tambahkan ini
 
     const { get, data, setData } = useForm({ search: "" });
     const { props } = usePage()

@@ -3,17 +3,23 @@
 namespace App\Http\Controllers\Rw;
 
 use App\Http\Controllers\Controller;
+use App\Models\Iuran;
 use App\Models\Tagihan;
 use App\Models\Kartu_keluarga;
+use Carbon\Carbon;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
-use Exception;
+use Illuminate\Database\Eloquent\Collection;
 
 class RwTagihanController extends Controller
 {
+    /**
+     * Menampilkan daftar tagihan RW.
+     */
     public function index(Request $request)
     {
         $title = 'Tagihan RW';
@@ -23,50 +29,144 @@ class RwTagihanController extends Controller
         $search = $request->search;
         $no_kk_filter = $request->no_kk_filter;
 
-        // KK dalam wilayah RW
+        // Daftar KK untuk dropdown filter
         $kartuKeluargaForFilter = Kartu_keluarga::where('id_rw', $idRw)
             ->select('no_kk')
             ->distinct()
             ->orderBy('no_kk')
             ->get();
 
-        $baseQuery = Tagihan::with(['iuran', 'kartuKeluarga', 'kartuKeluarga.warga'])
-            ->whereHas('kartuKeluarga', function ($q) use ($idRw) {
-                $q->where('id_rw', $idRw);
-            });
+        // Base query (sama struktur dengan RT)
+        $baseQuery = Tagihan::with([
+            'iuran',
+            'kartuKeluarga.warga',
+            'kartuKeluarga.kepalaKeluarga',
+        ])->whereHas('kartuKeluarga', function ($q) use ($idRw) {
+            $q->where('id_rw', $idRw);
+        });
 
+        // Tagihan manual
         $tagihanManual = (clone $baseQuery)
             ->where('jenis', 'manual')
-            ->when($search, fn($q) => $q->where('nama', 'like', "%$search%")
-                ->orWhere('no_kk', 'like', "%$search%"))
+            ->when($search, function ($query) use ($search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('nama', 'like', "%$search%")
+                        ->orWhere('nominal', 'like', "%$search%")
+                        ->orWhere('no_kk', 'like', "%$search%");
+                });
+            })
             ->when($no_kk_filter, fn($q) => $q->where('no_kk', $no_kk_filter))
             ->orderBy('tgl_tagih', 'desc')
             ->paginate(10, ['*'], 'manual_page');
 
+        // Tagihan otomatis
         $tagihanOtomatis = (clone $baseQuery)
             ->where('jenis', 'otomatis')
-            ->when($search, fn($q) => $q->where('nama', 'like', "%$search%")
-                ->orWhere('no_kk', 'like', "%$search%"))
+            ->when($search, function ($query) use ($search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('nama', 'like', "%$search%")
+                        ->orWhere('nominal', 'like', "%$search%")
+                        ->orWhere('no_kk', 'like', "%$search%");
+                });
+            })
             ->when($no_kk_filter, fn($q) => $q->where('no_kk', $no_kk_filter))
             ->orderBy('tgl_tagih', 'desc')
             ->paginate(10, ['*'], 'otomatis_page');
+
+        // Ambil iuran untuk RW
+        $iuran_for_tagihan = Iuran::with(['iuran_golongan', 'iuran_golongan.golongan'])
+            ->where('id_rw', $idRw)
+            ->where('level', 'rw')
+            ->where('jenis', 'manual')
+            ->get();
 
         return Inertia::render('Rw/Tagihan', [
             'title' => $title,
             'tagihanManual' => $tagihanManual,
             'tagihanOtomatis' => $tagihanOtomatis,
-            'kartuKeluargaForFilter' => $kartuKeluargaForFilter
+            'iuran_for_tagihan' => $iuran_for_tagihan,
+            'kartuKeluargaForFilter' => $kartuKeluargaForFilter,
         ]);
     }
 
+    /**
+     * Membuat tagihan RW manual.
+     */
+    public function store(Request $request)
+    {
+        $request->validate([
+            'nama' => 'required',
+            'nominal' => 'required|numeric|min:0|max:99999999',
+            'tgl_tagih' => 'nullable|date',
+            'no_kk' => 'nullable',
+            'id_iuran' => 'required|exists:iuran,id',
+        ]);
+
+        $iuran = Iuran::findOrFail($request->id_iuran);
+
+        $kkQuery = Kartu_keluarga::where('id_rw', $iuran->id_rw);
+
+        if ($request->no_kk && $request->no_kk !== 'semua') {
+            $kkQuery->where('no_kk', $request->no_kk);
+        }
+
+        $kkList = $kkQuery->get();
+
+        $tgl_tagih = Carbon::parse($request->tgl_tagih ?? $iuran->tgl_tagih);
+        $tgl_tempo = $request->tgl_tagih
+            ? $tgl_tagih->copy()->addDays(
+                Carbon::parse($iuran->tgl_tagih)->diffInDays(Carbon::parse($iuran->tgl_tempo))
+            )
+            : Carbon::parse($iuran->tgl_tempo);
+
+        $tagihanList = new Collection();
+
+        foreach ($kkList as $kk) {
+            $tagihan = Tagihan::create([
+                'nama' => $request->nama ?? $iuran->nama,
+                'nominal' => $request->nominal ?? $iuran->nominal,
+                'tgl_tagih' => $tgl_tagih,
+                'tgl_tempo' => $tgl_tempo,
+                'jenis' => 'manual',
+                'no_kk' => $kk->no_kk,
+                'status_bayar' => 'belum_bayar',
+                'id_iuran' => $iuran->id,
+            ]);
+
+            $tagihanList->push($tagihan);
+        }
+
+        $iuran->load(['iuran_golongan', 'iuran_golongan.golongan']);
+
+        $tagihanList->load([
+            'transaksi',
+            'iuran',
+            'kartuKeluarga.warga',
+            'kartuKeluarga.kepalaKeluarga',
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => $request->no_kk === 'semua'
+                ? 'Tagihan berhasil dibuat untuk semua KK di RW.'
+                : 'Tagihan berhasil dibuat.',
+            'tagihan' => $request->no_kk === 'semua' ? $tagihanList : $tagihanList->first(),
+            'iuran' => $iuran,
+        ], 201);
+    }
+
+    /**
+     * Update status bayar tagihan RW.
+     */
     public function update(Request $request, $id)
     {
-        $tagihan = \App\Models\Tagihan::findOrFail($id);
+        $tagihan = Tagihan::findOrFail($id);
         $iuran = $tagihan->iuran;
 
         $validated = $request->validate([
             'status_bayar' => 'required|in:sudah_bayar,belum_bayar',
             'tgl_bayar' => 'nullable|date',
+            'nominal_bayar' => 'nullable|numeric|min:0',
             'kategori_pembayaran' => 'nullable|in:transfer,tunai',
             'bukti_transfer' => 'nullable|file|mimes:jpg,jpeg,png|max:20480',
         ]);
@@ -74,7 +174,6 @@ class RwTagihanController extends Controller
         try {
             $buktiPath = $tagihan->bukti_transfer;
 
-            // ✅ Upload / Ganti bukti transfer jika ada
             if ($request->hasFile('bukti_transfer')) {
                 if ($buktiPath && Storage::exists('public/' . $buktiPath)) {
                     Storage::delete('public/' . $buktiPath);
@@ -82,35 +181,32 @@ class RwTagihanController extends Controller
                 $buktiPath = $request->file('bukti_transfer')->store('bukti_transfer', 'public');
             }
 
-            // ✅ Update data tagihan
             $tagihan->update([
                 'status_bayar' => $validated['status_bayar'],
                 'tgl_bayar' => $validated['tgl_bayar'] ?? null,
+                'nominal_bayar' => $validated['nominal_bayar'] ?? 0,
                 'kategori_pembayaran' => $validated['kategori_pembayaran'] ?? null,
                 'bukti_transfer' => $buktiPath,
             ]);
 
-            // ✅ Kelola transaksi berdasarkan status
-            if ($validated['status_bayar'] === 'sudah_bayar') {
-                // Jika belum ada transaksi, buat baru
-                if (!$tagihan->transaksi) {
-                    $tagihan->transaksi()->create([
-                        'tagihan_id' => $tagihan->id,
-                        'rt' => $iuran->rt->nomor_rt ?? '-',
-                        'tanggal' => $validated['tgl_bayar'] ?? now(),
-                        'jenis' => 'pemasukan',
-                        'nominal' => $tagihan->nominal,
-                        'nama_transaksi' => 'Pembayaran Iuran RW: ' . ($tagihan->nama ?? 'Iuran'),
-                        'keterangan' => 'Pembayaran untuk tagihan RW ' . ($tagihan->nama ?? 'iuran'),
-                    ]);
-                }
-            } else {
-                // Jika status diubah ke belum_bayar
+            if ($validated['status_bayar'] === 'sudah_bayar' && !$tagihan->transaksi) {
+                $tagihan->transaksi()->create([
+                    'tagihan_id' => $tagihan->id,
+                    'no_kk' => $tagihan->no_kk,
+                    'rt' => $iuran->rt->nomor_rt ?? '-',
+                    'tanggal' => $validated['tgl_bayar'] ?? now(),
+                    'jenis' => 'pemasukan',
+                    'nominal' => $tagihan->nominal_bayar,
+                    'nama_transaksi' => 'Pembayaran ' . ($tagihan->nama ?? 'Iuran RW'),
+                    'keterangan' => 'Pembayaran untuk tagihan RW ' . ($tagihan->nama ?? 'iuran'),
+                ]);
+            }
+
+            if ($validated['status_bayar'] === 'belum_bayar') {
                 if ($tagihan->transaksi) {
                     $tagihan->transaksi->delete();
                 }
 
-                // Hapus bukti & tanggal bayar agar bersih
                 if ($tagihan->bukti_transfer && Storage::exists('public/' . $tagihan->bukti_transfer)) {
                     Storage::delete('public/' . $tagihan->bukti_transfer);
                 }
@@ -125,13 +221,12 @@ class RwTagihanController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Tagihan diperbarui.',
-                'tagihan' => $tagihan->load(['kartuKeluarga.warga', 'transaksi']),
+                'message' => 'Tagihan RW berhasil diperbarui.',
+                'tagihan' => $tagihan->load(['transaksi', 'iuran', 'kartuKeluarga.kepalaKeluarga']),
                 'iuran' => $iuran
             ]);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error("RW gagal update tagihan ID {$id}: " . $e->getMessage());
-
             return response()->json([
                 'success' => false,
                 'message' => 'Kesalahan server: ' . $e->getMessage(),

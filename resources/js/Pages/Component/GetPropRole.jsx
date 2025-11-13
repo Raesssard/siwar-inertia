@@ -281,11 +281,11 @@ export function getAdminLinks() {
             text: "Analisis Warga",
             icon: "users",
             children: [
-                {
-                    href: "/admin/analisis/warga",
-                    text: "Analisis Warga Admin",
-                    icon: "eye",
-                },
+                // {
+                //     href: "/admin/analisis/warga",
+                //     text: "Analisis Warga Admin",
+                //     icon: "eye",
+                // },
                 {
                     href: "/admin/kartu_keluarga",
                     text: "Data Kartu Keluarga",
@@ -307,11 +307,11 @@ export function getAdminLinks() {
             text: "Pengaturan Sistem",
             icon: "cog",
             children: [
-                {
-                    href: "/admin/analisis/sistem",
-                    text: "Analisis Sistem",
-                    icon: "cogs",
-                },
+                // {
+                //     href: "/admin/analisis/sistem",
+                //     text: "Analisis Sistem",
+                //     icon: "cogs",
+                // },
                 {
                     href: "/admin/kategori-golongan",
                     text: "Kategori Golongan",
