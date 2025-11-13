@@ -26,7 +26,8 @@ export default function Iuran() {
     const [showModalEdit, setShowModalEdit] = useState(false);
 
     const { get, data, setData } = useForm({ search: "" });
-    const role = "rw";
+    const { props } = usePage()
+    const role = props.auth?.currentRole
 
     const modalEdit = (item, matched, gol) => {
         setSelected(item);
@@ -37,7 +38,7 @@ export default function Iuran() {
 
     const filter = (e) => {
         e.preventDefault();
-        get(`/rw/iuran`, { preserveState: true, preserveScroll: true });
+        get(`/${role}/iuran`, { preserveState: true, preserveScroll: true });
     };
 
     const resetFilter = () => setData({ search: "" });
@@ -82,33 +83,35 @@ export default function Iuran() {
         });
     };
 
-    let no = 1;
+    let no = 1
 
-    const rows = iuranListOtomatis.flatMap((item) =>
+    const rows = iuranListOtomatis.flatMap((item, index) =>
         golongan_list
             .map((gol) => {
-                const matched = item.iuran_golongan?.find((ig) => ig.id_golongan === gol.id);
-                if (!matched) return null;
+                const matched = item.iuran_golongan?.find(ig => ig.id_golongan === gol.id)
+                if (!matched) return null
                 return (
                     <tr key={`${item.id}-${gol.id}`}>
                         <td className="text-center">{no++}</td>
-                        <td className="text-center">{item.nama ?? "-"}</td>
+                        <td className="text-center">{item.nama ?? '-'}</td>
                         <td className="text-center">
                             {gol.jenis.charAt(0).toUpperCase() + gol.jenis.slice(1)}
                         </td>
                         <td className="text-center">{formatRupiah(matched.nominal)}</td>
-                        <td className="text-center">{formatTanggal(item.tgl_tagih) ?? "-"}</td>
-                        <td className="text-center">{formatTanggal(item.tgl_tempo) ?? "-"}</td>
+                        <td className="text-center">{formatTanggal(item.tgl_tagih) ?? '-'}</td>
+                        <td className="text-center">{formatTanggal(item.tgl_tempo) ?? '-'}</td>
                         <td className="text-center">
-                            <div className="d-flex justify-content-center gap-2">
+                            <div className="d-flex justify-content-center align-items-center gap-2">
                                 <button
-                                    className="btn btn-sm btn-warning"
+                                    className="btn btn-sm btn-warning my-auto"
+                                    title="Edit Iuran"
                                     onClick={() => modalEdit(item, matched, gol)}
                                 >
                                     <i className="fa-solid fa-pen-to-square"></i>
                                 </button>
                                 <button
-                                    className="btn btn-sm btn-danger"
+                                    className="btn btn-sm btn-danger my-auto"
+                                    title="Hapus Iuran"
                                     onClick={() => handleDelete(matched.id, item.jenis)}
                                 >
                                     <i className="fa-solid fa-trash"></i>
@@ -116,15 +119,19 @@ export default function Iuran() {
                             </div>
                         </td>
                     </tr>
-                );
+                )
             })
             .filter(Boolean)
-    );
+    )
 
     return (
         <Layout>
-            <Head title={title} />
+            <Head title={`${title} - ${role.length <= 2
+                ? role.toUpperCase()
+                : role.charAt(0).toUpperCase() + role.slice(1)}`} />
             <FilterIuran
+                iuranManual={iuranListManual}
+                iuranOtomatis={iuranListOtomatis}
                 data={data}
                 setData={setData}
                 filter={filter}
@@ -135,36 +142,42 @@ export default function Iuran() {
             {/* Table Manual */}
             <div className="table-container">
                 <div className="table-header">
-                    <h4>Data Iuran Manual</h4>
+                    <h4>Jenis Iuran (Manual)</h4>
                 </div>
                 <div className="table-scroll">
                     <table className="table-custom">
                         <thead>
                             <tr>
-                                <th className="text-center">No</th>
-                                <th className="text-center">Nama</th>
-                                <th className="text-center">Nominal</th>
-                                <th className="text-center">Tanggal Tagih</th>
-                                <th className="text-center">Tanggal Tempo</th>
-                                <th className="text-center">Aksi</th>
+                                <th className="px-3 text-center" scope="col">No.</th>
+                                <th className="px-3 text-center" scope="col">Nama</th>
+                                <th className="px-3 text-center" scope="col">Nominal</th>
+                                <th className="px-3 text-center" scope="col">Tanggal Tagih</th>
+                                <th className="px-3 text-center" scope="col">Tanggal Tempo</th>
+                                <th className="px-3 text-center" scope="col">Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {iuranListManual.length ? (
-                                iuranListManual.map((item, i) => (
+                            {iuranListManual.length > 0 ? (
+                                iuranListManual.map((item, index) => (
                                     <tr key={item.id}>
-                                        <td className="text-center">{i + 1}</td>
-                                        <td className="text-center">{item.nama}</td>
-                                        <td className="text-center">{formatRupiah(item.nominal)}</td>
-                                        <td className="text-center">{formatTanggal(item.tgl_tagih)}</td>
-                                        <td className="text-center">{formatTanggal(item.tgl_tempo)}</td>
+                                        <td className="text-center">{index + 1}</td>
+                                        <td className="text-center">{item.nama ?? '-'}</td>
+                                        <td className="text-center">{formatRupiah(item.nominal) ?? '-'}</td>
+                                        <td className="text-center">{formatTanggal(item.tgl_tagih) ?? '-'}</td>
+                                        <td className="text-center">{formatTanggal(item.tgl_tempo) ?? '-'}</td>
                                         <td className="text-center">
-                                            <button
-                                                className="btn btn-sm btn-danger"
-                                                onClick={() => handleDelete(item.id, item.jenis)}
-                                            >
-                                                <i className="fa-solid fa-trash"></i>
-                                            </button>
+                                            <div className="d-flex justify-content-center align-items-center gap-2">
+                                                <button
+                                                    className="btn btn-sm btn-warning my-auto"
+                                                    title="Edit Iuran"
+                                                    onClick={() => modalEditManual(item)}
+                                                >
+                                                    <i className="fa-solid fa-pen-to-square"></i>
+                                                </button>
+                                                <button className="btn btn-sm btn-danger my-auto" title="Hapus Iuran" onClick={() => handleDelete(item.id, item.jenis)}>
+                                                    <i className="fa-solid fa-trash"></i>
+                                                </button>
+                                            </div>
                                         </td>
                                     </tr>
                                 ))
@@ -178,28 +191,56 @@ export default function Iuran() {
                         </tbody>
                     </table>
                 </div>
+                {iuranManualFromServer.links && (
+                    <div className="pagination-container">
+                        <ul className="pagination-custom">
+                            {iuranManualFromServer.links.map((link, index) => {
+                                let label = link.label;
+                                if (label.includes("Previous")) label = "&lt;"
+                                if (label.includes("Next")) label = "&gt;"
+
+                                return (
+                                    <li
+                                        key={index}
+                                        className={`page-item ${link.active ? "active" : ""} ${!link.url ? "disabled" : ""
+                                            }`}
+                                        style={{ cursor: !link.url ? "not-allowed" : "pointer" }}
+                                    >
+                                        <Link
+                                            href={link.url || ""}
+                                            dangerouslySetInnerHTML={{
+                                                __html: label,
+                                            }}
+                                            title={`Pergi ke halaman ${label === "&lt;" ? 'sebelumnya' : label === "&gt;" ? 'selanjutnya' : label}`}
+                                        />
+                                    </li>
+                                )
+                            })}
+                        </ul>
+                    </div>
+                )}
             </div>
 
             {/* Table Otomatis */}
-            <div className="table-container mt-4">
+            <div className="table-container">
                 <div className="table-header">
-                    <h4>Data Iuran Otomatis</h4>
+                    <h4>Jenis Iuran (Otomatis)</h4>
                 </div>
                 <div className="table-scroll">
                     <table className="table-custom">
                         <thead>
                             <tr>
-                                <th className="text-center">No</th>
-                                <th className="text-center">Nama</th>
-                                <th className="text-center">Golongan</th>
-                                <th className="text-center">Nominal</th>
-                                <th className="text-center">Tanggal Tagih</th>
-                                <th className="text-center">Tanggal Tempo</th>
-                                <th className="text-center">Aksi</th>
+                                <th className="px-3 text-center" scope="col">No.</th>
+                                <th className="px-3 text-center" scope="col">Nama</th>
+                                <th className="px-3 text-center" scope="col">Golongan</th>
+                                <th className="px-3 text-center" scope="col">Nominal</th>
+                                <th className="px-3 text-center" scope="col">Tanggal Tagih</th>
+                                <th className="px-3 text-center" scope="col">Tanggal Tempo</th>
+                                <th className="px-3 text-center" scope="col">Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {rows.length ? (
+                            {rows.length > 0 ? (
                                 rows
                             ) : (
                                 <tr>
@@ -211,6 +252,34 @@ export default function Iuran() {
                         </tbody>
                     </table>
                 </div>
+                {iuranOtomatisFromServer.links && (
+                    <div className="pagination-container">
+                        <ul className="pagination-custom">
+                            {iuranOtomatisFromServer.links.map((link, index) => {
+                                let label = link.label;
+                                if (label.includes("Previous")) label = "&lt;";
+                                if (label.includes("Next")) label = "&gt;";
+
+                                return (
+                                    <li
+                                        key={index}
+                                        className={`page-item ${link.active ? "active" : ""} ${!link.url ? "disabled" : ""
+                                            }`}
+                                        style={{ cursor: !link.url ? "not-allowed" : "pointer" }}
+                                    >
+                                        <Link
+                                            href={link.url || ""}
+                                            dangerouslySetInnerHTML={{
+                                                __html: label,
+                                            }}
+                                            title={`Pergi ke halaman ${label === "&lt;" ? 'sebelumnya' : label === "&gt;" ? 'selanjutnya' : label}`}
+                                        />
+                                    </li>
+                                )
+                            })}
+                        </ul>
+                    </div>
+                )}
             </div>
 
             <TambahIuran
@@ -223,13 +292,30 @@ export default function Iuran() {
                 nik={nik_list}
                 no_kk={no_kk_list}
             />
+            <EditIuranManual
+                editShow={showModalEditManual}
+                onClose={() => setShowModalEditManual(false)}
+                onUpdated={(updated) => {
+                    setSelected(updated)
+                    setIuranListManual(prev =>
+                        prev.map(item =>
+                            item.id === updated.id ? updated : item
+                        )
+                    )
+                }}
+                role={role}
+                iuran={selected}
+            />
             <EditIuranOtomatis
                 editShow={showModalEdit}
                 onClose={() => setShowModalEdit(false)}
                 onUpdated={(updated) => {
-                    setIuranListOtomatis((prev) =>
-                        prev.map((item) => (item.id === updated.id ? updated : item))
-                    );
+                    setSelected(updated)
+                    setIuranListOtomatis(prev =>
+                        prev.map(item =>
+                            item.id === updated.id ? updated : item
+                        )
+                    )
                 }}
                 role={role}
                 golongan={selectedGolongan}

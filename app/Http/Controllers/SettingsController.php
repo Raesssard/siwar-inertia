@@ -17,10 +17,7 @@ class SettingsController extends Controller
             'max_rt_per_rw' => Setting::getValue('max_rt_per_rw'),
         ];
         return Inertia::render('Settings', [
-            'auth' => [
-                'user' => $user,
-                'currentRole' => session('current_role', $user->roles->first()->name ?? null),
-            ],
+            'user' => $user,
             'settings' => $settings, // ⬅️ kirim ke frontend
         ]);
     }

@@ -101,23 +101,24 @@ class RwIuranController extends Controller
             // Ambil semua KK milik RW ini
             $kkList = Kartu_keluarga::where('id_rw', $iuran->id_rw)->get();
 
+            // manual gk langsung dipakai buat tagihan
             // Manual: buat tagihan per KK
-            if ($request->jenis === 'manual') {
-                Log::info('🟦 Membuat tagihan manual untuk ' . count($kkList) . ' KK');
+            // if ($request->jenis === 'manual') {
+            //     Log::info('🟦 Membuat tagihan manual untuk ' . count($kkList) . ' KK');
 
-                foreach ($kkList as $kk) {
-                    Tagihan::create([
-                        'nama' => $iuran->nama,
-                        'nominal' => $iuran->nominal,
-                        'tgl_tagih' => $iuran->tgl_tagih,
-                        'tgl_tempo' => $iuran->tgl_tempo,
-                        'jenis' => 'manual',
-                        'no_kk' => $kk->no_kk,
-                        'status_bayar' => 'belum_bayar',
-                        'id_iuran' => $iuran->id,
-                    ]);
-                }
-            }
+            //     foreach ($kkList as $kk) {
+            //         Tagihan::create([
+            //             'nama' => $iuran->nama,
+            //             'nominal' => $iuran->nominal,
+            //             'tgl_tagih' => $iuran->tgl_tagih,
+            //             'tgl_tempo' => $iuran->tgl_tempo,
+            //             'jenis' => 'manual',
+            //             'no_kk' => $kk->no_kk,
+            //             'status_bayar' => 'belum_bayar',
+            //             'id_iuran' => $iuran->id,
+            //         ]);
+            //     }
+            // }
 
             // Otomatis: simpan iuran_golongan lalu buat tagihan sesuai kategori KK
             if ($request->jenis === 'otomatis') {

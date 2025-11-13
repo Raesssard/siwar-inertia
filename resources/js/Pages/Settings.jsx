@@ -3,9 +3,9 @@ import { useForm, usePage } from "@inertiajs/react";
 import Layout from "@/Layouts/Layout";
 
 export default function Settings() {
-    const { auth, settings } = usePage().props;
-    const user = auth.user;
-    const role = auth.currentRole;
+    const { user, settings } = usePage().props;
+    const { props } = usePage()
+    const role = props.auth?.currentRole
 
     // 🔐 Form ubah password
     const {

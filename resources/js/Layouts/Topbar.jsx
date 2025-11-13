@@ -3,17 +3,20 @@ import { usePage, Link } from "@inertiajs/react"
 import { Inertia } from "@inertiajs/inertia"
 import "../../css/topbar.css"
 import { PasswordModal } from "../Pages/Component/Modal"
+import Swal from "sweetalert2"
+import { router } from '@inertiajs/react'
+import { route } from "ziggy-js"
 
 export default function Topbar({ modalShow, hapusHistory }) {
     const { props } = usePage()
     const user = props.auth?.user
     const currentRole = props.auth?.currentRole
     const roles = props.auth?.roles || []
-    const [showPasswordModal, setShowPasswordModal] = useState(false)
+    // const [showPasswordModal, setShowPasswordModal] = useState(false)
     const [gantiAkun, setGantiAkun] = useState(false)
     const [selectedRole, setSelectedRole] = useState("")
 
-    const modalHandler = (showModal) => setShowPasswordModal(showModal)
+    // const modalHandler = (showModal) => setShowPasswordModal(showModal)
 
     function submit(e) {
         e.preventDefault()
@@ -22,10 +25,72 @@ export default function Topbar({ modalShow, hapusHistory }) {
         }
     }
 
+    const handleLogout = () => {
+        Swal.fire({
+            title: "Yakin logout dari akun ini?",
+            text: "Anda akan diarahkan ke halaman login.",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#d33",
+            cancelButtonColor: "#3085d6",
+            confirmButtonText: "Ya, logout",
+            cancelButtonText: "Batal",
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.fire({
+                    title: "Sedang logout...",
+                    text: "Mohon tunggu sebentar.",
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading()
+                    }
+                })
+
+                router.post(route('logout'), {}, {
+                    onSuccess: () => {
+                        Swal.close()
+                        Inertia.visit(route('login'))
+                    },
+                    onError: (error) => {
+                        Swal.fire({
+                            icon: "error",
+                            title: "Gagal logout!",
+                            text: "Terjadi kesalahan saat logout. Silakan coba lagi.",
+                        })
+                        console.error("Error during logout:", error)
+                    }
+                })
+            }
+        })
+    }
+
+
     function accountChange(e) {
         e.preventDefault()
         e.stopPropagation()
         setGantiAkun(!gantiAkun)
+    }
+
+    const handleChangeRole = (e, rol) => {
+        e.preventDefault();
+        setSelectedRole(rol);
+        hapusHistory();
+
+        Swal.fire({
+            title: "Mengganti akun...",
+            text: `Sedang masuk sebagai ${rol.length <= 2 ? rol.toUpperCase() : rol.charAt(0).toUpperCase() + rol.slice(1)}...`,
+            allowOutsideClick: false,
+            didOpen: () => Swal.showLoading(),
+        });
+
+        // Kirim form ganti role
+        axios.post("/choose-role", { role: rol })
+            .then(() => {
+                window.location.href = "/dashboard";
+            })
+            .catch(() => {
+                Swal.fire("Gagal", "Terjadi kesalahan saat mengganti akun.", "error");
+            });
     }
 
     const url = window.location.pathname
@@ -217,7 +282,7 @@ export default function Topbar({ modalShow, hapusHistory }) {
                         data-bs-auto-close="outside"
                     >
                         {/* Ubah password */}
-                        <button>
+                        <button className="w-100">
                             <Link
                                 href={route("settings")}
                                 className="dropdown-item"
@@ -247,10 +312,7 @@ export default function Topbar({ modalShow, hapusHistory }) {
                                                 <button
                                                     type="submit"
                                                     className={`btn-account dropdown-item ${currentRole === rol ? 'active' : ''}`}
-                                                    onClick={() => {
-                                                        setSelectedRole(rol)
-                                                        hapusHistory()
-                                                    }}
+                                                    onClick={(e) => handleChangeRole(e, rol)}
                                                     disabled={currentRole === rol}
                                                 >
                                                     <i className="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
@@ -270,22 +332,23 @@ export default function Topbar({ modalShow, hapusHistory }) {
                         <div className="dropdown-divider"></div>
 
                         {/* Tombol logout */}
-                        <Link
-                            href="/logout"
-                            method="post"
-                            as="button"
+                        <button
+                            type="button"
                             className="dropdown-item"
-                            onClick={() => hapusHistory()}
+                            onClick={() => {
+                                hapusHistory()
+                                handleLogout()
+                            }}
                         >
                             <i className="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>{" "}
                             Logout
-                        </Link>
+                        </button>
                     </div>
                 </li>
             </ul>
 
-            {/* Modal password */}
-            {showPasswordModal && <PasswordModal show={modalHandler} />}
+            {/* Modal password; gk kepake soalnya ada di settings */}
+            {/* {showPasswordModal && <PasswordModal show={modalHandler} />} */}
         </nav>
     )
 }

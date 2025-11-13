@@ -1704,7 +1704,7 @@ export function EditPengaduan({ toggle, onUpdated, onDeleted, pengaduan }) {
             )}
             <div className="flex-fill d-flex flex-column" style={previewUrl ? { maxWidth: "50%" } : { maxWidth: "100%" }}>
                 <div className="p-3" style={{ height: "100%" }}>
-                    <div className="d-flex justify-content-end w-100 mb-2">
+                    <div className="d-flex justify-content-end w-100">
                         <button
                             type="button"
                             onClick={() => toggle()}
@@ -1715,7 +1715,7 @@ export function EditPengaduan({ toggle, onUpdated, onDeleted, pengaduan }) {
                     </div>
 
                     <form onSubmit={handleSubmit}>
-                        <div className="mb-3">
+                        <div className="mb-2">
                             <label className="form-label">Judul</label>
                             <input
                                 name="judul"
@@ -1727,7 +1727,7 @@ export function EditPengaduan({ toggle, onUpdated, onDeleted, pengaduan }) {
                             />
                         </div>
 
-                        <div className="mb-3">
+                        <div className="mb-2">
                             <label className="form-label">Isi</label>
                             <textarea
                                 name="isi"
@@ -1739,20 +1739,25 @@ export function EditPengaduan({ toggle, onUpdated, onDeleted, pengaduan }) {
                             ></textarea>
                         </div>
 
-                        <div className="mb-3">
+                        <div className="mb-2">
                             <label className="form-label">Tujuan Pengaduan: </label>
                             <select
                                 name="level"
-                                className="edit-tujuan form-select"
+                                className="edit-tujuan form-control"
                                 value={data.level}
                                 onChange={(e) => setData("level", e.target.value)}
+                                style={{
+                                    border: '0',
+                                    borderBottom: '1px solid lightgray',
+                                    borderRadius: '0',
+                                }}
                             >
                                 <option value="rt">RT</option>
                                 <option value="rw">RW</option>
                             </select>
                         </div>
 
-                        <div className="mb-3">
+                        <div className="mb-2">
                             <input
                                 type="file"
                                 id="fileInput"
@@ -1772,12 +1777,22 @@ export function EditPengaduan({ toggle, onUpdated, onDeleted, pengaduan }) {
                                 </small>
                             </button>
                             {pengaduan?.file_name && !data.file && (
-                                <small className="text-muted d-block mt-2">
+                                <small
+                                    className="text-muted d-block mt-2"
+                                    style={{
+                                        wordBreak: 'break-all',
+                                    }}
+                                >
                                     File lama: {pengaduan.file_name}
                                 </small>
                             )}
                             {data.file && (
-                                <small className="text-success d-block mt-2">
+                                <small
+                                    className="text-success d-block mt-2"
+                                    style={{
+                                        wordBreak: 'break-all',
+                                    }}
+                                >
                                     File dipilih: {data.file.name}
                                 </small>
                             )}
@@ -1954,7 +1969,7 @@ export function TambahPengaduan({ tambahShow, onClose, onAdded }) {
                                 <div className="flex-fill d-flex flex-column" style={previewUrl ? { maxWidth: "50%" } : { maxWidth: "100%" }}>
                                     <div className="p-3" style={{ height: "100%" }}>
                                         <form onSubmit={handleSubmit}>
-                                            <div className="mb-3">
+                                            <div className="mb-2">
                                                 <label className="form-label">Judul</label>
                                                 <input
                                                     name="judul"
@@ -1966,7 +1981,7 @@ export function TambahPengaduan({ tambahShow, onClose, onAdded }) {
                                                 />
                                             </div>
 
-                                            <div className="mb-3">
+                                            <div className="mb-2">
                                                 <label className="form-label">Isi</label>
                                                 <textarea
                                                     name="isi"
@@ -1978,13 +1993,18 @@ export function TambahPengaduan({ tambahShow, onClose, onAdded }) {
                                                 ></textarea>
                                             </div>
 
-                                            <div className="mb-3">
+                                            <div className="mb-2">
                                                 <label className="form-label">Tujuan Pengaduan: </label>
                                                 <select
                                                     name="level"
-                                                    className="edit-tujuan form-select"
+                                                    className="edit-tujuan form-control"
                                                     value={data.level}
                                                     onChange={(e) => setData("level", e.target.value)}
+                                                    style={{
+                                                        border: '0',
+                                                        borderBottom: '1px solid lightgray',
+                                                        borderRadius: '0',
+                                                    }}
                                                 >
                                                     <option value="">...</option>
                                                     <option value="rt">RT</option>
@@ -1992,7 +2012,7 @@ export function TambahPengaduan({ tambahShow, onClose, onAdded }) {
                                                 </select>
                                             </div>
 
-                                            <div className="mb-3">
+                                            <div className="mb-2">
                                                 <input
                                                     ref={fileInputRef}
                                                     type="file"
@@ -2013,7 +2033,7 @@ export function TambahPengaduan({ tambahShow, onClose, onAdded }) {
                                                     </small>
                                                 </button>
                                                 {data.file && (
-                                                    <small className="text-success d-block mt-2">
+                                                    <small className="text-success d-block mt-2" style={{ wordBreak: 'break-all' }}>
                                                         File dipilih: {data.file.name}
                                                     </small>
                                                 )}
@@ -2773,7 +2793,7 @@ export function DetailKK({ selectedData, detailShow, onClose, role, userData }) 
     )
 }
 
-export function DetailPengumuman({ selectedData, detailShow, onClose, onUpdated, onDeleted, userData, role }) {
+export function DetailPengumuman({ kategori, selectedData, detailShow, onClose, onUpdated, onDeleted, userData, role }) {
     const { data, setData, reset } = useForm({
         isi_komentar: "",
         file: null,
@@ -2992,6 +3012,7 @@ export function DetailPengumuman({ selectedData, detailShow, onClose, onUpdated,
                         <div className="modal-body p-0 m-0">
                             {isEdit ? (
                                 <EditPengumuman
+                                    editKategori={kategori}
                                     toggle={toggleEdit}
                                     pengumuman={selectedData}
                                     onUpdated={(updatedPengumuman) => {
@@ -3414,7 +3435,7 @@ export function DetailPengumuman({ selectedData, detailShow, onClose, onUpdated,
     )
 }
 
-export function EditPengumuman({ toggle, onUpdated, onDeleted, pengumuman, role }) {
+export function EditPengumuman({ editKategori, toggle, onUpdated, onDeleted, pengumuman, role }) {
     const { data, setData } = useForm({
         judul: pengumuman.judul || "",
         isi: pengumuman.isi || "",
@@ -3569,7 +3590,7 @@ export function EditPengumuman({ toggle, onUpdated, onDeleted, pengumuman, role 
             )}
             <div className="flex-fill d-flex flex-column" style={previewUrl ? { maxWidth: "50%" } : { maxWidth: "100%" }}>
                 <div className="p-3" style={{ height: "100%" }}>
-                    <div className="d-flex justify-content-end w-100 mb-2">
+                    <div className="d-flex justify-content-end w-100">
                         <button
                             type="button"
                             onClick={() => toggle()}
@@ -3580,7 +3601,7 @@ export function EditPengumuman({ toggle, onUpdated, onDeleted, pengumuman, role 
                     </div>
 
                     <form onSubmit={handleSubmit}>
-                        <div className="mb-3">
+                        <div className="mb-2">
                             <label className="form-label">Judul</label>
                             <input
                                 name="judul"
@@ -3592,19 +3613,32 @@ export function EditPengumuman({ toggle, onUpdated, onDeleted, pengumuman, role 
                             />
                         </div>
 
-                        <div className="mb-3">
+                        <div className="mb-2">
                             <label className="form-label">Kategori</label>
-                            <input
-                                name="kategori"
-                                type="text"
-                                className="edit-kategori form-control"
-                                value={data.kategori}
-                                onChange={(e) => setData("kategori", e.target.value)}
-                                required
+                            <CreatableSelect
+                                placeholder="Pilih atau buat kategori baru..."
+                                value={data.kategori ? { value: data.kategori, label: data.kategori } : null}
+                                onChange={(selected) => setData("kategori", selected ? selected.value : "")}
+                                options={editKategori.map((kat) => ({
+                                    value: kat,
+                                    label: kat,
+                                }))}
+                                className="react-select-container"
+                                classNamePrefix="react-select"
+                                noOptionsMessage={() => "Ketik untuk membuat kategori baru"}
+                                styles={{
+                                    control: (base) => ({
+                                        ...base,
+                                        border: 0,
+                                        borderBottom: "1px solid lightgray",
+                                        borderRadius: 0,
+                                        boxShadow: "none",
+                                    }),
+                                }}
                             />
                         </div>
 
-                        <div className="mb-3">
+                        <div className="mb-2">
                             <label className="form-label">Tanggal Pelaksanaan</label>
                             <input
                                 name="tanggal"
@@ -3616,7 +3650,7 @@ export function EditPengumuman({ toggle, onUpdated, onDeleted, pengumuman, role 
                             <small className="mt-1 text-muted">Opsional</small>
                         </div>
 
-                        <div className="mb-3">
+                        <div className="mb-2">
                             <label className="form-label">Tempat Pelaksanaan</label>
                             <input
                                 name="tempat"
@@ -3628,7 +3662,7 @@ export function EditPengumuman({ toggle, onUpdated, onDeleted, pengumuman, role 
                             />
                         </div>
 
-                        <div className="mb-3">
+                        <div className="mb-2">
                             <label className="form-label">Isi</label>
                             <textarea
                                 name="isi"
@@ -3640,7 +3674,7 @@ export function EditPengumuman({ toggle, onUpdated, onDeleted, pengumuman, role 
                             ></textarea>
                         </div>
 
-                        <div className="mb-3">
+                        <div className="mb-2">
                             <input
                                 type="file"
                                 id="fileInput"
@@ -3664,12 +3698,12 @@ export function EditPengumuman({ toggle, onUpdated, onDeleted, pengumuman, role 
                                 </small>
                             </button>
                             {pengumuman?.dokumen_name && !data.dokumen && (
-                                <small className="text-muted d-block mt-2">
+                                <small className="text-muted d-block mt-2" style={{ wordBreak: 'break-all' }}>
                                     File lama: {pengumuman.dokumen_name}
                                 </small>
                             )}
                             {data.dokumen && (
-                                <small className="text-success d-block mt-2">
+                                <small className="text-success d-block mt-2" style={{ wordBreak: 'break-all' }}>
                                     File dipilih: {data.dokumen.name}
                                 </small>
                             )}
@@ -3854,7 +3888,7 @@ export function TambahPengumuman({ kategori, tambahShow, onClose, onAdded, role 
                                 <div className="flex-fill d-flex flex-column" style={previewUrl ? { maxWidth: "50%" } : { maxWidth: "100%" }}>
                                     <div className="p-3" style={{ height: "100%" }}>
                                         <form onSubmit={handleSubmit}>
-                                            <div className="mb-3">
+                                            <div className="mb-2">
                                                 <label className="form-label">Judul</label>
                                                 <input
                                                     name="judul"
@@ -3866,7 +3900,7 @@ export function TambahPengumuman({ kategori, tambahShow, onClose, onAdded, role 
                                                 />
                                             </div>
 
-                                            <div className="mb-3">
+                                            <div className="mb-2">
                                                 <label className="form-label">Kategori</label>
                                                 <CreatableSelect
                                                     placeholder="Pilih atau buat kategori baru..."
@@ -3878,6 +3912,7 @@ export function TambahPengumuman({ kategori, tambahShow, onClose, onAdded, role 
                                                     }))}
                                                     className="react-select-container"
                                                     classNamePrefix="react-select"
+                                                    noOptionsMessage={() => "Ketik untuk membuat kategori baru"}
                                                     styles={{
                                                         control: (base) => ({
                                                             ...base,
@@ -3888,24 +3923,9 @@ export function TambahPengumuman({ kategori, tambahShow, onClose, onAdded, role 
                                                         }),
                                                     }}
                                                 />
-                                                {/* <input
-                                                    list="daftarKategori"
-                                                    name="kategori"
-                                                    type="text"
-                                                    className="tambah-kategori form-control"
-                                                    value={data.kategori}
-                                                    onChange={(e) => setData("kategori", e.target.value)}
-                                                    required
-                                                />
-                                                sementara pake datalist 🙏
-                                                <datalist id="daftarKategori">
-                                                    {kategori.map((kat, index) => (
-                                                        <option key={index} value={kat} />
-                                                    ))}
-                                                </datalist> */}
                                             </div>
 
-                                            <div className="mb-3">
+                                            <div className="mb-2">
                                                 <label className="form-label">Tanggal Pelaksanaan</label>
                                                 <input
                                                     name="tanggal"
@@ -3917,7 +3937,7 @@ export function TambahPengumuman({ kategori, tambahShow, onClose, onAdded, role 
                                                 <small className="mt-1 text-muted">Opsional</small>
                                             </div>
 
-                                            <div className="mb-3">
+                                            <div className="mb-2">
                                                 <label className="form-label">Tempat Pelaksanaan</label>
                                                 <input
                                                     name="tempat"
@@ -3929,7 +3949,7 @@ export function TambahPengumuman({ kategori, tambahShow, onClose, onAdded, role 
                                                 />
                                             </div>
 
-                                            <div className="mb-3">
+                                            <div className="mb-2">
                                                 <label className="form-label">Isi</label>
                                                 <textarea
                                                     ref={isiRef}
@@ -3942,7 +3962,7 @@ export function TambahPengumuman({ kategori, tambahShow, onClose, onAdded, role 
                                                 ></textarea>
                                             </div>
 
-                                            <div className="mb-3">
+                                            <div className="mb-2">
                                                 <input
                                                     ref={fileInputRef}
                                                     type="file"
@@ -3967,7 +3987,7 @@ export function TambahPengumuman({ kategori, tambahShow, onClose, onAdded, role 
                                                     </small>
                                                 </button>
                                                 {data.dokumen && (
-                                                    <small className="text-success d-block mt-2">
+                                                    <small className="text-success d-block mt-2" style={{ wordBreak: 'break-all' }}>
                                                         File dipilih: {data.dokumen.name}
                                                     </small>
                                                 )}
@@ -4093,7 +4113,6 @@ export function TambahIuran({ tambahShow, onClose, onAdded, role, golongan, rt =
         tgl_tagih: "",
         tgl_tempo: "",
         jenis: "manual",
-        nik: "",
         no_kk: "",
         nominal: "",
         periode: "",
@@ -4153,7 +4172,6 @@ export function TambahIuran({ tambahShow, onClose, onAdded, role, golongan, rt =
                     tgl_tagih: "",
                     tgl_tempo: "",
                     jenis: "manual",
-                    nik: "",
                     no_kk: "",
                     nominal: "",
                     periode: "",
@@ -4243,34 +4261,32 @@ export function TambahIuran({ tambahShow, onClose, onAdded, role, golongan, rt =
                                         />
                                     </div>
 
-                                    <Role role="rw">
-                                        <div className="mb-3">
-                                            <label className="form-label">Pilih RT</label>
-                                            <select
-                                                name="id_rt"
-                                                className="form-control"
-                                                value={data.id_rt}
-                                                onChange={handleChange}
-                                                style={{
-                                                    border: '0',
-                                                    borderBottom: '1px solid lightgray',
-                                                    borderRadius: '0',
-                                                }}
-                                                required
-                                            >
-                                                <option value="">-- Pilih RT --</option>
-                                                {rt.length > 0 ? (
-                                                    rt.map((item) => (
-                                                        <option key={item.id} value={item.id}>
-                                                            RT {item.nomor_rt}
-                                                        </option>
-                                                    ))
-                                                ) : (
-                                                    <option value="">Tidak ada RT</option>
-                                                )}
-                                            </select>
-                                        </div>
-                                    </Role>
+                                    <div className="mb-3">
+                                        <label className="form-label">Pilih RT</label>
+                                        <select
+                                            name="id_rt"
+                                            className="form-control"
+                                            value={data.id_rt}
+                                            onChange={handleChange}
+                                            style={{
+                                                border: '0',
+                                                borderBottom: '1px solid lightgray',
+                                                borderRadius: '0',
+                                            }}
+                                            required
+                                        >
+                                            <option value="">-- Pilih RT --</option>
+                                            {rt.length > 0 ? (
+                                                rt.map((item) => (
+                                                    <option key={item.id} value={item.id}>
+                                                        RT {item.nomor_rt}
+                                                    </option>
+                                                ))
+                                            ) : (
+                                                <option value="">Tidak ada RT</option>
+                                            )}
+                                        </select>
+                                    </div>
 
                                     {/* {perWarga && (
                                         <div className="mb-3">
@@ -4299,24 +4315,35 @@ export function TambahIuran({ tambahShow, onClose, onAdded, role, golongan, rt =
                                     {perKk && (
                                         <div className="mb-3">
                                             <label className="form-label">Nomor Kartu Keluarga</label>
-                                            <select
-                                                name="no_kk"
-                                                type="text"
-                                                className="form-control"
-                                                value={data.no_kk}
-                                                onChange={handleChange}
-                                                required
-                                                style={{
-                                                    border: '0',
-                                                    borderBottom: '1px solid lightgray',
-                                                    borderRadius: '0',
+                                            <Select
+                                                options={[
+                                                    { value: "semua", label: "Semua Kartu Keluarga" },
+                                                    ...noKkWarga.map((kk) => ({
+                                                        value: kk.no_kk,
+                                                        label: kk.no_kk,
+                                                    })),
+                                                ]}
+                                                value={
+                                                    data.no_kk
+                                                        ? { value: data.no_kk, label: data.no_kk === "semua" ? "Semua Kartu Keluarga" : data.no_kk }
+                                                        : null
+                                                }
+                                                onChange={selected => handleChange({ target: { name: "no_kk", value: selected ? selected.value : "" } })}
+                                                placeholder="Pilih atau ketik nomor KK..."
+                                                isSearchable={true}
+                                                className="react-select-container"
+                                                classNamePrefix="react-select"
+                                                noOptionsMessage={() => "Tidak ada Kartu Keluarga"}
+                                                styles={{
+                                                    control: (base) => ({
+                                                        ...base,
+                                                        border: 0,
+                                                        borderBottom: "1px solid lightgray",
+                                                        borderRadius: 0,
+                                                        boxShadow: "none",
+                                                    }),
                                                 }}
-                                            >
-                                                <option value="" selected disabled>Pilih No. KK</option>
-                                                {noKkWarga.map((kk, index) => (
-                                                    <option value={kk.no_kk} key={index}>{kk.no_kk}</option>
-                                                ))}
-                                            </select>
+                                            />
                                         </div>
                                     )}
 
