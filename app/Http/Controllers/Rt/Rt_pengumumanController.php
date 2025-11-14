@@ -4,20 +4,12 @@ namespace App\Http\Controllers\Rt;
 
 use App\Http\Controllers\Controller;
 use App\Models\Pengumuman;
-use App\Models\Rt;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Dompdf\Dompdf;
-use Dompdf\Options;
-use PhpOffice\PhpWord\IOFactory as WordIO;
-use PhpOffice\PhpSpreadsheet\IOFactory as ExcelIO;
-use Intervention\Image\Facades\Image;
-use setasign\Fpdi\Fpdi;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\View;
 use Inertia\Inertia;
 
 class Rt_pengumumanController extends Controller

@@ -121,11 +121,17 @@ export default function Tagihan() {
                                         <td className="text-end">{formatRupiah(item.nominal) ?? '-'}</td>
                                         <td className="text-center">{formatTanggal(item.tgl_tagih)}</td>
                                         <td className="text-center">{formatTanggal(item.tgl_tempo)}</td>
-                                        <td className="text-center">{item.status_bayar === 'sudah_bayar' ? (
-                                            <span className="badge bg-success text-white">Sudah Bayar</span>
-                                        ) : (
-                                            <span className="badge bg-warning text-white">Belum Bayar</span>
-                                        )}
+                                        <td className="text-center">
+                                            {item.status_bayar === 'sudah_bayar' ? (
+                                                <span className="badge bg-success text-white">Sudah Bayar</span>
+                                            ) : (
+                                                <span className="badge bg-warning text-white">Belum Bayar</span>
+                                            )}
+                                            {item.status_bayar === 'sudah_bayar' && (item.nominal_bayar >= item.nominal) ? (
+                                                <span className="badge bg-primary text-white">Sudah Lunas</span>
+                                            ) : item.status_bayar === 'sudah_bayar' && (item.nominal_bayar < item.nominal) && (
+                                                <span className="badge bg-danger text-white">Belum Lunas</span>
+                                            )}
                                         </td>
                                         <td className="text-center">{formatTanggal(item.tgl_bayar)}</td>
                                         <td className="text-center">

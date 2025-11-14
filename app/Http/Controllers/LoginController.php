@@ -6,6 +6,7 @@ use App\Models\Warga;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 
 class LoginController extends Controller
@@ -28,6 +29,7 @@ class LoginController extends Controller
 
             // Kalau hanya punya 1 role → langsung ke dashboard
             if ($user->roles->count() === 1) {
+                Log::info('User ' . $user->nik . ' logged in with role ' . $user->roles->first()->name);
                 $role = $user->roles->first()->name;
                 session(['active_role' => $role]);
                 return $this->redirectByRole($role, $user);
@@ -73,11 +75,14 @@ class LoginController extends Controller
                     'nik' => 'Hanya Kepala Keluarga yang bisa login.',
                 ]);
             }
-            return Inertia::location(route('dashboard'));
+            return response()->json([
+                'redirect' => route('dashboard')
+            ]);
         }
 
-        // Semua role diarahkan ke Dashboard.jsx
-        return Inertia::location(route('dashboard'));
+        return response()->json([
+            'redirect' => route('dashboard')
+        ]);
     }
 
     // Halaman pilih role

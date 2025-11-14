@@ -312,7 +312,7 @@ export function FilterTagihan({ tagihanManual, tagihanOtomatis, data, setData, f
     )
 }
 
-export function FilterWarga({ data, setData, filter, resetFilter, role }) {
+export function FilterWarga({ data, setData, filter, resetFilter, role, total_warga }) {
     return (
         <form onSubmit={filter} className="filter-form form-filter d-flex px-0 pb-2 mb-2 w-100">
             <div className="col-md-5 col-12 pr-0">
@@ -348,6 +348,18 @@ export function FilterWarga({ data, setData, filter, resetFilter, role }) {
                 <Link href={`/${role}/warga`} onClick={resetFilter} className="btn-input btn btn-secondary btn-sm flex-fill p-0 mx-0" title="Reset" style={{ maxWidth: "3rem", minWidth: "3rem" }}>
                     <i className="fas fa-undo"></i>
                 </Link>
+                <Role role={['rt', 'rw']}>
+                    <button
+                        className="btn btn-success my-auto mr-3"
+                        type="button"
+                        title={total_warga < 1 ? "Tidak ada data warga yang dapat diexport" : "Export data warga ke Excel"}
+                        style={{ borderRadius: "0.2rem" }}
+                        onClick={() => window.location.href = `/${role}/export/warga`}
+                        disabled={total_warga < 1}
+                    >
+                        <i className="fas fa-file-excel"></i>
+                    </button>
+                </Role>
             </div>
         </form>
     )

@@ -48,6 +48,7 @@ export default function DataWarga() {
                 filter={filter}
                 resetFilter={resetFilter}
                 role={role}
+                total_warga={total_warga}
             />
             <div className="table-container">
                 <div className="table-header">

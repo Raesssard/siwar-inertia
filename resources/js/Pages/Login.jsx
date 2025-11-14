@@ -1,6 +1,6 @@
 import React, { useState } from "react"
 import "../../css/login.css"
-import { Head, useForm, usePage } from "@inertiajs/react"
+import { Head, useForm } from "@inertiajs/react"
 import Swal from "sweetalert2"
 import axios from "axios"
 import FloatingInput from './Component/FloatingInput'
@@ -74,7 +74,7 @@ export default function Login() {
                     },
                 })
             } else {
-                window.location.href = "/dashboard";
+                window.location.href = res.data?.redirect;
             }
         } catch (err) {
             console.error(err)
