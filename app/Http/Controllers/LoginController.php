@@ -27,10 +27,15 @@ class LoginController extends Controller
             $request->session()->regenerate();
             $user = Auth::user();
 
-            // Kalau hanya punya 1 role → langsung ke dashboard
-            if ($user->roles->count() === 1) {
+            $validRoles = ['admin', 'rw', 'rt', 'warga'];
+
+            $accountRoles = $user->roles->filter(
+                fn($r) => in_array($r->name, $validRoles)
+            )->values();
+
+            if ($accountRoles->count() === 1) {
                 Log::info('User ' . $user->nik . ' logged in with role ' . $user->roles->first()->name);
-                $role = $user->roles->first()->name;
+                $role = $accountRoles->first()->name;
                 session(['active_role' => $role]);
                 return $this->redirectByRole($role, $user);
             }
@@ -38,7 +43,7 @@ class LoginController extends Controller
             if ($request->wantsJson()) {
                 return response()->json([
                     'choose_role' => true,
-                    'roles' => $user->roles->pluck('name'),
+                    'roles' => $accountRoles->pluck('name'),
                 ]);
             }
 
@@ -49,7 +54,6 @@ class LoginController extends Controller
             return response()->json(['error' => 'NIK atau password salah.'], 401);
         }
 
-        // Jika gagal login
         return back()->withErrors([
             'nik' => 'NIK atau password salah.',
             'password' => 'NIK atau password salah.',

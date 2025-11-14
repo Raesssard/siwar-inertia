@@ -2,7 +2,7 @@ import React, { useState } from "react"
 import { usePage, Link } from "@inertiajs/react"
 import { Inertia } from "@inertiajs/inertia"
 import "../../css/topbar.css"
-import { PasswordModal } from "../Pages/Component/Modal"
+// import { PasswordModal } from "../Pages/Component/Modal"
 import Swal from "sweetalert2"
 import { router } from '@inertiajs/react'
 import { route } from "ziggy-js"
@@ -11,7 +11,7 @@ export default function Topbar({ modalShow, hapusHistory }) {
     const { props } = usePage()
     const user = props.auth?.user
     const currentRole = props.auth?.currentRole
-    const roles = props.auth?.roles || []
+    const roles = props.auth?.rolesAccount || []
     // const [showPasswordModal, setShowPasswordModal] = useState(false)
     const [gantiAkun, setGantiAkun] = useState(false)
     const [selectedRole, setSelectedRole] = useState("")

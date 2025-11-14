@@ -98,92 +98,93 @@ export function ModalSidebar({ modalIsOpen, modalShow, localStorageHistory }) {
     )
 }
 
-export function PasswordModal({ show }) {
-    return (
-        <>
-            <div
-                className="modal fade show"
-                style={{ display: "block", backgroundColor: "rgba(0,0,0,0.5)" }}
-                tabIndex="-1"
-            >
-                <div className="modal-dialog modal-dialog-centered">
-                    <div className="modal-content">
-                        <form onSubmit={() => show(false)}>
-                            <div className="modal-header">
-                                <h5 className="modal-title">
-                                    <i className="fas fa-key text-primary me-1"></i>{" "}
-                                    Ubah Password
-                                </h5>
-                                <button
-                                    type="button"
-                                    className="btn-close"
-                                    onClick={() => show(false)}
-                                />
-                            </div>
-                            <div className="modal-body">
-                                <div className="form-floating mb-3 position-relative">
-                                    <input
-                                        type="password"
-                                        name="current_password"
-                                        className="form-control"
-                                        id="current_password"
-                                        placeholder="Password Lama"
-                                        required
-                                    />
-                                    <label htmlFor="current_password">
-                                        <i className="fas fa-lock me-2"></i>
-                                        Password Lama
-                                    </label>
-                                </div>
-                                <div className="form-floating mb-3 position-relative">
-                                    <input
-                                        type="password"
-                                        name="password"
-                                        className="form-control"
-                                        id="password"
-                                        placeholder="Password Baru"
-                                        required
-                                        minLength="6"
-                                    />
-                                    <label htmlFor="password">
-                                        <i className="fas fa-lock me-2"></i>
-                                        Password Baru
-                                    </label>
-                                </div>
-                                <div className="form-floating mb-3 position-relative">
-                                    <input
-                                        type="password"
-                                        name="password_confirmation"
-                                        className="form-control"
-                                        id="password_confirmation"
-                                        placeholder="Konfirmasi Password Baru"
-                                        required
-                                    />
-                                    <label htmlFor="password_confirmation">
-                                        <i className="fas fa-lock me-2"></i>
-                                        Konfirmasi Password
-                                    </label>
-                                </div>
-                            </div>
-                            <div className="modal-footer">
-                                <button
-                                    type="button"
-                                    className="btn btn-secondary"
-                                    onClick={() => show(false)}
-                                >
-                                    Batal
-                                </button>
-                                <button type="submit" className="btn btn-primary">
-                                    Simpan Perubahan
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </>
-    )
-}
+// dah gk kepake lagi, kan ada di settings
+// export function PasswordModal({ show }) {
+//     return (
+//         <>
+//             <div
+//                 className="modal fade show"
+//                 style={{ display: "block", backgroundColor: "rgba(0,0,0,0.5)" }}
+//                 tabIndex="-1"
+//             >
+//                 <div className="modal-dialog modal-dialog-centered">
+//                     <div className="modal-content">
+//                         <form onSubmit={() => show(false)}>
+//                             <div className="modal-header">
+//                                 <h5 className="modal-title">
+//                                     <i className="fas fa-key text-primary me-1"></i>{" "}
+//                                     Ubah Password
+//                                 </h5>
+//                                 <button
+//                                     type="button"
+//                                     className="btn-close"
+//                                     onClick={() => show(false)}
+//                                 />
+//                             </div>
+//                             <div className="modal-body">
+//                                 <div className="form-floating mb-3 position-relative">
+//                                     <input
+//                                         type="password"
+//                                         name="current_password"
+//                                         className="form-control"
+//                                         id="current_password"
+//                                         placeholder="Password Lama"
+//                                         required
+//                                     />
+//                                     <label htmlFor="current_password">
+//                                         <i className="fas fa-lock me-2"></i>
+//                                         Password Lama
+//                                     </label>
+//                                 </div>
+//                                 <div className="form-floating mb-3 position-relative">
+//                                     <input
+//                                         type="password"
+//                                         name="password"
+//                                         className="form-control"
+//                                         id="password"
+//                                         placeholder="Password Baru"
+//                                         required
+//                                         minLength="6"
+//                                     />
+//                                     <label htmlFor="password">
+//                                         <i className="fas fa-lock me-2"></i>
+//                                         Password Baru
+//                                     </label>
+//                                 </div>
+//                                 <div className="form-floating mb-3 position-relative">
+//                                     <input
+//                                         type="password"
+//                                         name="password_confirmation"
+//                                         className="form-control"
+//                                         id="password_confirmation"
+//                                         placeholder="Konfirmasi Password Baru"
+//                                         required
+//                                     />
+//                                     <label htmlFor="password_confirmation">
+//                                         <i className="fas fa-lock me-2"></i>
+//                                         Konfirmasi Password
+//                                     </label>
+//                                 </div>
+//                             </div>
+//                             <div className="modal-footer">
+//                                 <button
+//                                     type="button"
+//                                     className="btn btn-secondary"
+//                                     onClick={() => show(false)}
+//                                 >
+//                                     Batal
+//                                 </button>
+//                                 <button type="submit" className="btn btn-primary">
+//                                     Simpan Perubahan
+//                                 </button>
+//                             </div>
+//                         </form>
+//                     </div>
+//                 </div>
+//             </div>
+//         </>
+//     )
+// }
 
 export function AddRwModal({ form, handleChange, handleAdd, onClose, roles = [] }) {
     return (
@@ -2726,7 +2727,7 @@ export function DetailKK({ selectedData, detailShow, onClose, role, userData }) 
                             </div>
                         </div>
 
-                        <div className="modal-footer bg-light">
+                        <div className="modal-footer bg-light mt-0">
                             <button
                                 type="button"
                                 className="btn btn-outline-success"
@@ -4041,14 +4042,14 @@ export function DetailWarga({ selectData, detailShow, onClose }) {
                             <h5 className="modal-title text-white">Detail Warga</h5>
                         </div>
 
-                        <div className="modal-body kk d-block p-4">
+                        <div className="modal-body kk d-block p-4 mt-0">
                             {/* <div className="kk-header w-100">
                                 <div className="kk-header-main-title">
                                     <h4>Detail Warga</h4>
                                 </div>
                             </div> */}
 
-                            <div className="kk-info-grid mb-2">
+                            <div className="kk-info-grid mb-0">
                                 <div className="kk-info-item">
                                     <p><strong>No. KK</strong> : {selectData.no_kk ?? '-'}</p>
                                     <p><strong>NIK</strong> : {selectData.nik ?? '-'}</p>
@@ -4089,7 +4090,7 @@ export function DetailWarga({ selectData, detailShow, onClose }) {
                             </div>
                         </div>
 
-                        <div className="modal-footer bg-light">
+                        <div className="modal-footer bg-light mt-0">
                             <button
                                 type="button"
                                 className="btn btn-outline-success"
