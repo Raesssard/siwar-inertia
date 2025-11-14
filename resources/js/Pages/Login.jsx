@@ -73,16 +73,12 @@ export default function Login() {
                         })
                     },
                 })
-            } else if (res.data?.redirect) {
-                window.location.href = res.data.redirect
+            } else {
+                window.location.href = "/dashboard";
             }
         } catch (err) {
             console.error(err)
-            Swal.fire({
-                icon: "error",
-                title: "Gagal Login",
-                text: err.response?.data?.error || "NIK atau kata sandi salah.",
-            })
+            Swal.fire("Gagal", "NIK atau kata sandi salah.", "error")
         }
     }
 
