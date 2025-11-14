@@ -365,7 +365,7 @@ export function FilterWarga({ data, setData, filter, resetFilter, role, total_wa
     )
 }
 
-export function FilterKK({ data, setData, filter, resetFilter, role }) {
+export function FilterKK({ data, setData, filter, resetFilter, role, totalKK }) {
     return (
         <form onSubmit={filter} className="filter-form form-filter px-0 pb-2 mb-2 w-100">
             <div className="col-md-5 col-12 pr-0">
@@ -384,9 +384,35 @@ export function FilterKK({ data, setData, filter, resetFilter, role }) {
                 </div>
             </div>
 
-            <Link href={`/${role}/kartu_keluarga`} onClick={resetFilter} className="btn-input btn btn-secondary btn-sm flex-fill p-0 mx-0 mr-3" title="Reset" style={{ maxWidth: "3rem" }}>
-                <i className="fas fa-undo"></i>
-            </Link>
+            <div className="d-flex flex-wrap gap-2">
+                <Link
+                    href={`/${role}/kartu_keluarga`}
+                    onClick={resetFilter}
+                    className="btn-input btn btn-secondary btn-sm flex-fill p-0 mx-0"
+                    title="Reset"
+                    style={{
+                        maxWidth: "3rem",
+                        minWidth: "3rem"
+                    }}>
+                    <i className="fas fa-undo"></i>
+                </Link>
+                <Role role={['rt', 'rw']}>
+                    <button
+                        className="btn btn-success my-auto mr-3"
+                        type="button"
+                        title={totalKK < 1 ? "Tidak ada data kartu keluarga yang dapat diexport" : "Export data kartu keluarga ke Excel"}
+                        style={{
+                            borderRadius: "0.2rem",
+                            maxWidth: "3rem",
+                            minWidth: "3rem"
+                        }}
+                        onClick={() => window.location.href = `/${role}/export/kartu_keluarga`}
+                        disabled={totalKK < 1}
+                    >
+                        <i className="fas fa-file-excel"></i>
+                    </button>
+                </Role>
+            </div>
         </form>
     )
 }

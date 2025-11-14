@@ -8,6 +8,7 @@ import '../../../css/kk.css'
 export default function KartuKeluarga() {
     const {
         kartu_keluarga,
+        total_kartu_keluarga,
         title,
     } = usePage().props
     const { props } = usePage()
@@ -46,6 +47,7 @@ export default function KartuKeluarga() {
                 filter={filter}
                 resetFilter={resetFilter}
                 role={role}
+                totalKK={total_kartu_keluarga}
             />
             <div className="table-container">
                 <div className="table-header">

@@ -11157,6 +11157,23 @@ a:focus {
   background-color: #eaecf4 !important;
 }
 
+/* butuh ini, soalnya nanti cuma pake bootstrap doang. */
+.bg-blue-200 {
+  background-color: #BFDBFE !important;
+}
+
+.bg-cyan-200 {
+  background-color: #A5F3FC !important;
+}
+
+.bg-yellow-200 {
+  background-color: #FEF08A !important;
+}
+
+.bg-green-200 {
+  background-color: #BBF7D0 !important;
+}
+
 .bg-gray-300 {
   background-color: #dddfeb !important;
 }
@@ -11227,6 +11244,23 @@ a:focus {
 
 .text-gray-800 {
   color: #5a5c69 !important;
+}
+
+/* ini juga */
+.text-blue-800 {
+  color: #1E40AF !important;
+}
+
+.text-cyan-800 {
+  color: #155E75 !important;
+}
+
+.text-yellow-800 {
+  color: #854D0E !important;
+}
+
+.text-green-800 {
+  color: #166534 !important;
 }
 
 .text-gray-900 {

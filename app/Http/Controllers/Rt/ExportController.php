@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Rt;
 
 use App\Http\Controllers\Controller;
 use App\Models\Iuran;
+use App\Models\Kartu_keluarga;
 use App\Models\Kategori_golongan;
 use App\Models\Tagihan;
 use App\Models\Transaksi;
@@ -358,7 +359,7 @@ class ExportController extends Controller
 
         if ($dataWarga->isNotEmpty()) {
             $merges = [
-                'B1:F1',
+                'B1:R1',
                 'I2:J2',
                 'B2:B3',
                 'C2:C3',
@@ -404,7 +405,7 @@ class ExportController extends Controller
             $sheet->setCellValue('J3', 'Asal');
 
             foreach ($dataWarga as $warga) {
-                $sheet->setCellValue("B{$row}", $no_urut);
+                $sheet->setCellValue("B{$row}", $no_urut . '.');
                 $sheet->setCellValueExplicit("C{$row}", $warga->no_kk, DataType::TYPE_STRING);
                 $sheet->setCellValueExplicit("D{$row}", $warga->nik, DataType::TYPE_STRING);
                 $sheet->setCellValue("E{$row}", $warga->nama);
@@ -425,7 +426,10 @@ class ExportController extends Controller
                 $no_urut++;
             }
 
-            $rowEnd = $row - 1;
+            $sheet->mergeCells("B{$row}:R{$row}");
+            $sheet->setCellValue("B{$row}", 'Total Warga: ' . ($no_urut - 1));
+
+            $rowEnd = $row;
 
             $sheet->getStyle("B2:R{$rowEnd}")->applyFromArray([
                 'borders' => [
@@ -439,6 +443,97 @@ class ExportController extends Controller
 
         $writer = new Xlsx($spreadsheet);
         $filename = "warga_rt_{$id_rt}.xlsx";
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header("Content-Disposition: attachment; filename=\"$filename\"");
+        $writer->save("php://output");
+        exit;
+    }
+
+    public function exportDataKK()
+    {
+        $id_rt = Auth::user()->id_rt;
+
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setTitle('Kartu Keluarga');
+
+        $sheet->getStyle("A2:AZ2")->getFont()->setBold(true);
+
+        $sheet->getStyle('A2:AZ2')->getAlignment()->applyFromArray([
+            'horizontal' => Alignment::HORIZONTAL_CENTER,
+            'vertical'   => Alignment::VERTICAL_CENTER,
+            'wrapText'   => true,
+        ]);
+
+        $maxCol = Coordinate::columnIndexFromString('AZ');
+        for ($i = 1; $i <= $maxCol; $i++) {
+            $colLetter = Coordinate::stringFromColumnIndex($i);
+            $sheet->getColumnDimension($colLetter)->setAutoSize(true);
+        }
+
+        $row = 3;
+        $dataKK = Kartu_keluarga::where('id_rt', $id_rt)->get();
+        $no_urut = 1;
+
+        if ($dataKK->isNotEmpty()) {
+            $sheet->mergeCells('B1:P1');
+
+            $sheet->setCellValue('B1', 'Data Kartu Keluarga');
+
+            $sheet->setCellValue('B2', 'No.');
+            $sheet->setCellValue('C2', 'No. KK');
+            $sheet->setCellValue('D2', 'No. Registrasi');
+            $sheet->setCellValue('E2', 'Alamat');
+            $sheet->setCellValue('F2', 'No. RT');
+            $sheet->setCellValue('G2', 'No. RW');
+            $sheet->setCellValue('H2', 'Kelurahan');
+            $sheet->setCellValue('I2', 'Kecamatan');
+            $sheet->setCellValue('J2', 'Kabupaten');
+            $sheet->setCellValue('K2', 'Provinsi');
+            $sheet->setCellValue('L2', 'Kode Pos');
+            $sheet->setCellValue('M2', 'Tanggal Terbit');
+            $sheet->setCellValue('N2', 'Golongan');
+            $sheet->setCellValue('O2', 'Instansi Penerbit');
+            $sheet->setCellValue('P2', 'Kabupaten/Kota Penerbit');
+
+            foreach ($dataKK as $kk) {
+                $sheet->setCellValue("B{$row}", $no_urut . '.');
+                $sheet->setCellValueExplicit("C{$row}", $kk->no_kk, DataType::TYPE_STRING);
+                $sheet->setCellValueExplicit("D{$row}", $kk->no_registrasi, DataType::TYPE_STRING);
+                $sheet->setCellValue("E{$row}", $kk->alamat ?? '-');
+                $sheet->setCellValue("F{$row}", $kk->rukunTetangga->nomor_rt ?? '-');
+                $sheet->setCellValue("G{$row}", $kk->rw->nomor_rw ?? '-');
+                $sheet->setCellValue("H{$row}", $kk->kelurahan ?? '-');
+                $sheet->setCellValue("I{$row}", $kk->kecamatan ?? '-');
+                $sheet->setCellValue("J{$row}", $kk->kabupaten ?? '-');
+                $sheet->setCellValue("K{$row}", $kk->provinsi ?? '-');
+                $sheet->setCellValue("L{$row}", $kk->kode_pos ?? '-');
+                $sheet->setCellValue("M{$row}", $kk->tgl_terbit ?? '-');
+                $sheet->setCellValue("N{$row}", $kk->kategori_iuran ?? '-');
+                $sheet->setCellValue("O{$row}", $kk->instansi_penerbit ?? '-');
+                $sheet->setCellValue("P{$row}", $kk->kabupaten_kota_penerbit ?? '-');
+                $row++;
+                $no_urut++;
+            }
+
+            $sheet->mergeCells("B{$row}:P{$row}");
+            $sheet->setCellValue("B{$row}", 'Total Kartu Keluarga: ' . ($no_urut - 1));
+
+            $rowEnd = $row;
+
+            $sheet->getStyle("B2:P{$rowEnd}")->applyFromArray([
+                'borders' => [
+                    'allBorders' => [
+                        'borderStyle' => Border::BORDER_THIN, // bisa THICK, DASHED, dll.
+                        'color' => ['argb' => 'FF000000'], // hitam
+                    ],
+                ],
+            ]);
+        }
+
+        $writer = new Xlsx($spreadsheet);
+        $filename = "kartu_keluarga_rt_{$id_rt}.xlsx";
 
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         header("Content-Disposition: attachment; filename=\"$filename\"");

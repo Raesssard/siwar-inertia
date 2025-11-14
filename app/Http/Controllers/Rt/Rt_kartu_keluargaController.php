@@ -53,8 +53,11 @@ class Rt_kartu_keluargaController extends Controller
             ->paginate(5)
             ->withQueryString();
 
+        $total_kartu_keluarga = Kartu_keluarga::where('id_rt', $rt_id_from_nomor)->count();
+
         return Inertia::render('RT/KartuKeluarga', [
             'kartu_keluarga' => $kartu_keluarga,
+            'total_kartu_keluarga' => $total_kartu_keluarga,
             'title' => $title,
         ]);
     }
