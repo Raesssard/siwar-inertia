@@ -78,11 +78,7 @@ export default function Login() {
             }
         } catch (err) {
             console.error(err)
-            Swal.fire({
-                icon: "error",
-                title: "Gagal Login",
-                text: err.response?.data?.error || "NIK atau kata sandi salah.",
-            })
+            Swal.fire("Gagal", "NIK atau kata sandi salah.", "error")
         }
     }
 

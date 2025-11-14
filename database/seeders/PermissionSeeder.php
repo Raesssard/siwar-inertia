@@ -23,6 +23,10 @@ class PermissionSeeder extends Seeder
 
                 // RT management
                 'view.rt', 'create.rt', 'edit.rt', 'delete.rt', 'toggle.rt',
+                
+                // Warga & KK
+                'view.warga', 'create.warga', 'edit.warga', 'delete.warga',
+                'view.kartu_keluarga', 'create.kartu_keluarga', 'edit.kartu_keluarga', 'delete.kartu_keluarga',
 
                 // Kategori & Golongan
                 'view.kategori_golongan', 'create.kategori_golongan', 'edit.kategori_golongan', 'delete.kategori_golongan',
@@ -45,7 +49,7 @@ class PermissionSeeder extends Seeder
                 'view.kartu_keluarga', 'create.kartu_keluarga', 'edit.kartu_keluarga', 'delete.kartu_keluarga',
 
                 // Pengumuman
-                'view.pengumuman', 'create.rwpengumuman', 'edit.rwpengumuman', 'delete.rwpengumuman', 'export.pengumuman',
+                'view.pengumuman', 'create.pengumuman', 'edit.pengumuman', 'delete.pengumuman', 'export.pengumuman',
 
                 // Pengaduan
                 'view.pengaduan', 'respond.pengaduan', 'confirm.pengaduan',
