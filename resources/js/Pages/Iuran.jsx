@@ -1,33 +1,35 @@
 import Layout from "@/Layouts/Layout"
 import { Head, Link, useForm, usePage } from "@inertiajs/react"
 import React, { useState } from "react"
-import { FilterIuran } from "../Component/Filter"
-import { formatRupiah, formatTanggal } from "../Component/GetPropRole"
-import { EditIuranManual, EditIuranOtomatis, TambahIuran } from "../Component/Modal"
+import { FilterIuran } from "./Component/Filter"
+import { formatRupiah, formatTanggal } from "./Component/GetPropRole"
+import { EditIuranManual, EditIuranOtomatis, TambahIuran } from "./Component/Modal"
 import Swal from "sweetalert2"
+import Role from "./Component/Role"
 
 export default function Iuran() {
     const {
         iuranOtomatis: iuranOtomatisFromServer,
         iuranManual: iuranManualFromServer,
         golongan_list,
+        rt_list,
         nik_list,
         no_kk_list,
         title,
     } = usePage().props
+
     const [selected, setSelected] = useState(null)
     const [selectedIuran, setSelectedIuran] = useState(null)
     const [selectedGolongan, setSelectedGolongan] = useState(null)
-    const [iuranListManual, setIuranListManual] = useState(iuranManualFromServer.data || [])
     const [iuranListOtomatis, setIuranListOtomatis] = useState(iuranOtomatisFromServer.data || [])
+    const [iuranListManual, setIuranListManual] = useState(iuranManualFromServer.data || [])
     const [showModalTambah, setShowModalTambah] = useState(false)
     const [showModalEdit, setShowModalEdit] = useState(false)
     const [showModalEditManual, setShowModalEditManual] = useState(false)
+
+    const { get, data, setData } = useForm({ search: "" })
     const { props } = usePage()
     const role = props.auth?.currentRole
-    const { get, data, setData } = useForm({
-        search: '',
-    })
 
     const modalEditManual = (item, matched, gol) => {
         setSelected(item)
@@ -96,45 +98,47 @@ export default function Iuran() {
 
     let no = 1
 
-    const rows = iuranListOtomatis.flatMap((item, index) =>
-        golongan_list
-            .map((gol) => {
-                const matched = item.iuran_golongan?.find(ig => ig.id_golongan === gol.id)
-                if (!matched) return null
-                return (
-                    <tr key={`${item.id}-${gol.id}`}>
-                        <td className="text-center">{no++}</td>
-                        <td className="text-center">{item.nama ?? '-'}</td>
-                        <td className="text-center">
-                            {gol.jenis.charAt(0).toUpperCase() + gol.jenis.slice(1)}
-                        </td>
-                        <td className="text-center">{formatRupiah(matched.nominal)}</td>
-                        <td className="text-center">{formatTanggal(item.tgl_tagih) ?? '-'}</td>
-                        <td className="text-center">{formatTanggal(item.tgl_tempo) ?? '-'}</td>
-                        {/* <td className="text-center">
-                            <div className="d-flex justify-content-center align-items-center gap-2">
-                                <button
-                                    className="btn btn-sm btn-warning my-auto"
-                                    title="Edit Iuran"
-                                    onClick={() => modalEdit(item, matched, gol)}
-                                >
-                                    <i className="fa-solid fa-pen-to-square"></i>
-                                </button>
-                                <button
-                                    className="btn btn-sm btn-danger my-auto"
-                                    title="Hapus Iuran"
-                                    onClick={() => handleDelete(matched.id, item.jenis)}
-                                >
-                                    <i className="fa-solid fa-trash"></i>
-                                </button>
-                            </div>
-                        </td> */}
-                    </tr>
-                )
-            })
-            .filter(Boolean)
+    const rows = iuranListOtomatis.flatMap(
+        (item) =>
+            golongan_list.map(
+                (gol) => {
+                    const matched = item.iuran_golongan?.find(ig => ig.id_golongan === gol.id)
+                    if (!matched) return null
+                    return (
+                        <tr key={`${item.id}-${gol.id}`}>
+                            <td className="text-center">{no++}</td>
+                            <td className="text-center">{item.nama ?? '-'}</td>
+                            <td className="text-center">
+                                {gol.jenis.charAt(0).toUpperCase() + gol.jenis.slice(1)}
+                            </td>
+                            <td className="text-center">{formatRupiah(matched.nominal)}</td>
+                            <td className="text-center">{formatTanggal(item.tgl_tagih) ?? '-'}</td>
+                            <td className="text-center">{formatTanggal(item.tgl_tempo) ?? '-'}</td>
+                            <Role role={['rw', 'bendahara']}>
+                                <td className="text-center">
+                                    <div className="d-flex justify-content-center align-items-center gap-2">
+                                        <button
+                                            className="btn btn-sm btn-warning my-auto"
+                                            title="Edit Iuran"
+                                            onClick={() => modalEdit(item, matched, gol)}
+                                        >
+                                            <i className="fa-solid fa-pen-to-square"></i>
+                                        </button>
+                                        <button
+                                            className="btn btn-sm btn-danger my-auto"
+                                            title="Hapus Iuran"
+                                            onClick={() => handleDelete(matched.id, item.jenis)}
+                                        >
+                                            <i className="fa-solid fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </Role>
+                        </tr>
+                    )
+                }
+            ).filter(Boolean)
     )
-
 
     return (
         <Layout>
@@ -151,6 +155,8 @@ export default function Iuran() {
                 role={role}
                 tambahShow={() => setShowModalTambah(true)}
             />
+            
+            {/* Table Iuran Manual */}
             <div className="table-container">
                 <div className="table-header">
                     <h4>Jenis Iuran (Manual)</h4>
@@ -164,7 +170,9 @@ export default function Iuran() {
                                 <th className="px-3 text-center" scope="col">Nominal</th>
                                 <th className="px-3 text-center" scope="col">Tanggal Tagih</th>
                                 <th className="px-3 text-center" scope="col">Tanggal Tempo</th>
-                                {/* <th className="px-3 text-center" scope="col">Aksi</th> */}
+                                <Role role={['rw', 'bendahara']}>
+                                    <th className="px-3 text-center" scope="col">Aksi</th>
+                                </Role>
                             </tr>
                         </thead>
                         <tbody>
@@ -176,25 +184,27 @@ export default function Iuran() {
                                         <td className="text-center">{formatRupiah(item.nominal) ?? '-'}</td>
                                         <td className="text-center">{formatTanggal(item.tgl_tagih) ?? '-'}</td>
                                         <td className="text-center">{formatTanggal(item.tgl_tempo) ?? '-'}</td>
-                                        {/* <td className="text-center">
-                                            <div className="d-flex justify-content-center align-items-center gap-2">
-                                                <button
-                                                    className="btn btn-sm btn-warning my-auto"
-                                                    title="Edit Iuran"
-                                                    onClick={() => modalEditManual(item)}
-                                                >
-                                                    <i className="fa-solid fa-pen-to-square"></i>
-                                                </button>
-                                                <button className="btn btn-sm btn-danger my-auto" title="Hapus Iuran" onClick={() => handleDelete(item.id, item.jenis)}>
-                                                    <i className="fa-solid fa-trash"></i>
-                                                </button>
-                                            </div>
-                                        </td> */}
+                                        <Role role={['rw', 'bendahara']}>
+                                            <td className="text-center">
+                                                <div className="d-flex justify-content-center align-items-center gap-2">
+                                                    <button
+                                                        className="btn btn-sm btn-warning my-auto"
+                                                        title="Edit Iuran"
+                                                        onClick={() => modalEditManual(item)}
+                                                    >
+                                                        <i className="fa-solid fa-pen-to-square"></i>
+                                                    </button>
+                                                    <button className="btn btn-sm btn-danger my-auto" title="Hapus Iuran" onClick={() => handleDelete(item.id, item.jenis)}>
+                                                        <i className="fa-solid fa-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </Role>
                                     </tr>
                                 ))
                             ) : (
                                 <tr>
-                                    <td colSpan="5" className="text-center">
+                                    <td colSpan={['rw', 'bendahara'].includes(role) ? "6" : "5"} className="text-center">
                                         Tidak ada data
                                     </td>
                                 </tr>
@@ -206,7 +216,7 @@ export default function Iuran() {
                     <div className="pagination-container">
                         <ul className="pagination-custom">
                             {iuranManualFromServer.links.map((link, index) => {
-                                let label = link.label;
+                                let label = link.label
                                 if (label.includes("Previous")) label = "&lt;"
                                 if (label.includes("Next")) label = "&gt;"
 
@@ -231,6 +241,8 @@ export default function Iuran() {
                     </div>
                 )}
             </div>
+
+            {/* Table Iuran Otomatis */}
             <div className="table-container">
                 <div className="table-header">
                     <h4>Jenis Iuran (Otomatis)</h4>
@@ -245,7 +257,9 @@ export default function Iuran() {
                                 <th className="px-3 text-center" scope="col">Nominal</th>
                                 <th className="px-3 text-center" scope="col">Tanggal Tagih</th>
                                 <th className="px-3 text-center" scope="col">Tanggal Tempo</th>
-                                {/* <th className="px-3 text-center" scope="col">Aksi</th> */}
+                                <Role role={['rw', 'bendahara']}>
+                                    <th className="px-3 text-center" scope="col">Aksi</th>
+                                </Role>
                             </tr>
                         </thead>
                         <tbody>
@@ -253,7 +267,7 @@ export default function Iuran() {
                                 rows
                             ) : (
                                 <tr>
-                                    <td colSpan="6" className="text-center">
+                                    <td colSpan={['rw', 'bendahara'].includes(role) ? "7" : "6"} className="text-center">
                                         Tidak ada data
                                     </td>
                                 </tr>
@@ -265,9 +279,9 @@ export default function Iuran() {
                     <div className="pagination-container">
                         <ul className="pagination-custom">
                             {iuranOtomatisFromServer.links.map((link, index) => {
-                                let label = link.label;
-                                if (label.includes("Previous")) label = "&lt;";
-                                if (label.includes("Next")) label = "&gt;";
+                                let label = link.label
+                                if (label.includes("Previous")) label = "&lt;"
+                                if (label.includes("Next")) label = "&gt;"
 
                                 return (
                                     <li
@@ -290,12 +304,14 @@ export default function Iuran() {
                     </div>
                 )}
             </div>
-            {/* <TambahIuran
+
+            <TambahIuran
                 tambahShow={showModalTambah}
                 onClose={() => setShowModalTambah(false)}
                 onAdded={handleAdded}
                 role={role}
                 golongan={golongan_list}
+                rt={rt_list} // ✅ sesuai dengan props di atas
                 nik={nik_list}
                 no_kk={no_kk_list}
             />
@@ -328,7 +344,7 @@ export default function Iuran() {
                 golongan={selectedGolongan}
                 iuranGol={selectedIuran}
                 iuran={selected}
-            /> */}
+            />
         </Layout>
     )
 }

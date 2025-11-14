@@ -43,6 +43,10 @@ class LoginController extends Controller
             return Inertia::location(route('choose-role'));
         }
 
+        if ($request->expectsJson()) {
+            return response()->json(['error' => 'NIK atau password salah.'], 401);
+        }
+
         // Jika gagal login
         return back()->withErrors([
             'nik' => 'NIK atau password salah.',

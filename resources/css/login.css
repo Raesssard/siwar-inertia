@@ -395,3 +395,16 @@ body {
     color: #842029;
     cursor: pointer;
 }
+
+/* Matikan tombol 'reveal password' bawaan di Microsoft Edge / Chrome */
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear {
+    display: none;
+}
+
+/* Matikan icon bawaan Chrome */
+input[type="password"]::-webkit-credentials-auto-fill-button,
+input[type="password"]::-webkit-password-toggle-button {
+    display: none;
+    -webkit-appearance: none;
+}
