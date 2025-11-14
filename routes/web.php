@@ -173,6 +173,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/export/tagihan', [ExportController::class, 'exportTagihan'])->name('tagihan.export');
 
         Route::resource('warga', Rt_wargaController::class)->only('index');
+        Route::get('/export/warga', [ExportController::class, 'exportDataWarga'])->name('warga.export');
 
         Route::resource('transaksi', Rt_transaksiController::class);
         Route::get('/export/transaksi', [ExportController::class, 'exportTransaksi'])->name('transaksi.export');

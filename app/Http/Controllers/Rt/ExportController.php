@@ -7,13 +7,16 @@ use App\Models\Iuran;
 use App\Models\Kategori_golongan;
 use App\Models\Tagihan;
 use App\Models\Transaksi;
+use App\Models\Warga;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Illuminate\Support\Facades\Auth;
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 use PhpOffice\PhpSpreadsheet\Cell\DataType;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Border;
-use PhpOffice\PhpSpreadsheet\Style\Fill;
+
+// export ini sementara aj, nanti diganti lagi
 
 class ExportController extends Controller
 {
@@ -63,27 +66,6 @@ class ExportController extends Controller
                     ],
                 ],
             ]);
-
-            $rowStart = 3;
-
-            $sheet->getStyle("B2:F2")->applyFromArray([
-                'fill' => [
-                    'fillType' => Fill::FILL_SOLID,
-                    'startColor' => ['argb' => '40bf40'], // kuning
-                ],
-            ]);
-
-            for ($r = $rowStart; $r <= $rowEnd; $r++) {
-                $isEven = $r % 2 == 0; // baris genap
-                $color = $isEven ? '79d279' : 'b3e6b3';
-
-                $sheet->getStyle("B{$r}:F{$r}")->applyFromArray([
-                    'fill' => [
-                        'fillType' => Fill::FILL_SOLID,
-                        'startColor' => ['argb' => $color],
-                    ],
-                ]);
-            }
         }
 
         $row_otomatis = 3;
@@ -134,27 +116,6 @@ class ExportController extends Controller
                     ],
                 ],
             ]);
-
-            $rowStart = 3;
-
-            $sheet->getStyle("I2:R2")->applyFromArray([
-                'fill' => [
-                    'fillType' => Fill::FILL_SOLID,
-                    'startColor' => ['argb' => '3366ff'], // kuning
-                ],
-            ]);
-
-            for ($r = $rowStart; $r <= $rowEnds; $r++) {
-                $isEven = $r % 2 == 0; // baris genap
-                $color = $isEven ? '809fff' : 'b3c6ff';
-
-                $sheet->getStyle("I{$r}:R{$r}")->applyFromArray([
-                    'fill' => [
-                        'fillType' => Fill::FILL_SOLID,
-                        'startColor' => ['argb' => $color],
-                    ],
-                ]);
-            }
         }
 
         $writer = new Xlsx($spreadsheet);
@@ -209,25 +170,6 @@ class ExportController extends Controller
 
             $rowEnd = $row - 1;
 
-            $sheet->getStyle("B2:H2")->applyFromArray([
-                'fill' => [
-                    'fillType' => Fill::FILL_SOLID,
-                    'startColor' => ['argb' => 'ffcc00'], // kuning
-                ],
-            ]);
-
-            for ($r = $rowStart; $r <= $rowEnd; $r++) {
-                $isEven = $r % 2 == 0; // baris genap
-                $color = $isEven ? 'ffd633' : 'ffe066';
-
-                $sheet->getStyle("B{$r}:H{$r}")->applyFromArray([
-                    'fill' => [
-                        'fillType' => Fill::FILL_SOLID,
-                        'startColor' => ['argb' => $color],
-                    ],
-                ]);
-            }
-
             $sheet->getStyle("B2:H{$rowEnd}")->applyFromArray([
                 'borders' => [
                     'allBorders' => [
@@ -268,25 +210,6 @@ class ExportController extends Controller
             }
 
             $rowEnd2 = $row2 - 1;
-
-            $sheet->getStyle("K2:R2")->applyFromArray([
-                'fill' => [
-                    'fillType' => Fill::FILL_SOLID,
-                    'startColor' => ['argb' => '009933'], // kuning
-                ],
-            ]);
-
-            for ($r = $rowStart; $r <= $rowEnd2; $r++) {
-                $isEven = $r % 2 == 0; // baris genap
-                $color = $isEven ? '00cc44' : '00ff55';
-
-                $sheet->getStyle("K{$r}:R{$r}")->applyFromArray([
-                    'fill' => [
-                        'fillType' => Fill::FILL_SOLID,
-                        'startColor' => ['argb' => $color],
-                    ],
-                ]);
-            }
 
             $sheet->getStyle("K2:R{$rowEnd2}")->applyFromArray([
                 'borders' => [
@@ -347,26 +270,7 @@ class ExportController extends Controller
                 $no++;
             }
 
-            $sheet->getStyle("B2:G2")->applyFromArray([
-                'fill' => [
-                    'fillType' => Fill::FILL_SOLID,
-                    'startColor' => ['argb' => '47d147'], // kuning
-                ],
-            ]);
-
             $rowEnd = $row - 1;
-
-            for ($r = $rowStart; $r <= $rowEnd; $r++) {
-                $isEven = $r % 2 == 0; // baris genap
-                $color = $isEven ? '70db70' : '99e699';
-
-                $sheet->getStyle("B{$r}:G{$r}")->applyFromArray([
-                    'fill' => [
-                        'fillType' => Fill::FILL_SOLID,
-                        'startColor' => ['argb' => $color],
-                    ],
-                ]);
-            }
 
             $sheet->getStyle("B2:G{$rowEnd}")->applyFromArray([
                 'borders' => [
@@ -403,26 +307,7 @@ class ExportController extends Controller
                 $no2++;
             }
 
-            $sheet->getStyle("J2:O2")->applyFromArray([
-                'fill' => [
-                    'fillType' => Fill::FILL_SOLID,
-                    'startColor' => ['argb' => 'ff1a1a'], // kuning
-                ],
-            ]);
-
             $rowEnd = $row2 - 1;
-
-            for ($r = $rowStart; $r <= $rowEnd; $r++) {
-                $isEven = $r % 2 == 0; // baris genap
-                $color = $isEven ? 'ff4d4d' : 'ff8080';
-
-                $sheet->getStyle("J{$r}:O{$r}")->applyFromArray([
-                    'fill' => [
-                        'fillType' => Fill::FILL_SOLID,
-                        'startColor' => ['argb' => $color],
-                    ],
-                ]);
-            }
 
             $sheet->getStyle("J2:O{$rowEnd}")->applyFromArray([
                 'borders' => [
@@ -436,6 +321,124 @@ class ExportController extends Controller
 
         $writer = new Xlsx($spreadsheet);
         $filename = "transaksi_rt_{$id_rt}.xlsx";
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header("Content-Disposition: attachment; filename=\"$filename\"");
+        $writer->save("php://output");
+        exit;
+    }
+
+    public function exportDataWarga()
+    {
+        $id_rt = Auth::user()->id_rt;
+
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setTitle('Warga');
+
+        $sheet->getStyle("A2:AZ3")->getFont()->setBold(true);
+
+        $sheet->getStyle('A2:AZ3')->getAlignment()->applyFromArray([
+            'horizontal' => Alignment::HORIZONTAL_CENTER,
+            'vertical'   => Alignment::VERTICAL_CENTER,
+            'wrapText'   => true,
+        ]);
+
+        $maxCol = Coordinate::columnIndexFromString('AZ');
+        for ($i = 1; $i <= $maxCol; $i++) {
+            $colLetter = Coordinate::stringFromColumnIndex($i);
+            $sheet->getColumnDimension($colLetter)->setAutoSize(true);
+        }
+
+        $row = 4;
+        $dataWarga = Warga::whereHas('kartuKeluarga', function ($warga) use ($id_rt) {
+            $warga->where('id_rt', $id_rt);
+        })->get();
+        $no_urut = 1;
+
+        if ($dataWarga->isNotEmpty()) {
+            $merges = [
+                'B1:F1',
+                'I2:J2',
+                'B2:B3',
+                'C2:C3',
+                'D2:D3',
+                'E2:E3',
+                'F2:F3',
+                'G2:G3',
+                'H2:H3',
+                'K2:K3',
+                'L2:L3',
+                'M2:M3',
+                'N2:N3',
+                'O2:O3',
+                'P2:P3',
+                'Q2:Q3',
+                'R2:R3',
+            ];
+
+            foreach ($merges as $range) {
+                $sheet->mergeCells($range);
+            }
+
+            $sheet->setCellValue('B1', 'Data Warga');
+
+            $sheet->setCellValue('B2', 'No.');
+            $sheet->setCellValue('C2', 'No. KK');
+            $sheet->setCellValue('D2', 'NIK');
+            $sheet->setCellValue('E2', 'Nama Lengkap');
+            $sheet->setCellValue('F2', 'Jenis Kelamin');
+            $sheet->setCellValue('G2', 'Tempat Lahir');
+            $sheet->setCellValue('H2', 'Tanggal Lahir');
+            $sheet->setCellValue('I2', 'Alamat');
+            $sheet->setCellValue('K2', 'Agama');
+            $sheet->setCellValue('L2', 'Pendidikan');
+            $sheet->setCellValue('M2', 'Pekerjaan');
+            $sheet->setCellValue('N2', 'Status Perkawinan');
+            $sheet->setCellValue('O2', 'Status Hubungan Dalam Keluarga');
+            $sheet->setCellValue('P2', 'Kewarganegaraan');
+            $sheet->setCellValue('Q2', 'Golongan Darah');
+            $sheet->setCellValue('R2', 'Status Warga');
+
+            $sheet->setCellValue('I3', 'Domisili');
+            $sheet->setCellValue('J3', 'Asal');
+
+            foreach ($dataWarga as $warga) {
+                $sheet->setCellValue("B{$row}", $no_urut);
+                $sheet->setCellValueExplicit("C{$row}", $warga->no_kk, DataType::TYPE_STRING);
+                $sheet->setCellValueExplicit("D{$row}", $warga->nik, DataType::TYPE_STRING);
+                $sheet->setCellValue("E{$row}", $warga->nama);
+                $sheet->setCellValue("F{$row}", $warga->jenis_kelamin);
+                $sheet->setCellValue("G{$row}", $warga->tempat_lahir);
+                $sheet->setCellValue("H{$row}", $warga->tanggal_lahir);
+                $sheet->setCellValue("I{$row}", $warga->alamat_domisili ?? $warga->kartuKeluarga->alamat);
+                $sheet->setCellValue("J{$row}", $warga->alamat_asal ?? '-');
+                $sheet->setCellValue("K{$row}", $warga->agama);
+                $sheet->setCellValue("L{$row}", $warga->pendidikan);
+                $sheet->setCellValue("M{$row}", $warga->pekerjaan);
+                $sheet->setCellValue("N{$row}", $warga->status_perkawinan);
+                $sheet->setCellValue("O{$row}", $warga->status_hubungan_dalam_keluarga);
+                $sheet->setCellValue("P{$row}", $warga->kewarganegaraan);
+                $sheet->setCellValue("Q{$row}", $warga->golongan_darah);
+                $sheet->setCellValue("R{$row}", $warga->status_warga);
+                $row++;
+                $no_urut++;
+            }
+
+            $rowEnd = $row - 1;
+
+            $sheet->getStyle("B2:R{$rowEnd}")->applyFromArray([
+                'borders' => [
+                    'allBorders' => [
+                        'borderStyle' => Border::BORDER_THIN, // bisa THICK, DASHED, dll.
+                        'color' => ['argb' => 'FF000000'], // hitam
+                    ],
+                ],
+            ]);
+        }
+
+        $writer = new Xlsx($spreadsheet);
+        $filename = "warga_rt_{$id_rt}.xlsx";
 
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         header("Content-Disposition: attachment; filename=\"$filename\"");
