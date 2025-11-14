@@ -157,14 +157,55 @@ Route::middleware(['auth'])->group(function () {
     | WARGA
     |--------------------------------------------------------------------------
     */
-    Route::prefix('warga')->as('warga.')->group(function () {
-        Route::get('pengumuman', [PengumumanWargaController::class, 'index'])->name('pengumuman');
-        Route::resource('pengaduan', PengaduanController::class);
-        Route::post('/pengaduan/{id}/komentar', [PengaduanController::class, 'komen'])->name('pengaduan.komentar.komen');
-        Route::post('/pengumuman/{id}/komentar', [PengumumanWargaController::class, 'komen'])->name('pengumuman.komentar.komen');
-        Route::get('kk', [LihatKKController::class, 'index'])->name('kk');
-        Route::get('tagihan', [WargatagihanController::class, 'index'])->name('tagihan');
-        Route::get('transaksi', [WargatransaksiController::class, 'index'])->name('transaksi');
+    Route::prefix('warga')
+        ->name('warga.')
+        ->middleware(['auth'])
+        ->group(function () {
+
+        // 📢 Pengumuman (warga hanya bisa melihat)
+        Route::get('pengumuman', [PengumumanWargaController::class, 'index'])
+            ->middleware(CheckPermission::class . ':view.pengumuman')
+            ->name('pengumuman');
+
+        Route::post('pengumuman/{id}/komentar', [PengumumanWargaController::class, 'komen'])
+            ->middleware(CheckPermission::class . ':view.pengumuman')
+            ->name('pengumuman.komentar.komen');
+
+
+        // 📮 Pengaduan (CRUD + komentar)
+        Route::resource('pengaduan', PengaduanController::class)
+            ->except(['create', 'edit', 'show'])
+            ->middleware(CheckPermission::class . ':view.pengaduan');
+
+        Route::get('pengaduan/create', [PengaduanController::class, 'create'])
+            ->middleware(CheckPermission::class . ':create.pengaduan')
+            ->name('pengaduan.create');
+
+        Route::get('pengaduan/{id}/edit', [PengaduanController::class, 'edit'])
+            ->middleware(CheckPermission::class . ':edit.pengaduan')
+            ->name('pengaduan.edit');
+
+        Route::post('pengaduan/{id}/komentar', [PengaduanController::class, 'komen'])
+            ->middleware(CheckPermission::class . ':comment.pengaduan')
+            ->name('pengaduan.komentar.komen');
+
+
+        // 👨‍👩‍👧‍👦 Lihat Kartu Keluarga
+        Route::get('kk', [LihatKKController::class, 'index'])
+            ->middleware(CheckPermission::class . ':view.kartu_keluarga')
+            ->name('kk');
+
+
+        // 🧾 Tagihan
+        Route::get('tagihan', [WargatagihanController::class, 'index'])
+            ->middleware(CheckPermission::class . ':view.tagihan')
+            ->name('tagihan');
+
+
+        // 💳 Transaksi
+        Route::get('transaksi', [WargatransaksiController::class, 'index'])
+            ->middleware(CheckPermission::class . ':view.transaksi')
+            ->name('transaksi');
     });
 
     /*
@@ -324,35 +365,124 @@ Route::middleware(['auth'])->group(function () {
     | RT
     |--------------------------------------------------------------------------
     */
-    Route::prefix('rt')->as('rt.')->group(function () {
-        Route::get('/analisis/keuangan', [AnalisisController::class, 'index'])->name('analisis');
-        Route::get('/analisis/warga', [AnalisisController::class, 'index'])->name('analisis');
-        Route::resource('kartu_keluarga', Rt_kartu_keluargaController::class)->only('index');
-        Route::resource('pengumuman', Rt_pengumumanController::class);
-        Route::get('/pengumuman/{id}/export-pdf', [Rt_pengumumanController::class, 'exportPDF'])->name('pengumuman.export.pdf');
-        Route::post('/pengumuman/{id}/komentar', [Rt_pengumumanController::class, 'komen'])->name('pengumuman.komentar.komen');
+    Route::prefix('rt')
+    ->name('rt.')
+    ->middleware(['auth'])
+    ->group(function () {
 
-        Route::resource('iuran', RtIuranController::class)->except(['destroy', 'update']);
-        Route::delete('/iuran/{id}/{jenis}', [RtIuranController::class, 'destroy'])->name('iuran.destroy');
-        Route::put('/iuran/{id}/{jenis}', [RtIuranController::class, 'update'])->name('iuran.update');
-        Route::get('/export/iuran', [ExportController::class, 'exportIuran'])->name('iuran.export');
+        // 📊 Analisis
+        // Route::get('/analisis/keuangan', [AnalisisController::class, 'index'])
+        //     ->middleware(CheckPermission::class . ':dashboard.rt')
+        //     ->name('analisis.keuangan');
+        // 
+        // Route::get('/analisis/warga', [AnalisisController::class, 'index'])
+        //     ->middleware(CheckPermission::class . ':dashboard.rt')
+        //     ->name('analisis.warga');
+        // 
+        // 🧾 Kartu Keluarga (hanya index)
+        Route::resource('kartu_keluarga', Rt_kartu_keluargaController::class)
+            ->only(['index'])
+            ->middleware(CheckPermission::class . ':view.kartu_keluarga');
 
-        Route::resource('tagihan', Rt_tagihanController::class);
-        Route::get('/export/tagihan', [ExportController::class, 'exportTagihan'])->name('tagihan.export');
+        Route::put('kartu_keluarga/{rt_kartu_keluarga}/upload-foto', [Rt_kartu_keluargaController::class, 'uploadFoto'])
+            ->middleware(CheckPermission::class . ':view.kartu_keluarga')
+            ->name('kartu_keluarga.upload_foto');
 
-        Route::resource('warga', Rt_wargaController::class)->only('index');
+        Route::delete('kartu_keluarga/{rt_kartu_keluarga}/delete-foto', [Rt_kartu_keluargaController::class, 'deleteFoto'])
+            ->middleware(CheckPermission::class . ':view.kartu_keluarga')
+            ->name('kartu_keluarga.delete_foto');
 
-        Route::resource('transaksi', Rt_transaksiController::class);
-        Route::get('/export/transaksi', [ExportController::class, 'exportTransaksi'])->name('transaksi.export');
+        Route::get('kartu_keluarga/{rt_kartu_keluarga}/upload-form', [Rt_kartu_keluargaController::class, 'uploadForm'])
+            ->middleware(CheckPermission::class . ':view.kartu_keluarga')
+            ->name('kartu_keluarga.upload_form');
 
-        Route::resource('pengaduan', Rt_PengaduanController::class)->only('index');
-        Route::post('/pengaduan/{id}/komentar', [Rt_PengaduanController::class, 'komen'])->name('pengaduan.komentar.komen');
-        Route::put('/pengaduan/{id}/status', [Rt_PengaduanController::class, 'updateStatus'])->name('pengaduan.updateStatus');
-        Route::put('/pengaduan/{id}/konfirmasi', [Rt_PengaduanController::class, 'updateKonfirmasi'])->name('pengaduan.updateKonfirmasi');
-        Route::post('pengaduan/{id}/baca', [Rt_PengaduanController::class, 'baca'])->name('pengaduan.baca');
 
-        Route::put('kartu_keluarga/{rt_kartu_keluarga}/upload-foto', [Rt_kartu_keluargaController::class, 'uploadFoto'])->name('kartu_keluarga.upload_foto');
-        Route::delete('kartu_keluarga/{rt_kartu_keluarga}/delete-foto', [Rt_kartu_keluargaController::class, 'deleteFoto'])->name('kartu_keluarga.delete_foto');
-        Route::get('kartu_keluarga/{rt_kartu_keluarga}/upload-form', [Rt_kartu_keluargaController::class, 'uploadForm'])->name('kartu_keluarga.upload_form');
+        // 📢 Pengumuman
+        Route::resource('pengumuman', Rt_pengumumanController::class)
+            ->middleware(CheckPermission::class . ':view.pengumuman');
+
+        Route::get('pengumuman/create', [Rt_pengumumanController::class, 'create'])
+            ->middleware(CheckPermission::class . ':create.pengumuman')
+            ->name('pengumuman.create');
+
+        Route::get('pengumuman/{id}/edit', [Rt_pengumumanController::class, 'edit'])
+            ->middleware(CheckPermission::class . ':edit.pengumuman')
+            ->name('pengumuman.edit');
+
+        Route::delete('pengumuman/{id}', [Rt_pengumumanController::class, 'destroy'])
+            ->middleware(CheckPermission::class . ':delete.pengumuman')
+            ->name('pengumuman.destroy');
+
+        Route::get('pengumuman/{id}/export-pdf', [Rt_pengumumanController::class, 'exportPDF'])
+            ->middleware(CheckPermission::class . ':export.pengumuman')
+            ->name('pengumuman.export.pdf');
+
+        Route::post('pengumuman/{id}/komentar', [Rt_pengumumanController::class, 'komen'])
+            ->middleware(CheckPermission::class . ':view.pengumuman')
+            ->name('pengumuman.komentar.komen');
+
+
+        // 💰 Iuran
+        Route::resource('iuran', RtIuranController::class)
+            ->except(['destroy', 'update'])
+            ->middleware(CheckPermission::class . ':view.iuran');
+
+        Route::delete('iuran/{id}/{jenis}', [RtIuranController::class, 'destroy'])
+            ->middleware(CheckPermission::class . ':view.iuran')
+            ->name('iuran.destroy');
+
+        Route::put('iuran/{id}/{jenis}', [RtIuranController::class, 'update'])
+            ->middleware(CheckPermission::class . ':view.iuran')
+            ->name('iuran.update');
+
+        Route::get('export/iuran', [ExportController::class, 'exportIuran'])
+            ->middleware(CheckPermission::class . ':export.iuran')
+            ->name('iuran.export');
+
+
+        // 🧾 Tagihan
+        Route::resource('tagihan', Rt_tagihanController::class)
+            ->middleware(CheckPermission::class . ':view.tagihan');
+
+        Route::get('export/tagihan', [ExportController::class, 'exportTagihan'])
+            ->middleware(CheckPermission::class . ':export.tagihan')
+            ->name('tagihan.export');
+
+
+        // 👥 Warga (hanya index)
+        Route::resource('warga', Rt_wargaController::class)
+            ->only(['index'])
+            ->middleware(CheckPermission::class . ':view.warga');
+
+
+        // 💳 Transaksi
+        Route::resource('transaksi', Rt_transaksiController::class)
+            ->middleware(CheckPermission::class . ':view.transaksi');
+
+        Route::get('export/transaksi', [ExportController::class, 'exportTransaksi'])
+            ->middleware(CheckPermission::class . ':export.transaksi')
+            ->name('transaksi.export');
+
+
+        // 📮 Pengaduan
+        Route::resource('pengaduan', Rt_PengaduanController::class)
+            ->only(['index'])
+            ->middleware(CheckPermission::class . ':view.pengaduan');
+
+        Route::post('pengaduan/{id}/komentar', [Rt_PengaduanController::class, 'komen'])
+            ->middleware(CheckPermission::class . ':respond.pengaduan')
+            ->name('pengaduan.komentar.komen');
+
+        Route::put('pengaduan/{id}/status', [Rt_PengaduanController::class, 'updateStatus'])
+            ->middleware(CheckPermission::class . ':respond.pengaduan')
+            ->name('pengaduan.updateStatus');
+
+        Route::put('pengaduan/{id}/konfirmasi', [Rt_PengaduanController::class, 'updateKonfirmasi'])
+            ->middleware(CheckPermission::class . ':respond.pengaduan')
+            ->name('pengaduan.updateKonfirmasi');
+
+        Route::post('pengaduan/{id}/baca', [Rt_PengaduanController::class, 'baca'])
+            ->middleware(CheckPermission::class . ':view.pengaduan')
+            ->name('pengaduan.baca');
     });
 });

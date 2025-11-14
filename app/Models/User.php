@@ -52,25 +52,26 @@ class User extends Authenticatable
         ];
     }
 
-    public function isKetuaRt(): bool
+    public function effectiveRole()
     {
-        return $this->hasRole('rt') 
-            && !$this->hasAnyRole(['sekretaris', 'bendahara']);
-    }
+        $roles = $this->roles->pluck('name')->toArray();
 
-    public function isKetuaRw(): bool
-    {
-        return $this->hasRole('rw') 
-            && !$this->hasAnyRole(['sekretaris', 'bendahara']);
-    }
+        // Jika hanya punya 1 role, itu role utamanya
+        if (count($roles) === 1) {
+            return $roles[0];
+        }
 
-    public function jabatan(): ?string
-    {
-        if ($this->hasRole('sekretaris')) return 'Sekretaris';
-        if ($this->hasRole('bendahara')) return 'Bendahara';
-        if ($this->isKetuaRt()) return 'Ketua RT';
-        if ($this->isKetuaRw()) return 'Ketua RW';
-        return null;
-    }
+        // Jika ada role RT dan role lain → pakai role lain
+        if (in_array('rt', $roles)) {
+            return collect($roles)->first(fn ($r) => $r !== 'rt');
+        }
 
+        // Jika ada role RW dan role lain → pakai role lain
+        if (in_array('rw', $roles)) {
+            return collect($roles)->first(fn ($r) => $r !== 'rw');
+        }
+
+        // Default kalau tidak ada RT/RW
+        return $roles[0];
+    }
 }
