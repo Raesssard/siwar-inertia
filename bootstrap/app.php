@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Middleware\CheckPermission;
+use App\Http\Middleware\CheckRememberCookie;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\InertiaSharedData;
 use Illuminate\Foundation\Application;
@@ -15,6 +16,7 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->web(append: [
+            CheckRememberCookie::class,
             HandleInertiaRequests::class,
         ]);
 
