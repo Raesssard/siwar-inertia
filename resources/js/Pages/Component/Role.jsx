@@ -1,16 +1,15 @@
 import { usePage } from '@inertiajs/react'
 
-export default function Role({ permission, children }) {
+export default function Role({ role, children }) {
   const { auth } = usePage().props
-  const permissions = auth?.permissions || []
+  const currentRole = auth?.currentRole
 
-  const required = Array.isArray(permission)
-      ? permission
-      : [permission]
 
-  const allowed = required.some(p => permissions.includes(p))
+  const allowedRoles = Array.isArray(role) ? role : [role]
 
-  if (!allowed) return null
+  if (!allowedRoles.includes(currentRole)) {
+    return null
+  }
 
   return children
 }

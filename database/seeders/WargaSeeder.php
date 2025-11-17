@@ -149,7 +149,7 @@ class WargaSeeder extends Seeder
                 'id_rw' => $rw->id,
             ]
         );
-        $userRw->syncRoles(['rw']);
+        $userRw->syncRoles(['rw', 'warga']);
 
         // === 12. Buat akun RT ===
         $userRt = User::updateOrCreate(
