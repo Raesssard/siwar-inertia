@@ -35,9 +35,7 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
-
         $validRoles = ['admin', 'rw', 'rt', 'warga'];
-
         $user = $request->user();
 
         if (!$user) {
@@ -52,19 +50,38 @@ class HandleInertiaRequests extends Middleware
                 session()->put('active_role', $firstRole);
             }
         }
+        // Role aktif dari session
+        $currentRole = session('active_role');
+
+        // Ambil role model utk role aktif saja
+        $roleModel = $user
+            ? $user->roles()->where('name', $currentRole)->first()
+            : null;
+
+        // Permission efektif (HANYA dari role aktif)
+        $effectivePermissions = $roleModel
+            ? $roleModel->permissions->pluck('name')
+            : collect();
 
         return array_merge(parent::share($request), [
             'auth' => [
-                'user' => $request->user()?->load(['warga', 'rukunTetangga', 'rw']),
+                'user' => $user?->load(['warga', 'rukunTetangga', 'rw']),
+
+                // Role yang valid (admin/rw/rt/warga)
                 'rolesAccount' => $user
                     ? $user->getRoleNames()->filter(fn($r) => in_array($r, $validRoles))->values()
                     : [],
-                'roles' => $request->user()?->getRoleNames(),
-                'permissions' => $request->user()
-                    ? $request->user()->getAllPermissions()->pluck('name')->toArray()
-                    : [],
-                'currentRole' => session('active_role'),
+
+                // Semua role user (tanpa filter)
+                'roles' => $user?->getRoleNames(),
+
+                // Permission efektif berdasarkan role aktif
+                'permissions' => $effectivePermissions,
+
+                // Role yang sedang dipakai
+                'currentRole' => $currentRole,
             ],
+
             'errors' => function () use ($request) {
                 return $request->session()->get('errors')
                     ? $request->session()->get('errors')->getBag('default')->getMessages()
