@@ -220,7 +220,7 @@ class DashboardController extends Controller
             $total_pengeluaran = Transaksi::where('jenis', 'pengeluaran')->sum('nominal');
 
             // Total pemasukan keseluruhan
-            $total_pemasukan = $total_pemasukan_iuran + $total_pemasukan_transaksi;
+            $total_pemasukan = $total_pemasukan_transaksi;
 
             // Saldo akhir
             $total_saldo_akhir = $total_pemasukan - $total_pengeluaran;

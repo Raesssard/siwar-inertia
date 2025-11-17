@@ -37,8 +37,22 @@ class HandleInertiaRequests extends Middleware
     {
 
         $validRoles = ['admin', 'rw', 'rt', 'warga'];
-
         $user = $request->user();
+
+        if (!$user) {
+            return parent::share($request);
+        }
+
+        if (!session()->has('active_role')) {
+            if ($user->last_role && $user->hasRole($user->last_role)) {
+                session()->put('active_role', $user->last_role);
+            } else {
+                $firstRole = $user->getRoleNames()->first();
+                session()->put('active_role', $firstRole);
+            }
+        }
+        // Role aktif dari session
+        $currentRole = session('active_role');
 
         return array_merge(parent::share($request), [
             'auth' => [

@@ -31,6 +31,7 @@ return new class extends Migration
                 ->onDelete('cascade');
 
             $table->string('password');
+            $table->string('last_role')->nullable();
             $table->rememberToken(); // supaya login via Auth jalan
             $table->timestamps();
             $table->softDeletes();
