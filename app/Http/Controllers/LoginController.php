@@ -110,6 +110,10 @@ class LoginController extends Controller
         }
 
         session(['active_role' => $role]);
+
+        $user->last_role = $role;
+        $user->save();
+
         return response()->json(['success' => true]);
     }
 }

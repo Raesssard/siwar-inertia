@@ -40,6 +40,19 @@ class HandleInertiaRequests extends Middleware
 
         $user = $request->user();
 
+        if (!$user) {
+            return parent::share($request);
+        }
+
+        if (!session()->has('active_role')) {
+            if ($user->last_role && $user->hasRole($user->last_role)) {
+                session()->put('active_role', $user->last_role);
+            } else {
+                $firstRole = $user->getRoleNames()->first();
+                session()->put('active_role', $firstRole);
+            }
+        }
+
         return array_merge(parent::share($request), [
             'auth' => [
                 'user' => $request->user()?->load(['warga', 'rukunTetangga', 'rw']),
@@ -47,7 +60,9 @@ class HandleInertiaRequests extends Middleware
                     ? $user->getRoleNames()->filter(fn($r) => in_array($r, $validRoles))->values()
                     : [],
                 'roles' => $request->user()?->getRoleNames(),
-                'permissions' => $request->user()?->getAllPermissions()->pluck('name'),
+                'permissions' => $request->user()
+                    ? $request->user()->getAllPermissions()->pluck('name')->toArray()
+                    : [],
                 'currentRole' => session('active_role'),
             ],
             'errors' => function () use ($request) {

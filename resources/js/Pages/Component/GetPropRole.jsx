@@ -613,7 +613,7 @@ export function getRwLinks() {
                 {
                     href: "/rw/tagihan",
                     text: "Tagihan Warga",
-                    icon: "file-invoice-dollar",
+                    icon: "hand-holding-usd",
                     permission: "view.tagihan",
                 },
                 {
