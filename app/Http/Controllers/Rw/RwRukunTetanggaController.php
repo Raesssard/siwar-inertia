@@ -19,13 +19,23 @@ class RwRukunTetanggaController extends Controller
 {
     public function index(Request $request)
     {
-        $id_rw = Auth::user()->id_rw;
         $title = 'Rukun Tetangga';
 
-        // 🔹 Query utama
-        $query = Rt::where('id_rw', $id_rw);
+        // Ambil data RW user (lewat relasi)
+        $userRwData = Auth::user()->rw;
+        if (!$userRwData) {
+            return redirect()->back()->with('error', 'Data RW Anda tidak ditemukan.');
+        }
 
-        // 🔍 Filter pencarian
+        // Nomor RW user
+        $nomorRwUser = $userRwData->nomor_rw;
+
+        // Query utama RT berdasarkan relasi
+        $query = Rt::whereHas('rw', function ($q) use ($nomorRwUser) {
+            $q->where('nomor_rw', $nomorRwUser);
+        });
+
+        // Filter pencarian
         if ($request->filled('keyword')) {
             $query->where(function ($q) use ($request) {
                 $q->where('nik', 'like', '%' . $request->keyword . '%')
@@ -37,24 +47,27 @@ class RwRukunTetanggaController extends Controller
             $query->where('nomor_rt', $request->nomor_rt);
         }
 
-        // 🔸 Ambil data RT paginasi
-        $rukun_tetangga = $query->orderBy('nomor_rt')->paginate(10)->withQueryString();
+        // Data RT
+        $rukun_tetangga = $query->orderBy('nomor_rt')
+            ->paginate(10)
+            ->withQueryString();
 
-        // 🔸 Ambil daftar nomor RT unik (untuk dropdown filter)
-        $rukun_tetangga_filter = Rt::where('id_rw', $id_rw)
+        // Dropdown filter RT
+        $rukun_tetangga_filter = Rt::whereHas('rw', function ($q) use ($nomorRwUser) {
+                $q->where('nomor_rw', $nomorRwUser);
+            })
             ->select('nomor_rt')
             ->distinct()
             ->orderBy('nomor_rt')
             ->get();
 
-        // 🔸 Ambil role tambahan selain bawaan
+        // Ambil role tambahan
         $roles = Role::pluck('name')
             ->filter(fn($r) => !in_array(strtolower($r), ['admin', 'rw', 'rt', 'warga']))
             ->values();
 
         $roles = collect(['ketua'])->merge($roles)->values();
 
-        // 📦 Kirim data ke Inertia
         return Inertia::render('Rw/Rt', [
             'rukun_tetangga' => $rukun_tetangga,
             'filters' => $request->only(['keyword', 'nomor_rt']),
