@@ -62,6 +62,7 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/settings/password', [SettingsController::class, 'updatePassword'])->name('settings.update-password');
     Route::put('/settings/update-system', [SettingsController::class, 'updateSystem'])->name('settings.update-system');
     Route::post('/request-cookie', [LoginController::class, 'requestCookie'])->name('request-cookie');
+    Route::post('/reject-cookie', [LoginController::class, 'rejectCookie'])->name('reject-cookie');
 
     /*
     |--------------------------------------------------------------------------

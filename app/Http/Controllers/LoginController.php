@@ -152,4 +152,20 @@ class LoginController extends Controller
             'message' => 'Remember token set'
         ])->cookie($cookie);
     }
+
+    public function rejectCookie()
+    {
+        /** @var User $user */
+        $user = Auth::user(); // ambil user yang sedang login
+
+        if (!$user) {
+            return response()->json(['error' => 'User tidak ditemukan'], 401);
+        }
+
+        session()->put('need_cookie_confirmation', false);
+
+        return response()->json([
+            'message' => 'Cookie rejected'
+        ]);
+    }
 }
