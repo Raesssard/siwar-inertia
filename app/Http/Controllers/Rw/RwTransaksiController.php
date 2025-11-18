@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Rw;
 
 use App\Http\Controllers\Controller;
+use App\Models\Kartu_keluarga;
 use App\Models\Transaksi;
 use App\Models\Rt;
 use Illuminate\Http\Request;
@@ -17,6 +18,7 @@ class RwTransaksiController extends Controller
         $title = "Transaksi RW";
         $user = Auth::user();
         $nomorRw = $user->rw->nomor_rw ?? null;
+        $idRw = $user->rw->id ?? null;
 
         $search = $request->input('search');
         $tahun = $request->input('tahun');
@@ -56,12 +58,15 @@ class RwTransaksiController extends Controller
             'desember'
         ];
 
+        $list_kk = Kartu_keluarga::where('id_rt', $idRw)->with('rukunTetangga')->get();
+
         return Inertia::render('Rw/Transaksi', [
             'title' => $title,
             'transaksi' => $transaksi,
             'daftar_tahun' => $daftar_tahun,
             'daftar_bulan' => $daftar_bulan,
             'daftar_rt' => $daftar_rt,
+            'list_kk' => $list_kk,
         ]);
     }
 
@@ -76,8 +81,11 @@ class RwTransaksiController extends Controller
             'rt' => 'required|numeric'
         ]);
 
+        $isPerKk = $request->no_kk !== 'semua';
+
         $data = [
             'tagihan_id' => null,
+            'no_kk' => $isPerKk ? $request->no_kk : null,
             'rt' => $request->rt,
             'tanggal' => $request->tanggal,
             'nama_transaksi' => $request->nama_transaksi,
