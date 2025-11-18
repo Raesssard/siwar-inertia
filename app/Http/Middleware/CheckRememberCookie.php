@@ -18,17 +18,21 @@ class CheckRememberCookie
      */
     public function handle(Request $request, Closure $next): Response
     {
-Log::info("check remember me");
+        Log::info("check remember me");
         if (!Auth::check() && $request->hasCookie('remember_web')) {
             $token = $request->cookie('remember_web');
             $user = User::where('remember_token', $token)->first();
 
-Log::info("remember me checked");
+            Log::info("remember me checked");
             if ($user) {
                 Auth::login($user);
                 $role = $user->last_role ?: $user->roles->pluck('name')->first();
 
                 session(['active_role' => $role]);
+
+                if ($request->is('login') || $request->is('/')) {
+                    return redirect()->route('dashboard');
+                }
             }
         }
 
