@@ -22,16 +22,32 @@ class RwKartuKeluargaController extends Controller
         $search = $request->search;
         $title = 'Kartu Keluarga';
 
+        // Ambil data RW user
         $userRwData = Auth::user()->rw;
         if (!$userRwData) {
-            return redirect()->back()->with('error', 'Data RW Anda tidak ditemukan. Mohon hubungi administrator.');
+            return redirect()->back()->with('error', 'Data RW Anda tidak ditemukan.');
         }
 
-        $idRwUser = $userRwData->id;
-        $total_kk = Kartu_keluarga::where('id_rw', $idRwUser)->count();
+        // Ambil nomor RW user
+        $nomorRwUser = $userRwData->nomor_rw;
 
-        $kartu_keluarga = Kartu_keluarga::with(['warga.kartuKeluarga.rukunTetangga', 'rukunTetangga.rw', 'rw', 'warga.kartuKeluarga.rw', 'kategoriGolongan', 'kepalaKeluarga'])
-            ->where('id_rw', $idRwUser)
+        // ✔️ TOTAL KK DIPERBAIKI — menggunakan relasi ke RW
+        $total_kk = Kartu_keluarga::whereHas('rw', function ($q) use ($nomorRwUser) {
+            $q->where('nomor_rw', $nomorRwUser);
+        })->count();
+
+        // ✔️ QUERY KK DIPERBAIKI — tidak lagi memakai nomor_rw di tabel KK
+        $kartu_keluarga = Kartu_keluarga::with([
+                'warga.kartuKeluarga.rukunTetangga',
+                'rukunTetangga.rw',
+                'rw',
+                'warga.kartuKeluarga.rw',
+                'kategoriGolongan',
+                'kepalaKeluarga'
+            ])
+            ->whereHas('rw', function ($q) use ($nomorRwUser) {
+                $q->where('nomor_rw', $nomorRwUser);
+            })
             ->when($search, function ($query) use ($search) {
                 $query->where('alamat', 'like', "%{$search}%")
                     ->orWhere('no_kk', 'like', "%{$search}%")
@@ -45,16 +61,16 @@ class RwKartuKeluargaController extends Controller
             ->withQueryString();
 
         $kategori_iuran = Kategori_golongan::select('id', 'jenis')->get();
-        $daftar_rt = Rt::where('id_rw', $idRwUser)
+
+        // ✔️ DAFTAR RT DIPERBAIKI — juga tidak punya kolom nomor_rw
+        $daftar_rt = Rt::whereHas('rw', function ($q) use ($nomorRwUser) {
+                $q->where('nomor_rw', $nomorRwUser);
+            })
             ->select('id', 'nomor_rt', 'id_rw')
             ->with(['rw', 'user.roles'])
             ->whereHas('user', function ($q) {
-                $q->whereHas('roles', function ($r) {
-                    $r->where('name', 'rt');
-                })
-                ->whereDoesntHave('roles', function ($r) {
-                    $r->whereIn('name', ['sekretaris', 'bendahara', 'seksi']);
-                });
+                $q->whereHas('roles', fn($r) => $r->where('name', 'rt'))
+                ->whereDoesntHave('roles', fn($r) => $r->whereIn('name', ['sekretaris', 'bendahara', 'seksi']));
             })
             ->get();
 

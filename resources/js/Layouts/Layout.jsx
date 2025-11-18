@@ -40,7 +40,7 @@ export default function Layout({ children }) {
     const ModalSideShow = (condition) => {
         setShowSidebar(condition)
     }
-
+    // console.log(cookie_prompt);
     // 🔹 Tampilkan flash message ketika ada dari server
     useEffect(() => {
         if (flash?.success || flash?.error) {
