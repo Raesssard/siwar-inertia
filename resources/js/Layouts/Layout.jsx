@@ -14,15 +14,15 @@ export default function Layout({ children }) {
     const [history, setHistory] = useState(false)
     const [showSidebar, setShowSidebar] = useState(false)
     const [flashMessage, setFlashMessage] = useState(null)
-    const { flash, cookie_prompt, auth } = usePage().props
+    const { props } = usePage()
+    const users = props.auth?.user
+    const { flash, cookie_prompt } = usePage().props
     const [showToast, setShowToast] = useState(false);
-    const [user, setUser] = useState(null);
     useEffect(() => {
         if (cookie_prompt?.need) {
-            setShowToast(true);
-            setUser(auth.user);
+            setShowToast(true)
         }
-    }, [cookie_prompt]);
+    }, [cookie_prompt])
 
     const toggleLocalStorage = () => {
         setHistory(true)
@@ -70,7 +70,7 @@ export default function Layout({ children }) {
                 />
                 <div
                     id="content-wrapper"
-                    className={`main-content d-flex flex-column ${toggle}`}
+                    className={`main-content d-flex flex-column ${window.innerWidth <= 767 ? '' : toggle}`}
                 >
                     <div id="content">
                         <Topbar
@@ -99,7 +99,9 @@ export default function Layout({ children }) {
                             <div className="row">{children}</div>
                         </div>
                     </div>
-                    {showToast && <RoleCookieToast user={user} />}
+                    {showToast &&
+                        <RoleCookieToast user={users} />
+                    }
                     <Footer />
                 </div>
             </div>

@@ -4214,7 +4214,7 @@ export function TambahIuran({ tambahShow, onClose, onAdded, role, golongan, rt =
                             <div className="p-3 h-100">
                                 <form onSubmit={handleSubmit} className="h-100 d-flex flex-column" id="iuran">
 
-                                    <div className="d-flex position-relative mb-3 border-bottom">
+                                    {/* <div className="d-flex position-relative mb-3 border-bottom">
                                         {["Semua Kartu Keluarga", "Kartu Keluarga"].map((label, i) => (
                                             <button
                                                 key={label}
@@ -4259,7 +4259,7 @@ export function TambahIuran({ tambahShow, onClose, onAdded, role, golongan, rt =
                                                 borderRadius: "2px",
                                             }}
                                         />
-                                    </div>
+                                    </div> */}
 
                                     <div className="mb-3">
                                         <label className="form-label">Pilih RT</label>
@@ -4312,12 +4312,11 @@ export function TambahIuran({ tambahShow, onClose, onAdded, role, golongan, rt =
                                         </div>
                                     )} */}
 
-                                    {perKk && (
+                                    {/* {perKk && (
                                         <div className="mb-3">
                                             <label className="form-label">Nomor Kartu Keluarga</label>
                                             <Select
                                                 options={[
-                                                    { value: "semua", label: "Semua Kartu Keluarga" },
                                                     ...noKkWarga.map((kk) => ({
                                                         value: kk.no_kk,
                                                         label: kk.no_kk,
@@ -4325,7 +4324,7 @@ export function TambahIuran({ tambahShow, onClose, onAdded, role, golongan, rt =
                                                 ]}
                                                 value={
                                                     data.no_kk
-                                                        ? { value: data.no_kk, label: data.no_kk === "semua" ? "Semua Kartu Keluarga" : data.no_kk }
+                                                        ? { value: data.no_kk, label: data.no_kk }
                                                         : null
                                                 }
                                                 onChange={selected => handleChange({ target: { name: "no_kk", value: selected ? selected.value : "" } })}
@@ -4345,7 +4344,7 @@ export function TambahIuran({ tambahShow, onClose, onAdded, role, golongan, rt =
                                                 }}
                                             />
                                         </div>
-                                    )}
+                                    )} */}
 
                                     <div className="mb-3">
                                         <label className="form-label">Nama Iuran</label>

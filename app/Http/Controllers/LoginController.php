@@ -146,8 +146,26 @@ class LoginController extends Controller
         // Buat cookie, expire misal 5 tahun
         $cookie = cookie('remember_web', $token, 60 * 24 * 365 * 5);
 
+        session()->put('need_cookie_confirmation', false);
+
         return response()->json([
             'message' => 'Remember token set'
         ])->cookie($cookie);
+    }
+
+    public function rejectCookie()
+    {
+        /** @var User $user */
+        $user = Auth::user(); // ambil user yang sedang login
+
+        if (!$user) {
+            return response()->json(['error' => 'User tidak ditemukan'], 401);
+        }
+
+        session()->put('need_cookie_confirmation', false);
+
+        return response()->json([
+            'message' => 'Cookie rejected'
+        ]);
     }
 }
