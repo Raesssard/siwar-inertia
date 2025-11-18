@@ -4,7 +4,6 @@ namespace App\Providers;
 
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Session;
 use Inertia\Inertia;
@@ -18,15 +17,19 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-Log::info("AppServiceProvider booted!");
-
         if (Auth::check()) {
+            /** @var User $user */
             $user = Auth::user();
 
-            // Jika belum ada active_role → ambil role pertama
+            // Jika belum ada active_role → ambil role pertama ❌
+            //                              ambil role yg terakhir dipake ✅
             if (!Session::has('active_role')) {
-                $role = $user->roles->first()->name ?? null;
-                Session::put('active_role', $role);
+                if ($user->last_role && $user->hasRole($user->last_role)) {
+                    Session::put('active_role', $user->last_role);
+                } else {
+                    $firstRole = $user->getRoleNames()->first();
+                    Session::put('active_role', $firstRole);
+                }
             }
         }
         Carbon::setLocale('id');

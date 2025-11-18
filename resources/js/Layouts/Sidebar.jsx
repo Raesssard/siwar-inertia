@@ -91,10 +91,6 @@ export default function Sidebar({ toggleKeParent, localStorageHistory }) {
         })
         .filter(Boolean)
 
-    console.log("role:", role)
-    console.log("permissions:", permissions)
-    console.log("links:", filteredLinks)
-
     return (
         <>
             <ul

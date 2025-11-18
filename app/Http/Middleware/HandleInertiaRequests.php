@@ -51,8 +51,6 @@ class HandleInertiaRequests extends Middleware
                 session()->put('active_role', $firstRole);
             }
         }
-        // Role aktif dari session
-        $currentRole = session('active_role');
 
         return array_merge(parent::share($request), [
             'auth' => [
@@ -63,6 +61,9 @@ class HandleInertiaRequests extends Middleware
                 'roles' => $request->user()?->getRoleNames(),
                 'permissions' => $request->user()?->getAllPermissions()->pluck('name'),
                 'currentRole' => session('active_role'),
+            ],
+            'cookie_prompt' => [
+                'need' => session('need_cookie_confirmation', false),
             ],
             'errors' => function () use ($request) {
                 return $request->session()->get('errors')
