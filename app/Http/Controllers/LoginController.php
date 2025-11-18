@@ -146,6 +146,8 @@ class LoginController extends Controller
         // Buat cookie, expire misal 5 tahun
         $cookie = cookie('remember_web', $token, 60 * 24 * 365 * 5);
 
+        session()->put('need_cookie_confirmation', false);
+
         return response()->json([
             'message' => 'Remember token set'
         ])->cookie($cookie);
