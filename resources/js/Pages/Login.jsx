@@ -74,7 +74,7 @@ export default function Login() {
                     },
                 })
             } else {
-                window.location.href = res.data?.redirect;
+                window.location.href = res.data?.redirect ?? '/dashboard';
             }
         } catch (err) {
             console.error(err)

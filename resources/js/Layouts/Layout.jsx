@@ -5,6 +5,7 @@ import Footer from "./Footer"
 import Topbar from "./Topbar"
 import { ModalSidebar } from "../Pages/Component/Modal"
 import { usePage } from "@inertiajs/react"
+import RoleCookieToast from "../Pages/Component/RoleCookieToast"
 
 export default function Layout({ children }) {
     const [toggle, setToggle] = useState(() => {
@@ -13,7 +14,15 @@ export default function Layout({ children }) {
     const [history, setHistory] = useState(false)
     const [showSidebar, setShowSidebar] = useState(false)
     const [flashMessage, setFlashMessage] = useState(null)
-    const { flash } = usePage().props
+    const { flash, cookie_prompt, auth } = usePage().props
+    const [showToast, setShowToast] = useState(false);
+    const [user, setUser] = useState(null);
+    useEffect(() => {
+        if (cookie_prompt?.need) {
+            setShowToast(true);
+            setUser(auth.user);
+        }
+    }, [cookie_prompt]);
 
     const toggleLocalStorage = () => {
         setHistory(true)
@@ -90,6 +99,7 @@ export default function Layout({ children }) {
                             <div className="row">{children}</div>
                         </div>
                     </div>
+                    {showToast && <RoleCookieToast user={user} />}
                     <Footer />
                 </div>
             </div>

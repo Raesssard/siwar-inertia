@@ -55,7 +55,7 @@ export function getWargaCards({ ...rest }) {
             ]
         },
         {
-            kategori: 'Tagihan',
+            kategori: 'Tagihan Saya',
             isi: [
                 {
                     href: "/warga/tagihan",
@@ -78,7 +78,7 @@ export function getWargaCards({ ...rest }) {
                     color: rest.jumlah_tagihan_sudah_bayar < 1 ? 'warning' : 'success',
                     title: "Tagihan Sudah Dibayar",
                     value: rest.jumlah_tagihan_sudah_bayar,
-                    icon: "money-check-alt",
+                    icon: "envelope-circle-check",
                     permission: "view.tagihan",
                 },
                 {
@@ -86,7 +86,7 @@ export function getWargaCards({ ...rest }) {
                     color: rest.total_tagihan_sudah_bayar < 1 ? 'warning' : 'success',
                     title: "Total Tagihan Yang Sudah Dibayar",
                     value: formatRupiah(rest.total_tagihan_sudah_bayar),
-                    icon: "hand-holding-usd",
+                    icon: "circle-dollar-to-slot",
                     permission: "view.tagihan",
                 },
             ]

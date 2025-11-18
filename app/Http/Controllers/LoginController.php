@@ -5,8 +5,10 @@ namespace App\Http\Controllers;
 use App\Models\Warga;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 
 class LoginController extends Controller
@@ -32,6 +34,12 @@ class LoginController extends Controller
             $accountRoles = $user->roles->filter(
                 fn($r) => in_array($r->name, $validRoles)
             )->values();
+
+            session()->put(
+                'need_cookie_confirmation',
+                !$request->boolean('remember')
+            );
+
 
             if ($accountRoles->count() === 1) {
                 Log::info('User ' . $user->nik . ' logged in with role ' . $user->roles->first()->name);
@@ -65,7 +73,7 @@ class LoginController extends Controller
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-        return redirect('/login');
+        return redirect('/login')->withoutCookie('remember_web');
     }
 
     private function redirectByRole(string $role, $user)
@@ -114,6 +122,32 @@ class LoginController extends Controller
         $user->last_role = $role;
         $user->save();
 
+        // session()->flash('need_cookie_confirmation', true);
+
         return response()->json(['success' => true]);
+    }
+
+    public function requestCookie(Request $request)
+    {
+        /** @var User $user */
+        $user = Auth::user(); // ambil user yang sedang login
+
+        if (!$user) {
+            return response()->json(['error' => 'User tidak ditemukan'], 401);
+        }
+
+        // Buat token random
+        $token = Str::random(60);
+
+        // Simpan di database
+        $user->remember_token = $token;
+        $user->save();
+
+        // Buat cookie, expire misal 5 tahun
+        $cookie = cookie('remember_web', $token, 60 * 24 * 365 * 5);
+
+        return response()->json([
+            'message' => 'Remember token set'
+        ])->cookie($cookie);
     }
 }
