@@ -5662,14 +5662,17 @@ export function TambahTransaksi({ tambahShow, onClose, onAdded, role, daftarRT =
     );
 }
 
-export function TambahTransaksiPerKk({ listKK, tambahShow, onClose, onAdded, role }) {
+export function TambahTransaksiPerKk({ listKK, tambahShow, onClose, onAdded, role, daftarRT }) {
     const { data, setData } = useForm({
         tanggal: "",
         nama_transaksi: "",
         nominal: "",
         keterangan: "",
+        jenis: "pemasukan",
         no_kk: "",
+        rt: "",
     })
+    const [Kklist, setKkList] = useState(listKK || [])
 
     const handleSubmit = (e) => {
         e.preventDefault()
@@ -5679,25 +5682,54 @@ export function TambahTransaksiPerKk({ listKK, tambahShow, onClose, onAdded, rol
         formData.append('nama_transaksi', data.nama_transaksi)
         formData.append('nominal', data.nominal)
         formData.append('keterangan', data.keterangan)
+        formData.append('jenis', data.jenis)
         formData.append('no_kk', data.no_kk)
+        formData.append('rt', data.rt)
 
         axios.post(`/${role}/transaksi`, formData)
             .then(res => {
                 console.log('RESPON:', res.data)
 
                 if (onAdded && res.data.transaksi) {
-                    onAdded(res.data.transaksi, res.data.jenis)
+                    onAdded(res.data.transaksi)
                 }
                 setData({
                     tanggal: "",
                     nama_transaksi: "",
                     nominal: "",
                     keterangan: "",
+                    jenis: "pemasukan",
                     no_kk: "",
+                    rt: "",
                 })
                 onClose()
             })
+            .catch(err => {
+                console.log('ERROR 422:', err.response.data)
+            })
     }
+
+    useEffect(() => {
+        let filteredKK;
+
+        if (data.rt) {
+            filteredKK = listKK.filter(
+                kk => kk.rukun_tetangga?.nomor_rt == data.rt
+            );
+        } else {
+            filteredKK = listKK;
+        }
+
+        if (role !== 'rt' && !data.rt) {
+            setKkList([])
+        } else {
+            setKkList(filteredKK);
+        }
+
+        if (filteredKK.length === 0) {
+            setData('no_kk', '');
+        }
+    }, [data.rt, listKK]);
 
     useEffect(() => {
         const handleEsc = (e) => {
@@ -5731,10 +5763,66 @@ export function TambahTransaksiPerKk({ listKK, tambahShow, onClose, onAdded, rol
                         <div className="modal-body p-0 m-0">
                             <div className="d-flex tambah-body flex-column" style={{ width: "100%", maxHeight: "80vh", overflowY: "auto" }}>
                                 <div className="p-3">
-                                    <form onSubmit={handleSubmit} className="h-100">
+                                    <form onSubmit={handleSubmit} className="h-100" id="transaksi">
+                                        <Role role='rw'>
+                                            <div className="mb-3">
+                                                <label className="form-label">RT</label>
+                                                <select
+                                                    name="rt"
+                                                    className="form-control"
+                                                    value={data.rt}
+                                                    onChange={(e) => setData('rt', e.target.value)}
+                                                    required
+                                                    style={{
+                                                        border: '0',
+                                                        borderBottom: '1px solid lightgray',
+                                                        borderRadius: '0',
+                                                    }}
+                                                >
+                                                    <option value="" selected disabled>-- Pilih RT --</option>
+                                                    {daftarRT?.map((nomor, i) => (
+                                                        <option key={i} value={nomor}>
+                                                            RT {nomor}
+                                                        </option>
+                                                    ))}
+                                                </select>
+                                            </div>
+                                        </Role>
+
                                         <div className="mb-3">
                                             <label className="form-label">Nomor Kartu Keluarga</label>
-                                            <select
+                                            <Select
+                                                options={
+                                                    Kklist.length ? [
+                                                        { value: "semua", label: "Semua Kartu Keluarga" },
+                                                        ...Kklist.map((kk) => ({
+                                                            value: kk.no_kk,
+                                                            label: kk.no_kk,
+                                                        })),
+                                                    ] : []
+                                                }
+                                                value={
+                                                    data.no_kk
+                                                        ? { value: data.no_kk, label: data.no_kk === "semua" ? "Semua Kartu Keluarga" : data.no_kk }
+                                                        : null
+                                                }
+                                                onChange={(selected) => setData("no_kk", selected?.value || "")}
+                                                placeholder="Pilih atau ketik nomor KK..."
+                                                isSearchable={true}
+                                                className="react-select-container"
+                                                classNamePrefix="react-select"
+                                                noOptionsMessage={() => data.rt ? "Tidak ada Kartu Keluarga yang terdaftar di RT ini" : "Harap pilih RT terlebih dahulu"}
+                                                styles={{
+                                                    control: (base) => ({
+                                                        ...base,
+                                                        border: 0,
+                                                        borderBottom: "1px solid lightgray",
+                                                        borderRadius: 0,
+                                                        boxShadow: "none",
+                                                    }),
+                                                }}
+                                            />
+                                            {/* <select
                                                 name="nama_transaksi"
                                                 type="text"
                                                 className="tambah-judul form-control"
@@ -5747,10 +5835,10 @@ export function TambahTransaksiPerKk({ listKK, tambahShow, onClose, onAdded, rol
                                                 }}
                                             >
                                                 <option value="" selected disabled>Pilih No. KK</option>
-                                                {listKK.map((kk) => (
-                                                    <option value={kk.no_kk} key={kk.id}>{kk.no_kk}</option>
+                                                {Kklist.map((kk) => (
+                                                    <option value={kk.no_kk} key={kk.id}>{kk.no_kk}{console.log(kk)}</option>
                                                 ))}
-                                            </select>
+                                            </select> */}
                                         </div>
 
                                         <div className="mb-3">
@@ -5763,6 +5851,27 @@ export function TambahTransaksiPerKk({ listKK, tambahShow, onClose, onAdded, rol
                                                 required
                                             />
                                         </div>
+
+                                        <Role role={['rw', 'bendahara']}>
+                                            <div className="mb-3">
+                                                <label className="form-label">Jenis Transaksi</label>
+                                                <select
+                                                    name="jenis_transksi"
+                                                    type="text"
+                                                    className="form-control"
+                                                    onChange={(j) => setData('jenis', j.target.value)}
+                                                    required
+                                                    style={{
+                                                        border: '0',
+                                                        borderBottom: '1px solid lightgray',
+                                                        borderRadius: '0',
+                                                    }}
+                                                >
+                                                    <option value="pemasukan" selected>Pemasukkan</option>
+                                                    <option value="pengeluaran">Pengeluaran</option>
+                                                </select>
+                                            </div>
+                                        </Role>
 
                                         <div className="mb-3">
                                             <label className="form-label">Tanggal Transaksi</label>
@@ -5800,13 +5909,18 @@ export function TambahTransaksiPerKk({ listKK, tambahShow, onClose, onAdded, rol
                                             ></textarea>
                                         </div>
 
-                                        <button type="submit" className="btn btn-primary ms-auto mt-auto">
+                                        {/* <button type="submit" className="btn btn-primary ms-auto mt-auto">
                                             <i className="fas fa-save me-2"></i>
                                             Simpan
-                                        </button>
+                                        </button> */}
                                     </form>
                                 </div>
                             </div>
+                        </div>
+                        <div className="modal-footer border-top mt-0" style={{ position: "sticky", zIndex: '10' }}>
+                            <button type="submit" form="transaksi" className="btn btn-primary" style={{ width: "25%" }}>
+                                <i className="fas fa-save me-2"></i> Simpan
+                            </button>
                         </div>
                     </div>
                 </div>
