@@ -73,7 +73,14 @@ class LoginController extends Controller
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-        return redirect('/login')->withoutCookie('remember_web');
+
+        foreach ($_COOKIE as $key => $value) {
+            if (str_contains($key, 'remember_web')) {
+                Cookie::queue(Cookie::forget($key));
+            }
+        }
+
+        return redirect('/login')->withoutCookie('custom_auth_token');
     }
 
     private function redirectByRole(string $role, $user)
@@ -130,33 +137,33 @@ class LoginController extends Controller
     public function requestCookie(Request $request)
     {
         /** @var User $user */
-        $user = Auth::user(); // ambil user yang sedang login
+        $user = Auth::user();
 
         if (!$user) {
             return response()->json(['error' => 'User tidak ditemukan'], 401);
         }
 
-        // Buat token random
         $token = Str::random(60);
-
-        // Simpan di database
-        $user->remember_token = $token;
+        $user->remember_custom_token = $token;
         $user->save();
 
-        // Buat cookie, expire misal 5 tahun
-        $cookie = cookie('remember_web', $token, 60 * 24 * 365 * 5);
+        cookie()->queue(
+            'custom_auth_token',
+            $token,
+            60 * 24 * 365 * 5
+        );
 
         session()->put('need_cookie_confirmation', false);
 
         return response()->json([
             'message' => 'Remember token set'
-        ])->cookie($cookie);
+        ]);
     }
 
     public function rejectCookie()
     {
         /** @var User $user */
-        $user = Auth::user(); // ambil user yang sedang login
+        $user = Auth::user();
 
         if (!$user) {
             return response()->json(['error' => 'User tidak ditemukan'], 401);

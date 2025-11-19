@@ -2,7 +2,9 @@
 
 use App\Http\Middleware\CheckPermission;
 use App\Http\Middleware\CheckRememberCookie;
+use App\Http\Middleware\CustomEncryptCookies;
 use App\Http\Middleware\HandleInertiaRequests;
+use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -16,6 +18,10 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->web(prepend: [
             CheckRememberCookie::class,
+        ]);
+
+        $middleware->web(replace: [
+            EncryptCookies::class => CustomEncryptCookies::class,
         ]);
 
         $middleware->web(append: [

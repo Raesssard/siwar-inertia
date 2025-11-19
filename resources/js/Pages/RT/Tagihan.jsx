@@ -118,7 +118,7 @@ export default function Tagihan() {
                                                 item.kartu_keluarga?.kepala_keluarga?.nama ?? '-'
                                             }
                                         </td>
-                                        <td className="text-end">{formatRupiah(item.nominal) ?? '-'}</td>
+                                        <td className="text-end px-0">{formatRupiah(item.nominal) ?? '-'}</td>
                                         <td className="text-center">{formatTanggal(item.tgl_tagih)}</td>
                                         <td className="text-center">{formatTanggal(item.tgl_tempo)}</td>
                                         <td className="text-center">
@@ -217,7 +217,7 @@ export default function Tagihan() {
                                                 item.kartu_keluarga?.kepala_keluarga?.nama ?? '-'
                                             }
                                         </td>
-                                        <td className="text-end">{formatRupiah(item.nominal) ?? '-'}</td>
+                                        <td className="text-end px-0">{formatRupiah(item.nominal) ?? '-'}</td>
                                         <td className="text-center">{formatTanggal(item.tgl_tagih)}</td>
                                         <td className="text-center">{formatTanggal(item.tgl_tempo)}</td>
                                         <td className="text-center">{item.status_bayar === 'sudah_bayar' ? (

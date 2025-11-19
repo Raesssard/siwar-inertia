@@ -70,7 +70,7 @@ export default function Layout({ children }) {
                 />
                 <div
                     id="content-wrapper"
-                    className={`main-content d-flex flex-column ${window.innerWidth <= 767 ? '' : toggle}`}
+                    className={`main-content d-flex flex-column ${window.innerWidth <= 768 ? '' : toggle}`}
                 >
                     <div id="content">
                         <Topbar
