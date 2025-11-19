@@ -16,49 +16,64 @@ class RwTransaksiController extends Controller
     public function index(Request $request)
     {
         $title = "Transaksi RW";
-        $user = Auth::user();
-        $nomorRw = $user->rw->nomor_rw ?? null;
-        $idRw = $user->rw->id ?? null;
 
-        $search = $request->input('search');
-        $tahun = $request->input('tahun');
-        $bulan = $request->input('bulan');
-        $rt = $request->input('rt');
+        // 🔹 Ambil data RW user
+        $userRwData = Auth::user()->rw;
+        if (!$userRwData) {
+            return redirect()->back()->with('error', 'Data RW Anda tidak ditemukan.');
+        }
 
-        // Ambil daftar RT di bawah RW
-        $daftar_rt = Rt::where('id_rw', $user->rw->id ?? null)
+        // 🔹 Ambil nomor RW user
+        $nomorRwUser = $userRwData->nomor_rw;
+
+        $search = $request->search;
+        $tahun = $request->tahun;
+        $bulan = $request->bulan;
+        $rt = $request->rt;
+
+        // -----------------------------------------------------------------------------------
+        // ✔️ Ambil daftar RT berdasarkan RW user
+        // -----------------------------------------------------------------------------------
+        $daftar_rt = Rt::whereHas('rw', function ($q) use ($nomorRwUser) {
+                $q->where('nomor_rw', $nomorRwUser);
+            })
+            ->select('nomor_rt')
             ->pluck('nomor_rt')
             ->toArray();
 
-        $query = Transaksi::whereIn('rt', $daftar_rt)
-            ->when($search, fn($q) => $q->where('nama_transaksi', 'like', '%' . $search . '%'))
+        // -----------------------------------------------------------------------------------
+        // ✔️ Query transaksi menggunakan relasi RW → RT
+        // -----------------------------------------------------------------------------------
+        $query = Transaksi::whereHas('rukunTetangga.rw', function ($q) use ($nomorRwUser) {
+                $q->where('nomor_rw', $nomorRwUser);
+            })
+            ->when($search, fn($q) => $q->where('nama_transaksi', 'like', "%{$search}%"))
             ->when($tahun, fn($q) => $q->whereYear('tanggal', $tahun))
             ->when($bulan, fn($q) => $q->whereMonth('tanggal', $bulan))
             ->when($rt, fn($q) => $q->where('rt', $rt));
 
-        $transaksi = $query->orderBy('tanggal', 'desc')->paginate(10);
+        $transaksi = $query->orderBy('tanggal', 'desc')
+            ->paginate(10)
+            ->withQueryString();
 
-        $daftar_tahun = Transaksi::selectRaw('YEAR(tanggal) as tahun')
+        // -----------------------------------------------------------------------------------
+        // ✔️ List tahun (distinct)
+        // -----------------------------------------------------------------------------------
+        $daftar_tahun = Transaksi::whereHas('rukunTetangga.rw', function ($q) use ($nomorRwUser) {
+                $q->where('nomor_rw', $nomorRwUser);
+            })
+            ->selectRaw('YEAR(tanggal) as tahun')
             ->distinct()
             ->orderBy('tahun', 'desc')
             ->pluck('tahun');
 
+        // -----------------------------------------------------------------------------------
+        // ✔️ List bulan
+        // -----------------------------------------------------------------------------------
         $daftar_bulan = [
-            'januari',
-            'februari',
-            'maret',
-            'april',
-            'mei',
-            'juni',
-            'juli',
-            'agustus',
-            'september',
-            'oktober',
-            'november',
-            'desember'
+            'januari','februari','maret','april','mei','juni',
+            'juli','agustus','september','oktober','november','desember'
         ];
-
-        $list_kk = Kartu_keluarga::where('id_rt', $idRw)->with('rukunTetangga')->get();
 
         return Inertia::render('Rw/Transaksi', [
             'title' => $title,
@@ -66,7 +81,6 @@ class RwTransaksiController extends Controller
             'daftar_tahun' => $daftar_tahun,
             'daftar_bulan' => $daftar_bulan,
             'daftar_rt' => $daftar_rt,
-            'list_kk' => $list_kk,
         ]);
     }
 

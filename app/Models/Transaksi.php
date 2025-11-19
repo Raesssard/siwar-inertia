@@ -38,4 +38,10 @@ class Transaksi extends Model
     {
         return $this->belongsTo(Kartu_keluarga::class, 'no_kk', 'no_kk');
     }
+
+    public function rukunTetangga()
+    {
+        return $this->belongsTo(Rt::class, 'rt', 'nomor_rt');
+    }
+
 }
