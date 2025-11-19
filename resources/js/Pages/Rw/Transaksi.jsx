@@ -4,19 +4,30 @@ import React, { useEffect, useState } from "react";
 import { formatRupiah, formatTanggal } from "../Component/GetPropRole";
 import Swal from "sweetalert2";
 import { FilterTransaksi } from "../Component/Filter";
-import { EditTransaksi, TambahTransaksi } from "../Component/Modal";
+import { EditTransaksi, TambahTransaksi, TambahTransaksiPerKk } from "../Component/Modal";
 import axios from "axios";
 
 export default function Transaksi() {
-    const { title, transaksi: transaksiFromServer, daftar_tahun, daftar_bulan, daftar_rt } = usePage().props;
+    const {
+        title,
+        transaksi: transaksiFromServer,
+        transaksiWarga: transaksiWargaFromServer,
+        daftar_tahun,
+        daftar_bulan,
+        list_kk,
+        daftar_rt: rtFromServer
+    } = usePage().props;
     const { props } = usePage();
     const role = props.auth?.currentRole;
     const user = props.auth?.user;
 
-    const [transaksiList, setTransaksiList] = useState(transaksiFromServer.data || []);
+    const [transaksiList, setTransaksiList] = useState(transaksiFromServer?.data ?? [])
+    const [transaksiWargaList, setTransaksiWargaList] = useState(transaksiWargaFromServer?.data ?? [])
     const [selected, setSelected] = useState(null);
     const [showModalTambah, setShowModalTambah] = useState(false);
+    const [showModalTambahPerKk, setShowModalTambahPerKk] = useState(false)
     const [showModalEdit, setShowModalEdit] = useState(false);
+    const [daftarRt, setDaftarRt] = useState(rtFromServer ?? [])
 
     const { get, data, setData } = useForm({
         search: "",
@@ -24,6 +35,12 @@ export default function Transaksi() {
         bulan: "",
         rt: "",
     });
+
+    useEffect(() => {
+        if (rtFromServer) {
+            setDaftarRt(rtFromServer)
+        }
+    }, [rtFromServer])
 
     const modalEdit = (tableData) => {
         setSelected(tableData);
@@ -74,17 +91,19 @@ export default function Transaksi() {
 
     return (
         <Layout>
-            <Head title={`${title} - RW ${user.rw?.nomor_rw}`} />
+            <Head title={`${title} - ${role.length <= 2
+                ? role.toUpperCase()
+                : role.charAt(0).toUpperCase() + role.slice(1)}`} />
 
             <FilterTransaksi
                 data={data}
                 setData={setData}
                 daftar_tahun={daftar_tahun}
                 daftar_bulan={daftar_bulan}
-                daftar_rt={daftar_rt}
+                daftar_rt={daftarRt}
                 filter={filter}
                 resetFilter={resetFilter}
-                tambahShow={() => setShowModalTambah(true)}
+                tambahShow={() => setShowModalTambahPerKk(true)}
                 role="rw"
             />
 
@@ -98,14 +117,14 @@ export default function Transaksi() {
                     <table className="table-custom">
                         <thead>
                             <tr>
-                                <th className="text-center">No.</th>
-                                <th className="text-center">RT</th>
-                                <th className="text-center">Tanggal</th>
-                                <th className="text-center">Nama</th>
-                                <th className="text-center">Jenis</th>
-                                <th className="text-center">Nominal</th>
-                                <th className="text-center">Keterangan</th>
-                                <th className="text-center">Aksi</th>
+                                <th className="px-5 text-center" scope="col">No.</th>
+                                <th className="px-5 text-center" scope="col">No. KK</th>
+                                <th className="px-5 text-center" scope="col">Tanggal</th>
+                                <th className="px-5 text-center" scope="col">Nama</th>
+                                <th className="px-5 text-center" scope="col">Jenis</th>
+                                <th className="px-5 text-center" scope="col">Nominal</th>
+                                <th className="px-5 text-center" scope="col">Keterangan</th>
+                                <th className="px-5 text-center" scope="col">Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -113,24 +132,24 @@ export default function Transaksi() {
                                 transaksiList.map((item, index) => (
                                     <tr key={item.id}>
                                         <td className="text-center">{index + 1}</td>
-                                        <td className="text-center">{item.rt ?? "-"}</td>
-                                        <td className="text-center">{formatTanggal(item.tanggal) ?? "-"}</td>
-                                        <td className="text-center">{item.nama_transaksi ?? "-"}</td>
+                                        <td className="text-center">{item.no_kk ?? 'Semua Kartu Keluarga'}</td>
+                                        <td className="text-center">{formatTanggal(item.tanggal) ?? '-'}</td>
+                                        <td className="text-start">{item.nama_transaksi ?? '-'}</td>
                                         <td className="text-center">
-                                            {item.jenis === "pemasukan" ? (
+                                            {item.jenis === 'pemasukan' ? (
                                                 <span className="badge bg-success text-white">Pemasukan</span>
                                             ) : (
                                                 <span className="badge bg-danger text-white">Pengeluaran</span>
                                             )}
                                         </td>
-                                        <td className="text-center">{formatRupiah(item.nominal) ?? "-"}</td>
-                                        <td className="text-center">{item.keterangan ?? "-"}</td>
+                                        <td className="text-end">{formatRupiah(item.nominal) ?? '-'}</td>
+                                        <td className="text-start">{item.keterangan ?? '-'}</td>
                                         <td className="text-center">
                                             <div className="d-flex justify-content-center align-items-center gap-2">
-                                                <button className="btn btn-sm btn-warning" title="Edit" onClick={() => modalEdit(item)}>
+                                                <button className="btn btn-sm btn-warning my-auto" title="Edit Transaksi" onClick={() => modalEdit(item)}>
                                                     <i className="fa-solid fa-pen-to-square"></i>
                                                 </button>
-                                                <button className="btn btn-sm btn-danger" title="Hapus" onClick={() => handleDelete(item.id)}>
+                                                <button className="btn btn-sm btn-danger my-auto" title="Hapus Transaksi" onClick={() => handleDelete(item.id)}>
                                                     <i className="fa-solid fa-trash"></i>
                                                 </button>
                                             </div>
@@ -139,21 +158,31 @@ export default function Transaksi() {
                                 ))
                             ) : (
                                 <tr>
-                                    <td colSpan="20" className="text-center">Tidak ada data</td>
+                                    <td colSpan="8" className="text-center">Tidak ada data</td>
                                 </tr>
                             )}
                         </tbody>
                     </table>
                 </div>
             </div>
+            <TambahTransaksiPerKk
+                listKK={list_kk}
+                tambahShow={showModalTambahPerKk}
+                onClose={() => setShowModalTambahPerKk(false)}
+                onAdded={(transaksiBaru) => {
+                    setTransaksiList(prev => [transaksiBaru, ...prev])
+                }}
+                role={role}
+                daftarRT={daftarRt}
+            />
 
-            <TambahTransaksi
+            {/* sementara diilangin dulu, perKK dulu */}
+            {/* <TambahTransaksi
                 tambahShow={showModalTambah}
                 onClose={() => setShowModalTambah(false)}
                 onAdded={(baru) => setTransaksiList(prev => [baru, ...prev])}
                 role="rw"
-                daftarRT={daftar_rt}
-            />
+            /> */}
 
             <EditTransaksi
                 editShow={showModalEdit}

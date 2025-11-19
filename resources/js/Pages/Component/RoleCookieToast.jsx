@@ -47,7 +47,7 @@ export default function RoleCookieToast({ user }) {
                     ></i>
 
                     <div>
-                        <strong>{user?.nama}</strong>, Anda tidak memilih untuk diingat diawal saat login.<br />
+                        <strong>{user?.nama}</strong>, Anda tidak memilih untuk diingat saat login.<br />
                         Jadi... mau kue ini? biar mudah diingat oleh kita.
                     </div>
                 </div>

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Rw;
 
 use App\Http\Controllers\Controller;
+use App\Models\Kartu_keluarga;
 use App\Models\Transaksi;
 use App\Models\Rt;
 use Illuminate\Http\Request;
@@ -94,8 +95,11 @@ class RwTransaksiController extends Controller
             'rt' => 'required|numeric'
         ]);
 
+        $isPerKk = $request->no_kk !== 'semua';
+
         $data = [
             'tagihan_id' => null,
+            'no_kk' => $isPerKk ? $request->no_kk : null,
             'rt' => $request->rt,
             'tanggal' => $request->tanggal,
             'nama_transaksi' => $request->nama_transaksi,

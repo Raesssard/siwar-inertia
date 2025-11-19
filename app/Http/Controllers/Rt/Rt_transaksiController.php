@@ -96,7 +96,7 @@ class Rt_transaksiController extends Controller
             'keterangan' => 'nullable|string',
         ]);
 
-        $isPerKk = $request->filled('no_kk');
+        $isPerKk = $request->no_kk !== 'semua';
 
         $dataYangDimasukin = [
             'tagihan_id' => null,
@@ -115,7 +115,6 @@ class Rt_transaksiController extends Controller
             'success' => true,
             'message' => 'Transaksi berhasil dibuat.',
             'transaksi' => $transaksi,
-            'jenis' => $isPerKk ? 'kk' : 'umum',
         ]);
     }
 

@@ -136,11 +136,11 @@ export default function Transaksi() {
                             </tr>
                         </thead>
                         <tbody>
-                            {transaksiWargaList.length > 0 ? (
-                                transaksiWargaList.map((item, index) => (
+                            {transaksiList.length > 0 ? (
+                                transaksiList.map((item, index) => (
                                     <tr key={item.id}>
                                         <td className="text-center">{index + 1}</td>
-                                        <td className="text-center">{item.no_kk ?? '-'}</td>
+                                        <td className="text-center">{item.no_kk ?? 'Semua Kartu Keluarga'}</td>
                                         <td className="text-center">{formatTanggal(item.tanggal) ?? '-'}</td>
                                         <td className="text-start">{item.nama_transaksi ?? '-'}</td>
                                         <td className="text-center">
@@ -166,7 +166,7 @@ export default function Transaksi() {
                                 ))
                             ) : (
                                 <tr>
-                                    <td colSpan="20" className="text-center">
+                                    <td colSpan="8" className="text-center">
                                         Tidak ada data
                                     </td>
                                 </tr>
@@ -174,10 +174,10 @@ export default function Transaksi() {
                         </tbody>
                     </table>
                 </div>
-                {transaksiWargaFromServer.links && (
+                {transaksiFromServer.links && (
                     <div className="pagination-container">
                         <ul className="pagination-custom">
-                            {transaksiWargaFromServer.links.map((link, index) => {
+                            {transaksiFromServer.links.map((link, index) => {
                                 let label = link.label;
                                 if (label.includes("Previous")) label = "&lt;";
                                 if (label.includes("Next")) label = "&gt;";
@@ -298,8 +298,8 @@ export default function Transaksi() {
                 listKK={list_kk}
                 tambahShow={showModalTambahPerKk}
                 onClose={() => setShowModalTambahPerKk(false)}
-                onAdded={(transaksiBaru, jenis) => {
-                    if (jenis === 'kk') setTransaksiWargaList(prev => [transaksiBaru, ...prev])
+                onAdded={(transaksiBaru) => {
+                    setTransaksiList(prev => [transaksiBaru, ...prev])
                 }}
                 role={role}
             />
