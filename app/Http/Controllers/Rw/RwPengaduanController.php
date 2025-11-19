@@ -14,19 +14,31 @@ class RwPengaduanController extends Controller
     public function index(Request $request)
     {
         $title = 'Pengaduan';
-        $user = Auth::user();
-        $rw = $user->rw;
 
+        // Ambil nomor RW user
+        $userRwData = Auth::user()->rw;
+
+        if (!$userRwData) {
+            return back()->with('error', 'Data RW Anda tidak ditemukan.');
+        }
+
+        $nomorRwUser = $userRwData->nomor_rw;
+
+        // Filter request
         $tahun = $request->input('tahun');
         $bulan = $request->input('bulan');
         $search = $request->input('search');
         $kategori = $request->input('kategori');
 
-        // 🔹 Ambil SEMUA pengaduan di wilayah RW ini (baik RT maupun RW)
+        // ✔ Query diperbaiki: memakai nomor_rw dan di-group
         $pengaduan = Pengaduan::query()
-            ->where('konfirmasi_rw', 'menunggu')
-            ->orWhere('konfirmasi_rw', 'sudah')
-            ->whereHas('warga.kartuKeluarga.rw', fn($q) => $q->where('id', $rw->id))
+            ->whereHas('warga.kartuKeluarga.rw', function ($q) use ($nomorRwUser) {
+                $q->where('nomor_rw', $nomorRwUser);
+            })
+            ->where(function ($q) {
+                $q->where('konfirmasi_rw', 'menunggu')
+                ->orWhere('konfirmasi_rw', 'sudah');
+            })
             ->with([
                 'warga',
                 'komentar.user',
@@ -35,26 +47,20 @@ class RwPengaduanController extends Controller
             ])
             ->when($tahun, fn($q) => $q->whereYear('created_at', $tahun))
             ->when($bulan, fn($q) => $q->whereMonth('created_at', $bulan))
-            ->when($search, fn($q) => $q->where('judul', 'like', "%$search%"))
+            ->when($search, fn($q) => $q->where('judul', 'like', "%{$search}%"))
             ->when($kategori, fn($q) => $q->where('level', $kategori))
             ->orderByDesc('created_at')
             ->get();
 
-        $total_pengaduan = Pengaduan::whereHas('warga.kartuKeluarga.rw', fn($q) => $q->where('id', $rw->id))->count();
+        // ✔ Total pengaduan di RW ini
+        $total_pengaduan = Pengaduan::whereHas('warga.kartuKeluarga.rw', function ($q) use ($nomorRwUser) {
+            $q->where('nomor_rw', $nomorRwUser);
+        })->count();
 
+        // Daftar filter
         $list_bulan = [
-            'januari',
-            'februari',
-            'maret',
-            'april',
-            'mei',
-            'juni',
-            'juli',
-            'agustus',
-            'september',
-            'oktober',
-            'november',
-            'desember'
+            'januari','februari','maret','april','mei','juni',
+            'juli','agustus','september','oktober','november','desember'
         ];
 
         $list_tahun = Pengaduan::selectRaw('YEAR(created_at) as tahun')
@@ -64,13 +70,11 @@ class RwPengaduanController extends Controller
 
         $list_level = Pengaduan::select('level')->distinct()->pluck('level');
 
-        $total_pengaduan_filtered = $pengaduan->count();
-
         return Inertia::render('Pengaduan', [
             'title' => $title,
             'pengaduan' => $pengaduan,
             'total_pengaduan' => $total_pengaduan,
-            'total_pengaduan_filtered' => $total_pengaduan_filtered,
+            'total_pengaduan_filtered' => $pengaduan->count(),
             'list_bulan' => $list_bulan,
             'list_tahun' => $list_tahun,
             'list_level' => $list_level,
