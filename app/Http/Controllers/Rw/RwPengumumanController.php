@@ -20,30 +20,36 @@ class RwPengumumanController extends Controller
     {
         $title = 'Pengumuman';
 
+        // Ambil data RW user
+        $userRwData = Auth::user()->rw;
+        if (!$userRwData) {
+            return redirect()->back()->with('error', 'Data RW Anda tidak ditemukan.');
+        }
+
+        // Ambil nomor RW user
+        $nomorRwUser = $userRwData->nomor_rw;
+
         $search = $request->input('search');
         $tahun = $request->input('tahun');
         $bulan = $request->input('bulan');
         $kategori = $request->input('kategori');
         $level = $request->input('level');
 
-        $rwId = Auth::user()->id_rw;
+        // ✔ Query hanya yang berada di RW ini (pakai nomor_rw)
+        $baseQuery = Pengumuman::with([
+                'rukunTetangga',
+                'rw',
+                'komen',
+                'komen.user',
+            ])
+            ->whereHas('rw', function ($q) use ($nomorRwUser) {
+                $q->where('nomor_rw', $nomorRwUser);
+            });
 
-        $baseQuery = Pengumuman::query()->with([
-            'rukunTetangga',
-            'rw',
-            'komen',
-            'komen.user',
-        ]);
+        // Hitung total
+        $total_pengumuman = (clone $baseQuery)->count();
 
-        // Tampilkan pengumuman RW ini dan RT-RT di bawah RW tersebut
-        $baseQuery->where(function ($q) use ($rwId) {
-            $q->where('id_rw', $rwId);
-        });
-
-        $total_pengumuman = Pengumuman::where('id_rw', $rwId)->count();
-        $total_pengumuman_filtered = (clone $baseQuery)->count();
-
-        // Filter pencarian
+        // Setelah filter
         $pengumuman = (clone $baseQuery)
             ->when($search, function ($q) use ($search) {
                 $q->where(function ($sub) use ($search) {
@@ -64,6 +70,7 @@ class RwPengumumanController extends Controller
             ->orderByDesc('tanggal')
             ->get();
 
+        // Tahun dan kategori
         $daftar_tahun = Pengumuman::selectRaw('YEAR(tanggal) as tahun')
             ->distinct()
             ->orderByDesc('tahun')
@@ -73,19 +80,10 @@ class RwPengumumanController extends Controller
             ->distinct()
             ->pluck('kategori');
 
+        // Nama bulan
         $list_bulan = [
-            'januari',
-            'februari',
-            'maret',
-            'april',
-            'mei',
-            'juni',
-            'juli',
-            'agustus',
-            'september',
-            'oktober',
-            'november',
-            'desember'
+            'januari','februari','maret','april','mei','juni',
+            'juli','agustus','september','oktober','november','desember'
         ];
 
         return Inertia::render('Pengumuman', [
@@ -94,7 +92,7 @@ class RwPengumumanController extends Controller
             'daftar_tahun' => $daftar_tahun,
             'daftar_kategori' => $daftar_kategori,
             'total_pengumuman' => $total_pengumuman,
-            'total_pengumuman_filtered' => $total_pengumuman_filtered,
+            'total_pengumuman_filtered' => $pengumuman->count(),
             'list_bulan' => $list_bulan,
         ]);
     }
