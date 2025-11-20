@@ -119,13 +119,8 @@ class AdminWargaController extends Controller
         ]);
 
 
-        return response()->json([
-                'success' => true,
-                'message' => 'Tagihan sudah diperbarui.',
-                'warga'=> $warga
-        ]);
-
-        return redirect()->route('admin.Kartu_keluarga.index')->with('success', 'Warga berhasil ditambahkan.');
+        return redirect()->route('admin.kartu_keluarga.index')
+            ->with('success', 'Warga berhasil ditambahkan.');
     }
 
     public function edit($id)

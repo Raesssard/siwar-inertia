@@ -79,18 +79,37 @@ class AdminRwController extends Controller
             return back()->withErrors($validator)->withInput();
         }
 
-        // 🚫 Cegah jabatan ganda aktif
+        /**
+         * 🚫 CEGAH DUA USER DENGAN ROLES SAMA DALAM RW YANG SAMA
+         * *****************************************************
+         * Logika:
+         * - Ambil semua RW aktif berdasar nomor RW yang sama
+         * - Ambil semua user dalam RW tersebut
+         * - Jika ada user yang punya role = jabatan yg dipilih → TOLAK
+         */
         if ($request->filled('jabatan')) {
-            $existing = User::whereHas('roles', fn($q) => $q->where('name', $request->jabatan))
-                ->whereHas('rw', fn($q) => $q->where('nomor_rw', $request->nomor_rw))
-                ->exists();
 
-            if ($existing) {
-                return back()->with('error', "RW {$request->nomor_rw} sudah memiliki {$request->jabatan} aktif!")->withInput();
+            // Semua RW aktif pada nomor RW yang sama
+            $rwAktif = Rw::where('nomor_rw', $request->nomor_rw)
+                ->where('status', 'aktif')
+                ->pluck('id'); // ambil ID RW
+
+            if ($rwAktif->count() > 0) {
+
+                // Cek apakah ada user yang memiliki role jabatan itu
+                $existing = User::whereIn('id_rw', $rwAktif)
+                    ->whereHas('roles', fn($q) => $q->where('name', $request->jabatan))
+                    ->exists();
+
+                if ($existing) {
+                    return back()->with('error',
+                        "Tidak dapat membuat user baru. RW {$request->nomor_rw} sudah memiliki {$request->jabatan} aktif."
+                    )->withInput();
+                }
             }
         }
 
-        // 💾 Simpan data RW
+        // 💾 Simpan RW
         $rw = Rw::create([
             'nik' => $request->nik,
             'no_kk' => $request->filled('nik')
@@ -103,30 +122,33 @@ class AdminRwController extends Controller
             'status' => $request->status,
         ]);
 
-        // 👤 Buat user hanya jika dua-duanya diisi
+        /**
+         * 👤 BUAT USER JIKA NIK & NAMA DIISI
+         */
         if ($request->filled('nik') && $request->filled('nama_anggota_rw')) {
+
             $user = User::create([
-                'nik' => $request->nik,
-                'nama' => $request->nama_anggota_rw,
+                'nik'      => $request->nik,
+                'nama'     => $request->nama_anggota_rw,
                 'password' => Hash::make('password'),
-                'id_rw' => $rw->id,
+                'id_rw'    => $rw->id,
             ]);
 
-            // Default role selalu 'rw'
+            // default role
             $roles = ['rw'];
 
-            // 💡 Jika jabatan selain ketua, dan role-nya ada di database
+            // Jika ada jabatan tambahan selain ketua (ketua tidak disimpan sebagai role)
             if ($request->filled('jabatan') && $request->jabatan !== 'ketua') {
                 if (Role::where('name', $request->jabatan)->exists()) {
                     $roles[] = $request->jabatan;
                 }
             }
 
-            // 🧠 Sinkronkan semua role (rw + tambahan)
             $user->syncRoles($roles);
         }
 
-        return redirect()->route('admin.rw.index')->with('success', 'RW baru berhasil ditambahkan.');
+        return redirect()->route('admin.rw.index')
+            ->with('success', 'RW baru berhasil ditambahkan.');
     }
 
     public function update(Request $request, string $id)

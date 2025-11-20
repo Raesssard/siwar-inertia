@@ -26,7 +26,7 @@ class AdminRtController extends Controller
         if ($request->filled('keyword')) {
             $query->where(function ($q) use ($request) {
                 $q->where('nik', 'like', '%' . $request->keyword . '%')
-                  ->orWhere('nama_anggota_rt', 'like', '%' . $request->keyword . '%');
+                ->orWhere('nama_anggota_rt', 'like', '%' . $request->keyword . '%');
             });
         }
 
@@ -36,14 +36,48 @@ class AdminRtController extends Controller
 
         $rukun_tetangga = $query->orderBy('nomor_rt')->paginate(10)->withQueryString();
         $nomorRtList = Rt::select('nomor_rt')->distinct()->orderBy('nomor_rt')->pluck('nomor_rt');
-        $rwList = Rw::select('id', 'nomor_rw', 'nama_anggota_rw')->get();
+
+        // ⭐ FILTER RW berdasarkan role user ⭐
+        $rwList = Rw::with('users.roles')
+            ->get()
+            ->filter(function ($rw) {
+
+                // Pastikan RW punya user
+                if ($rw->users->isEmpty()) return false;
+
+                // Ambil user yang punya role "rw"
+                $userRw = $rw->users->first(function ($user) {
+                    return $user->roles->pluck('name')->contains('rw');
+                });
+
+                if (!$userRw) return false;
+
+                // Ambil semua role dari user RW itu
+                $roles = $userRw->roles->pluck('name')->toArray();
+
+                // Role yang diperbolehkan
+                $allowed = ['rw', 'warga'];
+
+                // Jika ada role lain, tolak
+                foreach ($roles as $r) {
+                    if (!in_array($r, $allowed)) return false;
+                }
+
+                return true;
+            })
+            ->values()
+            ->map(fn($rw) => [
+                'id' => $rw->id,
+                'nomor_rw' => $rw->nomor_rw,
+                'nama_anggota_rw' => $rw->nama_anggota_rw,
+            ]);
 
         // 🔹 Ambil role dari database kecuali role utama
         $roles = Role::pluck('name')
             ->filter(fn($r) => !in_array(strtolower($r), ['admin', 'rw', 'rt', 'warga']))
             ->values();
 
-        // 🔹 Tambahkan manual “Ketua RT” di atas
+        // Tambahkan manual “Ketua RT”
         $roles = collect(['ketua'])->merge($roles)->values();
 
         return Inertia::render('Admin/Rt', [
@@ -55,6 +89,7 @@ class AdminRtController extends Controller
             'title' => $title,
         ]);
     }
+
 
     public function store(Request $request)
     {
