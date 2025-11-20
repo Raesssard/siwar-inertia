@@ -3,7 +3,9 @@
 namespace App\Http\Middleware;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Middleware;
+use Spatie\Permission\Models\Role;
 
 class HandleInertiaRequests extends Middleware
 {
@@ -35,9 +37,7 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
-
-        $validRoles = ['admin', 'rw', 'rt', 'warga'];
-        $user = $request->user();
+        $user = Auth::user();
 
         if (!$user) {
             return parent::share($request);
@@ -52,15 +52,30 @@ class HandleInertiaRequests extends Middleware
             }
         }
 
+        $validRoles = ['admin', 'rw', 'rt', 'warga'];
+        $currentRole = session('active_role');
+        
+        $sideRoles = $user->roles()
+            ->whereNotIn('name', $validRoles)
+            ->pluck('name')
+            ->toArray();
+        
+        $roleName = !empty($sideRoles) ? $sideRoles[0] : $currentRole;
+        
+        $role = Role::findByName($roleName);
+        
+        $permissions = $role->permissions->pluck('name');
+
         return array_merge(parent::share($request), [
             'auth' => [
-                'user' => $request->user()?->load(['warga', 'rukunTetangga', 'rw']),
+                'user' => $user->load(['warga', 'rukunTetangga', 'rw']),
                 'rolesAccount' => $user
                     ? $user->getRoleNames()->filter(fn($r) => in_array($r, $validRoles))->values()
                     : [],
-                'roles' => $request->user()?->getRoleNames(),
-                'permissions' => $request->user()?->getAllPermissions()->pluck('name'),
-                'currentRole' => session('active_role'),
+                'roles' => $user->getRoleNames(),
+                'permissions' => $permissions,
+                'currentRole' => $currentRole,
+                'sideRoles' => $sideRoles,
             ],
             'cookie_prompt' => [
                 'need' => session('need_cookie_confirmation', false),

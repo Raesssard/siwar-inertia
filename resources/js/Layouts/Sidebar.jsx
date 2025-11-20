@@ -24,6 +24,7 @@ export default function Sidebar({ toggleKeParent, localStorageHistory }) {
 
     const { props } = usePage()
     const role = props.auth?.currentRole
+    const sideRoles = props.auth?.sideRoles || []
     const permissions = props.auth?.permissions || []
 
     useEffect(() => {
@@ -75,21 +76,57 @@ export default function Sidebar({ toggleKeParent, localStorageHistory }) {
             statLinks = []
     }
 
-    // 🔥 Filter link berdasarkan permission user
-    const filteredLinks = statLinks
-        .map(link => {
-            if (link.children) {
-                const filteredChildren = link.children.filter(child =>
-                    !child.permission || permissions.includes(child.permission)
-                )
-                return { ...link, children: filteredChildren }
+    // ROLE UTAMA
+    const mainRoles = ["admin", "rw", "rt", "warga"]
+    const activeRole = sideRoles.length > 0 ? sideRoles[0] : role
+
+    const filteredLinks = statLinks.flatMap(link => {
+
+        // 1) DASHBOARD selalu muncul
+        if (link.href === "/dashboard") {
+            return [{
+                text: link.text,
+                href: link.href,
+                icon: link.icon
+            }]
+        }
+
+        const parentAllowed =
+            !link.permission || permissions.includes(link.permission)
+
+        const childrenAllowed = link.children
+            ? link.children.filter(child =>
+                !child.permission || permissions.includes(child.permission)
+            )
+            : []
+
+        // 2) ROLE UTAMA → parent boleh muncul
+        if (mainRoles.includes(activeRole)) {
+            if (parentAllowed || childrenAllowed.length > 0) {
+                if (childrenAllowed.length > 0) {
+                    return [{
+                        ...link,
+                        children: childrenAllowed
+                    }]
+                }
+
+                const { children, ...rest } = link
+                return [rest]
             }
-            if (!link.permission || permissions.includes(link.permission)) {
-                return link
-            }
-            return null
-        })
-        .filter(Boolean)
+            return []
+        }
+
+        // 3) ROLE SAMPINGAN → parent dihilangkan, children naik
+        if (!mainRoles.includes(activeRole)) {
+            return childrenAllowed.map(child => {
+                const { children, ...rest } = child  // 🔥 hapus children
+                return rest
+            })
+        }
+
+        return []
+    })
+
 
     return (
         <>

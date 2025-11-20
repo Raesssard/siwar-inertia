@@ -8,8 +8,9 @@ import { getAdminCards, getRtCards, getWargaCards, getRwCards } from "./Componen
 export default function Dashboard() {
   const { role, title, auth, ...rest } = usePage().props;
   const permissions = auth?.permissions || [];
+  const sideRoles = auth?.sideRoles || [];
+console.log(sideRoles.length)
   let statCards = [];
-
   // Ambil card sesuai role
   switch (role) {
     case "admin":
@@ -31,52 +32,44 @@ export default function Dashboard() {
   return (
     <Layout>
       <Head
-        title={`${title} - ${
-          role.length <= 2
-            ? role.toUpperCase()
-            : role.charAt(0).toUpperCase() + role.slice(1)
-        }`}
+        title={`${title} - ${role.length <= 2
+          ? role.toUpperCase()
+          : role.charAt(0).toUpperCase() + role.slice(1)
+          }`}
       />
 
-      {statCards[0]?.kategori ? (
-        <div className="col">
-          {statCards.map((stat, i) => (
-            <div key={i}>
-              <div
-                className="mb-4"
-                style={{ borderBottom: "1px solid lightgray" }}
-              >
-                <p className="w-100 mb-1 ml-2">
-                  <span style={{ fontWeight: "600", fontSize: "1.15rem" }}>
-                    {stat.kategori}
-                  </span>
-                </p>
-              </div>
+      {statCards.map((card, cIndex) => {
+        // ngecek boleh liat kartu atau nggak, pake permission parent
+        const canSeeParent = card.permissions?.some(p =>
+          permissions.includes(p)
+        );
 
-              <div className="row">
-                {stat.isi
-                  // 🔹 FILTER CARD berdasarkan permission user
-                  .filter(
-                    (card) =>
-                      !card.permission ||
-                      permissions.includes(card.permission)
-                  )
-                  .map((card, index) => (
-                    <StatCard key={index} {...card} />
-                  ))}
-              </div>
+        // ngefilter si kartu dari permission kartunya
+        const filteredIsi = card.isi.filter(item =>
+          !item.permission || permissions.includes(item.permission)
+        );
+
+        // klo nggak ada permission yg sesuai, skip 👍
+        if (!canSeeParent && filteredIsi.length === 0) return null;
+
+        return (
+          <div key={cIndex} className={sideRoles.length > 0 ? "col px-3" : "row px-3"}>
+            <div className="mb-4 w-100" style={{ borderBottom: "1px solid lightgray" }}>
+              <p className="w-100 mb-1 ml-2">
+                <span style={{ fontWeight: "600", fontSize: "1.15rem" }}>
+                  {card.kategori}
+                </span>
+              </p>
             </div>
-          ))}
-        </div>
-      ) : (
-        statCards
-          // 🔹 FILTER kalau data bukan kategori tapi flat list
-          .filter(
-            (card) =>
-              !card.permission || permissions.includes(card.permission)
-          )
-          .map((card, index) => <StatCard key={index} {...card} />)
-      )}
+
+            <div className="row">
+              {filteredIsi.map((cards, index) => (
+                <StatCard key={index} {...cards} />
+              ))}
+            </div>
+          </div>
+        );
+      })}
     </Layout>
   );
 }
