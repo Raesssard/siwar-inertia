@@ -1,10 +1,10 @@
 import Layout from "@/Layouts/Layout"
 import { Head, Link, useForm, usePage } from "@inertiajs/react"
 import React, { useState } from "react"
-import { formatRupiah, formatTanggal } from "../Component/GetPropRole"
+import { formatRupiah, formatTanggal } from "./Component/GetPropRole"
 import Swal from "sweetalert2"
-import { FilterTagihan } from "../Component/Filter"
-import { EditTagihan, TambahTagihan } from "../Component/Modal"
+import { FilterTagihan } from "./Component/Filter"
+import { EditTagihan, TambahTagihan } from "./Component/Modal"
 
 export default function Tagihan() {
     const {
@@ -118,14 +118,20 @@ export default function Tagihan() {
                                                 item.kartu_keluarga?.kepala_keluarga?.nama ?? '-'
                                             }
                                         </td>
-                                        <td className="text-end">{formatRupiah(item.nominal) ?? '-'}</td>
+                                        <td className="text-end px-0">{formatRupiah(item.nominal) ?? '-'}</td>
                                         <td className="text-center">{formatTanggal(item.tgl_tagih)}</td>
                                         <td className="text-center">{formatTanggal(item.tgl_tempo)}</td>
-                                        <td className="text-center">{item.status_bayar === 'sudah_bayar' ? (
-                                            <span className="badge bg-success text-white">Sudah Bayar</span>
-                                        ) : (
-                                            <span className="badge bg-warning text-white">Belum Bayar</span>
-                                        )}
+                                        <td className="text-center">
+                                            {item.status_bayar === 'sudah_bayar' ? (
+                                                <span className="badge bg-success text-white">Sudah Bayar</span>
+                                            ) : (
+                                                <span className="badge bg-warning text-white">Belum Bayar</span>
+                                            )}
+                                            {item.status_bayar === 'sudah_bayar' && (item.nominal_bayar >= item.nominal) ? (
+                                                <span className="badge bg-primary text-white">Sudah Lunas</span>
+                                            ) : item.status_bayar === 'sudah_bayar' && (item.nominal_bayar < item.nominal) && (
+                                                <span className="badge bg-danger text-white">Belum Lunas</span>
+                                            )}
                                         </td>
                                         <td className="text-center">{formatTanggal(item.tgl_bayar)}</td>
                                         <td className="text-center">
@@ -211,14 +217,20 @@ export default function Tagihan() {
                                                 item.kartu_keluarga?.kepala_keluarga?.nama ?? '-'
                                             }
                                         </td>
-                                        <td className="text-end">{formatRupiah(item.nominal) ?? '-'}</td>
+                                        <td className="text-end px-0">{formatRupiah(item.nominal) ?? '-'}</td>
                                         <td className="text-center">{formatTanggal(item.tgl_tagih)}</td>
                                         <td className="text-center">{formatTanggal(item.tgl_tempo)}</td>
-                                        <td className="text-center">{item.status_bayar === 'sudah_bayar' ? (
-                                            <span className="badge bg-success text-white">Sudah Bayar</span>
-                                        ) : (
-                                            <span className="badge bg-warning text-white">Belum Bayar</span>
-                                        )}
+                                        <td className="text-center">
+                                            {item.status_bayar === 'sudah_bayar' ? (
+                                                <span className="badge bg-success text-white">Sudah Bayar</span>
+                                            ) : (
+                                                <span className="badge bg-warning text-white">Belum Bayar</span>
+                                            )}
+                                            {item.status_bayar === 'sudah_bayar' && (item.nominal_bayar >= item.nominal) ? (
+                                                <span className="badge bg-primary text-white">Sudah Lunas</span>
+                                            ) : item.status_bayar === 'sudah_bayar' && (item.nominal_bayar < item.nominal) && (
+                                                <span className="badge bg-danger text-white">Belum Lunas</span>
+                                            )}
                                         </td>
                                         <td className="text-center">{formatTanggal(item.tgl_bayar)}</td>
                                         <td className="text-center">

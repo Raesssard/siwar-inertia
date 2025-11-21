@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Inertia\Middleware;
 use Spatie\Permission\Models\Role;
 
@@ -44,6 +45,7 @@ class HandleInertiaRequests extends Middleware
         }
 
         if (!session()->has('active_role')) {
+            Log::info('cookie laravel lagi nyoba ngasih session ke user dengan id' . $user->id);
             if ($user->last_role && $user->hasRole($user->last_role)) {
                 session()->put('active_role', $user->last_role);
             } else {
@@ -54,16 +56,16 @@ class HandleInertiaRequests extends Middleware
 
         $validRoles = ['admin', 'rw', 'rt', 'warga'];
         $currentRole = session('active_role');
-        
+
         $sideRoles = $user->roles()
             ->whereNotIn('name', $validRoles)
             ->pluck('name')
             ->toArray();
-        
+
         $roleName = !empty($sideRoles) ? $sideRoles[0] : $currentRole;
-        
+
         $role = Role::findByName($roleName);
-        
+
         $permissions = $role->permissions->pluck('name');
 
         return array_merge(parent::share($request), [

@@ -91,7 +91,7 @@ class RwTagihanController extends Controller
             ->where('jenis', 'manual')
             ->get();
 
-        return Inertia::render('Rw/Tagihan', [
+        return Inertia::render('Tagihan', [
             'title' => $title,
             'tagihanManual' => $tagihanManual,
             'tagihanOtomatis' => $tagihanOtomatis,
@@ -111,7 +111,6 @@ class RwTagihanController extends Controller
             'nominal' => 'required|numeric|min:0|max:99999999',
             'tgl_tagih' => 'nullable|date',
             'no_kk' => 'nullable',
-            'id_iuran' => 'required|exists:iuran,id',
         ]);
 
         $iuran = Iuran::findOrFail($request->id_iuran);
