@@ -76,7 +76,6 @@ export default function Sidebar({ toggleKeParent, localStorageHistory }) {
             statLinks = []
     }
 
-    // ROLE UTAMA
     const mainRoles = ["admin", "rw", "rt", "warga"]
     const activeRole = sideRoles.length > 0 ? sideRoles[0] : role
 
@@ -100,7 +99,7 @@ export default function Sidebar({ toggleKeParent, localStorageHistory }) {
             )
             : []
 
-        // 2) ROLE UTAMA → parent boleh muncul
+        // 2) ROLE UTAMA → masih ada ortu, anaknya masih kecil
         if (mainRoles.includes(activeRole)) {
             if (parentAllowed || childrenAllowed.length > 0) {
                 if (childrenAllowed.length > 0) {
@@ -116,10 +115,10 @@ export default function Sidebar({ toggleKeParent, localStorageHistory }) {
             return []
         }
 
-        // 3) ROLE SAMPINGAN → parent dihilangkan, children naik
+        // 3) ROLE SAMPINGAN → ortu dh pergi, anaknya udah gede
         if (!mainRoles.includes(activeRole)) {
             return childrenAllowed.map(child => {
-                const { children, ...rest } = child  // 🔥 hapus children
+                const { children, ...rest } = child  // 🔥 anaknya dh mandiri
                 return rest
             })
         }

@@ -535,7 +535,7 @@ export function getRwCards({ ...rest }) {
                     color: "success",
                     title: "Total Iuran Masuk Bulan Ini",
                     value: formatRupiah(rest.total_iuran_bulan_ini),
-                    icon: "dollar-sign",
+                    icon: "circle-dollar-to-slot",
                     permission: "view.iuran",
                 },
                 {

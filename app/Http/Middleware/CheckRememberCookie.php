@@ -19,7 +19,6 @@ class CheckRememberCookie
      */
     public function handle(Request $request, Closure $next): Response
     {
-        Log::info("check remember me");
         if (!Auth::check() && $request->hasCookie('custom_auth_token')) {
             try {
                 $token = $request->cookie('custom_auth_token'); // plain
@@ -29,7 +28,6 @@ class CheckRememberCookie
             }
             $user = User::where('remember_custom_token', $token)->first();
 
-            Log::info("token dari cookie:", [$token]);
             Log::info("remember me checked");
             if ($user) {
                 Log::info("user valid", [$user]);

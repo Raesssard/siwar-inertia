@@ -92,7 +92,7 @@ class Rt_tagihanController extends Controller
             ->where('jenis', 'manual')
             ->get();
 
-        return Inertia::render('RT/Tagihan', [
+        return Inertia::render('Tagihan', [
             'title' => $title,
             'tagihanManual' => $tagihanManual,
             'tagihanOtomatis' => $tagihanOtomatis,

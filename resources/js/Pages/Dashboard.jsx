@@ -9,7 +9,7 @@ export default function Dashboard() {
   const { role, title, auth, ...rest } = usePage().props;
   const permissions = auth?.permissions || [];
   const sideRoles = auth?.sideRoles || [];
-console.log(sideRoles.length)
+
   let statCards = [];
   // Ambil card sesuai role
   switch (role) {
@@ -53,16 +53,18 @@ console.log(sideRoles.length)
         if (!canSeeParent && filteredIsi.length === 0) return null;
 
         return (
-          <div key={cIndex} className={sideRoles.length > 0 ? "col px-3" : "row px-3"}>
-            <div className="mb-4 w-100" style={{ borderBottom: "1px solid lightgray" }}>
-              <p className="w-100 mb-1 ml-2">
-                <span style={{ fontWeight: "600", fontSize: "1.15rem" }}>
-                  {card.kategori}
-                </span>
-              </p>
-            </div>
+          <div key={cIndex} className={`${sideRoles.length > 0 ? "col" : "row"} px-3`}>
+            {!sideRoles.length > 0 && (
+              <div className="mb-3 w-100" style={{ borderBottom: "1px solid lightgray" }}>
+                <p className="w-100 mb-1 ml-2">
+                  <span style={{ fontWeight: "600", fontSize: "1.15rem" }}>
+                    {card.kategori}
+                  </span>
+                </p>
+              </div>
+            )}
 
-            <div className="row">
+            <div className="row mt-2">
               {filteredIsi.map((cards, index) => (
                 <StatCard key={index} {...cards} />
               ))}
