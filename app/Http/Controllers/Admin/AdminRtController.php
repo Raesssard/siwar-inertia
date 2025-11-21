@@ -370,22 +370,25 @@ class AdminRtController extends Controller
     {
         $rt = Rt::findOrFail($id);
 
-        // Ambil user yg menjabat di RT ini
+        // Role yang tidak dianggap jabatan
+        $ignoredRoles = ['rt', 'warga'];
+
+        // Ambil user pemegang jabatan
         $user = $rt->users()->first();
 
-        // Ambil jabatan user (roles selain 'rt' dan 'warga')
+        // Ambil jabatan user selain role inti → default ke ketua
         $jabatanUser = $user?->roles()
-            ->whereNotIn('name', ['rt', 'warga'])
+            ->whereNotIn('name', $ignoredRoles)
             ->pluck('name')
             ->first() ?? 'ketua';
 
-        // Jika sedang aktif → ubah ke nonaktif
+        // Jika sedang aktif → nonaktifkan
         if ($rt->status === 'aktif') {
             $rt->update(['status' => 'nonaktif']);
             return back()->with('success', "RT {$rt->nomor_rt} berhasil dinonaktifkan.");
         }
 
-        // Cari RT aktif lain pada RW DAN NOMOR RT yang sama
+        // ✔ Cari RT aktif lain dengan RW & nomor RT yang sama
         $existingActive = Rt::where('id_rw', $rt->id_rw)
             ->where('nomor_rt', $rt->nomor_rt)
             ->where('status', 'aktif')
@@ -396,28 +399,30 @@ class AdminRtController extends Controller
 
             $existingUser = $existingActive->users()->first();
 
-            // Jabatan RT aktif sekarang (abaikan rt & warga)
+            // Ambil jabatan RT aktif sekarang
             $existingJabatan = $existingUser?->roles()
-                ->whereNotIn('name', ['rt', 'warga'])
+                ->whereNotIn('name', $ignoredRoles)
                 ->pluck('name')
                 ->first() ?? 'ketua';
 
-            // Jika jabatan sama → tidak boleh aktif
+            // Jika jabatannya sama → tolak
             if ($existingJabatan === $jabatanUser) {
                 return back()->with('error',
                     "RT {$rt->nomor_rt} sudah memiliki {$existingJabatan} aktif. Nonaktifkan yang lama dulu!"
                 );
             }
 
-            // Jika masa jabatan sudah habis → otomatis nonaktifkan
+            // Jika masa jabatan lama sudah berakhir → nonaktifkan otomatis
             if ($existingActive->akhir_jabatan && $existingActive->akhir_jabatan < now()->toDateString()) {
                 $existingActive->update(['status' => 'nonaktif']);
             }
         }
 
-        // Aktifkan RT ini
+        // Aktifkan RT baru
         $rt->update(['status' => 'aktif']);
 
-        return back()->with('success', "RT {$rt->nomor_rt} dengan jabatan {$jabatanUser} berhasil diaktifkan.");
+        return back()->with('success',
+            "RT {$rt->nomor_rt} dengan jabatan {$jabatanUser} berhasil diaktifkan."
+        );
     }
 }
