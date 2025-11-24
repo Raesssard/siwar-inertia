@@ -101,19 +101,32 @@ Route::middleware(['auth'])->group(function () {
                 ->middleware(CheckPermission::class . ':toggle.rt')
                 ->name('rt.toggleStatus');
 
-            // 🧾 Kartu Keluarga
+            // 🧾 Kartu Keluarga (ADMIN)
             Route::resource('kartu_keluarga', AdminKartuKeluargaController::class)
                 ->except(['create', 'edit', 'show'])
                 ->middleware(CheckPermission::class . ':view.kartu_keluarga');
 
+            // CREATE
+            Route::get('kartu_keluarga/create', [AdminKartuKeluargaController::class, 'create'])
+                ->middleware(CheckPermission::class . ':create.kartu_keluarga')
+                ->name('kartu_keluarga.create');
+
+            // EDIT
+            Route::get('kartu_keluarga/{id}/edit', [AdminKartuKeluargaController::class, 'edit'])
+                ->middleware(CheckPermission::class . ':edit.kartu_keluarga')
+                ->name('kartu_keluarga.edit');
+
+            // Upload Foto
             Route::put('kartu_keluarga/{id}/upload-foto', [AdminKartuKeluargaController::class, 'uploadFoto'])
                 ->middleware(CheckPermission::class . ':edit.kartu_keluarga')
                 ->name('kartu_keluarga.upload_foto');
 
+            // Delete Foto
             Route::delete('kartu_keluarga/{id}/delete-foto', [AdminKartuKeluargaController::class, 'deleteFoto'])
                 ->middleware(CheckPermission::class . ':edit.kartu_keluarga')
                 ->name('kartu_keluarga.delete_foto');
 
+            // Upload Form (PDF)
             Route::get('kartu_keluarga/{id}/upload-form', [AdminKartuKeluargaController::class, 'uploadForm'])
                 ->middleware(CheckPermission::class . ':edit.kartu_keluarga')
                 ->name('kartu_keluarga.upload_form');
@@ -264,26 +277,32 @@ Route::middleware(['auth'])->group(function () {
                 ->name('warga.getOrangTua');
 
             // 🧾 Kartu Keluarga
+            // 🧾 Kartu Keluarga (RW)
             Route::resource('kartu_keluarga', RwKartuKeluargaController::class)
                 ->except(['create', 'edit', 'show'])
                 ->middleware(CheckPermission::class . ':view.kartu_keluarga');
 
+            // CREATE
             Route::get('kartu_keluarga/create', [RwKartuKeluargaController::class, 'create'])
                 ->middleware(CheckPermission::class . ':create.kartu_keluarga')
                 ->name('kartu_keluarga.create');
 
+            // EDIT
             Route::get('kartu_keluarga/{id}/edit', [RwKartuKeluargaController::class, 'edit'])
                 ->middleware(CheckPermission::class . ':edit.kartu_keluarga')
                 ->name('kartu_keluarga.edit');
 
+            // Upload Foto
             Route::put('kartu_keluarga/{id}/upload-foto', [RwKartuKeluargaController::class, 'uploadFoto'])
                 ->middleware(CheckPermission::class . ':edit.kartu_keluarga')
                 ->name('kartu_keluarga.upload_foto');
 
+            // Delete Foto
             Route::delete('kartu_keluarga/{id}/delete-foto', [RwKartuKeluargaController::class, 'deleteFoto'])
                 ->middleware(CheckPermission::class . ':edit.kartu_keluarga')
                 ->name('kartu_keluarga.delete_foto');
 
+            // Upload Form (PDF)
             Route::get('kartu_keluarga/{id}/upload-form', [RwKartuKeluargaController::class, 'uploadForm'])
                 ->middleware(CheckPermission::class . ':edit.kartu_keluarga')
                 ->name('kartu_keluarga.upload_form');

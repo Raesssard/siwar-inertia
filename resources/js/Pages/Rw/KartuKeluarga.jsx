@@ -77,12 +77,12 @@ export default function KartuKeluarga() {
             <div className="table-container">
                 <div className="table-header d-flex justify-content-between align-items-center">
                     <h4>Data Kartu Keluarga</h4>
-                    <button
-                        className="btn btn-success btn-sm"
-                        onClick={() => setModalTambah(true)}
-                    >
-                        <i className="bi bi-plus-circle"></i> Tambah KK
-                    </button>
+                        <Link
+                            href={`/${role}/kartu_keluarga/create`}
+                            className="btn btn-success btn-sm"
+                        >
+                            <i className="bi bi-plus-circle"></i> Tambah KK
+                        </Link>
                 </div>
 
                 <div className="table-scroll">
@@ -131,13 +131,12 @@ export default function KartuKeluarga() {
                                             >
                                                 <i className="fas fa-info"></i>
                                             </button>
-                                            <button
-                                                className="btn btn-warning btn-sm me-1"
-                                                title="Edit KK"
-                                                onClick={() => openEditModal(item)}
-                                            >
-                                                <i className="fas fa-edit"></i>
-                                            </button>
+                                                <Link
+                                                    href={`/${role}/kartu_keluarga/${item.id}/edit`}
+                                                    className="btn btn-warning btn-sm me-1"
+                                                >
+                                                    <i className="fas fa-edit"></i>
+                                                </Link>
                                             <button
                                                 className="btn btn-danger btn-sm"
                                                 title="Hapus KK"

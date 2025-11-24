@@ -83,6 +83,38 @@ class RwKartuKeluargaController extends Controller
         ]);
     }
 
+    public function create()
+    {
+        $title = 'Tambah Kartu Keluarga';
+
+        $userRw = Auth::user()->rw;
+
+        $kategori_iuran = Kategori_golongan::select('id', 'jenis')->get();
+
+        // RT yang berada dalam RW user
+        $daftar_rt = Rt::select('id', 'nomor_rt', 'id_rw')
+            ->with(['rw', 'user.roles'])
+            ->whereHas('user', function ($q) {
+                $q->whereHas('roles', function ($r) {
+                    // Hanya ambil user dengan role utama RT (Ketua RT)
+                    $r->where('name', 'rt');
+                })
+                // Pastikan user tersebut tidak punya role tambahan (sekretaris/bendahara/seksi)
+                ->whereDoesntHave('roles', function ($r) {
+                    $r->whereIn('name', ['sekretaris', 'bendahara', 'seksi']);
+                });
+            })
+            ->get();
+
+        return Inertia::render('FormKK', [
+            'title' => $title,
+            'kategori_iuran' => $kategori_iuran,
+            'daftar_rt' => $daftar_rt,
+            'mode' => 'create',
+            'kk' => null
+        ]);
+    }
+
     public function store(Request $request)
     {
         try {
@@ -118,6 +150,40 @@ class RwKartuKeluargaController extends Controller
             Log::error('Gagal menambahkan KK: ' . $e->getMessage());
             return back()->with('error', 'Gagal menambahkan data KK.');
         }
+    }
+
+    public function edit($id)
+    {
+        $title = 'Edit Kartu Keluarga';
+
+        $userRw = Auth::user()->rw;
+
+        $kk = Kartu_keluarga::with(['rukunTetangga', 'rw', 'kategoriGolongan', 'kepalaKeluarga'])
+            ->where('id_rw', $userRw->id)
+            ->findOrFail($id);
+
+        $kategori_iuran = Kategori_golongan::select('id', 'jenis')->get();
+        $daftar_rt = Rt::select('id', 'nomor_rt', 'id_rw')
+            ->with(['rw', 'user.roles'])
+            ->whereHas('user', function ($q) {
+                $q->whereHas('roles', function ($r) {
+                    // Hanya ambil user dengan role utama RT (Ketua RT)
+                    $r->where('name', 'rt');
+                })
+                // Pastikan user tersebut tidak punya role tambahan (sekretaris/bendahara/seksi)
+                ->whereDoesntHave('roles', function ($r) {
+                    $r->whereIn('name', ['sekretaris', 'bendahara', 'seksi']);
+                });
+            })
+            ->get();
+
+        return Inertia::render('FormKK', [
+            'title' => $title,
+            'kategori_iuran' => $kategori_iuran,
+            'daftar_rt' => $daftar_rt,
+            'mode' => 'edit',
+            'kk' => $kk
+        ]);
     }
 
     public function update(Request $request, $id)
