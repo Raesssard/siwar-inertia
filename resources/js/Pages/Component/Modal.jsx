@@ -920,6 +920,16 @@ export function DetailPengaduan({ selectedData, detailShow, onClose, onUpdated, 
     const komenVideoRef = useRef(null)
     const previewVideoRef = useRef(null)
     const fileInputRef = useRef(null)
+    const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+
+    useEffect(() => {
+        function handleResize() {
+            setIsMobile(window.innerWidth <= 768);
+        }
+
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
 
     const handleClear = () => {
         setData("file", null)

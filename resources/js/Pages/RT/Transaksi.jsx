@@ -83,13 +83,13 @@ export default function Transaksi() {
 
                         Swal.fire("Terhapus!", "Data Transaksi berhasil dihapus.", "success")
 
-                        if (jenis === 'kk') {
-                            setTransaksiWargaList(prev => prev.filter(item => item.id !== id))
-                        }
+                        // if (jenis === 'kk') {
+                            setTransaksiList(prev => prev.filter(item => item.id !== id))
+                        // }
 
-                        if (jenis === 'umum') {
-                            setTransaksiUmumList(prev => prev.filter(item => item.id !== id))
-                        }
+                        // if (jenis === 'umum') {
+                            // setTransaksiUmumList(prev => prev.filter(item => item.id !== id))
+                        // }
                     })
                     .catch(() => {
                         console.log(`/${role}/transaksi/${id}, ini rutenya salah mas🗿`)
@@ -316,20 +316,20 @@ export default function Transaksi() {
                 onClose={() => setShowModalEdit(false)}
                 onUpdated={(updated, jenis) => {
                     setSelected(updated)
-                    if (jenis === 'kk') {
-                        setTransaksiWargaList(prev =>
+                    // if (jenis === 'kk') {
+                        setTransaksiList(prev =>
                             prev.map(item =>
                                 item.id === updated.id ? updated : item
                             )
                         )
-                    }
-                    if (jenis === 'umum') {
-                        setTransaksiUmumList(prev =>
-                            prev.map(item =>
-                                item.id === updated.id ? updated : item
-                            )
-                        )
-                    }
+                    // }
+                    // if (jenis === 'umum') {
+                    //     setTransaksiUmumList(prev =>
+                    //         prev.map(item =>
+                    //             item.id === updated.id ? updated : item
+                    //         )
+                    //     )
+                    // }
                 }}
                 role={role}
                 selectedData={selected}

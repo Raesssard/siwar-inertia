@@ -47,7 +47,7 @@
 <body>
     <div class="kop center">
         {{-- sementara pake logo app dlu 🙏 --}}
-        <img src="{{ public_path('img/logo.png') }}">
+        <img src="{{ public_path('img/LogoDaerah.png') }}">
         <h2>PEMERINTAH {{ strtoupper($kabupaten) }}</h2>
         <h3>KECAMATAN {{ strtoupper($kecamatan) }}</h3>
         <h3>KELURAHAN {{ strtoupper($kelurahan) }}</h3>

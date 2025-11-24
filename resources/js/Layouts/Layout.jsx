@@ -18,6 +18,17 @@ export default function Layout({ children }) {
     const users = props.auth?.user
     const { flash, cookie_prompt } = usePage().props
     const [showToast, setShowToast] = useState(false);
+    const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+
+    useEffect(() => {
+        function handleResize() {
+            setIsMobile(window.innerWidth <= 768);
+        }
+
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
     useEffect(() => {
         if (cookie_prompt?.need) {
             setShowToast(true)
@@ -70,7 +81,7 @@ export default function Layout({ children }) {
                 />
                 <div
                     id="content-wrapper"
-                    className={`main-content d-flex flex-column ${window.innerWidth <= 768 ? '' : toggle}`}
+                    className={`main-content d-flex flex-column ${isMobile ? '' : toggle}`}
                 >
                     <div id="content">
                         <Topbar

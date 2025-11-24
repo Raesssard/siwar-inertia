@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import { usePage, Link } from "@inertiajs/react"
 import { Inertia } from "@inertiajs/inertia"
 import "../../css/topbar.css"
@@ -6,6 +6,7 @@ import "../../css/topbar.css"
 import Swal from "sweetalert2"
 import { router } from '@inertiajs/react'
 import { route } from "ziggy-js"
+import { judul } from "../Pages/Component/GetPropRole"
 
 export default function Topbar({ modalShow, hapusHistory }) {
     const { props } = usePage()
@@ -15,8 +16,21 @@ export default function Topbar({ modalShow, hapusHistory }) {
     // const [showPasswordModal, setShowPasswordModal] = useState(false)
     const [gantiAkun, setGantiAkun] = useState(false)
     const [selectedRole, setSelectedRole] = useState("")
+    const [isMobile, setIsMobile] = useState(window.innerWidth <= 768)
+
+    useEffect(() => {
+        function handleResize() {
+            setIsMobile(window.innerWidth <= 768)
+        }
+
+        window.addEventListener('resize', handleResize)
+        return () => window.removeEventListener('resize', handleResize)
+    }, [])
+
+    const widthName = isMobile && '40%'
+
     function getNameFromUrl(url) {
-        return url.split("/").pop();
+        return url.split("/").pop()
     }
     const isSettingsPage = getNameFromUrl(usePage().url) === "settings"
     // const modalHandler = (showModal) => setShowPasswordModal(showModal)
@@ -75,198 +89,45 @@ export default function Topbar({ modalShow, hapusHistory }) {
     }
 
     const handleChangeRole = (e, rol) => {
-        e.preventDefault();
-        setSelectedRole(rol);
-        hapusHistory();
+        e.preventDefault()
+        setSelectedRole(rol)
+        hapusHistory()
 
         Swal.fire({
             title: "Mengganti akun...",
             text: `Sedang masuk sebagai ${rol.length <= 2 ? rol.toUpperCase() : rol.charAt(0).toUpperCase() + rol.slice(1)}...`,
             allowOutsideClick: false,
             didOpen: () => Swal.showLoading(),
-        });
+        })
 
         // Kirim form ganti role
         axios.post("/choose-role", { role: rol })
             .then(() => {
-                window.location.href = "/dashboard";
+                window.location.href = "/dashboard"
             })
             .catch(() => {
-                Swal.fire("Gagal", "Terjadi kesalahan saat mengganti akun.", "error");
-            });
-    }
-
-    const url = window.location.pathname
-    const segment = url.split("/").pop()
-
-    let judulHalaman
-
-    if (currentRole === 'warga') {
-        if (!segment && (url === "/" || url === "/dashboard-main")) {
-            judulHalaman = "Dashboard"
-        } else {
-            switch (segment) {
-                case "kk":
-                    judulHalaman = "Data Kartu Keluarga"
-                    break
-                case "dashboard":
-                    judulHalaman = "Dashboard"
-                    break
-                case "pengumuman":
-                    judulHalaman = "Pengumuman"
-                    break
-                case "tagihan":
-                    judulHalaman = "Tagihan"
-                    break
-                case "iuran":
-                    judulHalaman = "Iuran"
-                    break
-                case "transaksi":
-                    judulHalaman = "Transaksi"
-                    break
-                case "pengaduan":
-                    judulHalaman = "Pengaduan"
-                    break
-                default:
-                    judulHalaman =
-                        segment.charAt(0).toUpperCase() +
-                        segment.slice(1).replace(/-/g, " ")
-            }
-        }
-    }
-
-    if (currentRole === 'rt') {
-        if (!segment && (url === "/" || url === "/dashboard-main")) {
-            judulHalaman = "Dashboard"
-        } else {
-            switch (segment) {
-                case "kartu_keluarga":
-                    judulHalaman = "Data Kartu Keluarga"
-                    break
-                case "dashboard":
-                    judulHalaman = "Dashboard"
-                    break
-                case "pengumuman":
-                    judulHalaman = "Pengumuman"
-                    break
-                case "tagihan":
-                    judulHalaman = "Tagihan"
-                    break
-                case "iuran":
-                    judulHalaman = "Iuran"
-                    break
-                case "transaksi":
-                    judulHalaman = "Transaksi"
-                    break
-                case "pengaduan":
-                    judulHalaman = "Pengaduan"
-                    break
-                case "warga":
-                    judulHalaman = "Analisis Warga"
-                    break
-                case "keuangan":
-                    judulHalaman = "Analisis Keuangan"
-                    break
-                default:
-                    judulHalaman =
-                        segment.charAt(0).toUpperCase() +
-                        segment.slice(1).replace(/-/g, " ")
-            }
-        }
-    }
-
-    if (currentRole === 'rw') {
-        if (!segment && (url === "/" || url === "/dashboard-main")) {
-            judulHalaman = "Dashboard"
-        } else {
-            switch (segment) {
-                case "rt":
-                    judulHalaman = "Rukun Tetangga"
-                    break
-                case "kartu_keluarga":
-                    judulHalaman = "Data Kartu Keluarga"
-                    break
-                case "dashboard":
-                    judulHalaman = "Dashboard"
-                    break
-                case "pengumuman":
-                    judulHalaman = "Pengumuman"
-                    break
-                case "tagihan":
-                    judulHalaman = "Tagihan Warga"
-                    break
-                case "iuran":
-                    judulHalaman = "Iuran Warga"
-                    break
-                case "transaksi":
-                    judulHalaman = "Transaksi RW"
-                    break
-                case "pengaduan":
-                    judulHalaman = "Pengaduan"
-                    break
-                case "warga":
-                    judulHalaman = "Analisis Warga"
-                    break
-                case "keuangan":
-                    judulHalaman = "Analisis Keuangan"
-                    break
-                default:
-                    judulHalaman =
-                        segment.charAt(0).toUpperCase() +
-                        segment.slice(1).replace(/-/g, " ")
-            }
-        }
-    }
-
-    if (currentRole === 'admin') {
-        if (!segment && (url === "/" || url === "/dashboard-main")) {
-            judulHalaman = "Dashboard"
-        } else {
-            switch (segment) {
-                case "rw":
-                    judulHalaman = "Rukun Warga"
-                    break
-                case "dashboard":
-                    judulHalaman = "Dashboard"
-                    break
-                case "rt":
-                    judulHalaman = "Rukun Tetangga"
-                    break
-                case "kategori-golongan":
-                    judulHalaman = "Kategori Golongan"
-                    break
-                case "roles":
-                    judulHalaman = "Roles"
-                    break
-                case "permissions":
-                    judulHalaman = "Permissions"
-                    break
-                default:
-                    judulHalaman =
-                        segment.charAt(0).toUpperCase() +
-                        segment.slice(1).replace(/-/g, " ")
-            }
-        }
+                Swal.fire("Gagal", "Terjadi kesalahan saat mengganti akun.", "error")
+            })
     }
 
     return (
         <nav className="navbar nav-top navbar-expand navbar-light bg-white topbar mb-3 sticky-top shadow">
             {/* tombol sidebar mobile */}
             <button
-                className="btn btn-link d-md-none rounded-circle mr-3"
+                className="btn btn-link d-md-none rounded-circle my-3 mr-2"
                 onClick={() => modalShow(true)}
             >
                 <i className="fa fa-bars"></i>
             </button>
 
-            <h1 className="h3 mb-0 text-gray-800 mx-2 text-truncate">
-                {judulHalaman}
+            <h1 className={`${isMobile ? 'h5 mx-0' : 'h3 mx-2'} mb-0 text-gray-800 text-truncate`}>
+                {judul(currentRole)}
             </h1>
 
-            <ul className="navbar-nav ml-auto">
-                <li className="nav-item dropdown no-arrow">
+            <ul className="navbar-nav ml-auto" style={{ width: widthName }}>
+                <li className="nav-item dropdown no-arrow w-100">
                     <Link
-                        className="nav-link dropdown-toggle"
+                        className="nav-link dropdown-toggle w-100"
                         href="#"
                         id="userDropdown"
                         role="button"
@@ -274,7 +135,7 @@ export default function Topbar({ modalShow, hapusHistory }) {
                         aria-haspopup="true"
                         aria-expanded="false"
                     >
-                        <span className="mr-3 text-gray-600 small user-name-display">
+                        <span className={`${isMobile ? 'ms-auto' : ''} me-3 text-gray-600 small user-name-display`} style={{ maxWidth: '100%' }}>
                             {user?.nama || "User"}
                         </span>
                     </Link>

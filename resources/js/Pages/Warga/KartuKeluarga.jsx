@@ -125,8 +125,8 @@ export default function KartuKeluarga() {
                                             kartuKeluarga.warga
                                                 .sort((a, b) => {
                                                     const getRank = (hubungan) => {
-                                                        if (hubungan === "Kepala Keluarga") return 2
-                                                        if (hubungan === "Istri") return 1
+                                                        if (hubungan === "kepala keluarga") return 2
+                                                        if (hubungan === "istri") return 1
                                                         return 0
                                                     }
                                                     return getRank(b.status_hubungan_dalam_keluarga) - getRank(a.status_hubungan_dalam_keluarga)
