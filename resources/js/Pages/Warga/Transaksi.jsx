@@ -1,9 +1,8 @@
-
 import Layout from "@/Layouts/Layout"
-import { Head, Link, useForm, usePage } from "@inertiajs/react";
-import React from "react";
-import { FilterTransaksi } from "../Component/Filter";
-import { formatRupiah, formatTanggal } from "../Component/GetPropRole";
+import { Head, Link, useForm, usePage } from "@inertiajs/react"
+import React from "react"
+import { FilterTransaksi } from "../Component/Filter"
+import { formatRupiah, formatTanggal } from "../Component/GetPropRole"
 
 export default function Transaksi() {
     const {
@@ -106,9 +105,9 @@ export default function Transaksi() {
                     <div className="pagination-container">
                         <ul className="pagination-custom">
                             {transaksi.links.map((link, index) => {
-                                let label = link.label;
-                                if (label.includes("Previous")) label = "&lt;";
-                                if (label.includes("Next")) label = "&gt;";
+                                let label = link.label
+                                if (label.includes("Previous")) label = "&lt;"
+                                if (label.includes("Next")) label = "&gt;"
 
                                 return (
                                     <li
@@ -125,7 +124,7 @@ export default function Transaksi() {
                                             title={`Pergi ke halaman ${label === "&lt;" ? 'sebelumnya' : label === "&gt;" ? 'selanjutnya' : label}`}
                                         />
                                     </li>
-                                );
+                                )
                             })}
                         </ul>
                     </div>

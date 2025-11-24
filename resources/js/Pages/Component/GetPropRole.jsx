@@ -889,3 +889,160 @@ export function getRtLinks() {
         },
     ];
 }
+
+export function judul(role) {
+    const url = window.location.pathname
+    const segment = url.split("/").pop()
+
+    let judulHalaman
+
+    if (role === 'warga') {
+        if (!segment && (url === "/" || url === "/dashboard-main")) {
+            judulHalaman = "Dashboard"
+        } else {
+            switch (segment) {
+                case "dashboard":
+                    judulHalaman = "Dashboard"
+                    break
+                case "kk":
+                    judulHalaman = "Kartu Keluarga"
+                    break
+                case "pengumuman":
+                    judulHalaman = "Pengumuman"
+                    break
+                case "tagihan":
+                    judulHalaman = "Tagihan"
+                    break
+                case "iuran":
+                    judulHalaman = "Iuran"
+                    break
+                case "transaksi":
+                    judulHalaman = "Transaksi"
+                    break
+                case "pengaduan":
+                    judulHalaman = "Pengaduan"
+                    break
+                default:
+                    judulHalaman =
+                        segment.charAt(0).toUpperCase() +
+                        segment.slice(1).replace(/-/g, " ")
+            }
+        }
+    }
+
+    if (role === 'rt') {
+        if (!segment && (url === "/" || url === "/dashboard-main")) {
+            judulHalaman = "Dashboard"
+        } else {
+            switch (segment) {
+                case "kartu_keluarga":
+                    judulHalaman = "Data Kartu Keluarga"
+                    break
+                case "dashboard":
+                    judulHalaman = "Dashboard"
+                    break
+                case "pengumuman":
+                    judulHalaman = "Pengumuman"
+                    break
+                case "tagihan":
+                    judulHalaman = "Tagihan"
+                    break
+                case "iuran":
+                    judulHalaman = "Iuran"
+                    break
+                case "transaksi":
+                    judulHalaman = "Transaksi"
+                    break
+                case "pengaduan":
+                    judulHalaman = "Pengaduan"
+                    break
+                case "warga":
+                    judulHalaman = "Analisis Warga"
+                    break
+                case "keuangan":
+                    judulHalaman = "Analisis Keuangan"
+                    break
+                default:
+                    judulHalaman =
+                        segment.charAt(0).toUpperCase() +
+                        segment.slice(1).replace(/-/g, " ")
+            }
+        }
+    }
+
+    if (role === 'rw') {
+        if (!segment && (url === "/" || url === "/dashboard-main")) {
+            judulHalaman = "Dashboard"
+        } else {
+            switch (segment) {
+                case "rt":
+                    judulHalaman = "Rukun Tetangga"
+                    break
+                case "kartu_keluarga":
+                    judulHalaman = "Data Kartu Keluarga"
+                    break
+                case "dashboard":
+                    judulHalaman = "Dashboard"
+                    break
+                case "pengumuman":
+                    judulHalaman = "Pengumuman"
+                    break
+                case "tagihan":
+                    judulHalaman = "Tagihan Warga"
+                    break
+                case "iuran":
+                    judulHalaman = "Iuran Warga"
+                    break
+                case "transaksi":
+                    judulHalaman = "Transaksi RW"
+                    break
+                case "pengaduan":
+                    judulHalaman = "Pengaduan"
+                    break
+                case "warga":
+                    judulHalaman = "Analisis Warga"
+                    break
+                case "keuangan":
+                    judulHalaman = "Analisis Keuangan"
+                    break
+                default:
+                    judulHalaman =
+                        segment.charAt(0).toUpperCase() +
+                        segment.slice(1).replace(/-/g, " ")
+            }
+        }
+    }
+
+    if (role === 'admin') {
+        if (!segment && (url === "/" || url === "/dashboard-main")) {
+            judulHalaman = "Dashboard"
+        } else {
+            switch (segment) {
+                case "rw":
+                    judulHalaman = "Rukun Warga"
+                    break
+                case "dashboard":
+                    judulHalaman = "Dashboard"
+                    break
+                case "rt":
+                    judulHalaman = "Rukun Tetangga"
+                    break
+                case "kategori-golongan":
+                    judulHalaman = "Kategori Golongan"
+                    break
+                case "roles":
+                    judulHalaman = "Roles"
+                    break
+                case "permissions":
+                    judulHalaman = "Permissions"
+                    break
+                default:
+                    judulHalaman =
+                        segment.charAt(0).toUpperCase() +
+                        segment.slice(1).replace(/-/g, " ")
+            }
+        }
+    }
+
+    return judulHalaman
+}

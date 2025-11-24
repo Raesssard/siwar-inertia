@@ -58,7 +58,7 @@ class RwTransaksiController extends Controller
             'desember'
         ];
 
-        $list_kk = Kartu_keluarga::where('id_rt', $idRw)->with('rukunTetangga')->get();
+        $list_kk = Kartu_keluarga::where('id_rw', $idRw)->with('rukunTetangga')->get();
 
         return Inertia::render('Rw/Transaksi', [
             'title' => $title,
