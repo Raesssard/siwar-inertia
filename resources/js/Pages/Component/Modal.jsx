@@ -5672,7 +5672,7 @@ export function TambahTransaksi({ tambahShow, onClose, onAdded, role, daftarRT =
     );
 }
 
-export function TambahTransaksiPerKk({ listKK, tambahShow, onClose, onAdded, role, daftarRT }) {
+export function TambahTransaksiPerKk({ listKK = [], tambahShow, onClose, onAdded, role, daftarRT = [] }) {
     const { data, setData } = useForm({
         tanggal: "",
         nama_transaksi: "",
@@ -5723,7 +5723,7 @@ export function TambahTransaksiPerKk({ listKK, tambahShow, onClose, onAdded, rol
         let filteredKK;
 
         if (data.rt) {
-            filteredKK = listKK.filter(
+            filteredKK = listKK?.filter(
                 kk => kk.rukun_tetangga?.nomor_rt == data.rt
             );
         } else {
@@ -5736,7 +5736,7 @@ export function TambahTransaksiPerKk({ listKK, tambahShow, onClose, onAdded, rol
             setKkList(filteredKK);
         }
 
-        if (filteredKK.length === 0) {
+        if (filteredKK?.length === 0) {
             setData('no_kk', '');
         }
     }, [data.rt, listKK]);
@@ -5803,7 +5803,7 @@ export function TambahTransaksiPerKk({ listKK, tambahShow, onClose, onAdded, rol
                                             <label className="form-label">Nomor Kartu Keluarga</label>
                                             <Select
                                                 options={
-                                                    Kklist.length ? [
+                                                    Kklist?.length ? [
                                                         { value: "semua", label: "Semua Kartu Keluarga" },
                                                         ...Kklist.map((kk) => ({
                                                             value: kk.no_kk,

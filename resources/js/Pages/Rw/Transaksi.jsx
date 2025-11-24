@@ -89,6 +89,8 @@ export default function Transaksi() {
         });
     };
 
+    console.log({ list_kk });
+
     return (
         <Layout>
             <Head title={`${title} - ${role.length <= 2
