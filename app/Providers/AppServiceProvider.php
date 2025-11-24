@@ -4,8 +4,8 @@ namespace App\Providers;
 
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\ServiceProvider;
 use Inertia\Inertia;
 
 class AppServiceProvider extends ServiceProvider
@@ -36,18 +36,6 @@ class AppServiceProvider extends ServiceProvider
 
         // Share global data ke semua halaman Inertia
         Inertia::share([
-            // 🔹 Data user login
-            'auth' => function () {
-                /** @var User $user */
-                $user = Auth::user();
-                return $user ? [
-                    'id' => $user->id,
-                    'name' => $user->name,
-                    'roles' => $user->getRoleNames()->toArray(),
-                ] : null;
-            },
-
-            // 🔹 Flash message (success, error, info)
             'flash' => function () {
                 return [
                     'success' => session('success'),

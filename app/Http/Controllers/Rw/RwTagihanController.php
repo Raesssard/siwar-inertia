@@ -24,26 +24,35 @@ class RwTagihanController extends Controller
     {
         $title = 'Tagihan RW';
 
-        $user = Auth::user();
-        $idRw = $user->id_rw;
+        $userRwData = Auth::user()->rw;
+        if (!$userRwData) {
+            return back()->with('error', 'Data RW Anda tidak ditemukan.');
+        }
+
+        // ✔ Ambil nomor RW user
+        $nomorRwUser = $userRwData->nomor_rw;
+
         $search = $request->search;
         $no_kk_filter = $request->no_kk_filter;
 
-        // Daftar KK untuk dropdown filter
-        $kartuKeluargaForFilter = Kartu_keluarga::where('id_rw', $idRw)
+        // ✔ Daftar KK untuk filter — berdasar nomor RW
+        $kartuKeluargaForFilter = Kartu_keluarga::whereHas('rw', function ($q) use ($nomorRwUser) {
+                $q->where('nomor_rw', $nomorRwUser);
+            })
             ->select('no_kk')
             ->distinct()
             ->orderBy('no_kk')
             ->get();
 
-        // Base query (sama struktur dengan RT)
+        // Base query — PENTING: pakai nomor_rw
         $baseQuery = Tagihan::with([
-            'iuran',
-            'kartuKeluarga.warga',
-            'kartuKeluarga.kepalaKeluarga',
-        ])->whereHas('kartuKeluarga', function ($q) use ($idRw) {
-            $q->where('id_rw', $idRw);
-        });
+                'iuran',
+                'kartuKeluarga.warga',
+                'kartuKeluarga.kepalaKeluarga',
+            ])
+            ->whereHas('kartuKeluarga.rw', function ($q) use ($nomorRwUser) {
+                $q->where('nomor_rw', $nomorRwUser);
+            });
 
         // Tagihan manual
         $tagihanManual = (clone $baseQuery)
@@ -73,9 +82,11 @@ class RwTagihanController extends Controller
             ->orderBy('tgl_tagih', 'desc')
             ->paginate(10, ['*'], 'otomatis_page');
 
-        // Ambil iuran untuk RW
+        // ✔ iuran RW — FILTER PAKAI nomor_rw
         $iuran_for_tagihan = Iuran::with(['iuran_golongan', 'iuran_golongan.golongan'])
-            ->where('id_rw', $idRw)
+            ->whereHas('rw', function ($q) use ($nomorRwUser) {
+                $q->where('nomor_rw', $nomorRwUser);
+            })
             ->where('level', 'rw')
             ->where('jenis', 'manual')
             ->get();
@@ -88,6 +99,7 @@ class RwTagihanController extends Controller
             'kartuKeluargaForFilter' => $kartuKeluargaForFilter,
         ]);
     }
+
 
     /**
      * Membuat tagihan RW manual.

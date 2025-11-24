@@ -53,20 +53,22 @@ class RwWargaController extends Controller
     public function create(Request $request)
     {
         $title = 'Tambah Warga';
-        $noKK = $request->query('no_kk'); // ambil dari URL query
-        $wargaList = [];
+        $noKK = $request->query('no_kk');
 
-        if ($noKK) {
-            // Ambil semua warga dalam KK tersebut (autofill ayah & ibu)
-            $wargaList = Warga::where('no_kk', $noKK)->get();
+        $wargaList = $noKK ? Warga::where('no_kk', $noKK)->get() : [];
+
+        $userRw = Auth::user()->rw;
+        if (!$userRw) {
+            return back()->with('error', 'Data RW tidak ditemukan.');
         }
 
-        // Ambil daftar KK hanya untuk RW login
-        $rw_id = Auth::user()->rw->id ?? null;
+        // ✔️ Ambil nomor RW user
+        $nomorRwUser = $userRw->nomor_rw;
 
-        $daftarKK = Kartu_keluarga::whereHas('rukunTetangga', function ($q) use ($rw_id) {
-            $q->where('id_rw', $rw_id);
-        })
+        // ✔️ Filter KK berdasarkan nomor RW (TANPA pakai nomor_rw di tabel KK)
+        $daftarKK = Kartu_keluarga::whereHas('rw', function ($q) use ($nomorRwUser) {
+                $q->where('nomor_rw', $nomorRwUser);
+            })
             ->select('no_kk', 'alamat')
             ->orderBy('no_kk')
             ->get();
@@ -138,10 +140,22 @@ class RwWargaController extends Controller
     {
         $title = 'Edit Data Warga';
         $warga = Warga::findOrFail($id);
+
+        $userRw = Auth::user()->rw;
+        $nomorRwUser = $userRw->nomor_rw;
+
+        $daftarKK = Kartu_keluarga::whereHas('rw', fn($q) => 
+                $q->where('nomor_rw', $nomorRwUser)
+            )
+            ->select('no_kk', 'alamat')
+            ->orderBy('no_kk')
+            ->get();
+
         return Inertia::render('FormWarga', [
             'title' => $title,
             'role' => 'rw',
             'warga' => $warga,
+            'daftarKK' => $daftarKK,
         ]);
     }
 

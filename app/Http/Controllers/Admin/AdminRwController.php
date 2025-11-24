@@ -79,18 +79,51 @@ class AdminRwController extends Controller
             return back()->withErrors($validator)->withInput();
         }
 
-        // 🚫 Cegah jabatan ganda aktif
-        if ($request->filled('jabatan')) {
-            $existing = User::whereHas('roles', fn($q) => $q->where('name', $request->jabatan))
-                ->whereHas('rw', fn($q) => $q->where('nomor_rw', $request->nomor_rw))
-                ->exists();
+        /*
+        |----------------------------------------------------------------------
+        | 🚫 VALIDASI ROLE — SAMA DENGAN UPDATE()
+        |----------------------------------------------------------------------
+        | Ketentuan:
+        | - Ketua = user yang TIDAK punya role lain selain "rw" (abaikan "warga")
+        | - Jika jabatan kosong → dianggap ketua
+        | - Tidak boleh ada jabatan yang sama di RW yang sama jika masih aktif
+        |----------------------------------------------------------------------
+        */
 
-            if ($existing) {
-                return back()->with('error', "RW {$request->nomor_rw} sudah memiliki {$request->jabatan} aktif!")->withInput();
+        $targetRole = $request->jabatan ?: 'ketua';
+
+        // cari semua RW dengan nomor yang sama & status aktif
+        $rwAktif = Rw::where('nomor_rw', $request->nomor_rw)
+            ->where('status', 'aktif')
+            ->get();
+
+        foreach ($rwAktif as $r) {
+
+            $u = $r->users()->first();
+            if (!$u) continue;
+
+            // ambil role selain rw & warga
+            $extraRole = $u->roles()
+                ->whereNotIn('name', ['warga', 'rw'])
+                ->pluck('name')
+                ->first();
+
+            $existingRole = $extraRole ?: 'ketua';
+
+            // jika jabatan sama → tolak
+            if ($existingRole === $targetRole) {
+                return back()->with(
+                    'error',
+                    "RW {$request->nomor_rw} sudah memiliki {$existingRole} aktif!"
+                )->withInput();
             }
         }
 
-        // 💾 Simpan data RW
+        /*
+        |----------------------------------------------------------------------
+        | 💾 SIMPAN DATA RW
+        |----------------------------------------------------------------------
+        */
         $rw = Rw::create([
             'nik' => $request->nik,
             'no_kk' => $request->filled('nik')
@@ -103,30 +136,40 @@ class AdminRwController extends Controller
             'status' => $request->status,
         ]);
 
-        // 👤 Buat user hanya jika dua-duanya diisi
+        /*
+        |----------------------------------------------------------------------
+        | 👤 BUAT USER JIKA DIISI
+        |----------------------------------------------------------------------
+        */
         if ($request->filled('nik') && $request->filled('nama_anggota_rw')) {
+
             $user = User::create([
-                'nik' => $request->nik,
-                'nama' => $request->nama_anggota_rw,
+                'nik'      => $request->nik,
+                'nama'     => $request->nama_anggota_rw,
                 'password' => Hash::make('password'),
-                'id_rw' => $rw->id,
+                'id_rw'    => $rw->id,
             ]);
 
-            // Default role selalu 'rw'
+            /*
+            |----------------------------------------------------------------------
+            | 🔐 SET ROLE USER
+            | - Default = rw
+            | - Jika jabatan != ketua → tambahkan role jabatan
+            |----------------------------------------------------------------------
+            */
             $roles = ['rw'];
 
-            // 💡 Jika jabatan selain ketua, dan role-nya ada di database
             if ($request->filled('jabatan') && $request->jabatan !== 'ketua') {
                 if (Role::where('name', $request->jabatan)->exists()) {
                     $roles[] = $request->jabatan;
                 }
             }
 
-            // 🧠 Sinkronkan semua role (rw + tambahan)
             $user->syncRoles($roles);
         }
 
-        return redirect()->route('admin.rw.index')->with('success', 'RW baru berhasil ditambahkan.');
+        return redirect()->route('admin.rw.index')
+            ->with('success', 'RW baru berhasil ditambahkan.');
     }
 
     public function update(Request $request, string $id)
@@ -157,19 +200,52 @@ class AdminRwController extends Controller
             return back()->withErrors($validator)->withInput();
         }
 
-        // 🚫 Cegah jabatan ganda aktif
-        if ($request->filled('jabatan')) {
-            $existing = User::whereHas('roles', fn($q) => $q->where('name', $request->jabatan))
-                ->whereHas('rw', fn($q) => $q->where('nomor_rw', $request->nomor_rw)
-                    ->where('id', '!=', $rw->id))
-                ->exists();
+        /*
+        |--------------------------------------------------------------------------
+        | 🚫 CEGAH ROLE GANDA DALAM RW YANG SAMA
+        |--------------------------------------------------------------------------
+        | Ketentuan:
+        | - "ketua" = user yang hanya punya role "rw" saja (abaikan role warga)
+        | - Selain itu role = sekretaris, bendahara, dll
+        | - Tidak boleh ada role yang sama pada nomor_rw & RW lain yang masih aktif
+        |--------------------------------------------------------------------------
+        */
 
-            if ($existing) {
-                return back()->with('error', "RW {$request->nomor_rw} sudah memiliki {$request->jabatan} aktif!")->withInput();
+        $targetRole = $request->jabatan ?: 'ketua'; // jika kosong → ketua
+
+        // Ambil rw lain dengan nomor_rw yg sama
+        $rwLain = Rw::where('nomor_rw', $request->nomor_rw)
+            ->where('id', '!=', $rw->id)
+            ->where('status', 'aktif')
+            ->get();
+
+        foreach ($rwLain as $rwl) {
+            $u = $rwl->users()->first();
+
+            if (!$u) continue;
+
+            // Ambil role selain warga & rw
+            $extraRole = $u->roles()
+                ->whereNotIn('name', ['warga', 'rw'])
+                ->pluck('name')
+                ->first();
+
+            // Tentukan jabatan user RW tersebut
+            $jabatanExisting = $extraRole ?: 'ketua';
+
+            if ($jabatanExisting === $targetRole) {
+                return back()->with(
+                    'error',
+                    "RW {$request->nomor_rw} sudah memiliki {$jabatanExisting} aktif!"
+                )->withInput();
             }
         }
 
-        // 🔄 Update RW
+        /*
+        |--------------------------------------------------------------------------
+        | 🔄 UPDATE RW
+        |--------------------------------------------------------------------------
+        */
         $rw->update([
             'nik' => $request->nik,
             'no_kk' => $request->filled('nik')
@@ -182,10 +258,17 @@ class AdminRwController extends Controller
             'status' => $request->status,
         ]);
 
-        // 👤 Update atau buat user
+        /*
+        |--------------------------------------------------------------------------
+        | 👤 UPDATE / CREATE USER
+        |--------------------------------------------------------------------------
+        */
+
         $user = User::where('id_rw', $rw->id)->first();
 
         if ($request->filled('nik') && $request->filled('nama_anggota_rw')) {
+
+            // Update atau create user
             if ($user) {
                 $user->update([
                     'nik' => $request->nik,
@@ -200,17 +283,24 @@ class AdminRwController extends Controller
                 ]);
             }
 
-            // Default role selalu 'rw'
-            $roles = ['rw'];
+            /*
+            |--------------------------------------------------------------------------
+            | 🔐 ATUR ROLE USER
+            |--------------------------------------------------------------------------
+            | - default = 'rw'
+            | - jika jabatan tambahan → tambahkan role tsb
+            | - jabatan 'ketua' berarti hanya role 'rw'
+            |--------------------------------------------------------------------------
+            */
 
-            // 💡 Jika jabatan selain ketua dan role-nya ada di database
+            $roles = ['rw']; // ketua tetap hanya rw
+
             if ($request->filled('jabatan') && $request->jabatan !== 'ketua') {
                 if (Role::where('name', $request->jabatan)->exists()) {
                     $roles[] = $request->jabatan;
                 }
             }
 
-            // 🧠 Sinkronkan role (rw + tambahan)
             $user->syncRoles($roles);
         } else {
             if ($user) $user->delete();
@@ -241,33 +331,53 @@ class AdminRwController extends Controller
     {
         $rw = Rw::findOrFail($id);
 
-        // 🔄 Jika sedang aktif → ubah ke nonaktif
+        // 🎯 Role yang harus diabaikan (tidak dianggap jabatan)
+        $ignoredRoles = ['rw', 'warga'];
+
+        // 🔎 Ambil user RW
+        $user = $rw->users()->first();
+
+        // Ambil role selain ignoredRoles, jika tidak ada → ketua
+        $jabatanUser = $user?->roles()
+            ->whereNotIn('name', $ignoredRoles)
+            ->pluck('name')
+            ->first() ?? 'ketua';
+
+        // Jika sedang aktif → nonaktifkan
         if ($rw->status === 'aktif') {
             $rw->update(['status' => 'nonaktif']);
             return back()->with('success', "RW {$rw->nomor_rw} berhasil dinonaktifkan.");
         }
 
-        // 🔍 Cek apakah ada RW aktif lain dengan nomor sama
+        // 🔍 Cek RW lain aktif dengan nomor RW sama
         $existingActive = Rw::where('nomor_rw', $rw->nomor_rw)
             ->where('status', 'aktif')
             ->where('id', '!=', $rw->id)
             ->first();
 
         if ($existingActive) {
-            // ⏳ Kalau RW lama masih dalam masa jabatan
-            if ($existingActive->akhir_jabatan && $existingActive->akhir_jabatan >= now()->toDateString()) {
-                // Jika jabatan sama, tidak boleh aktif dua-duanya
-                if ($existingActive->jabatan === $rw->jabatan) {
-                    return back()->with('error', "RW {$rw->nomor_rw} dengan jabatan {$rw->jabatan} masih aktif. Nonaktifkan yang lama dulu!");
-                }
-            } else {
-                // 🕒 Kalau masa jabatan lama sudah habis → otomatis nonaktifkan
-                $existingActive->update(['status' => 'nonaktif']);
+
+            // 🎯 Ambil jabatan existing RW
+            $existingUser = $existingActive->users()->first();
+
+            $existingJabatan = $existingUser?->roles()
+                ->whereNotIn('name', $ignoredRoles)
+                ->pluck('name')
+                ->first() ?? 'ketua';
+
+            // Jika jabatannya sama → tolak
+            if ($existingJabatan === $jabatanUser) {
+                return back()->with('error',
+                    "RW {$rw->nomor_rw} sudah memiliki {$existingJabatan} aktif. Nonaktifkan yang lama dulu!"
+                );
             }
         }
 
-        // ✅ Aktifkan RW baru
+        // ✔ Aktifkan RW baru
         $rw->update(['status' => 'aktif']);
-        return back()->with('success', "RW {$rw->nomor_rw} dengan jabatan {$rw->jabatan} berhasil diaktifkan.");
+
+        return back()->with('success',
+            "RW {$rw->nomor_rw} dengan jabatan {$jabatanUser} berhasil diaktifkan."
+        );
     }
 }
