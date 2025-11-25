@@ -1,6 +1,7 @@
 import React from "react"
 import { Link } from "@inertiajs/react"
 import Role from "./Role"
+import { useIsMobile } from "./GetPropRole"
 
 export function FilterPengaduan({ data, setData, list_tahun, list_bulan, list_level, filter, resetFilter, tambahShow, role }) {
     return (
@@ -250,7 +251,7 @@ export function FilterTransaksi({ transaksi, data, setData, daftar_tahun, daftar
 export function FilterTagihan({ tagihanManual, tagihanOtomatis, data, setData, filter, resetFilter, role, kk_list, tambahShow }) {
     return (
         <form onSubmit={filter} className="filter-form form-filter d-flex px-0 g-2 pb-2 mb-2 w-100">
-            <div className="col-md-5 col-12 pr-2">
+            <div className={`${useIsMobile() ? 'ms-2' : 'col-md-5 col-12'}`} style={useIsMobile() ? { width: "80%" } : null}>
                 <div className="input-group input-group-sm">
                     <input
                         type="text"

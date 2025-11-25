@@ -3,7 +3,7 @@ import { Link, useForm, usePage, router } from "@inertiajs/react"
 import logo from '../../../../public/img/logo.png'
 import { FormatWaktu } from "../Pengaduan"
 import { SidebarLink } from "./SidebarLink"
-import { formatTanggal, getAdminLinks, getRtLinks, getWargaLinks, getRwLinks, formatRupiah, isMobile } from "./GetPropRole"
+import { formatTanggal, getAdminLinks, getRtLinks, getWargaLinks, getRwLinks, formatRupiah, useIsMobile } from "./GetPropRole"
 import Role from "./Role"
 import { route } from "ziggy-js"
 import { motion } from "framer-motion"
@@ -16,17 +16,17 @@ export function ModalSidebar({ modalIsOpen, modalShow, localStorageHistory }) {
         return saved ? JSON.parse(saved) : {};
     })
     // const [isMobile, setIsMobile] = useState(window.innerWidth < 768)
-    const [mobile, setMobile] = useState(isMobile);
+    const mobile = useIsMobile();
 
-    useEffect(() => {
-        function handleResize() {
-            // setIsMobile(window.innerWidth < 768)
-            setMobile(isMobile);
-        }
+    // useEffect(() => {
+    //     function handleResize() {
+    //         // setIsMobile(window.innerWidth < 768)
+    //         setMobile(useIsMobile);
+    //     }
 
-        window.addEventListener('resize', handleResize)
-        return () => window.removeEventListener('resize', handleResize)
-    }, [])
+    //     window.addEventListener('resize', handleResize)
+    //     return () => window.removeEventListener('resize', handleResize)
+    // }, [])
 
     const toggleMenu = (menuName) => {
         setOpenMenus((prev) => {
@@ -934,17 +934,17 @@ export function DetailPengaduan({ selectedData, detailShow, onClose, onUpdated, 
     const previewVideoRef = useRef(null)
     const fileInputRef = useRef(null)
     // const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
-    const [mobile, setMobile] = useState(isMobile);
+    const mobile = useIsMobile();
 
-    useEffect(() => {
-        function handleResize() {
-            // setIsMobile(window.innerWidth < 768);
-            setMobile(isMobile);
-        }
+    // useEffect(() => {
+    //     function handleResize() {
+    //         // setIsMobile(window.innerWidth < 768);
+    //         setMobile(useIsMobile);
+    //     }
 
-        window.addEventListener('resize', handleResize);
-        return () => window.removeEventListener('resize', handleResize);
-    }, []);
+    //     window.addEventListener('resize', handleResize);
+    //     return () => window.removeEventListener('resize', handleResize);
+    // }, []);
 
     const handleClear = () => {
         setData("file", null)

@@ -6,7 +6,7 @@ import Topbar from "./Topbar"
 import { ModalSidebar } from "../Pages/Component/Modal"
 import { usePage } from "@inertiajs/react"
 import RoleCookieToast from "../Pages/Component/RoleCookieToast"
-import { isMobile } from "../Pages/Component/GetPropRole"
+import { useIsMobile } from "../Pages/Component/GetPropRole"
 
 export default function Layout({ children }) {
     const [toggle, setToggle] = useState(() => {
@@ -20,17 +20,17 @@ export default function Layout({ children }) {
     const { flash, cookie_prompt } = usePage().props
     const [showToast, setShowToast] = useState(false)
     // const [isMobile, setIsMobile] = useState(window.innerWidth < 768)
-    const [mobile, setMobile] = useState(isMobile)
+    const mobile = useIsMobile()
 
-    useEffect(() => {
-        function handleResize() {
-            // setIsMobile(window.innerWidth < 768)
-            setMobile(isMobile)
-        }
+    // useEffect(() => {
+    //     function handleResize() {
+    //         // setIsMobile(window.innerWidth < 768)
+    //         setMobile(useIsMobile)
+    //     }
 
-        window.addEventListener('resize', handleResize)
-        return () => window.removeEventListener('resize', handleResize)
-    }, [])
+    //     window.addEventListener('resize', handleResize)
+    //     return () => window.removeEventListener('resize', handleResize)
+    // }, [])
 
     useEffect(() => {
         if (cookie_prompt?.need) {
