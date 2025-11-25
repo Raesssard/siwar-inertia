@@ -89,6 +89,8 @@ export default function Transaksi() {
         });
     };
 
+    console.log({ list_kk });
+
     return (
         <Layout>
             <Head title={`${title} - ${role.length <= 2
@@ -135,7 +137,7 @@ export default function Transaksi() {
                                         <td className="text-center">{index + 1}</td>
                                         <td className="text-center">{item.no_kk ?? 'Semua Kartu Keluarga'}</td>
                                         <td className="text-center">{formatTanggal(item.tanggal) ?? '-'}</td>
-                                        <td className="text-start">{item.nama_transaksi ?? '-'}</td>
+                                        <td className="text-center">{item.nama_transaksi ?? '-'}</td>
                                         <td className="text-center">
                                             {item.jenis === 'pemasukan' ? (
                                                 <span className="badge bg-success text-white">Pemasukan</span>
@@ -143,8 +145,8 @@ export default function Transaksi() {
                                                 <span className="badge bg-danger text-white">Pengeluaran</span>
                                             )}
                                         </td>
-                                        <td className="text-end">{formatRupiah(item.nominal) ?? '-'}</td>
-                                        <td className="text-start">{item.keterangan ?? '-'}</td>
+                                        <td className="text-center">{formatRupiah(item.nominal) ?? '-'}</td>
+                                        <td className="text-center">{item.keterangan ?? '-'}</td>
                                         <td className="text-center">
                                             <div className="d-flex justify-content-center align-items-center gap-2">
                                                 <button className="btn btn-sm btn-warning my-auto" title="Edit Transaksi" onClick={() => modalEdit(item)}>
