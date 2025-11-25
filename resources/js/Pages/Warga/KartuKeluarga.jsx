@@ -35,7 +35,7 @@ export default function KartuKeluarga() {
                 <div className="card-body p-3">
                     <div className="kk-container p-4 border rounded shadow-sm">
                         <div className="kk-header text-center mb-4">
-                            <div className="kk-header-top-line d-flex justify-content-between align-items-center mb-2">
+                            <div className="kk-header-top-line d-flex justify-content-between align-items-center">
                                 <div className="kk-header-right-reg text-end flex-grow-1">
                                     {kartuKeluarga.no_registrasi && (
                                         <p className="mb-0 small">No. Registrasi:
@@ -56,30 +56,38 @@ export default function KartuKeluarga() {
                         <div className="kk-info-grid col g-3 mb-4 small">
                             <div className="kk-info-item">
                                 <p className="mb-1 text-start">
-                                    <strong>Kepala Keluarga</strong> : {kartuKeluarga.kepala_keluarga.nama ?? '-'}
+                                    <strong>Kepala Keluarga</strong> :{" "}
+                                    {kartuKeluarga.kepala_keluarga.nama ?? '-'}
                                 </p>
                                 <p className="mb-1 text-start">
-                                    <strong>Alamat</strong> : {kartuKeluarga.alamat ?? '-'}
+                                    <strong>Alamat</strong> :{" "}
+                                    {kartuKeluarga.alamat ?? '-'}
                                 </p>
                                 <p className="mb-1 text-start">
-                                    <strong>Desa/Kelurahan</strong> : {kartuKeluarga.kelurahan ?? '-'}
+                                    <strong>Desa/Kelurahan</strong> :{" "}
+                                    {kartuKeluarga.kelurahan ?? '-'}
                                 </p>
                                 <p className="mb-1 text-start">
-                                    <strong>Kecamatan</strong> : {kartuKeluarga.kecamatan ?? '-'}
+                                    <strong>Kecamatan</strong> :{" "}
+                                    {kartuKeluarga.kecamatan ?? '-'}
                                 </p>
                                 <p className="mb-1 text-start">
-                                    <strong>RT/RW</strong> : {kartuKeluarga.rukun_tetangga.nomor_rt ?? '-'}/{kartuKeluarga.rw.nomor_rw ?? '-'}
+                                    <strong>RT/RW</strong> :{" "}
+                                    {kartuKeluarga.rukun_tetangga.nomor_rt ?? '-'}/{kartuKeluarga.rw.nomor_rw ?? '-'}
                                 </p>
                             </div>
                             <div className="kk-info-item">
                                 <p className="mb-1 text-start">
-                                    <strong>Kabupaten/Kota</strong> : {kartuKeluarga.kabupaten ?? '-'}
+                                    <strong>Kabupaten/Kota</strong> :{" "}
+                                    {kartuKeluarga.kabupaten ?? '-'}
                                 </p>
                                 <p className="mb-1 text-start">
-                                    <strong>Kode Pos</strong> : {kartuKeluarga.kode_pos ?? '-'}
+                                    <strong>Kode Pos</strong> :{" "}
+                                    {kartuKeluarga.kode_pos ?? '-'}
                                 </p>
                                 <p className="mb-1 text-start">
-                                    <strong>Provinsi</strong> : {kartuKeluarga.provinsi ?? '-'}
+                                    <strong>Provinsi</strong> :{" "}
+                                    {kartuKeluarga.provinsi ?? '-'}
                                 </p>
                             </div>
                         </div>

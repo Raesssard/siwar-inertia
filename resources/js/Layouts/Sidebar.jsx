@@ -151,6 +151,7 @@ export default function Sidebar({ toggleKeParent, localStorageHistory }) {
                         {...link}
                         isOpen={!!openMenus[link.text]}
                         onToggle={() => toggleMenu(link.text)}
+                        isToggleOrMobile={toggle !== ""}
                     />
                 ))}
 

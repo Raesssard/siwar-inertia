@@ -25,6 +25,7 @@ class RwTransaksiController extends Controller
 
         // 🔹 Ambil nomor RW user
         $nomorRwUser = $userRwData->nomor_rw;
+        $idRw = Auth::user()->rw->id;
 
         $search = $request->search;
         $tahun = $request->tahun;
@@ -83,6 +84,7 @@ class RwTransaksiController extends Controller
             'daftar_tahun' => $daftar_tahun,
             'daftar_bulan' => $daftar_bulan,
             'daftar_rt' => $daftar_rt,
+            'list_kk' => $list_kk,
         ]);
     }
 

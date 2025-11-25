@@ -1046,3 +1046,7 @@ export function judul(role) {
 
     return judulHalaman
 }
+
+export function isMobile() {
+    return /Mobi|Android/i.test(navigator.userAgent);
+}

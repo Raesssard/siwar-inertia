@@ -3,7 +3,7 @@ import { Link, useForm, usePage, router } from "@inertiajs/react"
 import logo from '../../../../public/img/logo.png'
 import { FormatWaktu } from "../Pengaduan"
 import { SidebarLink } from "./SidebarLink"
-import { formatTanggal, getAdminLinks, getRtLinks, getWargaLinks, getRwLinks, formatRupiah } from "./GetPropRole"
+import { formatTanggal, getAdminLinks, getRtLinks, getWargaLinks, getRwLinks, formatRupiah, isMobile } from "./GetPropRole"
 import Role from "./Role"
 import { route } from "ziggy-js"
 import { motion } from "framer-motion"
@@ -15,6 +15,18 @@ export function ModalSidebar({ modalIsOpen, modalShow, localStorageHistory }) {
         const saved = localStorage.getItem("openMenus");
         return saved ? JSON.parse(saved) : {};
     })
+    // const [isMobile, setIsMobile] = useState(window.innerWidth < 768)
+    const [mobile, setMobile] = useState(isMobile);
+
+    useEffect(() => {
+        function handleResize() {
+            // setIsMobile(window.innerWidth < 768)
+            setMobile(isMobile);
+        }
+
+        window.addEventListener('resize', handleResize)
+        return () => window.removeEventListener('resize', handleResize)
+    }, [])
 
     const toggleMenu = (menuName) => {
         setOpenMenus((prev) => {
@@ -66,7 +78,7 @@ export function ModalSidebar({ modalIsOpen, modalShow, localStorageHistory }) {
                     onClick={() => modalShow(false)}
                 >
                     <div
-                        className={`modal-dialog modal-dialog-slideout-left modal-sm animasi-modal ${modalIsOpen ? "show" : ""}`}
+                        className={`modal-dialog modal-dialog-slideout-left modal-sm animasi-modal ${modalIsOpen ? "show" : ""} my-0`}
                         onClick={(e) => e.stopPropagation()}
                     >
                         <div className="modal-content bg-primary text-white">
@@ -85,6 +97,7 @@ export function ModalSidebar({ modalIsOpen, modalShow, localStorageHistory }) {
                                             {...link}
                                             isOpen={!!openMenus[link.text]}
                                             onToggle={() => toggleMenu(link.text)}
+                                            isToggleOrMobile={mobile}
                                         />
                                     ))}
                                     <hr className="sidebar-divider d-none d-md-block" />
@@ -920,11 +933,13 @@ export function DetailPengaduan({ selectedData, detailShow, onClose, onUpdated, 
     const komenVideoRef = useRef(null)
     const previewVideoRef = useRef(null)
     const fileInputRef = useRef(null)
-    const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+    // const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+    const [mobile, setMobile] = useState(isMobile);
 
     useEffect(() => {
         function handleResize() {
-            setIsMobile(window.innerWidth <= 768);
+            // setIsMobile(window.innerWidth < 768);
+            setMobile(isMobile);
         }
 
         window.addEventListener('resize', handleResize);
@@ -2438,8 +2453,12 @@ export function DetailKK({ selectedData, detailShow, onClose, role, userData }) 
 
                             <div className="kk-info-grid mb-2">
                                 <div className="kk-info-item">
-                                    <p><strong>Nama Kepala Keluarga</strong> : {selectedData?.kepala_keluarga?.nama ?? '-'}</p>
-                                    <p><strong>Alamat</strong> : {selectedData?.alamat ?? '-'}</p>
+                                    <p><strong>Nama Kepala Keluarga</strong> :{" "}
+                                        {selectedData?.kepala_keluarga?.nama ?? '-'}
+                                    </p>
+                                    <p><strong>Alamat</strong> :{" "}
+                                        {selectedData?.alamat ?? '-'}
+                                    </p>
                                     <p><strong>RT/RW</strong> :{" "}
                                         {selectedData?.rukun_tetangga?.nomor_rt ?? '-'}/{selectedData?.rw?.nomor_rw ?? '-'}
                                     </p>
@@ -2449,7 +2468,6 @@ export function DetailKK({ selectedData, detailShow, onClose, role, userData }) 
                                     </p>
                                 </div>
                                 <div className="kk-info-item">
-
                                     <p>
                                         <strong>Kecamatan</strong> :{" "}
                                         {selectedData?.kecamatan ?? "-"}

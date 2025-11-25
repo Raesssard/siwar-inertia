@@ -1,10 +1,12 @@
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import "../../css/login.css"
 import { Head, useForm } from "@inertiajs/react"
 import Swal from "sweetalert2"
 import axios from "axios"
 import FloatingInput from './Component/FloatingInput'
 import logo from '../../../public/img/logo.png'
+import { header } from "framer-motion/client"
+import { isMobile } from "./Component/GetPropRole"
 
 export default function Login() {
     const { data, setData, processing } = useForm({
@@ -12,6 +14,22 @@ export default function Login() {
         password: '',
         remember: false,
     })
+    // const [isMobile, setIsMobile] = useState(window.innerWidth < 768)
+    const [mobile, setMobile] = useState(isMobile);
+    const [windowWidth, setWindowWidth] = useState(window.innerWidth)
+    const [windowHeight, setWindowHeight] = useState(window.innerHeight)
+
+    useEffect(() => {
+        function handleResize() {
+            // setIsMobile(window.innerWidth < 768)
+            setMobile(isMobile);
+            setWindowWidth(window.innerWidth)
+            setWindowHeight(window.innerHeight)
+        }
+
+        window.addEventListener('resize', handleResize)
+        return () => window.removeEventListener('resize', handleResize)
+    }, [])
 
     const handleSubmit = async (e) => {
         e.preventDefault()
@@ -82,16 +100,29 @@ export default function Login() {
         }
     }
 
+    const dependMobile = {
+        width: windowWidth - (windowWidth * 0.2),
+        height: windowHeight - (windowHeight * 0.3),
+        header: mobile ? { fontSize: '1rem', marginTop: '0' } : {},
+        cardHead: mobile ? { height: '130px' } : {},
+        mobileStyle: mobile ? {
+            width: '90vw',
+            maxWidth: (windowWidth - (windowWidth * 0.2)) + 'px',
+            maxHeight: (windowHeight - (windowHeight * 0.3)) + 'px',
+        } : {},
+        logoMobile: mobile ? { width: '120px', height: '66.72px' } : {},
+    };
+
     return (
         <>
             <Head title="Login" />
             <div className="login-container">
-                <div className="login-card">
-                    <div className="login-card-header">
-                        <div className="login-logo">
-                            <img src={logo} alt="SiWar Logo" className="login-logo-img" />
+                <div className="login-card" style={dependMobile.mobileStyle}>
+                    <div className="login-card-header" style={dependMobile.cardHead}>
+                        <div className={`login-logo ${mobile ? 'mb-0' : ''}`}>
+                            <img src={logo} alt="SiWar Logo" className="login-logo-img" style={dependMobile.logoMobile} />
                         </div>
-                        <h3>Sistem Informasi Warga</h3>
+                        <h3 style={dependMobile.header}>Sistem Informasi Warga</h3>
                     </div>
 
                     <div className="login-card-body">
