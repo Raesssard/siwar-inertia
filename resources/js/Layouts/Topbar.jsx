@@ -148,6 +148,13 @@ export default function Topbar({ modalShow, hapusHistory }) {
                         data-bs-auto-close="outside"
                         style={{ width: 'fit-content' }}
                     >
+                        <button
+                            className="dropdown-item"
+                            onClick={() => router.visit(route("profile"))}
+                        >
+                            <i className="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
+                            Profil
+                        </button>
                         {/* Ubah password */}
                         <button className="dropdown-item"
                             disabled={isSettingsPage}

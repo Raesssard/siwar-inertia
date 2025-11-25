@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Kartu_keluarga;
 use App\Models\Setting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -61,5 +62,52 @@ class SettingsController extends Controller
         Setting::setValue('max_rt_per_rw', $request->max_rt_per_rw, 'Batas maksimal jumlah RT per RW.');
 
         return redirect()->route('settings')->with('success', 'Pengaturan sistem berhasil diperbarui.');
+    }
+
+    public function profile()
+    {
+        $user = Auth::user();
+
+        // Ambil data RT & RW
+        $rt = $user->rt;
+        $rw = $user->rw;
+
+        // Ambil no_kk berdasarkan nik user
+        $kk = Kartu_keluarga::where('id_rt', $user->id_rt)
+            ->whereHas('warga', function ($q) use ($user) {
+                $q->where('nik', $user->nik);
+            })
+            ->first();
+
+        return Inertia::render('ProfilePage', [
+            'user' => $user,
+            'rt' => $rt,
+            'rw' => $rw,
+            'kk' => $kk,
+        ]);
+    }
+
+    public function updatePhoto(Request $request)
+    {
+        $request->validate([
+            'foto_profil' => 'required|image|mimes:jpg,jpeg,png|max:2048',
+        ]);
+
+        $user = Auth::user();
+
+        // hapus foto lama
+        if ($user->foto_profil && file_exists(public_path('uploads/profil/'.$user->foto_profil))) {
+            unlink(public_path('uploads/profil/'.$user->foto_profil));
+        }
+
+        // simpan foto baru
+        $file = $request->file('foto_profil');
+        $filename = time().'_'.$file->getClientOriginalName();
+        $file->move(public_path('uploads/profil/'), $filename);
+
+        $user->foto_profil = $filename;
+        $user->save();
+
+        return back()->with('success', 'Foto profil berhasil diperbarui.');
     }
 }
