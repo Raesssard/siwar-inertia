@@ -5789,7 +5789,7 @@ export function TambahTransaksiPerKk({ listKK = [], tambahShow, onClose, onAdded
                                                         borderRadius: '0',
                                                     }}
                                                 >
-                                                    <option value="" selected disabled>-- Pilih RT --</option>
+                                                    <option value="" disabled>-- Pilih RT --</option>
                                                     {daftarRT?.map((nomor, i) => (
                                                         <option key={i} value={nomor}>
                                                             RT {nomor}
