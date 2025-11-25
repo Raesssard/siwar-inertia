@@ -10,7 +10,7 @@ export default function ProfilePage({ user, rt, rw, kk }) {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        post(route('profile.update'), {
+        post(route('profile.updatePhoto'), {
             forceFormData: true,
         });
     };
