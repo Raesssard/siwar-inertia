@@ -48,7 +48,7 @@ export default function ProfilePage({ user, rt, rw, kk }) {
                                 type="text"
                                 value={data.nama}
                                 className="w-full border rounded p-2"
-                                onChange={(e) => setData("nama", e.target.value)}
+                                disabled
                             />
                             {errors.nama && <p className="text-red-500 text-sm">{errors.nama}</p>}
                         </div>
