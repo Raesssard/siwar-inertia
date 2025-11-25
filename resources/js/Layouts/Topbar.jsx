@@ -6,7 +6,7 @@ import "../../css/topbar.css"
 import Swal from "sweetalert2"
 import { router } from '@inertiajs/react'
 import { route } from "ziggy-js"
-import { judul } from "../Pages/Component/GetPropRole"
+import { isMobile, judul } from "../Pages/Component/GetPropRole"
 
 export default function Topbar({ modalShow, hapusHistory }) {
     const { props } = usePage()
@@ -16,18 +16,20 @@ export default function Topbar({ modalShow, hapusHistory }) {
     // const [showPasswordModal, setShowPasswordModal] = useState(false)
     const [gantiAkun, setGantiAkun] = useState(false)
     const [selectedRole, setSelectedRole] = useState("")
-    const [isMobile, setIsMobile] = useState(window.innerWidth <= 768)
+    // const [isMobile, setIsMobile] = useState(window.innerWidth < 768)
+    const [mobile, setMobile] = useState(isMobile);
 
     useEffect(() => {
         function handleResize() {
-            setIsMobile(window.innerWidth <= 768)
+            // setIsMobile(window.innerWidth < 768)
+            setMobile(isMobile);
         }
 
         window.addEventListener('resize', handleResize)
         return () => window.removeEventListener('resize', handleResize)
     }, [])
 
-    const widthName = isMobile && '40%'
+    const widthName = mobile && '40%'
 
     function getNameFromUrl(url) {
         return url.split("/").pop()
@@ -120,7 +122,7 @@ export default function Topbar({ modalShow, hapusHistory }) {
                 <i className="fa fa-bars"></i>
             </button>
 
-            <h1 className={`${isMobile ? 'h5 mx-0' : 'h3 mx-2'} mb-0 text-gray-800 text-truncate`}>
+            <h1 className={`${mobile ? 'h5 mx-0' : 'h3 mx-2'} mb-0 text-gray-800 text-truncate`}>
                 {judul(currentRole)}
             </h1>
 
@@ -135,7 +137,7 @@ export default function Topbar({ modalShow, hapusHistory }) {
                         aria-haspopup="true"
                         aria-expanded="false"
                     >
-                        <span className={`${isMobile ? 'ms-auto' : ''} me-3 text-gray-600 small user-name-display`} style={{ maxWidth: '100%' }}>
+                        <span className={`${mobile ? 'ms-auto' : ''} me-3 text-gray-600 small user-name-display`} style={{ maxWidth: '100%' }}>
                             {user?.nama || "User"}
                         </span>
                     </Link>
@@ -144,6 +146,7 @@ export default function Topbar({ modalShow, hapusHistory }) {
                         className="dropdown-menu dropdown-menu-right shadow animated--grow-in"
                         aria-labelledby="userDropdown"
                         data-bs-auto-close="outside"
+                        style={{ width: 'fit-content' }}
                     >
                         {/* Ubah password */}
                         <button className="dropdown-item"

@@ -6,6 +6,7 @@ import Topbar from "./Topbar"
 import { ModalSidebar } from "../Pages/Component/Modal"
 import { usePage } from "@inertiajs/react"
 import RoleCookieToast from "../Pages/Component/RoleCookieToast"
+import { isMobile } from "../Pages/Component/GetPropRole"
 
 export default function Layout({ children }) {
     const [toggle, setToggle] = useState(() => {
@@ -17,17 +18,19 @@ export default function Layout({ children }) {
     const { props } = usePage()
     const users = props.auth?.user
     const { flash, cookie_prompt } = usePage().props
-    const [showToast, setShowToast] = useState(false);
-    const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+    const [showToast, setShowToast] = useState(false)
+    // const [isMobile, setIsMobile] = useState(window.innerWidth < 768)
+    const [mobile, setMobile] = useState(isMobile)
 
     useEffect(() => {
         function handleResize() {
-            setIsMobile(window.innerWidth <= 768);
+            // setIsMobile(window.innerWidth < 768)
+            setMobile(isMobile)
         }
 
-        window.addEventListener('resize', handleResize);
-        return () => window.removeEventListener('resize', handleResize);
-    }, []);
+        window.addEventListener('resize', handleResize)
+        return () => window.removeEventListener('resize', handleResize)
+    }, [])
 
     useEffect(() => {
         if (cookie_prompt?.need) {
@@ -51,7 +54,7 @@ export default function Layout({ children }) {
     const ModalSideShow = (condition) => {
         setShowSidebar(condition)
     }
-    // console.log(cookie_prompt);
+
     // 🔹 Tampilkan flash message ketika ada dari server
     useEffect(() => {
         if (flash?.success || flash?.error) {
@@ -81,7 +84,7 @@ export default function Layout({ children }) {
                 />
                 <div
                     id="content-wrapper"
-                    className={`main-content d-flex flex-column ${isMobile ? '' : toggle}`}
+                    className={`main-content d-flex flex-column ${mobile ? '' : toggle}`}
                 >
                     <div id="content">
                         <Topbar

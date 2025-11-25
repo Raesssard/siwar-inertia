@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react"
 import { Link, usePage } from "@inertiajs/react"
 
-export function SidebarLink({ href, icon, text, children, isOpen, onToggle }) {
+export function SidebarLink({ href, icon, text, children, isOpen, onToggle, isToggleOrMobile }) {
     const { url } = usePage()
 
     const isActive = (url, pattern, exact = false) => {
@@ -12,6 +12,8 @@ export function SidebarLink({ href, icon, text, children, isOpen, onToggle }) {
     }
 
     const open = isOpen;
+
+    const sizeFont = isToggleOrMobile ? '0.55rem' : '0.75rem';
 
     return (
         <li className={`nav-item ${isActive(url, href) ? 'active' : ''}`}>
@@ -34,12 +36,12 @@ export function SidebarLink({ href, icon, text, children, isOpen, onToggle }) {
                             zIndex: 10,
                         }}></i>
                     </button>
-                    <ul className={`list-unstyled ps-3 ${open ? "open" : ""}`}>
+                    <ul className={`list-unstyled ${isToggleOrMobile ? '' : 'ps-3'} ${open ? "open" : ""}`}>
                         {children.map((child, idx) => (
                             <li key={idx} className={`nav-item m-0 ${isActive(url, child.href) ? "active" : ""}`}>
                                 <Link className="nav-link" href={child.href}>
                                     <i className={`fas fa-${child.icon} me-2`}></i>
-                                    {child.text}
+                                    <span style={{ fontSize: sizeFont }}>{child.text}</span>
                                 </Link>
                             </li>
                         ))}

@@ -48,7 +48,7 @@ export default function Pengumuman() {
         groups[kategori].push(item)
         return groups
     }, {})
-    console.log(daftarKategori)
+
     const order = [
         "Hari ini",
         "Kemarin",
