@@ -6,7 +6,7 @@ import "../../css/topbar.css"
 import Swal from "sweetalert2"
 import { router } from '@inertiajs/react'
 import { route } from "ziggy-js"
-import { isMobile, judul } from "../Pages/Component/GetPropRole"
+import { useIsMobile, judul } from "../Pages/Component/GetPropRole"
 
 export default function Topbar({ modalShow, hapusHistory }) {
     const { props } = usePage()
@@ -17,17 +17,17 @@ export default function Topbar({ modalShow, hapusHistory }) {
     const [gantiAkun, setGantiAkun] = useState(false)
     const [selectedRole, setSelectedRole] = useState("")
     // const [isMobile, setIsMobile] = useState(window.innerWidth < 768)
-    const [mobile, setMobile] = useState(isMobile);
+    const mobile = useIsMobile();
 
-    useEffect(() => {
-        function handleResize() {
-            // setIsMobile(window.innerWidth < 768)
-            setMobile(isMobile);
-        }
+    // useEffect(() => {
+    //     function handleResize() {
+    //         // setIsMobile(window.innerWidth < 768)
+    //         setMobile(useIsMobile);
+    //     }
 
-        window.addEventListener('resize', handleResize)
-        return () => window.removeEventListener('resize', handleResize)
-    }, [])
+    //     window.addEventListener('resize', handleResize)
+    //     return () => window.removeEventListener('resize', handleResize)
+    // }, [])
 
     const widthName = mobile && '40%'
 

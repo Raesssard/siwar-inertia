@@ -1,4 +1,4 @@
-import React, { Children } from "react";
+import React, { Children, useEffect, useState } from "react";
 
 export function formatRupiah(angka, withDecimals = false) {
     if (angka == null || isNaN(angka)) return "Rp. 0";
@@ -1047,6 +1047,17 @@ export function judul(role) {
     return judulHalaman
 }
 
-export function isMobile() {
-    return /Mobi|Android/i.test(navigator.userAgent);
+export function useIsMobile() {
+    const [mobile, setMobile] = useState(window.innerWidth < 768);
+
+    useEffect(() => {
+        function handleResize() {
+            setMobile(window.innerWidth < 768);
+        }
+
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
+    return mobile;
 }

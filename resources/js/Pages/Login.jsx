@@ -6,7 +6,7 @@ import axios from "axios"
 import FloatingInput from './Component/FloatingInput'
 import logo from '../../../public/img/logo.png'
 import { header } from "framer-motion/client"
-import { isMobile } from "./Component/GetPropRole"
+import { useIsMobile } from "./Component/GetPropRole"
 
 export default function Login() {
     const { data, setData, processing } = useForm({
@@ -15,14 +15,14 @@ export default function Login() {
         remember: false,
     })
     // const [isMobile, setIsMobile] = useState(window.innerWidth < 768)
-    const [mobile, setMobile] = useState(isMobile);
+    const mobile = useIsMobile();
     const [windowWidth, setWindowWidth] = useState(window.innerWidth)
     const [windowHeight, setWindowHeight] = useState(window.innerHeight)
 
     useEffect(() => {
         function handleResize() {
             // setIsMobile(window.innerWidth < 768)
-            setMobile(isMobile);
+            // setMobile(useIsMobile);
             setWindowWidth(window.innerWidth)
             setWindowHeight(window.innerHeight)
         }
@@ -101,8 +101,6 @@ export default function Login() {
     }
 
     const dependMobile = {
-        width: windowWidth - (windowWidth * 0.2),
-        height: windowHeight - (windowHeight * 0.3),
         header: mobile ? { fontSize: '1rem', marginTop: '0' } : {},
         cardHead: mobile ? { height: '130px' } : {},
         mobileStyle: mobile ? {
