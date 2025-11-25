@@ -29,7 +29,6 @@ class RwTransaksiController extends Controller
         // id RW dan nomor RW user sekarang pasti ada
         $idRw = $userRwData->id;
         $nomorRwUser = $userRwData->nomor_rw;
-        $idRw = Auth::user()->rw->id;
 
         $search = $request->search;
         $tahun = $request->tahun;
