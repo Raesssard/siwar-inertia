@@ -167,7 +167,7 @@ export default function Pengumuman() {
             <div className="d-flex align-items-center ms-3 me-3 mb-3 mt-0 w-100">
                 <i className="fas fa-bullhorn me-2 text-primary"></i>
                 {totalFiltered} Pengumuman
-                <Role role={['rt', 'rw', 'sekretaris']}>
+                <Role role={['admin', 'rt', 'rw', 'sekretaris']}>
                     <div className="ml-auto">
                         <button type="button" onClick={() => setShowModalTambah(true)} className="btn-input m-0 btn btn-sm btn-success">
                             <i className="fas fa-plus mr-2"></i>
