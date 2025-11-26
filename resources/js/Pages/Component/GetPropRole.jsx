@@ -851,6 +851,12 @@ export function getRtLinks() {
             icon: "wallet",
             children: [
                 {
+                    href: "/informasi_keuangan",
+                    text: "Informasi Keuangan",
+                    icon: "money-check-alt",
+                    permission: "view.iuran",
+                },
+                {
                     href: "/rt/iuran",
                     text: "Iuran",
                     icon: "file-invoice-dollar",
@@ -935,17 +941,20 @@ export function judul(role) {
             judulHalaman = "Dashboard"
         } else {
             switch (segment) {
-                case "kartu_keluarga":
-                    judulHalaman = "Data Kartu Keluarga"
-                    break
                 case "dashboard":
                     judulHalaman = "Dashboard"
+                    break
+                case "kartu_keluarga":
+                    judulHalaman = "Data Kartu Keluarga"
                     break
                 case "pengumuman":
                     judulHalaman = "Pengumuman"
                     break
                 case "tagihan":
                     judulHalaman = "Tagihan"
+                    break
+                case "informasi_keuangan":
+                    judulHalaman = "Informasi Keuangan"
                     break
                 case "iuran":
                     judulHalaman = "Iuran"
@@ -1005,6 +1014,9 @@ export function judul(role) {
                 case "keuangan":
                     judulHalaman = "Analisis Keuangan"
                     break
+                case "informasi_keuangan":
+                    judulHalaman = "Informasi Keuangan"
+                    break
                 default:
                     judulHalaman =
                         segment.charAt(0).toUpperCase() +
@@ -1035,6 +1047,9 @@ export function judul(role) {
                     break
                 case "permissions":
                     judulHalaman = "Permissions"
+                    break
+                case "informasi_keuangan":
+                    judulHalaman = "Informasi Keuangan"
                     break
                 default:
                     judulHalaman =

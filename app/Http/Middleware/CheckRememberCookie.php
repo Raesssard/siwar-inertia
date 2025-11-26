@@ -28,17 +28,13 @@ class CheckRememberCookie
             }
             $user = User::where('remember_custom_token', $token)->first();
 
-            Log::info("remember me checked");
             if ($user) {
-                Log::info("user valid", [$user]);
                 Auth::login($user);
                 $role = $user->last_role ?: $user->roles->pluck('name')->first();
-                Log::info("user role", [$role]);
 
                 session(['active_role' => $role]);
 
                 if ($request->is('login') || $request->is('/')) {
-                    Log::info("redirect to dashboard");
                     return redirect()->route('dashboard');
                 }
             }

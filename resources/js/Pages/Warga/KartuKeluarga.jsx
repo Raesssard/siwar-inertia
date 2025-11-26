@@ -2,7 +2,7 @@ import React, { useState } from "react"
 import Layout from "@/Layouts/Layout"
 import { Head, usePage } from "@inertiajs/react"
 import '../../../css/kartu-keluarga.css'
-import { formatTanggal } from "../Component/GetPropRole"
+import { formatTanggal, useIsMobile } from "../Component/GetPropRole"
 
 export default function KartuKeluarga() {
     const { title, kartuKeluarga } = usePage().props
@@ -19,6 +19,8 @@ export default function KartuKeluarga() {
             </Layout>
         )
     }
+
+    const mobile = useIsMobile();
 
     return (
         <Layout>
@@ -38,7 +40,7 @@ export default function KartuKeluarga() {
                             <div className="kk-header-top-line d-flex justify-content-between align-items-center">
                                 <div className="kk-header-right-reg text-end flex-grow-1">
                                     {kartuKeluarga.no_registrasi && (
-                                        <p className="mb-0 small">No. Registrasi:
+                                        <p className={`${mobile ? 'mb-0' : 'mb-2'} small`}>No. Registrasi:
                                             <strong>{kartuKeluarga.no_registrasi}</strong>
                                         </p>
                                     )}
