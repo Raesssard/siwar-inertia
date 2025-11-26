@@ -105,6 +105,21 @@ class RwRukunTetanggaController extends Controller
         }
 
         /**
+         * =========================================================================
+         * 🚫 VALIDASI BATAS MAKSIMAL RT DALAM SATU RW
+         * =========================================================================
+         */
+        $maxRT = Setting::where('key', 'max_rt_per_rw')->value('value') ?? 0;
+
+        $currentRTCount = Rt::where('id_rw', $request->id_rw)->count();
+
+        if ($maxRT > 0 && $currentRTCount >= $maxRT) {
+            return back()
+                ->with('error', "RW ini sudah memiliki jumlah RT maksimal ({$maxRT}). Tidak dapat menambah RT baru.")
+                ->withInput();
+        }
+        
+        /**
          * ===============================================================
          * 🚫 VALIDASI: Cegah Jabatan Ganda Aktif (SAMA DENGAN ADMIN)
          * ===============================================================
