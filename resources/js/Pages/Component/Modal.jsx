@@ -2347,6 +2347,19 @@ export function DetailKK({ selectedData, detailShow, onClose, role, userData }) 
     const [viewDoc, setViewDoc] = useState(null)
     const [selected, setSelected] = useState(null)
     const [showModal, setShowModal] = useState(false)
+    const [windowWidth, setWindowWidth] = useState(window.innerWidth)
+    const [windowHeight, setWindowHeight] = useState(window.innerHeight)
+
+    useEffect(() => {
+        function handleResize() {
+            setWindowWidth(window.innerWidth)
+            setWindowHeight(window.innerHeight)
+        }
+
+        window.addEventListener('resize', handleResize)
+        return () => window.removeEventListener('resize', handleResize)
+    }, [])
+
     const modalDetail = (item) => {
         setSelected(item)
         setShowModal(true)
@@ -2409,6 +2422,17 @@ export function DetailKK({ selectedData, detailShow, onClose, role, userData }) 
             })
     }
 
+    const mobile = useIsMobile();
+
+    const mobileStyle = mobile ? {
+        width: '90vw',
+        maxWidth: (windowWidth - (windowWidth * 0.2)) + 'px',
+        maxHeight: (windowHeight - (windowHeight * 0.2)) + 'px',
+        height: '80vh',         // pastikan ADA height fixed
+        overflowY: 'auto',      // biar scroll
+        margin: '19% auto',
+    } : {};
+
     return (
         <>
             <div
@@ -2418,10 +2442,8 @@ export function DetailKK({ selectedData, detailShow, onClose, role, userData }) 
                 onClick={onClose}
             >
                 <div
-                    className="modal-dialog modal-xl modal-dialog-scrollable modal-dialog-centered"
-                    style={{
-                        maxWidth: "80%",
-                    }}
+                    className={`modal-dialog modal-xl modal-dialog-scrollable ${mobile ? "" : "modal-dialog-centered"}`}
+                    style={mobileStyle}
                     onClick={(e) => e.stopPropagation()}
                 >
                     <div className="modal-content shadow border-0">
