@@ -64,7 +64,7 @@ export function FilterPengaduan({ data, setData, list_tahun, list_bulan, list_le
                     ))}
                 </select>
 
-                <button type="submit" className="btn-input btn btn-sm btn-primary flex-fill" title="Filter" style={{ maxWidth: '3rem' }}>
+                <button type="submit" className="btn-input btn btn-sm btn-primary flex-fill" title="Filter Pengaduan" style={{ maxWidth: '3rem' }}>
                     <i className="fas fa-filter"></i>
                 </button>
                 <Link
@@ -219,7 +219,7 @@ export function FilterTransaksi({ transaksi, data, setData, daftar_tahun, daftar
                         </option>
                     ))}
                 </select>
-                <button type="submit" className="btn-input btn btn-sm btn-primary flex-fill p-0" title="Filter Pengumuman" style={{ maxWidth: "3rem", minWidth: "3rem" }}>
+                <button type="submit" className="btn-input btn btn-sm btn-primary flex-fill p-0" title="Filter Transaksi" style={{ maxWidth: "3rem", minWidth: "3rem" }}>
                     <i className="fas fa-filter"></i>
                 </button>
                 <Link href={`/${role}/transaksi`} onClick={resetFilter} className="btn-input btn btn-secondary btn-sm flex-fill p-0 mx-0" title="Reset" style={{ maxWidth: "3rem", minWidth: "3rem" }}>
@@ -282,7 +282,7 @@ export function FilterTagihan({ tagihanManual, tagihanOtomatis, data, setData, f
                             </option>
                         ))}
                     </select>
-                    <button type="submit" className="btn-input btn btn-sm btn-primary flex-fill p-0 mx-0" title="Filter Warga" style={{ maxWidth: "3rem", minWidth: "3rem" }}>
+                    <button type="submit" className="btn-input btn btn-sm btn-primary flex-fill p-0 mx-0" title="Filter Tagihan" style={{ maxWidth: "3rem", minWidth: "3rem" }}>
                         <i className="fas fa-filter"></i>
                     </button>
                 </Role>
@@ -379,7 +379,7 @@ export function FilterKK({ data, setData, filter, resetFilter, role, totalKK }) 
                         className="form-control"
                         placeholder="Cari Nama Kepala Keluarga/Alamat/Nomor KK..."
                     />
-                    <button className="btn-filter btn btn-primary" type="submit">
+                    <button className="btn-filter btn btn-primary" title="Filter Kartu Keluarga" type="submit">
                         <i className="fas fa-search"></i>
                     </button>
                 </div>
@@ -431,7 +431,7 @@ export function FilterIuran({ iuranManual, iuranOtomatis, data, setData, filter,
                         className="form-control"
                         placeholder="Cari Data Iuran..."
                     />
-                    <button className="btn-filter btn btn-primary" type="submit">
+                    <button className="btn-filter btn btn-primary" title="Filter Iuran" type="submit">
                         <i className="fas fa-search"></i>
                     </button>
                 </div>
@@ -462,5 +462,179 @@ export function FilterIuran({ iuranManual, iuranOtomatis, data, setData, filter,
                 </Role>
             </Role>
         </form >
+    )
+}
+
+export function FilterLaporanKeuangan({ transaksi, data, setData, daftar_tahun, daftar_bulan, filter, resetFilter, role }) {
+    return (
+        <form onSubmit={filter} className="filter-form form-filter d-flex px-0 g-2 pb-2 mb-2 w-100">
+            <div className="col-md-5 col-12 pr-2">
+                <div className="input-group input-group-sm">
+                    <input
+                        type="text"
+                        name="search"
+                        value={data.search}
+                        onChange={(e) => setData('search', e.target.value)}
+                        className="form-control"
+                        placeholder="Cari Transaksi..."
+                    />
+                    <button className="btn-filter btn btn-primary my-0" type="submit">
+                        <i className="fas fa-search"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div className="d-flex flex-wrap gap-2">
+                <select
+                    name="tahun"
+                    value={data.tahun}
+                    onChange={(e) => setData('tahun', e.target.value)}
+                    className="form-select form-select-sm flex-fill my-2"
+                >
+                    <option value="">Semua Tahun</option>
+                    {daftar_tahun.map((th) => (
+                        <option key={th} value={th}>
+                            {th}
+                        </option>
+                    ))}
+                </select>
+
+                <select
+                    name="bulan"
+                    value={data.bulan}
+                    onChange={(e) => setData('bulan', e.target.value)}
+                    className="form-select form-select-sm flex-fill my-2"
+                >
+                    <option value="">Semua Bulan</option>
+                    {daftar_bulan.map((nama, index) => (
+                        <option key={index + 1} value={index + 1}>
+                            {nama.charAt(0).toUpperCase() + nama.slice(1)}
+                        </option>
+                    ))}
+                </select>
+                <select
+                    name="jenis"
+                    value={data.jenis}
+                    onChange={(e) => setData('jenis', e.target.value)}
+                    className="form-select form-select-sm flex-fill my-2"
+                >
+                    <option value="">Semua jenis</option>
+                    <option value="pemasukan">Pemasukan</option>
+                    <option value="pengeluaran">Pengeluaran</option>
+                </select>
+                <button type="submit" className="btn-input btn btn-sm btn-primary flex-fill p-0" title="Filter Laporan" style={{ maxWidth: "3rem", minWidth: "3rem" }}>
+                    <i className="fas fa-filter"></i>
+                </button>
+                <Link href={'/laporan-keuangan'} onClick={resetFilter} className="btn-input btn btn-secondary btn-sm flex-fill p-0 mx-0" title="Reset" style={{ maxWidth: "3rem", minWidth: "3rem" }}>
+                    <i className="fas fa-undo"></i>
+                </Link>
+                <button
+                    className="btn btn-success my-auto mr-3"
+                    type="button"
+                    title={!transaksi?.length ? "Tidak ada Transaksi yang dapat diexport" : "Export Transaksi ke Excel"}
+                    style={{ borderRadius: "0.2rem" }}
+                    onClick={() => window.location.href = `/${role}/export/transaksi`}
+                    // disabled={!transaksi?.length}
+                    disabled
+                >
+                    <i className="fas fa-file-excel"></i>
+                </button>
+            </div>
+        </form>
+    )
+}
+
+export function FilterLaporanPengaduan({ pengaduan, data, setData, daftar_tahun, daftar_bulan, filter, resetFilter, role }) {
+    return (
+        <form onSubmit={filter} className="filter-form form-filter d-flex px-0 g-2 pb-2 mb-2 w-100">
+            <div className="col-md-5 col-12 pr-2">
+                <div className="input-group input-group-sm">
+                    <input
+                        type="text"
+                        name="search"
+                        value={data.search}
+                        onChange={(e) => setData('search', e.target.value)}
+                        className="form-control"
+                        placeholder="Cari Pengaduan..."
+                    />
+                    <button className="btn-filter btn btn-primary my-0" type="submit">
+                        <i className="fas fa-search"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div className="d-flex flex-wrap gap-2">
+                <select
+                    name="tahun"
+                    value={data.tahun}
+                    onChange={(e) => setData('tahun', e.target.value)}
+                    className="form-select form-select-sm flex-fill my-2"
+                >
+                    <option value="">Semua Tahun</option>
+                    {daftar_tahun.map((th) => (
+                        <option key={th} value={th}>
+                            {th}
+                        </option>
+                    ))}
+                </select>
+
+                <select
+                    name="bulan"
+                    value={data.bulan}
+                    onChange={(e) => setData('bulan', e.target.value)}
+                    className="form-select form-select-sm flex-fill my-2"
+                >
+                    <option value="">Semua Bulan</option>
+                    {daftar_bulan.map((nama, index) => (
+                        <option key={index + 1} value={index + 1}>
+                            {nama.charAt(0).toUpperCase() + nama.slice(1)}
+                        </option>
+                    ))}
+                </select>
+
+                <select
+                    name="kategori"
+                    value={data.kategori}
+                    onChange={(e) => setData('kategori', e.target.value)}
+                    className="form-select form-select-sm flex-fill my-2"
+                >
+                    <option value="">Semua Pengaduan</option>
+                    <option value="rt">Pengaduan RT</option>
+                    <option value="rw">Pengaduan RW</option>
+                </select>
+
+                <select
+                    name="status"
+                    value={data.status}
+                    onChange={(e) => setData('status', e.target.value)}
+                    className="form-select form-select-sm flex-fill my-2"
+                >
+                    <option value="">Semua Status</option>
+                    <option value="belum">Belum</option>
+                    <option value="diproses">Diproses</option>
+                    <option value="selesai">Selesai</option>
+                </select>
+
+                <button type="submit" className="btn-input btn btn-sm btn-primary flex-fill p-0" title="Filter Pengumuman" style={{ maxWidth: "3rem", minWidth: "3rem" }}>
+                    <i className="fas fa-filter"></i>
+                </button>
+
+                <Link href={'/laporan-pengaduan'} onClick={resetFilter} className="btn-input btn btn-secondary btn-sm flex-fill p-0 mx-0" title="Reset" style={{ maxWidth: "3rem", minWidth: "3rem" }}>
+                    <i className="fas fa-undo"></i>
+                </Link>
+
+                <button
+                    className="btn btn-success my-auto mr-3"
+                    type="button"
+                    title={!pengaduan?.length ? "Tidak ada pengaduan yang dapat diexport" : "Export pengaduan ke Excel"}
+                    style={{ borderRadius: "0.2rem" }}
+                    onClick={() => window.location.href = `/${role}/export/pengaduan`}
+                    // disabled={!pengaduan?.length}
+                    disabled
+                >
+                    <i className="fas fa-file-excel"></i>
+                </button>
+            </div>
+        </form>
     )
 }

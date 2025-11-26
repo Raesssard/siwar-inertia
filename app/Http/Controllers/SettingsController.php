@@ -97,13 +97,13 @@ class SettingsController extends Controller
 
         // hapus foto lama
         if ($user->foto_profil && file_exists(public_path('uploads/profil/'.$user->foto_profil))) {
-            unlink(public_path('uploads/profil/'.$user->foto_profil));
+            unlink(public_path('storage/profil/'.$user->foto_profil));
         }
 
         // simpan foto baru
         $file = $request->file('foto_profil');
         $filename = time().'_'.$file->getClientOriginalName();
-        $file->move(public_path('uploads/profil/'), $filename);
+        $file->move(public_path('storage/profil/'), $filename);
 
         $user->foto_profil = $filename;
         $user->save();
