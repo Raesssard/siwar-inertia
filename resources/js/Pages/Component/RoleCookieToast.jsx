@@ -35,28 +35,30 @@ export default function RoleCookieToast({ user }) {
                     <button className="btn-close" onClick={hide}></button>
                 </div>
 
-                <div className="toast-body d-flex align-items-center gap-3">
+                <div className="toast-body d-flex align-items-center gap-3 py-1">
                     <i
                         className="fa-solid fa-cookie-bite"
                         style={{
                             position: 'relative',
                             fontSize: '48px',
-                            top: '25px',
+                            top: '15px',
                             opacity: '0.75'
                         }}
                     ></i>
 
                     <div>
-                        <strong>{user?.nama}</strong>, Anda tidak memilih untuk diingat saat login.<br />
-                        Jadi... mau kue ini? biar mudah diingat oleh kita.
+                        <p className="mb-0" style={{fontSize: '0.8rem'}}>
+                            <strong>{user?.nama}</strong>, Anda tidak memilih untuk diingat saat login.<br />
+                            Jadi... mau kue ini? biar mudah diingat oleh kita.
+                        </p>
                     </div>
                 </div>
 
                 <div className="d-flex justify-content-end gap-2 me-2">
-                    <button className="btn btn-sm btn-secondary" onClick={hide}>
+                    <button className="btn btn-sm btn-secondary mt-0" onClick={hide}>
                         Tidak, terima kasih
                     </button>
-                    <button className="btn btn-sm btn-primary" onClick={saveCookie}>
+                    <button className="btn btn-sm btn-primary mt-0" onClick={saveCookie}>
                         Terima
                     </button>
                 </div>
