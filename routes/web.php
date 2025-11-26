@@ -65,6 +65,8 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/request-cookie', [LoginController::class, 'requestCookie'])->name('request-cookie');
     Route::post('/reject-cookie', [LoginController::class, 'rejectCookie'])->name('reject-cookie');
     Route::resource('/informasi_keuangan', InformasiKeuangan::class)->only(['index']);
+    Route::get('/profile', [SettingsController::class, 'profile'])->name('profile');
+    Route::post('/profil/update-photo', [SettingsController::class, 'updatePhoto'])->name('profile.updatePhoto');
 
     /*
     |--------------------------------------------------------------------------
