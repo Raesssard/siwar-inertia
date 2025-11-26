@@ -29,6 +29,7 @@ class User extends Authenticatable
         'id_rw',
         'id_rt',
         'last_role',
+        'foto_profil',
     ];
 
     public function warga()
