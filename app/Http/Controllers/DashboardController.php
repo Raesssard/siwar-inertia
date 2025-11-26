@@ -38,6 +38,25 @@ class DashboardController extends Controller
         ];
 
         if ($role === 'admin') {
+
+            $jumlah_pengumuman_rw = Pengumuman::whereNotNull('id_rw')->count();
+            $jumlah_pengumuman_rt = Pengumuman::whereNotNull('id_rt')->count();
+
+            $total_pemasukan_transaksi = Transaksi::where('jenis', 'pemasukan')->sum('nominal');
+            $total_pengeluaran = Transaksi::where('jenis', 'pengeluaran')->sum('nominal');
+
+            // Total pemasukan keseluruhan
+            $total_pemasukan = $total_pemasukan_transaksi;
+
+            // Saldo akhir
+            $total_saldo_akhir = $total_pemasukan - $total_pengeluaran;
+
+            // Total iuran masuk bulan ini
+            $total_iuran_bulan_ini = Tagihan::where('status_bayar', 'sudah_bayar')
+                ->whereMonth('updated_at', Carbon::now()->month)
+                ->whereYear('updated_at', Carbon::now()->year)
+                ->sum('nominal');
+
             $data = array_merge(
                 $data,
                 [
@@ -50,6 +69,13 @@ class DashboardController extends Controller
                     'jumlah_golongan' => Kategori_golongan::count(),
                     'jumlah_roles' => Role::count(),
                     'jumlah_permissions' => Permission::count(),
+                    'jumlah_pengumuman_rw' => $jumlah_pengumuman_rw,
+                    'jumlah_pengumuman_rt' => $jumlah_pengumuman_rt,
+                    'jumlah_pengaduan' => Pengaduan::count(),
+                    'total_pemasukan' => $total_pemasukan,
+                    'total_pengeluaran' => $total_pengeluaran,
+                    'total_saldo_akhir' => $total_saldo_akhir,
+                    'total_iuran_bulan_ini' => $total_iuran_bulan_ini,
                 ]
             );
         }
