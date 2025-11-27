@@ -75,7 +75,7 @@ export default function InformasiPengaduan() {
                             <tr>
                                 <th className="px-3 text-center" scope="col">No.</th>
                                 <th className="px-3 text-center" scope="col">NIK</th>
-                                <th className="px-3 text-center" scope="col">Nama Pengadu</th>
+                                <th className="px-3 text-center" scope="col">Nama Pelapor</th>
                                 <th className="px-3 text-center" scope="col">Aduan</th>
                                 <th className="px-3 text-center" scope="col">Status</th>
                                 <th className="px-3 text-center" scope="col">Tanggal</th>
@@ -84,7 +84,7 @@ export default function InformasiPengaduan() {
                         <tbody>
                             {pengaduan?.length > 0 ? (
                                 pengaduan?.map((item, index) => (
-                                    <tr key={item.id}>{console.log(item)}
+                                    <tr key={item.id}>
                                         <td className="text-center">{index + 1}</td>
                                         <td className="text-center">{item.nik_warga ?? '-'}</td>
                                         <td className="text-center">{item.warga.nama ?? '-'}</td>

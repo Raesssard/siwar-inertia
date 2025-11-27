@@ -491,7 +491,7 @@ export function FilterLaporanKeuangan({ transaksi, data, setData, daftar_tahun, 
                     onChange={(e) => setData('tahun', e.target.value)}
                     className="form-select form-select-sm flex-fill my-2"
                 >
-                    <option value="">Semua Tahun</option>
+                    <option value="">Tahun ini</option>
                     {daftar_tahun.map((th) => (
                         <option key={th} value={th}>
                             {th}
@@ -505,7 +505,7 @@ export function FilterLaporanKeuangan({ transaksi, data, setData, daftar_tahun, 
                     onChange={(e) => setData('bulan', e.target.value)}
                     className="form-select form-select-sm flex-fill my-2"
                 >
-                    <option value="">Semua Bulan</option>
+                    <option value="">Bulan ini</option>
                     {daftar_bulan.map((nama, index) => (
                         <option key={index + 1} value={index + 1}>
                             {nama.charAt(0).toUpperCase() + nama.slice(1)}
@@ -528,7 +528,7 @@ export function FilterLaporanKeuangan({ transaksi, data, setData, daftar_tahun, 
                 <Link href={'/laporan-keuangan'} onClick={resetFilter} className="btn-input btn btn-secondary btn-sm flex-fill p-0 mx-0" title="Reset" style={{ maxWidth: "3rem", minWidth: "3rem" }}>
                     <i className="fas fa-undo"></i>
                 </Link>
-                <button
+                {/* <button
                     className="btn btn-success my-auto mr-3"
                     type="button"
                     title={!transaksi?.length ? "Tidak ada Transaksi yang dapat diexport" : "Export Transaksi ke Excel"}
@@ -538,7 +538,7 @@ export function FilterLaporanKeuangan({ transaksi, data, setData, daftar_tahun, 
                     disabled
                 >
                     <i className="fas fa-file-excel"></i>
-                </button>
+                </button> */}
             </div>
         </form>
     )
@@ -623,7 +623,7 @@ export function FilterLaporanPengaduan({ pengaduan, data, setData, daftar_tahun,
                     <i className="fas fa-undo"></i>
                 </Link>
 
-                <button
+                {/* <button
                     className="btn btn-success my-auto mr-3"
                     type="button"
                     title={!pengaduan?.length ? "Tidak ada pengaduan yang dapat diexport" : "Export pengaduan ke Excel"}
@@ -633,7 +633,7 @@ export function FilterLaporanPengaduan({ pengaduan, data, setData, daftar_tahun,
                     disabled
                 >
                     <i className="fas fa-file-excel"></i>
-                </button>
+                </button> */}
             </div>
         </form>
     )
