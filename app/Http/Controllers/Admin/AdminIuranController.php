@@ -80,13 +80,13 @@ class AdminIuranController extends Controller
                 'tgl_tempo' => 'required|date',
                 'jenis' => 'required|in:manual,otomatis',
                 'nominal' => 'required_if:jenis,manual|nullable|numeric|min:0|max:99999999',
-                'id_rw' => 'required|exists:rw,id',
+                // 'id_rw' => 'required|exists:rw,id',
                 'id_rt' => 'nullable|exists:rt,id',
             ]);
 
             // Buat iuran
             $iuran = Iuran::create([
-                'id_rw' => $request->id_rw,
+                'id_rw' => 1,
                 'id_rt' => $request->id_rt,
                 'nama' => $request->nama,
                 'tgl_tagih' => $request->tgl_tagih,
