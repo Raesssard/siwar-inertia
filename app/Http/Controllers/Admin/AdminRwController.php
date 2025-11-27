@@ -143,11 +143,14 @@ class AdminRwController extends Controller
         */
         if ($request->filled('nik') && $request->filled('nama_anggota_rw')) {
 
+            $warga = Warga::where('nik', $request->nik)->first();
+
             $user = User::create([
                 'nik'      => $request->nik,
                 'nama'     => $request->nama_anggota_rw,
                 'password' => Hash::make('password'),
                 'id_rw'    => $rw->id,
+                'id_rt'    => $warga?->id_rt, // ← otomatis isi dari data warga
             ]);
 
             /*

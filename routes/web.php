@@ -24,6 +24,8 @@ use App\Http\Controllers\Admin\{
     AdminRoleController,
     AdminWargaController,
     AdminKartuKeluargaController,
+    AdminPengaduanController,
+    AdminPengumumanController,
 };
 use App\Http\Controllers\Rt\{
     ExportController,
@@ -148,6 +150,48 @@ Route::middleware(['auth'])->group(function () {
             Route::get('warga/{id}/edit', [AdminWargaController::class, 'edit'])
                 ->middleware(CheckPermission::class . ':edit.warga')
                 ->name('warga.edit');
+
+            // 📢 Pengumuman (ADMIN)
+            Route::resource('pengumuman', AdminPengumumanController::class)
+                ->except(['create', 'edit', 'show'])
+                ->middleware(CheckPermission::class . ':view.pengumuman');
+
+            Route::get('pengumuman/create', [AdminPengumumanController::class, 'create'])
+                ->middleware(CheckPermission::class . ':create.pengumuman')
+                ->name('pengumuman.create');
+
+            Route::get('pengumuman/{id}/edit', [AdminPengumumanController::class, 'edit'])
+                ->middleware(CheckPermission::class . ':edit.pengumuman')
+                ->name('pengumuman.edit');
+
+            Route::get('pengumuman/{id}/export-pdf', [AdminPengumumanController::class, 'exportPDF'])
+                ->middleware(CheckPermission::class . ':export.pengumuman')
+                ->name('pengumuman.export.pdf');
+
+            Route::post('pengumuman/{id}/komentar', [AdminPengumumanController::class, 'komen'])
+                ->middleware(CheckPermission::class . ':view.pengumuman')
+                ->name('pengumuman.komentar.komen');
+
+                // 📮 Pengaduan (ADMIN)
+            Route::get('pengaduan', [AdminPengaduanController::class, 'index'])
+                ->middleware(CheckPermission::class . ':view.pengaduan')
+                ->name('pengaduan.index');
+
+            Route::put('pengaduan/{id}/status', [AdminPengaduanController::class, 'updateStatus'])
+                ->middleware(CheckPermission::class . ':respond.pengaduan')
+                ->name('pengaduan.updateStatus');
+
+            Route::put('pengaduan/{id}/konfirmasi', [AdminPengaduanController::class, 'updateKonfirmasi'])
+                ->middleware(CheckPermission::class . ':confirm.pengaduan')
+                ->name('pengaduan.updateKonfirmasi');
+
+            Route::post('pengaduan/{id}/komentar', [AdminPengaduanController::class, 'komen'])
+                ->middleware(CheckPermission::class . ':view.pengaduan')
+                ->name('pengaduan.komentar.komen');
+
+            Route::post('pengaduan/{id}/baca', [AdminPengaduanController::class, 'baca'])
+                ->middleware(CheckPermission::class . ':view.pengaduan')
+                ->name('pengaduan.baca');
 
             // ⚙️ Kategori Golongan
             Route::resource('kategori-golongan', AdminKategoriGolonganController::class)

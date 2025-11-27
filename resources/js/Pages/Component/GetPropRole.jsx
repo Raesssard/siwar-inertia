@@ -328,6 +328,35 @@ export function getAdminCards({ ...rest }) {
                 },
             ]
         },
+        {
+            kategori: 'Informasi',
+            isi: [
+                {
+                    href: "/admin/pengaduan",
+                    color: "warning",
+                    title: "Pengaduan",
+                    value: rest.pengaduan,
+                    icon: "paper-plane",
+                    permission: "view.pengaduan",
+                },
+                {
+                    href: "/admin/pengumuman",
+                    color: "warning",
+                    title: "Pengumuman RW",
+                    value: rest.pengumuman_rw,
+                    icon: "comments",
+                    permission: "view.pengumuman",
+                },
+                {
+                    href: "/admin/pengumuman",
+                    color: "warning",
+                    title: "Pengumuman RT",
+                    value: rest.pengumuman_rt,
+                    icon: "clipboard-list",
+                    permission: "view.pengumuman",
+                },
+            ],
+        },
     ];
 }
 
@@ -396,6 +425,18 @@ export function getAdminLinks() {
                 "view.role",
                 "view.permission",
             ]
+        },
+        {
+            href: "/admin/pengumuman",
+            text: "Pengumuman",
+            icon: "bullhorn",
+            permission: "view.pengumuman",
+        },
+        {
+            href: "/admin/pengaduan",
+            text: "Pengaduan",
+            icon: "paper-plane",
+            permission: "view.pengaduan",
         },
     ];
 }
@@ -584,7 +625,7 @@ export function getRwCards({ ...rest }) {
                     permission: "view.pengumuman",
                 },
                 {
-                    href: "/rw/pengumuman-rt",
+                    href: "/rw/pengumuman",
                     color: "warning",
                     title: "Pengumuman RT",
                     value: rest.pengumuman_rt,
