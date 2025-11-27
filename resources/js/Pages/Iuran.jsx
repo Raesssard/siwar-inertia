@@ -114,7 +114,7 @@ export default function Iuran() {
                             <td className="text-end">{formatRupiah(matched.nominal)}</td>
                             <td className="text-center">{formatTanggal(item.tgl_tagih) ?? '-'}</td>
                             <td className="text-center">{formatTanggal(item.tgl_tempo) ?? '-'}</td>
-                            <Role role={['rw', 'bendahara']}>
+                            <Role role={['rw', 'bendahara', 'admin']}>
                                 <td className="text-center">
                                     <div className="d-flex justify-content-center align-items-center gap-2">
                                         <button
@@ -170,7 +170,7 @@ export default function Iuran() {
                                 <th className="px-3 text-center" scope="col">Nominal</th>
                                 <th className="px-3 text-center" scope="col">Tanggal Tagih</th>
                                 <th className="px-3 text-center" scope="col">Tanggal Tempo</th>
-                                <Role role={['rw', 'bendahara']}>
+                                <Role role={['rw', 'bendahara', 'admin']}>
                                     <th className="px-3 text-center" scope="col">Aksi</th>
                                 </Role>
                             </tr>
@@ -184,7 +184,7 @@ export default function Iuran() {
                                         <td className="text-end">{formatRupiah(item.nominal) ?? '-'}</td>
                                         <td className="text-center">{formatTanggal(item.tgl_tagih) ?? '-'}</td>
                                         <td className="text-center">{formatTanggal(item.tgl_tempo) ?? '-'}</td>
-                                        <Role role={['rw', 'bendahara']}>
+                                        <Role role={['rw', 'bendahara', 'admin']}>
                                             <td className="text-center">
                                                 <div className="d-flex justify-content-center align-items-center gap-2">
                                                     <button
@@ -257,7 +257,7 @@ export default function Iuran() {
                                 <th className="px-3 text-center" scope="col">Nominal</th>
                                 <th className="px-3 text-center" scope="col">Tanggal Tagih</th>
                                 <th className="px-3 text-center" scope="col">Tanggal Tempo</th>
-                                <Role role={['rw', 'bendahara']}>
+                                <Role role={['rw', 'bendahara', 'admin']}>
                                     <th className="px-3 text-center" scope="col">Aksi</th>
                                 </Role>
                             </tr>

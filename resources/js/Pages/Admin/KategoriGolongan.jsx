@@ -107,7 +107,7 @@ export default function KategoriGolongan({ kategori, filters, title }) {
                 <div className="table-header d-flex justify-content-between align-items-center">
                     <h4>Manajemen Kategori Golongan</h4>
                     <button
-                        className="btn btn-primary btn-sm"
+                        className="btn btn-success btn-sm"
                         onClick={() => setShowAdd(true)}
                     >
                         Tambah Kategori
