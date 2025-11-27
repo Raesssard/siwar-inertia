@@ -89,9 +89,7 @@ export default function Transaksi() {
         });
     };
 
-    console.log({ list_kk });
-
-    return (
+        return (
         <Layout>
             <Head title={`${title} - ${role.length <= 2
                 ? role.toUpperCase()

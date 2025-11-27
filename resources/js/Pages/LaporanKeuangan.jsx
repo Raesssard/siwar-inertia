@@ -12,6 +12,9 @@ export default function LaporanKeuangan() {
         transaksi: transaksiFromServer,
         daftar_tahun,
         daftar_bulan,
+        totalPemasukan,
+        totalPengeluaran,
+        totalKeuangan,
     } = usePage().props
     const { props } = usePage()
     const role = props.auth.currentRole
@@ -19,30 +22,67 @@ export default function LaporanKeuangan() {
     const [pemasukan, setPemasukan] = useState(pemasukanFromServer?.data || [])
     const [pengeluaran, setPengeluaran] = useState(pengeluaranFromServer?.data || [])
     const [transaksi, setTransaksi] = useState(transaksiFromServer?.data || [])
-    const { get, data, setData } = useForm({
+    const { get, data, setData, reset } = useForm({
         search: '',
         tahun: '',
         bulan: '',
         jenis: '',
     })
+    const tahunIni = new Date().getFullYear()
+    const bulanIni = daftar_bulan.find((b, index) => index + 1 == new Date().getMonth() + 1)
+    const [bulan, setBulan] = useState(bulanIni)
+    const [tahun, setTahun] = useState(new Date().getFullYear())
 
     const filter = (e) => {
+        setBulan(() => {
+            if (data.bulan) {
+                return daftar_bulan.find((b, index) => index + 1 == data.bulan)
+            } else {
+                return bulanIni
+            }
+        })
+        setTahun(data.tahun || tahunIni)
         e.preventDefault()
         get('/laporan-keuangan', { preserveState: true, preserveScroll: true })
     }
 
     const resetFilter = () => {
-        setData({
-            search: '',
-            tahun: '',
-            bulan: '',
-            jenis: '',
-        })
+        reset()
+        setTahun(tahunIni)
+        setBulan(bulanIni)
     }
+
+    useEffect(() => {
+        const bulanTerpilih = daftar_bulan[data.bulan - 1] || bulanIni
+        setBulan(bulanTerpilih)
+    }, [transaksiFromServer])
 
     useEffect(() => {
         setTransaksi(transaksiFromServer.data)
     }, [transaksiFromServer])
+
+    const batasNominal = {
+        borderLeft: '1px solid lightGray',
+        borderRight: '1px solid lightGray'
+    }
+
+    const formatKeterangan = () => {
+        if (!bulan) return tahun === tahunIni ? "ini" : tahun
+
+        const bulanUpper = bulan.replace(/\b\w/g, char => char.toUpperCase())
+
+        if (bulan === bulanIni && tahun === tahunIni) {
+            return "ini"
+        }
+
+        if (tahun === tahunIni) {
+            return bulanUpper
+        }
+
+        return `${bulanUpper} ${tahun}`
+    }
+
+    const keteranganBulan = formatKeterangan()
 
     return (
         <Layout>
@@ -59,7 +99,7 @@ export default function LaporanKeuangan() {
                 resetFilter={resetFilter}
                 role={role}
             />
-            <div className="table-container">
+            <div className="table-container" style={{ maxHeight: 'none', height: '60vh' }}>
                 <div className="table-header">
                     <h4>Laporan Keuangan{' '}
                         {
@@ -71,49 +111,62 @@ export default function LaporanKeuangan() {
                         }
                     </h4>
                 </div>
-                <div className="table-scroll">
+                <div className="table-scroll" style={{ maxHeight: '40vh', height: '40vh' }}>
                     <table className="table-custom">
                         <thead>
                             <tr>
                                 <th className="px-3 text-center" scope="col">No.</th>
-                                <th className="px-3 text-center" scope="col">Nama</th>
-                                <th className="px-3 text-center" scope="col">Nominal</th>
                                 <th className="px-3 text-center" scope="col">Tanggal</th>
-                                <th className="px-3 text-center" scope="col">Jenis</th>
+                                <th className="px-3 text-center" scope="col">Nama</th>
+                                {/* <th className="px-3 text-center" scope="col">Jenis</th> */}
+                                <th className="px-3 text-center" style={batasNominal} scope="col">Pemasukan</th>
+                                <th className="px-3 text-center" style={batasNominal} scope="col">Pengeluaran</th>
+                                <th className="px-3 text-center" style={batasNominal} scope="col">Jumlah</th>
                             </tr>
                         </thead>
                         <tbody>
                             {transaksi?.length > 0 ? (
-                                transaksi?.map((item, index) => (
-                                    <tr key={item.id}>{console.log(item)}
-                                        <td className="text-center">{index + 1}</td>
-                                        <td className="text-center">{item.nama_transaksi ?? '-'}</td>
-                                        <td className="text-center">{formatRupiah(item.nominal) ?? '-'}</td>
-                                        <td className="text-center">{formatTanggal(item.tanggal)}</td>
-                                        <td className="text-center">
-                                            {item.jenis === 'pemasukan' ? (
-                                                <span className="badge bg-success text-white">Pemasukkan</span>
-                                            ) : (
-                                                <span className="badge bg-danger text-white">Pengeluaran</span>
-                                            )}
-                                        </td>
-                                    </tr>
-                                ))
+                                <>
+                                    {transaksi.map((item, index) => (
+                                        <tr key={item.id}>
+                                            <td className="text-center">{index + 1}</td>
+                                            <td className="text-center">{formatTanggal(item.tanggal)}</td>
+                                            <td className="text-center">{item.nama_transaksi ?? '-'}</td>
+                                            {/* <td className="text-center">
+                                                {item.jenis === 'pemasukan' ? (
+                                                    <span className="badge bg-success text-white">Pemasukan</span>
+                                                ) : (
+                                                    <span className="badge bg-danger text-white">Pengeluaran</span>
+                                                )}
+                                            </td> */}
+                                            <td className="text-end" style={batasNominal}>{item.jenis === 'pemasukan' ? formatRupiah(item.nominal) : '-'}</td>
+                                            <td className="text-end" style={batasNominal}>{item.jenis === 'pengeluaran' ? formatRupiah(item.nominal) : '-'}</td>
+                                            <td style={{ ...batasNominal, borderBottom: 'none', borderTop: 'none' }}></td>
+                                        </tr>
+                                    ))}
+
+                                </>
                             ) : (
                                 <tr>
-                                    <td colSpan="5" className="text-center">
-                                        Tidak ada data
-                                    </td>
+                                    <td colSpan="6" className="text-center">Tidak ada data</td>
                                 </tr>
                             )}
                         </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colSpan="3" className="text-start" style={{ fontWeight: '500' }}>Total Keuangan Bulan {keteranganBulan}</td>
+                                <td className="text-end" style={batasNominal}>{totalPemasukan ? formatRupiah(totalPemasukan) : '-'}</td>
+                                <td className="text-end" style={batasNominal}>{totalPengeluaran ? formatRupiah(totalPengeluaran) : '-'}</td>
+                                <td className="text-end" style={batasNominal}>{totalKeuangan ? formatRupiah(totalKeuangan) : '-'}</td>
+                            </tr>
+                        </tfoot>
                     </table>
                 </div>
                 {transaksiFromServer.links && (
                     <div className="pagination-container">
                         <ul className="pagination-custom">
                             {transaksiFromServer.links.map((link, index) => {
-                                let label = link.label;
+                                let label = link.label
                                 if (label.includes("Previous")) label = "&lt;"
                                 if (label.includes("Next")) label = "&gt;"
 
@@ -132,7 +185,7 @@ export default function LaporanKeuangan() {
                                             title={`Pergi ke halaman ${label === "&lt;" ? 'sebelumnya' : label === "&gt;" ? 'selanjutnya' : label}`}
                                         />
                                     </li>
-                                );
+                                )
                             })}
                         </ul>
                     </div>
@@ -184,7 +237,7 @@ export default function LaporanKeuangan() {
                     <div className="pagination-container">
                         <ul className="pagination-custom">
                             {pengeluaranFromServer.links.map((link, index) => {
-                                let label = link.label;
+                                let label = link.label
                                 if (label.includes("Previous")) label = "&lt;"
                                 if (label.includes("Next")) label = "&gt;"
 
@@ -203,12 +256,12 @@ export default function LaporanKeuangan() {
                                             title={`Pergi ke halaman ${label === "&lt;" ? 'sebelumnya' : label === "&gt;" ? 'selanjutnya' : label}`}
                                         />
                                     </li>
-                                );
+                                )
                             })}
                         </ul>
                     </div>
                 )}
             </div> */}
-        </Layout>
+        </Layout >
     )
 }

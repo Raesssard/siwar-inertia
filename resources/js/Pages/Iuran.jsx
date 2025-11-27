@@ -111,7 +111,7 @@ export default function Iuran() {
                             <td className="text-center">
                                 {gol.jenis.charAt(0).toUpperCase() + gol.jenis.slice(1)}
                             </td>
-                            <td className="text-center">{formatRupiah(matched.nominal)}</td>
+                            <td className="text-end">{formatRupiah(matched.nominal)}</td>
                             <td className="text-center">{formatTanggal(item.tgl_tagih) ?? '-'}</td>
                             <td className="text-center">{formatTanggal(item.tgl_tempo) ?? '-'}</td>
                             <Role role={['rw', 'bendahara']}>
@@ -181,7 +181,7 @@ export default function Iuran() {
                                     <tr key={item.id}>
                                         <td className="text-center">{index + 1}</td>
                                         <td className="text-center">{item.nama ?? '-'}</td>
-                                        <td className="text-center">{formatRupiah(item.nominal) ?? '-'}</td>
+                                        <td className="text-end">{formatRupiah(item.nominal) ?? '-'}</td>
                                         <td className="text-center">{formatTanggal(item.tgl_tagih) ?? '-'}</td>
                                         <td className="text-center">{formatTanggal(item.tgl_tempo) ?? '-'}</td>
                                         <Role role={['rw', 'bendahara']}>

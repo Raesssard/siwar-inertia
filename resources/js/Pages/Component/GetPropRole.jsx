@@ -753,6 +753,24 @@ export function getRwLinks() {
             ],
         },
         {
+            text: "Laporan",
+            icon: "file-alt",
+            children: [
+                {
+                    href: "/laporan-keuangan",
+                    text: "Laporan Keuangan",
+                    icon: "money-check-alt",
+                    permission: "view.transaksi",
+                },
+                {
+                    href: "/laporan-pengaduan",
+                    text: "Laporan Pengaduan",
+                    icon: "file-contract",
+                    permission: "view.pengaduan",
+                },
+            ]
+        },
+        {
             href: "/rw/pengumuman",
             text: "Pengumuman",
             icon: "bullhorn",
@@ -1044,8 +1062,10 @@ export function judul(role) {
                     break
                 default:
                     judulHalaman =
-                        segment.charAt(0).toUpperCase() +
-                        segment.slice(1).replace(/-/g, " ")
+                        segment
+                            .replace(/[-_]+/g, " ")
+                            .trim()
+                            .replace(/\b\w/g, (char) => char.toUpperCase());
             }
         }
     }
@@ -1132,8 +1152,10 @@ export function judul(role) {
                     break
                 default:
                     judulHalaman =
-                        segment.charAt(0).toUpperCase() +
-                        segment.slice(1).replace(/-/g, " ")
+                        segment
+                            .replace(/[-_]+/g, " ")
+                            .trim()
+                            .replace(/\b\w/g, (char) => char.toUpperCase());
             }
         }
     }
@@ -1166,8 +1188,10 @@ export function judul(role) {
                     break
                 default:
                     judulHalaman =
-                        segment.charAt(0).toUpperCase() +
-                        segment.slice(1).replace(/-/g, " ")
+                        segment
+                            .replace(/[-_]+/g, " ")
+                            .trim()
+                            .replace(/\b\w/g, (char) => char.toUpperCase());
             }
         }
     }
