@@ -435,6 +435,30 @@ export function getAdminLinks() {
             ]
         },
         {
+            text: "Keuangan",
+            icon: "wallet",
+            children: [
+                {
+                    href: "/admin/iuran",
+                    text: "Iuran Warga",
+                    icon: "file-invoice-dollar",
+                    permission: "view.iuran",
+                },
+                {
+                    href: "/admin/tagihan",
+                    text: "Tagihan Warga",
+                    icon: "hand-holding-usd",
+                    permission: "view.tagihan",
+                },
+                {
+                    href: "/admin/transaksi",
+                    text: "Transaksi Warga",
+                    icon: "money-bill-wave",
+                    permission: "view.transaksi",
+                },
+            ],
+        },
+        {
             text: "Pengaturan Sistem",
             icon: "cog",
             children: [

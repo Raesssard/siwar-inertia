@@ -26,6 +26,9 @@ use App\Http\Controllers\Admin\{
     AdminKartuKeluargaController,
     AdminPengaduanController,
     AdminPengumumanController,
+    AdminTagihanController,
+    AdminTransaksiController,
+    AdminIuranController,
 };
 use App\Http\Controllers\Rt\{
     ExportController,
@@ -192,6 +195,34 @@ Route::middleware(['auth'])->group(function () {
             Route::post('pengaduan/{id}/baca', [AdminPengaduanController::class, 'baca'])
                 ->middleware(CheckPermission::class . ':view.pengaduan')
                 ->name('pengaduan.baca');
+
+            Route::resource('tagihan', AdminTagihanController::class)
+                ->except(['create', 'edit', 'show'])
+                ->middleware(CheckPermission::class . ':view.tagihan');
+
+            Route::get('export/tagihan', [ExportController::class, 'exportTagihan'])
+                ->middleware(CheckPermission::class . ':export.tagihan')
+                ->name('tagihan.export');
+
+            Route::resource('transaksi', AdminTransaksiController::class)
+                ->except(['create', 'edit', 'show'])
+                ->middleware(CheckPermission::class . ':view.transaksi');
+
+            Route::get('export/transaksi', [ExportController::class, 'exportTransaksi'])
+                ->middleware(CheckPermission::class . ':export.transaksi')
+                ->name('transaksi.export');
+
+            Route::resource('iuran', AdminIuranController::class)
+                ->except(['destroy'])
+                ->middleware(CheckPermission::class . ':view.iuran');
+
+            Route::delete('iuran/{id}/{jenis}', [AdminIuranController::class, 'destroy'])
+                ->middleware(CheckPermission::class . ':delete.iuran')
+                ->name('iuran.destroy');
+
+            Route::get('export/iuran', [ExportController::class, 'exportIuran'])
+                ->middleware(CheckPermission::class . ':export.iuran')
+                ->name('iuran.export');
 
             // ⚙️ Kategori Golongan
             Route::resource('kategori-golongan', AdminKategoriGolonganController::class)

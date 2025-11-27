@@ -42,6 +42,11 @@ class Kartu_keluarga extends Model
     {
         return $this->belongsTo(Rt::class, 'id_rt', 'id');
     }
+    
+    public function rt(): BelongsTo
+    {
+        return $this->belongsTo(Rt::class, 'id_rt', 'id');
+    }
 
     public function rw(): BelongsTo
     {

@@ -226,7 +226,7 @@ export function FilterTransaksi({ transaksi, data, setData, daftar_tahun, daftar
                     <i className="fas fa-undo"></i>
                 </Link>
             </div>
-            <Role role={['rt', 'rw']}>
+            <Role role={['rt', 'rw', 'bendahara', 'admin']}>
                 <button
                     className="btn btn-success my-auto mr-3"
                     type="button"
@@ -291,7 +291,7 @@ export function FilterTagihan({ tagihanManual, tagihanOtomatis, data, setData, f
                 </Link>
             </div>
 
-            <Role role={['rt', 'rw']}>
+            <Role role={['bendahara', 'rt', 'rw', 'admin']}>
                 <button
                     className="btn btn-success my-auto mr-3"
                     type="button"
@@ -349,7 +349,7 @@ export function FilterWarga({ data, setData, filter, resetFilter, role, total_wa
                 <Link href={`/${role}/warga`} onClick={resetFilter} className="btn-input btn btn-secondary btn-sm flex-fill p-0 mx-0" title="Reset" style={{ maxWidth: "3rem", minWidth: "3rem" }}>
                     <i className="fas fa-undo"></i>
                 </Link>
-                <Role role={['rt', 'rw']}>
+                <Role role={['rt', 'rw', 'sekretaris', 'admin']}>
                     <button
                         className="btn btn-success my-auto mr-3"
                         type="button"
@@ -397,7 +397,7 @@ export function FilterKK({ data, setData, filter, resetFilter, role, totalKK }) 
                     }}>
                     <i className="fas fa-undo"></i>
                 </Link>
-                <Role role={['rt', 'rw']}>
+                <Role role={['rt', 'rw', 'sekretaris', 'admin']}>
                     <button
                         className="btn btn-success my-auto mr-3"
                         type="button"
@@ -441,7 +441,7 @@ export function FilterIuran({ iuranManual, iuranOtomatis, data, setData, filter,
                 <i className="fas fa-undo"></i>
             </Link>
 
-            <Role role={['rt', 'rw', 'bendahara']}>
+            <Role role={['rt', 'rw', 'bendahara', 'admin']}>
                 <button
                     className="btn btn-success my-auto mr-3"
                     type="button"
@@ -452,7 +452,7 @@ export function FilterIuran({ iuranManual, iuranOtomatis, data, setData, filter,
                 >
                     <i className="fas fa-file-excel"></i>
                 </button>
-                <Role role={['rw', 'bendahara']}>
+                <Role role={['rw', 'bendahara' , 'admin']}>
                     <div className="text-end ml-auto mr-3">
                         <button type="button" onClick={() => tambahShow()} className="btn-input btn btn-sm btn-success">
                             <i className="fas fa-plus mr-2"></i>
