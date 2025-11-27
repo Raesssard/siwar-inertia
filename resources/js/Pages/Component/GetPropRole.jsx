@@ -929,12 +929,6 @@ export function getRtLinks() {
             icon: "wallet",
             children: [
                 {
-                    href: "/informasi_keuangan",
-                    text: "Informasi Keuangan",
-                    icon: "money-check-alt",
-                    permission: "view.iuran",
-                },
-                {
                     href: "/rt/iuran",
                     text: "Iuran",
                     icon: "file-invoice-dollar",
@@ -957,6 +951,24 @@ export function getRtLinks() {
                 "view.iuran",
                 "view.tagihan",
                 "view.transaksi",
+            ]
+        },
+        {
+            text: "Laporan",
+            icon: "file-alt",
+            children: [
+                {
+                    href: "/laporan-keuangan",
+                    text: "Laporan Keuangan",
+                    icon: "money-check-alt",
+                    permission: "view.transaksi",
+                },
+                {
+                    href: "/laporan-pengaduan",
+                    text: "Laporan Pengaduan",
+                    icon: "file-contract",
+                    permission: "view.pengaduan",
+                },
             ]
         },
         {
@@ -1031,9 +1043,6 @@ export function judul(role) {
                 case "tagihan":
                     judulHalaman = "Tagihan"
                     break
-                case "informasi_keuangan":
-                    judulHalaman = "Informasi Keuangan"
-                    break
                 case "iuran":
                     judulHalaman = "Iuran"
                     break
@@ -1051,8 +1060,10 @@ export function judul(role) {
                     break
                 default:
                     judulHalaman =
-                        segment.charAt(0).toUpperCase() +
-                        segment.slice(1).replace(/-/g, " ")
+                        segment
+                            .replace(/[-_]+/g, " ")
+                            .trim()
+                            .replace(/\b\w/g, (char) => char.toUpperCase());
             }
         }
     }
