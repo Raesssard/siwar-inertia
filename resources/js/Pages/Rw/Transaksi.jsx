@@ -89,7 +89,7 @@ export default function Transaksi() {
         });
     };
 
-        return (
+    return (
         <Layout>
             <Head title={`${title} - ${role.length <= 2
                 ? role.toUpperCase()
@@ -165,6 +165,34 @@ export default function Transaksi() {
                         </tbody>
                     </table>
                 </div>
+                {transaksiFromServer.links && (
+                    <div className="pagination-container">
+                        <ul className="pagination-custom">
+                            {transaksiFromServer.links.map((link, index) => {
+                                let label = link.label;
+                                if (label.includes("Previous")) label = "&lt;";
+                                if (label.includes("Next")) label = "&gt;";
+
+                                return (
+                                    <li
+                                        key={index}
+                                        className={`page-item ${link.active ? "active" : ""} ${!link.url ? "disabled" : ""
+                                            }`}
+                                        style={{ cursor: !link.url ? "not-allowed" : "pointer" }}
+                                    >
+                                        <Link
+                                            href={link.url || ""}
+                                            dangerouslySetInnerHTML={{
+                                                __html: label,
+                                            }}
+                                            title={`Pergi ke halaman ${label === "&lt;" ? 'sebelumnya' : label === "&gt;" ? 'selanjutnya' : label}`}
+                                        />
+                                    </li>
+                                );
+                            })}
+                        </ul>
+                    </div>
+                )}
             </div>
             <TambahTransaksiPerKk
                 listKK={list_kk}

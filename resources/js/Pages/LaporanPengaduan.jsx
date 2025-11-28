@@ -62,7 +62,7 @@ export default function InformasiPengaduan() {
                     <h4>Laporan Pengaduan Warga{' '}
                         {
                             role === 'rt'
-                                ? `RT ${user.rukun_tetangga.nomor_rt}`
+                                ? `RT ${user.rukun_tetangga.nomor_rt}/RW ${user.rw.nomor_rw}`
                                 : role === 'rw'
                                     ? `RW ${user.rw.nomor_rw}`
                                     : ''
@@ -74,11 +74,11 @@ export default function InformasiPengaduan() {
                         <thead>
                             <tr>
                                 <th className="px-3 text-center" scope="col">No.</th>
+                                <th className="px-3 text-center" scope="col">Tanggal</th>
                                 <th className="px-3 text-center" scope="col">NIK</th>
                                 <th className="px-3 text-center" scope="col">Nama Pelapor</th>
                                 <th className="px-3 text-center" scope="col">Aduan</th>
                                 <th className="px-3 text-center" scope="col">Status</th>
-                                <th className="px-3 text-center" scope="col">Tanggal</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -86,6 +86,7 @@ export default function InformasiPengaduan() {
                                 pengaduan?.map((item, index) => (
                                     <tr key={item.id}>
                                         <td className="text-center">{index + 1}</td>
+                                        <td className="text-center">{formatTanggal(item.created_at)}</td>
                                         <td className="text-center">{item.nik_warga ?? '-'}</td>
                                         <td className="text-center">{item.warga.nama ?? '-'}</td>
                                         <td className="text-center">{item.judul ?? '-'}</td>
@@ -98,7 +99,6 @@ export default function InformasiPengaduan() {
                                                 <span className="badge bg-danger text-white">Belum</span>
                                             )}
                                         </td>
-                                        <td className="text-center">{formatTanggal(item.created_at)}</td>
                                     </tr>
                                 ))
                             ) : (
