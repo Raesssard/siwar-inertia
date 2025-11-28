@@ -5814,7 +5814,7 @@ export function TambahTransaksiPerKk({ listKK = [], tambahShow, onClose, onAdded
                             <div className="d-flex tambah-body flex-column" style={{ width: "100%", maxHeight: "80vh", overflowY: "auto" }}>
                                 <div className="p-3">
                                     <form onSubmit={handleSubmit} className="h-100" id="transaksi">
-                                        <Role role='rw'>
+                                        <Role role={['rw', 'admin', 'bendahara']}>
                                             <div className="mb-3">
                                                 <label className="form-label">RT</label>
                                                 <select
@@ -5902,7 +5902,7 @@ export function TambahTransaksiPerKk({ listKK = [], tambahShow, onClose, onAdded
                                             />
                                         </div>
 
-                                        <Role role={['rw', 'bendahara']}>
+                                        <Role role={['rw', 'bendahara', 'admin']}>
                                             <div className="mb-3">
                                                 <label className="form-label">Jenis Transaksi</label>
                                                 <select

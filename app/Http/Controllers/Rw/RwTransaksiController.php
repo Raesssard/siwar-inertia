@@ -78,7 +78,7 @@ class RwTransaksiController extends Controller
             ->orderBy('no_kk')
             ->get();
 
-        return Inertia::render('Rw/Transaksi', [
+        return Inertia::render('Transaksi', [
             'title' => $title,
             'transaksi' => $transaksi,
             'daftar_tahun' => $daftar_tahun,
