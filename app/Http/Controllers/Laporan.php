@@ -41,19 +41,6 @@ class Laporan extends Controller
                 ->when($tahun, fn($q) => $q->whereYear('tanggal', $tahun))
                 ->when($bulan, fn($q) => $q->whereMonth('tanggal', $bulan))
                 ->when($jenis, fn($q) => $q->where('jenis', $jenis));
-
-            if (!$bulan) {
-                $transaksi->whereMonth('tanggal', now()->month);
-            }
-
-            if (!$tahun) {
-                $transaksi->whereYear('tanggal', now()->year);
-            }
-
-            $allTransaksi = (clone $transaksi)->paginate(10, ['*'], 'transaksi_page');
-
-            $pemasukan = (clone $transaksi)->where('jenis', 'pemasukan')->paginate(10, ['*'], 'pemasukan_page');
-            $pengeluaran = (clone $transaksi)->where('jenis', 'pengeluaran')->paginate(10, ['*'], 'pengeluaran_page');
         }
 
         if ($currentRole === 'rt') {
@@ -75,20 +62,24 @@ class Laporan extends Controller
                 ->when($tahun, fn($q) => $q->whereYear('tanggal', $tahun))
                 ->when($bulan, fn($q) => $q->whereMonth('tanggal', $bulan))
                 ->when($jenis, fn($q) => $q->where('jenis', $jenis));
-
-            if (!$bulan) {
-                $transaksi->whereMonth('tanggal', now()->month);
-            }
-
-            if (!$tahun) {
-                $transaksi->whereYear('tanggal', now()->year);
-            }
-
-            $allTransaksi = (clone $transaksi)->paginate(10, ['*'], 'transaksi_page');
-
-            $pemasukan = (clone $transaksi)->where('jenis', 'pemasukan')->paginate(10, ['*'], 'pemasukan_page');
-            $pengeluaran = (clone $transaksi)->where('jenis', 'pengeluaran')->paginate(10, ['*'], 'pengeluaran_page');
         }
+
+        if (!$bulan) {
+            $transaksi->whereMonth('tanggal', now()->month);
+        }
+
+        if (!$tahun) {
+            $transaksi->whereYear('tanggal', now()->year);
+        }
+
+        $allTransaksi = (clone $transaksi)->paginate(10, ['*'], 'transaksi_page');
+
+        $pemasukan = (clone $transaksi)->where('jenis', 'pemasukan')->paginate(10, ['*'], 'pemasukan_page');
+        $pengeluaran = (clone $transaksi)->where('jenis', 'pengeluaran')->paginate(10, ['*'], 'pengeluaran_page');
+
+        $totalPemasukan = (clone $transaksi)->where('jenis', 'pemasukan')->sum('nominal');
+        $totalPengeluaran = (clone $transaksi)->where('jenis', 'pengeluaran')->sum('nominal');
+        $totalKeuangan = $totalPemasukan - $totalPengeluaran;
 
         $daftar_tahun = Transaksi::selectRaw('YEAR(tanggal) as tahun')
             ->distinct()
@@ -115,10 +106,6 @@ class Laporan extends Controller
                 $transaksi->fresh()
             );
         }
-
-        $totalPemasukan = $pemasukan->sum('nominal');
-        $totalPengeluaran = $pengeluaran->sum('nominal');
-        $totalKeuangan = $pemasukan->sum('nominal') - $pengeluaran->sum('nominal');
 
         return Inertia::render('LaporanKeuangan', [
             'title' => $title,
@@ -166,11 +153,6 @@ class Laporan extends Controller
                 ->when($kategori, fn($q) => $q->where('level', $kategori))
                 ->when($status, fn($q) => $q->where('status', $status))
                 ->orderBy('created_at', 'desc');
-
-            $allPengaduan = (clone $pengaduan)->paginate(10, ['*'], 'pengaduan_page');
-
-            // $pemasukan = (clone $transaksi)->where('jenis', 'pemasukan')->paginate(10, ['*'], 'pemasukan_page');
-            // $pengeluaran = (clone $transaksi)->where('jenis', 'pengeluaran')->paginate(10, ['*'], 'pengeluaran_page');
         }
 
         if ($currentRole === 'rt') {
@@ -187,14 +169,11 @@ class Laporan extends Controller
                 ->when($kategori, fn($q) => $q->where('level', $kategori))
                 ->when($status, fn($q) => $q->where('status', $status))
                 ->orderBy('created_at', 'desc');
-
-            $allPengaduan = (clone $pengaduan)->paginate(10, ['*'], 'pengaduan_page');
-
-            // $pemasukan = (clone $transaksi)->where('jenis', 'pemasukan')->paginate(10, ['*'], 'pemasukan_page');
-            // $pengeluaran = (clone $transaksi)->where('jenis', 'pengeluaran')->paginate(10, ['*'], 'pengeluaran_page');
         }
 
-        $daftar_tahun = Transaksi::selectRaw('YEAR(tanggal) as tahun')
+        $allPengaduan = (clone $pengaduan)->paginate(10, ['*'], 'pengaduan_page');
+
+        $daftar_tahun = Pengaduan::selectRaw('YEAR(created_at) as tahun')
             ->distinct()
             ->orderBy('tahun', 'desc')
             ->pluck('tahun');

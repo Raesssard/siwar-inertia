@@ -465,7 +465,7 @@ export function FilterIuran({ iuranManual, iuranOtomatis, data, setData, filter,
     )
 }
 
-export function FilterLaporanKeuangan({ transaksi, data, setData, daftar_tahun, daftar_bulan, filter, resetFilter, role }) {
+export function FilterLaporanKeuangan({ transaksi, data, setData, daftar_tahun, daftar_bulan, tahunIni, bulanIni, filter, resetFilter, role }) {
     return (
         <form onSubmit={filter} className="filter-form form-filter d-flex px-0 g-2 pb-2 mb-2 w-100">
             <div className="col-md-5 col-12 pr-2">
@@ -492,11 +492,14 @@ export function FilterLaporanKeuangan({ transaksi, data, setData, daftar_tahun, 
                     className="form-select form-select-sm flex-fill my-2"
                 >
                     <option value="">Tahun ini</option>
-                    {daftar_tahun.map((th) => (
-                        <option key={th} value={th}>
-                            {th}
-                        </option>
-                    ))}
+                    {daftar_tahun.map((th) => {
+                        if (th === tahunIni) return null
+                        return (
+                            <option key={th} value={th}>
+                                {th}
+                            </option>
+                        )
+                    })}
                 </select>
 
                 <select

@@ -95,6 +95,8 @@ export default function LaporanKeuangan() {
                 setData={setData}
                 daftar_tahun={daftar_tahun}
                 daftar_bulan={daftar_bulan}
+                tahunIni={tahunIni}
+                bulanIni={bulanIni}
                 filter={filter}
                 resetFilter={resetFilter}
                 role={role}

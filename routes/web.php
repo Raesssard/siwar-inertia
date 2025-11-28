@@ -71,6 +71,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/laporan-pengaduan', [Laporan::class, 'laporanPengaduan'])->name('laporan-pengaduan');
     Route::get('/profile', [SettingsController::class, 'profile'])->name('profile');
     Route::post('/profil/update-photo', [SettingsController::class, 'updatePhoto'])->name('profile.updatePhoto');
+    Route::delete('/profile/delete-photo', [SettingsController::class, 'deletePhoto'])->name('profile.deletePhoto');
 
     /*
     |--------------------------------------------------------------------------
