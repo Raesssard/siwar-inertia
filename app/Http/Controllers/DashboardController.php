@@ -39,7 +39,7 @@ class DashboardController extends Controller
 
         if ($role === 'admin') {
 
-            $jumlah_pengumuman_rw = Pengumuman::whereNotNull('id_rw')->count();
+            $jumlah_pengumuman_rw = Pengumuman::whereNull('id_rt')->count();
             $jumlah_pengumuman_rt = Pengumuman::whereNotNull('id_rt')->count();
 
             $total_pemasukan_transaksi = Transaksi::where('jenis', 'pemasukan')->sum('nominal');
