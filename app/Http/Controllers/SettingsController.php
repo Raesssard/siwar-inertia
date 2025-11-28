@@ -79,8 +79,8 @@ class SettingsController extends Controller
 
         // Ambil no_kk berdasarkan nik user
         $kk = Kartu_keluarga::whereHas('warga', function ($q) use ($user) {
-                $q->where('nik', $user->nik);
-            })
+            $q->where('nik', $user->nik);
+        })
             ->first();
 
         return inertia('ProfilePage', [
@@ -92,42 +92,66 @@ class SettingsController extends Controller
     }
 
     public function updatePhoto(Request $request)
-{
-    try {
-        $user = Auth::user();
+    {
+        try {
+            /** @var User $user */
+            $user = Auth::user();
 
-        // Validasi
-        $request->validate([
-            'foto_profil' => 'required|file|mimes:jpeg,png,jpg|max:2048',
-        ]);
+            // Validasi
+            $request->validate([
+                'foto_profil' => 'required|file|mimes:jpeg,png,jpg|max:2048',
+            ]);
 
-        $file = $request->file('foto_profil');
+            $file = $request->file('foto_profil');
 
-        $fileName = time() . '_' .
-            Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)) .
-            '.' . $file->getClientOriginalExtension();
+            $fileName = time() . '_' .
+                Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)) .
+                '.' . $file->getClientOriginalExtension();
 
-        // Hapus foto lama
-        if ($user->foto_profil) {
-            Storage::disk('public')->delete($user->foto_profil);
+            // Hapus foto lama
+            if ($user->foto_profil) {
+                Storage::disk('public')->delete($user->foto_profil);
+            }
+
+            // Simpan file BARU
+            $path = $file->storeAs('profil', $fileName, 'public');
+
+            // UPDATE DATABASE
+            $user->update([
+                'foto_profil' => $path
+            ]);
+
+            return redirect()
+                ->route('profile')
+                ->with('success', 'Foto profil berhasil diperbarui.');
+        } catch (\Exception $e) {
+            Log::error('Upload Foto Profil Error: ' . $e->getMessage());
+            return back()->withErrors(['foto_profil' => 'Upload gagal.']);
         }
-
-        // Simpan file BARU
-        $path = $file->storeAs('profil', $fileName, 'public');
-
-        // UPDATE DATABASE
-        $user->update([
-            'foto_profil' => $path
-        ]);
-
-        return redirect()
-            ->route('profile')
-            ->with('success', 'Foto profil berhasil diperbarui.');
-
-    } catch (\Exception $e) {
-        Log::error('Upload Foto Profil Error: ' . $e->getMessage());
-        return back()->withErrors(['foto_profil' => 'Upload gagal.']);
     }
-}
 
+    public function deletePhoto()
+    {
+        try {
+            /** @var User $user */
+            $user = Auth::user();
+
+            // Hapus foto dari storage
+            if ($user->foto_profil) {
+                Storage::disk('public')->delete($user->foto_profil);
+            }
+
+            // Update database
+            $user->update([
+                'foto_profil' => null
+            ]);
+
+            return redirect()
+                ->route('profile')
+                ->with('success', 'Foto profil berhasil dihapus.');
+        } catch (\Exception $e) {
+            Log::error('Hapus Foto Profil Error: ' . $e->getMessage());
+            return back()->withErrors(['foto_profil' => 'Gagal menghapus foto.']);
+        }
+    }
 }
