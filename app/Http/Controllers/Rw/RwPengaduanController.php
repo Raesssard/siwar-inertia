@@ -37,7 +37,7 @@ class RwPengaduanController extends Controller
             })
             ->where(function ($q) {
                 $q->where('konfirmasi_rw', 'menunggu')
-                ->orWhere('konfirmasi_rw', 'sudah');
+                    ->orWhere('konfirmasi_rw', 'sudah');
             })
             ->with([
                 'warga',
@@ -59,8 +59,18 @@ class RwPengaduanController extends Controller
 
         // Daftar filter
         $list_bulan = [
-            'januari','februari','maret','april','mei','juni',
-            'juli','agustus','september','oktober','november','desember'
+            'januari',
+            'februari',
+            'maret',
+            'april',
+            'mei',
+            'juni',
+            'juli',
+            'agustus',
+            'september',
+            'oktober',
+            'november',
+            'desember'
         ];
 
         $list_tahun = Pengaduan::selectRaw('YEAR(created_at) as tahun')
@@ -128,6 +138,8 @@ class RwPengaduanController extends Controller
             }
         }
 
+        $komentar = null;
+
         if ($role === 'rt') {
             $isi_komentar = $request->input('isi_komentar');
 
@@ -135,9 +147,10 @@ class RwPengaduanController extends Controller
                 'user_id' => Auth::id(),
                 'isi_komentar' => $isi_komentar
             ]);
+
+            $komentar->load('user');
         }
 
-        $komentar->load('user');
 
         return response()->json([
             'pengaduan' => $pengaduan->fresh([

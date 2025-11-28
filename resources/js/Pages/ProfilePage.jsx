@@ -29,15 +29,15 @@ export default function ProfilePage({ user, rt, rw, kk }) {
     useEffect(() => {
         const unsub = router.on("before", (event) => {
 
-            if (bypassGuard.current || isSubmitting) return true;
+            if (bypassGuard.current || isSubmitting) return true
 
-            if (!isPhotoDirty) return true;
+            if (!isPhotoDirty) return true
 
-            event.preventDefault();
+            event.preventDefault()
 
             Swal.fire({
                 title: "Anda belum menyimpan perubahan profil. Tinggalkan halaman?",
-                text: 'Perubahan pada foto profil Anda belum disimpan. Jika Anda meninggalkan halaman, perubahan tersebut akan hilang.',
+                text: 'Harap simpan perubahan terlebih dahulu. Jika Anda meninggalkan halaman, perubahan tersebut akan hilang.',
                 icon: "warning",
                 showCancelButton: true,
                 confirmButtonColor: "#d33",
@@ -47,22 +47,22 @@ export default function ProfilePage({ user, rt, rw, kk }) {
             }).then((result) => {
                 if (result.isConfirmed) {
 
-                    const targetUrl = event.detail?.visit?.url ?? event.detail?.href;
-                    if (!targetUrl) return;
+                    const targetUrl = event.detail?.visit?.url ?? event.detail?.href
+                    if (!targetUrl) return
 
-                    bypassGuard.current = true;
+                    bypassGuard.current = true
 
                     setTimeout(() => {
-                        router.visit(targetUrl);
-                    }, 10);
+                        router.visit(targetUrl)
+                    }, 10)
                 }
-            });
+            })
 
-            return false;
-        });
+            return false
+        })
 
-        return unsub;
-    }, [isPhotoDirty, isSubmitting]);
+        return unsub
+    }, [isPhotoDirty, isSubmitting])
 
     const normalizeFoto = (value) => {
         if (value instanceof File) {
@@ -110,7 +110,7 @@ export default function ProfilePage({ user, rt, rw, kk }) {
     }
 
     const handleDeletePhoto = () => {
-        // if (!confirm("Yakin ingin menghapus foto profil?")) return;
+        // if (!confirm("Yakin ingin menghapus foto profil?")) return
         Swal.fire({
             title: "Yakin ingin menghapus foto profil?",
             text: 'Foto profil akan dihapus',

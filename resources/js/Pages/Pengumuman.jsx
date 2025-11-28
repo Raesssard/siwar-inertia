@@ -213,8 +213,8 @@ export default function Pengumuman() {
                                                     <span>
                                                         <i className="fas fa-user mr-1"></i>
                                                         {item.rukun_tetangga
-                                                            ? item.rukun_tetangga.nama_ketua_rt
-                                                            : item.rw.nama_ketua_rw}
+                                                            ? item.rukun_tetangga.nama_anggota_rt
+                                                            : item.rw.nama_anggota_rw}
                                                     </span>
                                                     <span>
                                                         <i className="fas fa-clock mr-1"></i>

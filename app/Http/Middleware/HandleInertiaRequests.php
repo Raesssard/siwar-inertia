@@ -45,7 +45,7 @@ class HandleInertiaRequests extends Middleware
         }
 
         if (!session()->has('active_role')) {
-            Log::info('cookie laravel lagi nyoba ngasih session ke user dengan Nama' . $user->nama);
+            Log::info('cookie laravel lagi nyoba ngasih session ke user dengan Nama ' . $user->nama);
             if ($user->last_role && $user->hasRole($user->last_role)) {
                 session()->put('active_role', $user->last_role);
             } else {
