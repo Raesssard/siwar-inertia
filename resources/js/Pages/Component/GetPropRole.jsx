@@ -459,6 +459,24 @@ export function getAdminLinks() {
             ],
         },
         {
+            text: "Laporan",
+            icon: "file-alt",
+            children: [
+                {
+                    href: "/laporan-keuangan",
+                    text: "Laporan Keuangan",
+                    icon: "money-check-alt",
+                    permission: "view.transaksi",
+                },
+                {
+                    href: "/laporan-pengaduan",
+                    text: "Laporan Pengaduan",
+                    icon: "file-contract",
+                    permission: "view.pengaduan",
+                },
+            ]
+        },
+        {
             text: "Pengaturan Sistem",
             icon: "cog",
             children: [

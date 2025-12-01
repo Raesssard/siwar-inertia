@@ -22,6 +22,14 @@ class Laporan extends Controller
         $bulan = $request->input('bulan');
         $jenis = $request->input('jenis');
 
+        if ($currentRole === 'admin') {
+            $transaksi = Transaksi::query()
+                ->when($search, fn($q) => $q->where('nama_transaksi', 'like', '%' . $search . '%'))
+                ->when($tahun, fn($q) => $q->whereYear('tanggal', $tahun))
+                ->when($bulan, fn($q) => $q->whereMonth('tanggal', $bulan))
+                ->when($jenis, fn($q) => $q->where('jenis', $jenis));
+        }
+
         if ($currentRole === 'rw') {
             $transaksi = Transaksi::where(function ($query) use ($idRw) {
                 $query->where(function ($q) use ($idRw) {
@@ -133,6 +141,16 @@ class Laporan extends Controller
         $bulan = $request->input('bulan');
         $kategori = $request->input('kategori');
         $status = $request->input('status');
+
+        if ($currentRole === 'admin') {
+            $pengaduan = Pengaduan::query()
+                ->when($search, fn($q) => $q->where('nama_transaksi', 'like', '%' . $search . '%'))
+                ->when($tahun, fn($q) => $q->whereYear('created_at', $tahun))
+                ->when($bulan, fn($q) => $q->whereMonth('created_at', $bulan))
+                ->when($kategori, fn($q) => $q->where('level', $kategori))
+                ->when($status, fn($q) => $q->where('status', $status))
+                ->orderBy('created_at', 'desc');
+        }
 
         if ($currentRole === 'rw') {
             $pengaduan = Pengaduan::with(['warga'])->where(function ($query) use ($idRw) {
