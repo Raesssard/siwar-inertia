@@ -162,7 +162,7 @@ class Laporan extends Controller
         $status = $request->input('status');
 
         if ($currentRole === 'admin') {
-            $pengaduan = Pengaduan::query()
+            $pengaduan = Pengaduan::query()->with(['warga'])
                 ->when($search, fn($q) => $q->where('nama_transaksi', 'like', '%' . $search . '%'))
                 ->when($tahun, fn($q) => $q->whereYear('created_at', $tahun))
                 ->when($bulan, fn($q) => $q->whereMonth('created_at', $bulan))
