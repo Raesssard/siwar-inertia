@@ -1049,7 +1049,7 @@ export function DetailPengaduan({ selectedData, detailShow, onClose, onUpdated, 
                 console.error(err)
             })
     }
-
+console.log(selectedData)
     const handleConfirm = () => {
         const komen = role === "rw" ? "" : "Sudah diteruskan ke RW untuk ditindaklanjuti"
         axios.put(`/${role}/pengaduan/${selectedData.id}/konfirmasi`, {
@@ -1280,7 +1280,7 @@ export function DetailPengaduan({ selectedData, detailShow, onClose, onUpdated, 
                                                         <small className="text-muted">
                                                             • <FormatWaktu createdAt={komen?.created_at} />
                                                         </small>
-                                                        {(komen.file_path && komen.file_name) && (
+                                                        {(komen?.file_path && komen?.file_name) && (
                                                             <div
                                                                 className="flex-fill border-end bg-black d-flex align-items-center justify-content-center mb-2 mt-2"
                                                                 style={{
@@ -1294,12 +1294,12 @@ export function DetailPengaduan({ selectedData, detailShow, onClose, onUpdated, 
                                                                     onClick={() =>
                                                                         setPreview({
                                                                             show: true,
-                                                                            type: komen.file_name.endsWith(".pdf")
+                                                                            type: komen?.file_name.endsWith(".pdf")
                                                                                 ? "pdf"
-                                                                                : komen.file_name.match(/\.(mp4|webm|avi)$/)
+                                                                                : komen?.file_name.match(/\.(mp4|webm|avi)$/)
                                                                                     ? "video"
                                                                                     : "image",
-                                                                            src: getFileUrl(komen.file_path),
+                                                                            src: getFileUrl(komen?.file_path),
                                                                         })
                                                                     }
                                                                     style={{
@@ -1321,9 +1321,9 @@ export function DetailPengaduan({ selectedData, detailShow, onClose, onUpdated, 
                                                                 >
                                                                     <i className="fa-solid fa-expand"></i>
                                                                 </button>
-                                                                {komen.file_name.endsWith(".jpg") || komen.file_name.endsWith(".jpeg") || komen.file_name.endsWith(".png") || komen.file_name.endsWith(".gif") ? (
+                                                                {komen?.file_name.endsWith(".jpg") || komen?.file_name.endsWith(".jpeg") || komen?.file_name.endsWith(".png") || komen?.file_name.endsWith(".gif") ? (
                                                                     <img
-                                                                        src={getFileUrl(komen.file_path)}
+                                                                        src={getFileUrl(komen?.file_path)}
                                                                         alt="Preview"
                                                                         style={{
                                                                             maxWidth: "100%",
@@ -1331,10 +1331,10 @@ export function DetailPengaduan({ selectedData, detailShow, onClose, onUpdated, 
                                                                             objectFit: "contain"
                                                                         }}
                                                                     />
-                                                                ) : komen.file_name.endsWith(".mp4") || komen.file_name.endsWith(".webm") || komen.file_name.endsWith(".avi") ? (
+                                                                ) : komen?.file_name.endsWith(".mp4") || komen?.file_name.endsWith(".webm") || komen?.file_name.endsWith(".avi") ? (
                                                                     <video
                                                                         ref={komenVideoRef}
-                                                                        src={getFileUrl(komen.file_path)}
+                                                                        src={getFileUrl(komen?.file_path)}
                                                                         controls
                                                                         loop
                                                                         style={{
@@ -1344,9 +1344,9 @@ export function DetailPengaduan({ selectedData, detailShow, onClose, onUpdated, 
                                                                             backgroundColor: "black"
                                                                         }}
                                                                     />
-                                                                ) : komen.file_name.endsWith(".pdf") ? (
+                                                                ) : komen?.file_name.endsWith(".pdf") ? (
                                                                     <embed
-                                                                        src={getFileUrl(komen.file_path)}
+                                                                        src={getFileUrl(komen?.file_path)}
                                                                         type="application/pdf"
                                                                         className="pdf-preview"
                                                                         style={{
@@ -1357,26 +1357,26 @@ export function DetailPengaduan({ selectedData, detailShow, onClose, onUpdated, 
                                                                     />
                                                                 ) : (
                                                                     <p style={{ color: "white", textAlign: "center" }}>
-                                                                        File dipilih: {komen.file_name}
+                                                                        File dipilih: {komen?.file_name}
                                                                     </p>
                                                                 )}
                                                             </div>
                                                         )}
                                                         <p
-                                                            className={`mb-2 komen ${commentExpanded[komen.id]
+                                                            className={`mb-2 komen ${commentExpanded[komen?.id]
                                                                 ? "line-clamp-none"
                                                                 : "line-clamp-3"
                                                                 }`}
                                                         >
-                                                            {komen.isi_komentar}
+                                                            {komen?.isi_komentar}
                                                         </p>
 
-                                                        {komen.isi_komentar?.length > 100 && (
+                                                        {komen?.isi_komentar?.length > 100 && (
                                                             <button
                                                                 className="btn-expand btn btn-link p-0 text-decoration-none mt-0"
-                                                                onClick={() => toggleExpand(komen.id)}
+                                                                onClick={() => toggleExpand(komen?.id)}
                                                             >
-                                                                {commentExpanded[komen.id]
+                                                                {commentExpanded[komen?.id]
                                                                     ? "lebih sedikit"
                                                                     : "selengkapnya"}
                                                             </button>

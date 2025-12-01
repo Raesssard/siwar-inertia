@@ -22,7 +22,7 @@ export default function InformasiPengaduan() {
         kategori: '',
         status: '',
     })
-
+console.log(pengaduan)
     const filter = (e) => {
         e.preventDefault()
         get('/laporan-pengaduan', { preserveState: true, preserveScroll: true })
@@ -91,7 +91,7 @@ export default function InformasiPengaduan() {
                                         <td className="text-center">{item.warga.nama ?? '-'}</td>
                                         <td className="text-center">{item.judul ?? '-'}</td>
                                         <td className="text-center">
-                                            {item.status === 'selsai' ? (
+                                            {item.status === 'selesai' ? (
                                                 <span className="badge bg-success text-white">Selesai</span>
                                             ) : item.status === 'diproses' ? (
                                                 <span className="badge bg-warning text-white">Sedang diproses</span>
