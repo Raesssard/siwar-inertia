@@ -268,7 +268,7 @@ export function FilterTagihan({ tagihanManual, tagihanOtomatis, data, setData, f
             </div>
 
             <div className="d-flex flex-wrap gap-2" style={role === 'warga' ? { maxWidth: "3rem", minWidth: "3rem" } : null}>
-                <Role role={['rt', 'rw']}>
+                <Role role={['rt', 'rw', 'bendahara', 'admin']}>
                     <select
                         name="no_kk_filter"
                         value={data.no_kk_filter}
@@ -452,7 +452,7 @@ export function FilterIuran({ iuranManual, iuranOtomatis, data, setData, filter,
                 >
                     <i className="fas fa-file-excel"></i>
                 </button>
-                <Role role={['rw', 'bendahara' , 'admin']}>
+                <Role role={['rw', 'bendahara', 'admin']}>
                     <div className="text-end ml-auto mr-3">
                         <button type="button" onClick={() => tambahShow()} className="btn-input btn btn-sm btn-success">
                             <i className="fas fa-plus mr-2"></i>

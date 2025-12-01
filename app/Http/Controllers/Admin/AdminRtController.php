@@ -389,7 +389,7 @@ class AdminRtController extends Controller
         $ignoredRoles = ['rt', 'warga'];
 
         // Ambil user pemegang jabatan
-        $user = $rt->users()->first();
+        $user = $rt->user()->first();
 
         // Ambil jabatan user selain role inti → default ke ketua
         $jabatanUser = $user?->roles()

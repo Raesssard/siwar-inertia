@@ -1537,7 +1537,7 @@ console.log(selectedData)
                                                             onChange={(e) => setData("isi_komentar", e.target.value)}
                                                             title="Masukkan Pesan"
                                                         />
-                                                        <Role role={['rt', 'rw', 'sekretaris']}>
+                                                        <Role role={['rt', 'rw', 'sekretaris', 'admin']}>
                                                             <input
                                                                 ref={fileInputRef}
                                                                 type="file"
@@ -3125,7 +3125,7 @@ export function DetailPengumuman({ kategori, selectedData, detailShow, onClose, 
                                             {(userData?.rukun_tetangga?.id === selectedData.id_rt || userData?.rw?.id === selectedData.id_rw) ? (
                                                 <div className="d-flex">
                                                     <h5 className="fw-bold mb-1 mt-2 me-auto">{selectedData.judul}</h5>
-                                                    <Role role={["rt", "rw", 'sekretaris']}>
+                                                    <Role role={["rt", "rw", 'sekretaris', 'admin']}>
                                                         <button
                                                             className="btn komen btn-primary my-auto px-1"
                                                             title="Export Pengumuman ke PDF"
@@ -3135,7 +3135,7 @@ export function DetailPengumuman({ kategori, selectedData, detailShow, onClose, 
                                                             <i className="far fa-file-pdf me-2"></i>
                                                         </button>
                                                     </Role>
-                                                    <Role role={selectedData.rukun_tetangga ? ["rt", "sekretaris"] : ["rw", "sekretaris"]}>
+                                                    <Role role={selectedData.rukun_tetangga ? ["rt", "sekretaris", "admin"] : ["rw", "sekretaris", "admin"]} >
                                                         <button onClick={toggleEdit} title="Edit Pengumuman">
                                                             <i className="far fa-edit"></i>
                                                         </button>
@@ -3451,7 +3451,7 @@ export function DetailPengumuman({ kategori, selectedData, detailShow, onClose, 
                                                     value={data.isi_komentar}
                                                     onChange={(e) => setData("isi_komentar", e.target.value)}
                                                 />
-                                                <Role role={['rt', 'rw', 'sekretaris']}>
+                                                <Role role={['rt', 'rw', 'sekretaris', 'admin']}>
                                                     <input
                                                         ref={fileInputRef}
                                                         type="file"
