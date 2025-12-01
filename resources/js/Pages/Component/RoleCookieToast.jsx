@@ -49,7 +49,7 @@ export default function RoleCookieToast({ user }) {
                     <div>
                         <p className="mb-0" style={{fontSize: '0.8rem'}}>
                             <strong>{user?.nama}</strong>, Anda tidak memilih untuk diingat saat login.<br />
-                            Jadi... mau kue ini? biar mudah diingat oleh kita.
+                            Jadi... mau kue ini? supaya mudah diingat oleh kami.
                         </p>
                     </div>
                 </div>

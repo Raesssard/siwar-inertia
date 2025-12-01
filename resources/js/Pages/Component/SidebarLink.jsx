@@ -16,7 +16,7 @@ export function SidebarLink({ href, icon, text, children, isOpen, onToggle, isTo
     const sizeFont = isToggleOrMobile ? '0.55rem' : '0.75rem';
 
     return (
-        <li className={`nav-item ${isActive(url, href) ? 'active' : ''}`}>
+        <li className={`nav-item m-0 ${isActive(url, href) ? 'active' : ''}`}>
             {children ? (
                 <>
                     <button

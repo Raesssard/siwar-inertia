@@ -48,7 +48,8 @@ class Laporan extends Controller
                 ->when($search, fn($q) => $q->where('nama_transaksi', 'like', '%' . $search . '%'))
                 ->when($tahun, fn($q) => $q->whereYear('tanggal', $tahun))
                 ->when($bulan, fn($q) => $q->whereMonth('tanggal', $bulan))
-                ->when($jenis, fn($q) => $q->where('jenis', $jenis));
+                ->when($jenis, fn($q) => $q->where('jenis', $jenis))
+                ->orderBy('tanggal', 'desc');
         }
 
         if ($currentRole === 'rt') {
@@ -69,7 +70,8 @@ class Laporan extends Controller
                 ->when($search, fn($q) => $q->where('nama_transaksi', 'like', '%' . $search . '%'))
                 ->when($tahun, fn($q) => $q->whereYear('tanggal', $tahun))
                 ->when($bulan, fn($q) => $q->whereMonth('tanggal', $bulan))
-                ->when($jenis, fn($q) => $q->where('jenis', $jenis));
+                ->when($jenis, fn($q) => $q->where('jenis', $jenis))
+                ->orderBy('tanggal', 'desc');
         }
 
         if (!$bulan) {
@@ -79,6 +81,20 @@ class Laporan extends Controller
         if (!$tahun) {
             $transaksi->whereYear('tanggal', now()->year);
         }
+
+        $getBulan = $transaksi->clone()
+            ->selectRaw('tanggal, MONTH(tanggal) as bulan, MONTHNAME(tanggal) as nama_bulan')
+            ->distinct()
+            ->orderBy('tanggal', 'desc')
+            ->orderBy('bulan', 'asc')
+            ->get();
+
+        $getTahun = $transaksi->clone()
+            ->selectRaw('tanggal, YEAR(tanggal) as tahun')
+            ->distinct()
+            ->orderBy('tanggal', 'desc')
+            ->orderBy('tahun', 'asc')
+            ->get();
 
         $allTransaksi = (clone $transaksi)->paginate(10, ['*'], 'transaksi_page');
 
@@ -115,6 +131,7 @@ class Laporan extends Controller
             );
         }
 
+
         return Inertia::render('LaporanKeuangan', [
             'title' => $title,
             'pemasukan' => $pemasukan,
@@ -125,6 +142,8 @@ class Laporan extends Controller
             'totalPemasukan' => $totalPemasukan,
             'totalPengeluaran' => $totalPengeluaran,
             'totalKeuangan' => $totalKeuangan,
+            'getBulan' => $getBulan,
+            'getTahun' => $getTahun,
         ]);
     }
 

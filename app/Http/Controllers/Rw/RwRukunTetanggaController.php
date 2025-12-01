@@ -10,6 +10,7 @@ use App\Models\Setting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
@@ -54,8 +55,8 @@ class RwRukunTetanggaController extends Controller
 
         // Dropdown filter RT
         $rukun_tetangga_filter = Rt::whereHas('rw', function ($q) use ($nomorRwUser) {
-                $q->where('nomor_rw', $nomorRwUser);
-            })
+            $q->where('nomor_rw', $nomorRwUser);
+        })
             ->select('nomor_rt')
             ->distinct()
             ->orderBy('nomor_rt')
@@ -297,7 +298,6 @@ class RwRukunTetanggaController extends Controller
                 $roles[] = $jabatan;
             }
             $user->syncRoles($roles);
-
         } else {
             if ($user) $user->delete();
         }
@@ -332,7 +332,7 @@ class RwRukunTetanggaController extends Controller
         $ignoredRoles = ['rt', 'warga'];
 
         // Ambil user pemegang jabatan
-        $user = $rt->users()->first();
+        $user = $rt->user()->first();
 
         // Ambil jabatan user selain role inti → default ke ketua
         $jabatanUser = $user?->roles()
@@ -365,7 +365,8 @@ class RwRukunTetanggaController extends Controller
 
             // Jika jabatannya sama → tolak
             if ($existingJabatan === $jabatanUser) {
-                return back()->with('error',
+                return back()->with(
+                    'error',
                     "RT {$rt->nomor_rt} sudah memiliki {$existingJabatan} aktif. Nonaktifkan yang lama dulu!"
                 );
             }
@@ -379,7 +380,8 @@ class RwRukunTetanggaController extends Controller
         // Aktifkan RT baru
         $rt->update(['status' => 'aktif']);
 
-        return back()->with('success',
+        return back()->with(
+            'success',
             "RT {$rt->nomor_rt} dengan jabatan {$jabatanUser} berhasil diaktifkan."
         );
     }

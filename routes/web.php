@@ -8,6 +8,7 @@ use App\Http\Controllers\{
     InformasiKeuangan,
     Laporan,
     SettingsController,
+    ExportController,
 };
 use App\Http\Controllers\Warga\{
     LihatKKController,
@@ -31,7 +32,6 @@ use App\Http\Controllers\Admin\{
     AdminIuranController,
 };
 use App\Http\Controllers\Rt\{
-    ExportController,
     Rt_kartu_keluargaController,
     Rt_PengaduanController,
     Rt_pengumumanController,
@@ -75,6 +75,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/profile', [SettingsController::class, 'profile'])->name('profile');
     Route::post('/profile/update-photo', [SettingsController::class, 'updatePhoto'])->name('profile.updatePhoto');
     Route::delete('/profile/delete-photo', [SettingsController::class, 'deletePhoto'])->name('profile.deletePhoto');
+    Route::get('/export/laporan-keuangan/{bulan}/{tahun}', [ExportController::class, 'exportLaporanKeuangan'])->name('laporan-keuangan.export');
 
     /*
     |--------------------------------------------------------------------------
@@ -176,7 +177,7 @@ Route::middleware(['auth'])->group(function () {
                 ->middleware(CheckPermission::class . ':view.pengumuman')
                 ->name('pengumuman.komentar.komen');
 
-                // 📮 Pengaduan (ADMIN)
+            // 📮 Pengaduan (ADMIN)
             Route::get('pengaduan', [AdminPengaduanController::class, 'index'])
                 ->middleware(CheckPermission::class . ':view.pengaduan')
                 ->name('pengaduan.index');
