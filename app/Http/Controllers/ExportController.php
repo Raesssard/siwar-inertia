@@ -1,8 +1,7 @@
 <?php
 
-namespace App\Http\Controllers\Rt;
+namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use App\Models\Iuran;
 use App\Models\Kartu_keluarga;
 use App\Models\Kategori_golongan;
@@ -12,10 +11,12 @@ use App\Models\Warga;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 use PhpOffice\PhpSpreadsheet\Cell\DataType;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Border;
+use Symfony\Component\HttpFoundation\Request;
 
 // export ini sementara aj, nanti diganti lagi
 
@@ -35,7 +36,9 @@ class ExportController extends Controller
         }
 
         $row = 3;
-        $iurans = Iuran::where('id_rt', $id_rt)->where('jenis', 'manual')->get();
+        $iurans = Iuran::where('id_rt', $id_rt)->where('jenis', 'manual')
+            ->orderBy('tgl_tagih', 'desc')
+            ->get();
         $no_urut = 1;
 
         if ($iurans->isNotEmpty()) {
@@ -70,7 +73,9 @@ class ExportController extends Controller
         }
 
         $row_otomatis = 3;
-        $iuran_otomatis = Iuran::where('id_rt', $id_rt)->where('jenis', 'otomatis')->get();
+        $iuran_otomatis = Iuran::where('id_rt', $id_rt)->where('jenis', 'otomatis')
+            ->orderBy('tgl_tagih', 'desc')
+            ->get();
         $starCol = Kategori_golongan::all();
         $no = 1;
 
@@ -142,7 +147,9 @@ class ExportController extends Controller
             $sheet->getColumnDimension($col)->setAutoSize(true);
         }
 
-        $belum = Tagihan::where('status_bayar', 'belum_bayar')->get();
+        $belum = Tagihan::where('status_bayar', 'belum_bayar')
+            ->orderBy('tgl_tagih', 'desc')
+            ->get();
         $row = 3;
         $no = 1;
 
@@ -181,7 +188,9 @@ class ExportController extends Controller
             ]);
         }
 
-        $sudah = Tagihan::where('status_bayar', 'sudah_bayar')->get();
+        $sudah = Tagihan::where('status_bayar', 'sudah_bayar')
+            ->orderBy('tgl_tagih', 'desc')
+            ->get();
         $row2 = 3;
         $no2 = 1;
 
@@ -248,7 +257,9 @@ class ExportController extends Controller
 
         $no = 1;
         $row = 3;
-        $pemasukan = Transaksi::where('jenis', 'pemasukan')->get();
+        $pemasukan = Transaksi::where('jenis', 'pemasukan')
+            ->orderBy('tanggal', 'desc')
+            ->get();
 
         if ($pemasukan->isNotEmpty()) {
             $sheet->setCellValue('B1', 'Pemasukkan');
@@ -285,7 +296,9 @@ class ExportController extends Controller
 
         $no2 = 1;
         $row2 = 3;
-        $pengeluaran = Transaksi::where('jenis', 'pengeluaran')->get();
+        $pengeluaran = Transaksi::where('jenis', 'pengeluaran')
+            ->orderBy('tanggal', 'desc')
+            ->get();
 
         if ($pengeluaran->isNotEmpty()) {
             $sheet->setCellValue('J1', 'Pengeluaran');
@@ -534,6 +547,168 @@ class ExportController extends Controller
 
         $writer = new Xlsx($spreadsheet);
         $filename = "kartu_keluarga_rt_{$id_rt}.xlsx";
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header("Content-Disposition: attachment; filename=\"$filename\"");
+        $writer->save("php://output");
+        exit;
+    }
+
+    public function exportLaporanKeuangan($bulan, $tahun)
+    {
+        $currentRole = session('active_role');
+        $idRw = Auth::user()->rw->id ?? null;
+        $idRt = Auth::user()->rukunTetangga->id ?? null;
+        Log::info('bulan sama tahun yg masuk', [$bulan, $tahun]);
+
+        $daftar_bulan = [
+            'januari',
+            'februari',
+            'maret',
+            'april',
+            'mei',
+            'juni',
+            'juli',
+            'agustus',
+            'september',
+            'oktober',
+            'november',
+            'desember'
+        ];
+
+        $namaBulan = ucfirst($daftar_bulan[$bulan - 1]);
+
+        Log::info('nama bulan yg didapet', [$namaBulan]);
+
+        $nomor_rt = Auth::user()->rukunTetangga->nomor_rt ?? null;
+        $nomor_rw = Auth::user()->rw->nomor_rw ?? null;
+
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setTitle('Transaksi');
+        $sheet->getStyle("A1:Z3")->getFont()->setBold(true);
+        $sheet->getStyle('A1:AZ3')->getAlignment()->applyFromArray([
+            'horizontal' => Alignment::HORIZONTAL_CENTER,
+            'vertical'   => Alignment::VERTICAL_CENTER,
+            'wrapText'   => true,
+        ]);
+
+        $maxCol = Coordinate::columnIndexFromString('AZ');
+        for ($i = 1; $i <= $maxCol; $i++) {
+            $colLetter = Coordinate::stringFromColumnIndex($i);
+            $sheet->getColumnDimension($colLetter)->setAutoSize(true);
+        }
+
+        $no = 1;
+        $row = 4;
+
+        if ($currentRole === 'rw') {
+            $transaksi = Transaksi::where(function ($query) use ($idRw) {
+                $query->where(function ($q) use ($idRw) {
+                    $q->whereNotNull('tagihan_id')
+                        ->whereHas('tagihan.iuran', function ($subQuery) use ($idRw) {
+                            $subQuery->where('id_rw', $idRw);
+                        });
+                })
+                    ->orWhere(function ($q) use ($idRw) {
+                        $q->whereNull('tagihan_id')
+                            ->whereHas('rukunTetangga', function ($subQuery) use ($idRw) {
+                                $subQuery->where('id_rw', $idRw);
+                            });
+                    });
+            })
+                ->when($tahun, fn($q) => $q->whereYear('tanggal', $tahun))
+                ->when($bulan, fn($q) => $q->whereMonth('tanggal', $bulan))
+                ->orderBy('tanggal', 'desc');
+        }
+
+        if ($currentRole === 'rt') {
+            $transaksi = Transaksi::where(function ($query) use ($idRt) {
+                $query->where(function ($q) use ($idRt) {
+                    $q->whereNotNull('tagihan_id')
+                        ->whereHas('tagihan.iuran', function ($subQuery) use ($idRt) {
+                            $subQuery->where('id_rt', $idRt);
+                        });
+                })
+                    ->orWhere(function ($q) use ($idRt) {
+                        $q->whereNull('tagihan_id')
+                            ->whereHas('rukunTetangga', function ($subQuery) use ($idRt) {
+                                $subQuery->where('id', $idRt);
+                            });
+                    });
+            })
+                ->when($tahun, fn($q) => $q->whereYear('tanggal', $tahun))
+                ->when($bulan, fn($q) => $q->whereMonth('tanggal', $bulan))
+                ->orderBy('tanggal', 'desc');
+        }
+
+        if (!$bulan) {
+            $transaksi->whereMonth('tanggal', now()->month);
+        }
+
+        if (!$tahun) {
+            $transaksi->whereYear('tanggal', now()->year);
+        }
+
+        $totalPemasukan = (clone $transaksi)->where('jenis', 'pemasukan')->sum('nominal');
+        $totalPengeluaran = (clone $transaksi)->where('jenis', 'pengeluaran')->sum('nominal');
+        $totalKeuangan = $totalPemasukan - $totalPengeluaran;
+
+        $sheet->setCellValue('B1', "Laporan Pemasukan dan Pengeluaran " . ($currentRole === 'rt' ? "RT {$nomor_rt}/RW {$nomor_rw}" : "RW {$nomor_rw}"));
+        $sheet->mergeCells('B1:F1');
+        $sheet->setCellValue('B2', "Periode {$namaBulan} {$tahun}");
+        $sheet->mergeCells('B2:F2');
+
+        $sheet->setCellValue('B3', 'No.');
+        $sheet->setCellValue('C3', 'Tanggal');
+        $sheet->setCellValue('D3', 'Keterangan');
+        $sheet->setCellValue('E3', 'Pemasukan');
+        $sheet->setCellValue('F3', 'Pengeluaran');
+        $sheet->getStyle('B3:F3')->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
+        $sheet->getStyle('B3:F3')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+
+        foreach ($transaksi->get() as $trx) {
+            $pemasukan = $trx->jenis === 'pemasukan';
+            $pengeluaran = $trx->jenis === 'pengeluaran';
+
+            $sheet->setCellValue("B{$row}", $no);
+            $sheet->setCellValue("C{$row}", date('d/m/Y', strtotime($trx->tanggal)));
+            $sheet->setCellValue("D{$row}", $trx->nama_transaksi);
+            $sheet->setCellValue("E{$row}", $pemasukan ? $trx->nominal : null);
+            $sheet->setCellValue("F{$row}", $pengeluaran ? $trx->nominal : null);
+            $row++;
+            $no++;
+        }
+
+        $rowEnd = $row + 1;
+        $rowDataEnd = $row - 1;
+
+        $sheet->setCellValue("B{$row}", 'Total');
+        $sheet->mergeCells("B{$row}:D{$row}");
+        $sheet->setCellValue("E{$row}", $totalPemasukan ? $totalPemasukan : null);
+        $sheet->setCellValue("F{$row}", $totalPengeluaran ? $totalPengeluaran : null);
+        $sheet->setCellValue("B{$rowEnd}", 'Saldo Akhir');
+        $sheet->mergeCells("B{$rowEnd}:E{$rowEnd}");
+        $sheet->setCellValue("F{$rowEnd}", $totalKeuangan ? $totalKeuangan : null);
+
+        $sheet->getStyle("B{$row}:F{$rowEnd}")->getFont()->setBold(true);
+        $sheet->getStyle("B4:C{$rowDataEnd}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle("D4:D{$rowDataEnd}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
+        $sheet->getStyle("E4:F{$rowEnd}")->getNumberFormat()->setFormatCode('"Rp"#,##0.00_-');
+        $sheet->getStyle("E4:F{$rowEnd}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
+
+
+        $sheet->getStyle("B1:F{$rowEnd}")->applyFromArray([
+            'borders' => [
+                'allBorders' => [
+                    'borderStyle' => Border::BORDER_THIN, // bisa THICK, DASHED, dll.
+                    'color' => ['argb' => 'FF000000'], // hitam
+                ],
+            ],
+        ]);
+
+        $writer = new Xlsx($spreadsheet);
+        $filename = "laporan_keuangan_rt_{$nomor_rt}.xlsx";
 
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         header("Content-Disposition: attachment; filename=\"$filename\"");

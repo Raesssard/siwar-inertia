@@ -145,15 +145,17 @@ export default function Sidebar({ toggleKeParent, localStorageHistory }) {
 
                 <hr className="sidebar-divider my-0" />
 
-                {filteredLinks.map((link, index) => (
-                    <SidebarLink
-                        key={index}
-                        {...link}
-                        isOpen={!!openMenus[link.text]}
-                        onToggle={() => toggleMenu(link.text)}
-                        isToggleOrMobile={toggle !== ""}
-                    />
-                ))}
+                <div className='item-nav' style={{ maxHeight: '80vh', zIndex: 0, overflow: 'auto' }}>
+                    {filteredLinks.map((link, index) => (
+                        <SidebarLink
+                            key={index}
+                            {...link}
+                            isOpen={!!openMenus[link.text]}
+                            onToggle={() => toggleMenu(link.text)}
+                            isToggleOrMobile={toggle !== ""}
+                        />
+                    ))}
+                </div>
 
                 <hr className="sidebar-divider d-none d-md-block" />
 

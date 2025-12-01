@@ -465,7 +465,7 @@ export function FilterIuran({ iuranManual, iuranOtomatis, data, setData, filter,
     )
 }
 
-export function FilterLaporanKeuangan({ transaksi, data, setData, daftar_tahun, daftar_bulan, tahunIni, bulanIni, filter, resetFilter, role }) {
+export function FilterLaporanKeuangan({ transaksi, exportLaporan, handleChangeBulan, data, setData, daftar_tahun, daftar_bulan, tahunIni, bulanIni, filter, resetFilter, role }) {
     return (
         <form onSubmit={filter} className="filter-form form-filter d-flex px-0 g-2 pb-2 mb-2 w-100">
             <div className="col-md-5 col-12 pr-2">
@@ -505,7 +505,7 @@ export function FilterLaporanKeuangan({ transaksi, data, setData, daftar_tahun, 
                 <select
                     name="bulan"
                     value={data.bulan}
-                    onChange={(e) => setData('bulan', e.target.value)}
+                    onChange={(e) => handleChangeBulan(e)}
                     className="form-select form-select-sm flex-fill my-2"
                 >
                     <option value="">Bulan ini</option>
@@ -515,6 +515,7 @@ export function FilterLaporanKeuangan({ transaksi, data, setData, daftar_tahun, 
                         </option>
                     ))}
                 </select>
+
                 <select
                     name="jenis"
                     value={data.jenis}
@@ -531,17 +532,16 @@ export function FilterLaporanKeuangan({ transaksi, data, setData, daftar_tahun, 
                 <Link href={'/laporan-keuangan'} onClick={resetFilter} className="btn-input btn btn-secondary btn-sm flex-fill p-0 mx-0" title="Reset" style={{ maxWidth: "3rem", minWidth: "3rem" }}>
                     <i className="fas fa-undo"></i>
                 </Link>
-                {/* <button
+                <button
                     className="btn btn-success my-auto mr-3"
                     type="button"
-                    title={!transaksi?.length ? "Tidak ada Transaksi yang dapat diexport" : "Export Transaksi ke Excel"}
+                    title={!transaksi?.length ? "Tidak ada laporan yang dapat diexport" : "Export Laporan"}
                     style={{ borderRadius: "0.2rem" }}
-                    onClick={() => window.location.href = `/${role}/export/transaksi`}
-                    // disabled={!transaksi?.length}
-                    disabled
+                    onClick={exportLaporan}
+                    disabled={!transaksi?.length}
                 >
                     <i className="fas fa-file-excel"></i>
-                </button> */}
+                </button>
             </div>
         </form>
     )
