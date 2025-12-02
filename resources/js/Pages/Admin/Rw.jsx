@@ -181,19 +181,21 @@ export default function Rw({ rw, filters, nomorRwList, title, roles }) {
                                         <td className="text-center">{item.mulai_menjabat || "-"}</td>
                                         <td className="text-center">{item.akhir_jabatan || "-"}</td>
                                         <td className="text-center align-middle">
-                                        <span
-                                            className={`inline-block px-2 py-1 rounded text-sm font-medium ${
-                                            item.status === "aktif"
-                                                ? "bg-green-100 text-green-700"
-                                                : "bg-red-100 text-red-700"
-                                            }`}
-                                        >
-                                            {item.status || "-"}
-                                        </span>
+                                            <span
+                                                className={`inline-block px-2 py-1 rounded text-sm font-medium ${item.status === "aktif"
+                                                    ? "bg-green-100 text-green-700"
+                                                    : "bg-red-100 text-red-700"
+                                                    }`}
+                                                onClick={() => handleToggleStatus(item.id)}
+                                                style={{ cursor: 'pointer', width: '4.25rem' }}
+                                                title="Ganti status RW"
+                                            >
+                                                {item.status || "-"}
+                                            </span>
                                         </td>
                                         <td className="text-center">
                                             <div className="d-flex justify-content-center gap-2">
-                                                <button
+                                                {/* <button
                                                     className={`btn btn-sm ${
                                                         item.status === "aktif"
                                                             ? "btn-secondary"
@@ -204,7 +206,7 @@ export default function Rw({ rw, filters, nomorRwList, title, roles }) {
                                                     {item.status === "aktif"
                                                         ? "Nonaktifkan"
                                                         : "Aktifkan"}
-                                                </button>
+                                                </button> */}
 
                                                 <button
                                                     className="btn btn-warning btn-sm"
