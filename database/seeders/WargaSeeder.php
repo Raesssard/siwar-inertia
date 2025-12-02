@@ -147,6 +147,7 @@ class WargaSeeder extends Seeder
                 'nama' => $rw->nama_anggota_rw,
                 'password' => Hash::make('password'),
                 'id_rw' => $rw->id,
+                'id_rt' => $rt->id,
             ]
         );
         $userRw->syncRoles(['rw', 'warga']);

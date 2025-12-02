@@ -204,7 +204,7 @@ export default function Iuran() {
                                 ))
                             ) : (
                                 <tr>
-                                    <td colSpan={['rw', 'bendahara'].includes(role) ? "6" : "5"} className="text-center">
+                                    <td colSpan={['rw', 'bendahara', 'admin'].includes(role) ? "6" : "5"} className="text-center">
                                         Tidak ada data
                                     </td>
                                 </tr>
@@ -267,7 +267,7 @@ export default function Iuran() {
                                 rows
                             ) : (
                                 <tr>
-                                    <td colSpan={['rw', 'bendahara'].includes(role) ? "7" : "6"} className="text-center">
+                                    <td colSpan={['rw', 'bendahara', 'admin'].includes(role) ? "7" : "6"} className="text-center">
                                         Tidak ada data
                                     </td>
                                 </tr>
