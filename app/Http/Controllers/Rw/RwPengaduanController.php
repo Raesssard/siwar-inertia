@@ -175,6 +175,8 @@ class RwPengaduanController extends Controller
 
     public function komen(Request $request, $id)
     {
+        /** @var User $user */
+        $user = Auth::user();
         $request->validate([
             'isi_komentar' => 'required_without:file|string|nullable|max:255',
             'file' => 'required_without:isi_komentar|nullable|file|mimes:jpg,jpeg,png,gif,mp4,mov,avi,mkv,doc,docx,pdf|max:20480',
@@ -196,6 +198,7 @@ class RwPengaduanController extends Controller
             'isi_komentar' => $request->isi_komentar,
             'file_path' => $filePath,
             'file_name' => $fileName,
+            'role_snapshot' => session('active_role') ?? $user->getRoleNames()->first()
         ]);
 
         $komentar->load('user');

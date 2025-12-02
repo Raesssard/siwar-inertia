@@ -1,7 +1,8 @@
-import React from "react"
+import React, { useEffect, useRef, useState } from "react"
 import { Link } from "@inertiajs/react"
 import Role from "./Role"
 import { useIsMobile } from "./GetPropRole"
+import axios from "axios"
 
 export function FilterPengaduan({ data, setData, list_tahun, list_bulan, list_level, filter, resetFilter, tambahShow, role }) {
     return (
@@ -232,7 +233,28 @@ export function FilterTransaksi({ transaksi, data, setData, daftar_tahun, daftar
                     type="button"
                     title={!transaksi?.length ? "Tidak ada Transaksi yang dapat diexport" : "Export Transaksi ke Excel"}
                     style={{ borderRadius: "0.2rem" }}
-                    onClick={() => window.location.href = `/${role}/export/transaksi`}
+                    onClick={() => {
+                        // window.location.href = `/${role}/export/transaksi`
+
+                        axios({
+                            url: `/${role}/export/transaksi`,
+                            method: "GET",
+                            responseType: "blob"
+                        })
+                            .then((response) => {
+                                const url = window.URL.createObjectURL(new Blob([response.data]))
+                                const link = document.createElement("a")
+                                link.href = url
+                                link.setAttribute(
+                                    "download",
+                                    `laporan-transaksi.xlsx`
+                                )
+                                document.body.appendChild(link)
+                                link.click()
+                                link.remove()
+                            })
+                            .catch((err) => console.error(err))
+                    }}
                     disabled={!transaksi?.length}
                 >
                     <i className="fas fa-file-excel"></i>
@@ -297,7 +319,28 @@ export function FilterTagihan({ tagihanManual, tagihanOtomatis, data, setData, f
                     type="button"
                     title={!tagihanManual?.length && !tagihanOtomatis?.length ? "Tidak ada Tagihan yang dapat diexport" : "Export Tagihan ke Excel"}
                     style={{ borderRadius: "0.2rem" }}
-                    onClick={() => window.location.href = `/${role}/export/tagihan`}
+                    onClick={() => {
+                        // window.location.href = `/${role}/export/tagihan`
+
+                        axios({
+                            url: `/${role}/export/tagihan`,
+                            method: "GET",
+                            responseType: "blob"
+                        })
+                            .then((response) => {
+                                const url = window.URL.createObjectURL(new Blob([response.data]))
+                                const link = document.createElement("a")
+                                link.href = url
+                                link.setAttribute(
+                                    "download",
+                                    `laporan-tagihan.xlsx`
+                                )
+                                document.body.appendChild(link)
+                                link.click()
+                                link.remove() // bersih2
+                            })
+                            .catch((err) => console.error(err))
+                    }}
                     disabled={!tagihanManual?.length && !tagihanOtomatis?.length}
                 >
                     <i className="fas fa-file-excel"></i>
@@ -447,7 +490,28 @@ export function FilterIuran({ iuranManual, iuranOtomatis, data, setData, filter,
                     type="button"
                     title={!iuranManual?.length && !iuranOtomatis?.length ? "Tidak ada Iuran yang dapat diexport" : "Export Iuran ke Excel"}
                     style={{ borderRadius: "0.2rem" }}
-                    onClick={() => window.location.href = `/${role}/export/iuran`}
+                    onClick={() => {
+                        // window.location.href = `/${role}/export/iuran`
+
+                        axios({
+                            url: `/${role}/export/iuran`,
+                            method: "GET",
+                            responseType: "blob"
+                        })
+                            .then((response) => {
+                                const url = window.URL.createObjectURL(new Blob([response.data]))
+                                const link = document.createElement("a")
+                                link.href = url
+                                link.setAttribute(
+                                    "download",
+                                    `laporan-iuran.xlsx`
+                                )
+                                document.body.appendChild(link)
+                                link.click()
+                                link.remove() // bersih2
+                            })
+                            .catch((err) => console.error(err))
+                    }}
                     disabled={!iuranManual?.length && !iuranOtomatis?.length}
                 >
                     <i className="fas fa-file-excel"></i>
@@ -465,7 +529,22 @@ export function FilterIuran({ iuranManual, iuranOtomatis, data, setData, filter,
     )
 }
 
-export function FilterLaporanKeuangan({ transaksi, exportLaporan, handleChangeBulan, data, setData, daftar_tahun, daftar_bulan, tahunIni, bulanIni, filter, resetFilter, role }) {
+export function FilterLaporanKeuangan({ transaksi, exportExcel, exportPdf, handleChangeBulan, data, setData, daftar_tahun, daftar_bulan, tahunIni, bulanIni, filter, resetFilter, role }) {
+    const [showMenu, setShowMenu] = useState(false)
+    const toggleMenu = () => setShowMenu(prev => !prev)
+    const menuRef = useRef(null)
+
+    useEffect(() => {
+        function handleClickOutside(e) {
+            if (menuRef.current && !menuRef.current.contains(e.target)) {
+                setShowMenu(false)
+            }
+        }
+
+        document.addEventListener("click", handleClickOutside)
+        return () => document.removeEventListener("click", handleClickOutside)
+    }, [])
+
     return (
         <form onSubmit={filter} className="filter-form form-filter d-flex px-0 g-2 pb-2 mb-2 w-100">
             <div className="col-md-5 col-12 pr-2">
@@ -532,22 +611,88 @@ export function FilterLaporanKeuangan({ transaksi, exportLaporan, handleChangeBu
                 <Link href={'/laporan-keuangan'} onClick={resetFilter} className="btn-input btn btn-secondary btn-sm flex-fill p-0 mx-0" title="Reset" style={{ maxWidth: "3rem", minWidth: "3rem" }}>
                     <i className="fas fa-undo"></i>
                 </Link>
-                <button
-                    className="btn btn-success my-auto mr-3"
-                    type="button"
-                    title={!transaksi?.length ? "Tidak ada laporan yang dapat diexport" : "Export Laporan"}
-                    style={{ borderRadius: "0.2rem" }}
-                    onClick={exportLaporan}
-                    disabled={!transaksi?.length}
-                >
-                    <i className="fas fa-file-excel"></i>
-                </button>
+                <div style={{
+                    position: 'relative',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center'
+                }}>
+                    <button
+                        className="btn-input btn btn-sm btn-primary flex-fill p-0"
+                        style={{ maxWidth: "3rem", minWidth: "3rem", fontSize: "1rem" }}
+                        onClick={(e) => {
+                            e.stopPropagation()
+                            toggleMenu()
+                        }}
+                        disabled={!transaksi?.length}
+                        title="Export Laporan"
+                    >
+                        <i className="fas fa-file-download"></i>
+                    </button>
+                    {showMenu && (
+                        <div>
+                            <div
+                                ref={menuRef}
+                                style={{
+                                    position: "absolute",
+                                    right: 0,
+                                    top: "110%",
+                                    background: "white",
+                                    border: "1px solid lightgray",
+                                    borderRadius: "8px",
+                                    padding: "8px 0",
+                                    width: "140px",
+                                    boxShadow: "0px 4px 8px rgba(0,0,0,0.1)",
+                                    zIndex: 50
+                                }}
+                            >
+                                <button
+                                    className="dropdown-item"
+                                    style={{ padding: "6px 12px", cursor: "pointer", color: 'green' }}
+                                    onClick={(e) => {
+                                        e.stopPropagation()
+                                        exportExcel(e)
+                                    }}
+                                >
+                                    <i className="fas fa-file-excel me-2"></i>
+                                    Export Excel
+                                </button>
+                                <button
+                                    className="dropdown-item"
+                                    style={{ padding: "6px 12px", cursor: "pointer", color: 'red' }}
+                                    onClick={(e) => {
+                                        e.stopPropagation()
+                                        exportPdf(e)
+                                    }}
+                                >
+                                    <i className="fas fa-file-pdf me-2"></i>
+                                    Export PDF
+                                </button>
+                            </div>
+                        </div>
+                    )}
+                </div>
             </div>
         </form>
     )
 }
 
-export function FilterLaporanPengaduan({ pengaduan, data, setData, daftar_tahun, daftar_bulan, filter, resetFilter, role }) {
+export function FilterLaporanPengaduan({ pengaduan, exportExcel, exportPdf, data, setData, daftar_tahun, daftar_bulan, filter, resetFilter, role }) {
+    const [showMenu, setShowMenu] = useState(false)
+    const toggleMenu = () => setShowMenu(prev => !prev)
+    const menuRef = useRef(null)
+
+    useEffect(() => {
+        function handleClickOutside(e) {
+            if (menuRef.current && !menuRef.current.contains(e.target)) {
+                setShowMenu(false)
+            }
+        }
+
+        document.addEventListener("click", handleClickOutside)
+        return () => document.removeEventListener("click", handleClickOutside)
+    }, [])
+
     return (
         <form onSubmit={filter} className="filter-form form-filter d-flex px-0 g-2 pb-2 mb-2 w-100">
             <div className="col-md-5 col-12 pr-2">
@@ -626,17 +771,67 @@ export function FilterLaporanPengaduan({ pengaduan, data, setData, daftar_tahun,
                     <i className="fas fa-undo"></i>
                 </Link>
 
-                {/* <button
-                    className="btn btn-success my-auto mr-3"
-                    type="button"
-                    title={!pengaduan?.length ? "Tidak ada pengaduan yang dapat diexport" : "Export pengaduan ke Excel"}
-                    style={{ borderRadius: "0.2rem" }}
-                    onClick={() => window.location.href = `/${role}/export/pengaduan`}
-                    // disabled={!pengaduan?.length}
-                    disabled
-                >
-                    <i className="fas fa-file-excel"></i>
-                </button> */}
+                <div style={{
+                    position: 'relative',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center'
+                }}>
+                    <button
+                        className="btn-input btn btn-sm btn-primary flex-fill p-0"
+                        style={{ maxWidth: "3rem", minWidth: "3rem", fontSize: "1rem" }}
+                        onClick={(e) => {
+                            e.stopPropagation()
+                            toggleMenu()
+                        }}
+                        disabled={!pengaduan?.length}
+                        title="Export Laporan"
+                    >
+                        <i className="fas fa-file-download"></i>
+                    </button>
+                    {showMenu && (
+                        <div>
+                            <div
+                                ref={menuRef}
+                                style={{
+                                    position: "absolute",
+                                    right: 0,
+                                    top: "110%",
+                                    background: "white",
+                                    border: "1px solid lightgray",
+                                    borderRadius: "8px",
+                                    padding: "8px 0",
+                                    width: "140px",
+                                    boxShadow: "0px 4px 8px rgba(0,0,0,0.1)",
+                                    zIndex: 50
+                                }}
+                            >
+                                <button
+                                    className="dropdown-item"
+                                    style={{ padding: "6px 12px", cursor: "pointer", color: 'green' }}
+                                    onClick={(e) => {
+                                        e.stopPropagation()
+                                        exportExcel(e)
+                                    }}
+                                >
+                                    <i className="fas fa-file-excel me-2"></i>
+                                    Export Excel
+                                </button>
+                                <button
+                                    className="dropdown-item"
+                                    style={{ padding: "6px 12px", cursor: "pointer", color: 'red' }}
+                                    onClick={(e) => {
+                                        e.stopPropagation()
+                                        exportPdf(e)
+                                    }}
+                                >
+                                    <i className="fas fa-file-pdf me-2"></i>
+                                    Export PDF
+                                </button>
+                            </div>
+                        </div>
+                    )}
+                </div>
             </div>
         </form>
     )

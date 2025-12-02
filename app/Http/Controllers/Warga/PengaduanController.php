@@ -271,6 +271,8 @@ class PengaduanController extends Controller
 
     public function komen(Request $request, $id)
     {
+        /** @var User $user */
+        $user = Auth::user();
         $request->validate([
             'isi_komentar' => 'required|string|max:255'
         ]);
@@ -279,7 +281,8 @@ class PengaduanController extends Controller
 
         $komentar = $pengaduan->komentar()->create([
             'user_id' => Auth::id(),
-            'isi_komentar' => $request->isi_komentar
+            'isi_komentar' => $request->isi_komentar,
+            'role_snapshot' => session('active_role') ?? $user->getRoleNames()->first()
         ]);
 
         $komentar->load('user');

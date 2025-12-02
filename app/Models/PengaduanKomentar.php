@@ -17,6 +17,7 @@ class PengaduanKomentar extends Model
         'isi_komentar',
         'file_path',
         'file_name',
+        'role_snapshot',
     ];
 
     public function pengaduan(): BelongsTo

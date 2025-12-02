@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Rw;
 use App\Http\Controllers\Controller;
 use App\Models\Pengumuman;
 use App\Models\Rw;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -37,11 +38,11 @@ class RwPengumumanController extends Controller
 
         // ✔ Query hanya yang berada di RW ini (pakai nomor_rw)
         $baseQuery = Pengumuman::with([
-                'rukunTetangga',
-                'rw',
-                'komen',
-                'komen.user',
-            ])
+            'rukunTetangga',
+            'rw',
+            'komen',
+            'komen.user',
+        ])
             ->whereHas('rw', function ($q) use ($nomorRwUser) {
                 $q->where('nomor_rw', $nomorRwUser);
             });
@@ -82,8 +83,18 @@ class RwPengumumanController extends Controller
 
         // Nama bulan
         $list_bulan = [
-            'januari','februari','maret','april','mei','juni',
-            'juli','agustus','september','oktober','november','desember'
+            'januari',
+            'februari',
+            'maret',
+            'april',
+            'mei',
+            'juni',
+            'juli',
+            'agustus',
+            'september',
+            'oktober',
+            'november',
+            'desember'
         ];
 
         return Inertia::render('Pengumuman', [
@@ -198,27 +209,53 @@ class RwPengumumanController extends Controller
 
     public function exportPDF($id)
     {
-        $pengumuman = Pengumuman::findOrFail($id);
+        $data = Pengumuman::with(['rukunTetangga', 'rw.kartuKeluarga'])->findOrFail($id);
 
+        /** @var User $user */
+        $user = Auth::user();
+        $role = session('active_role') ?? $user->getRoleNames()->first();
+        $rt = $data->rukunTetangga;
+        $rw = $data->rw;
 
-        $html = View::make('rt.pengumuman.komponen.export_pengumuman', compact('pengumuman'))->render();
+        $rtNumber = $rt ? str_pad($rt->nomor_rt, 2, '0', STR_PAD_LEFT) : null;
+        $rwNumber = $rw ? str_pad($rw->nomor_rw, 2, '0', STR_PAD_LEFT) : null;
 
+        $bulanRomawi = [1 => "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII"];
+        $bulan = $bulanRomawi[now()->format('n')];
+        $tahun = now()->year;
 
-        $options = new Options();
-        $options->set('isHtml5ParserEnabled', true);
-        $options->set('isRemoteEnabled', true);
+        $urut = str_pad($data->id, 3, '0', STR_PAD_LEFT);
 
-        $dompdf = new Dompdf($options);
-        $dompdf->loadHtml($html);
-        $dompdf->setPaper('A4', 'portrait');
-        $dompdf->render();
+        $no_surat = $rt
+            ? "$urut/RT$rtNumber/$bulan/$tahun"
+            : "$urut/RW$rwNumber/$bulan/$tahun";
 
+        $hari   = Carbon::parse($data->tanggal)->translatedFormat('l');
+        $tanggal = Carbon::parse($data->tanggal)->translatedFormat('d F Y');
+        $waktu  = Carbon::parse($data->tanggal)->format('H:i');
+        $judul = $data->judul;
 
-        $filename = 'Pengumuman ' . $pengumuman->judul . '.pdf';
+        $kk = $data->rw->kartuKeluarga->where('no_kk', $role === 'rw' ? $rw->no_kk : $rt->no_kk)->first();
 
-        return response($dompdf->output(), 200)
-            ->header('Content-Type', 'application/pdf')
-            ->header('Content-Disposition', "attachment; filename=\"{$filename}\"");
+        $pdf = Pdf::loadView('rt.export-pengumuman', [
+            'rt' => $data->rukunTetangga->nomor_rt ?? null,
+            'rw' => $data->rw->nomor_rw,
+            'nama_desa' => 'Nama Desa',
+            'kelurahan' => $kk->kelurahan,
+            'kecamatan' => $kk->kecamatan,
+            'kabupaten' => $kk->kabupaten,
+            'nomor_surat' => $no_surat,
+            'hari' => $hari,
+            'tanggal' => $tanggal,
+            'waktu' => $waktu,
+            'tempat' => $data->tempat,
+            'isi_pengumuman' => $data->isi,
+            'tanggal_surat' => now()->format('d F Y'),
+            'nama_penanggung_jawab' => $user->nama,
+            'penanggung_jawab' => ucfirst($role),
+            'judul' => $judul,
+        ]);
+        return $pdf->download("Surat_Pengumuman_$judul.pdf");
     }
 
     protected function indoToEnglishDay(string $indoDay): ?string
@@ -237,6 +274,8 @@ class RwPengumumanController extends Controller
 
     public function komen(Request $request, $id)
     {
+        /** @var User $user */
+        $user = Auth::user();
         $request->validate([
             'isi_komentar' => 'required_without:file|string|nullable|max:255',
             'file' => 'required_without:isi_komentar|nullable|file|mimes:jpg,jpeg,png,gif,mp4,mov,avi,mkv,doc,docx,pdf|max:20480',
@@ -258,6 +297,7 @@ class RwPengumumanController extends Controller
             'isi_komentar' => $request->isi_komentar,
             'file_path' => $filePath,
             'file_name' => $fileName,
+            'role_snapshot' => session('active_role') ?? $user->getRoleNames()->first()
         ]);
 
         $komentar->load('user');

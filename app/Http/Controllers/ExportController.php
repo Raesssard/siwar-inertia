@@ -5,18 +5,20 @@ namespace App\Http\Controllers;
 use App\Models\Iuran;
 use App\Models\Kartu_keluarga;
 use App\Models\Kategori_golongan;
+use App\Models\Pengaduan;
 use App\Models\Tagihan;
 use App\Models\Transaksi;
 use App\Models\Warga;
+use Barryvdh\DomPDF\Facade\Pdf;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Http\Request;
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 use PhpOffice\PhpSpreadsheet\Cell\DataType;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Border;
-use Symfony\Component\HttpFoundation\Request;
 
 // export ini sementara aj, nanti diganti lagi
 
@@ -65,8 +67,8 @@ class ExportController extends Controller
             $sheet->getStyle("B2:F{$rowEnd}")->applyFromArray([
                 'borders' => [
                     'allBorders' => [
-                        'borderStyle' => Border::BORDER_THIN, // bisa THICK, DASHED, dll.
-                        'color' => ['argb' => 'FF000000'], // hitam
+                        'borderStyle' => Border::BORDER_THIN,
+                        'color' => ['argb' => 'FF000000'],
                     ],
                 ],
             ]);
@@ -117,8 +119,8 @@ class ExportController extends Controller
             $sheet->getStyle("I2:R{$rowEnds}")->applyFromArray([
                 'borders' => [
                     'allBorders' => [
-                        'borderStyle' => Border::BORDER_THIN, // bisa THICK, DASHED, dll.
-                        'color' => ['argb' => 'FF000000'], // hitam
+                        'borderStyle' => Border::BORDER_THIN,
+                        'color' => ['argb' => 'FF000000'],
                     ],
                 ],
             ]);
@@ -181,8 +183,8 @@ class ExportController extends Controller
             $sheet->getStyle("B2:H{$rowEnd}")->applyFromArray([
                 'borders' => [
                     'allBorders' => [
-                        'borderStyle' => Border::BORDER_THIN, // bisa THICK, DASHED, dll.
-                        'color' => ['argb' => 'FF000000'], // hitam
+                        'borderStyle' => Border::BORDER_THIN,
+                        'color' => ['argb' => 'FF000000'],
                     ],
                 ],
             ]);
@@ -224,8 +226,8 @@ class ExportController extends Controller
             $sheet->getStyle("K2:R{$rowEnd2}")->applyFromArray([
                 'borders' => [
                     'allBorders' => [
-                        'borderStyle' => Border::BORDER_THIN, // bisa THICK, DASHED, dll.
-                        'color' => ['argb' => 'FF000000'], // hitam
+                        'borderStyle' => Border::BORDER_THIN,
+                        'color' => ['argb' => 'FF000000'],
                     ],
                 ],
             ]);
@@ -287,8 +289,8 @@ class ExportController extends Controller
             $sheet->getStyle("B2:G{$rowEnd}")->applyFromArray([
                 'borders' => [
                     'allBorders' => [
-                        'borderStyle' => Border::BORDER_THIN, // bisa THICK, DASHED, dll.
-                        'color' => ['argb' => 'FF000000'], // hitam
+                        'borderStyle' => Border::BORDER_THIN,
+                        'color' => ['argb' => 'FF000000'],
                     ],
                 ],
             ]);
@@ -326,8 +328,8 @@ class ExportController extends Controller
             $sheet->getStyle("J2:O{$rowEnd}")->applyFromArray([
                 'borders' => [
                     'allBorders' => [
-                        'borderStyle' => Border::BORDER_THIN, // bisa THICK, DASHED, dll.
-                        'color' => ['argb' => 'FF000000'], // hitam
+                        'borderStyle' => Border::BORDER_THIN,
+                        'color' => ['argb' => 'FF000000'],
                     ],
                 ],
             ]);
@@ -447,8 +449,8 @@ class ExportController extends Controller
             $sheet->getStyle("B2:R{$rowEnd}")->applyFromArray([
                 'borders' => [
                     'allBorders' => [
-                        'borderStyle' => Border::BORDER_THIN, // bisa THICK, DASHED, dll.
-                        'color' => ['argb' => 'FF000000'], // hitam
+                        'borderStyle' => Border::BORDER_THIN,
+                        'color' => ['argb' => 'FF000000'],
                     ],
                 ],
             ]);
@@ -538,8 +540,8 @@ class ExportController extends Controller
             $sheet->getStyle("B2:P{$rowEnd}")->applyFromArray([
                 'borders' => [
                     'allBorders' => [
-                        'borderStyle' => Border::BORDER_THIN, // bisa THICK, DASHED, dll.
-                        'color' => ['argb' => 'FF000000'], // hitam
+                        'borderStyle' => Border::BORDER_THIN,
+                        'color' => ['argb' => 'FF000000'],
                     ],
                 ],
             ]);
@@ -654,6 +656,8 @@ class ExportController extends Controller
         $totalPengeluaran = (clone $transaksi)->where('jenis', 'pengeluaran')->sum('nominal');
         $totalKeuangan = $totalPemasukan - $totalPengeluaran;
 
+        $allTransaksi = (clone $transaksi)->get();
+
         $sheet->setCellValue('B1', "Laporan Pemasukan dan Pengeluaran " . ($currentRole === 'rt' ? "RT {$nomor_rt}/RW {$nomor_rw}" : "RW {$nomor_rw}"));
         $sheet->mergeCells('B1:F1');
         $sheet->setCellValue('B2', "Periode {$namaBulan} {$tahun}");
@@ -667,13 +671,13 @@ class ExportController extends Controller
         $sheet->getStyle('B3:F3')->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
         $sheet->getStyle('B3:F3')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
-        foreach ($transaksi->get() as $trx) {
+        foreach ($allTransaksi as $trx) {
             $pemasukan = $trx->jenis === 'pemasukan';
             $pengeluaran = $trx->jenis === 'pengeluaran';
 
             $sheet->setCellValue("B{$row}", $no);
-            $sheet->setCellValue("C{$row}", date('d/m/Y', strtotime($trx->tanggal)));
-            $sheet->setCellValue("D{$row}", $trx->nama_transaksi);
+            $sheet->setCellValue("C{$row}", date('d/m/Y', strtotime($trx->tanggal)) ?? '-');
+            $sheet->setCellValue("D{$row}", $trx->nama_transaksi ?? '-');
             $sheet->setCellValue("E{$row}", $pemasukan ? $trx->nominal : null);
             $sheet->setCellValue("F{$row}", $pengeluaran ? $trx->nominal : null);
             $row++;
@@ -701,18 +705,375 @@ class ExportController extends Controller
         $sheet->getStyle("B1:F{$rowEnd}")->applyFromArray([
             'borders' => [
                 'allBorders' => [
-                    'borderStyle' => Border::BORDER_THIN, // bisa THICK, DASHED, dll.
-                    'color' => ['argb' => 'FF000000'], // hitam
+                    'borderStyle' => Border::BORDER_THIN,
+                    'color' => ['argb' => 'FF000000'],
                 ],
             ],
         ]);
 
+        $formatBulan = strtolower($namaBulan);
+
         $writer = new Xlsx($spreadsheet);
-        $filename = "laporan_keuangan_rt_{$nomor_rt}.xlsx";
+        $filename = "laporan_keuangan_" . ($currentRole === 'rt' ? "rt{$nomor_rt}/rw{$nomor_rw}" : "rw{$nomor_rw}") . "_{$formatBulan}_{$tahun}.xlsx";
 
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         header("Content-Disposition: attachment; filename=\"$filename\"");
         $writer->save("php://output");
         exit;
+    }
+
+    public function exportLaporanKeuanganPdf($bulan, $tahun)
+    {
+        $currentRole = session('active_role');
+        $idRw = Auth::user()->rw->id ?? null;
+        $idRt = Auth::user()->rukunTetangga->id ?? null;
+        Log::info('bulan sama tahun yg masuk', [$bulan, $tahun]);
+
+        $daftar_bulan = [
+            'januari',
+            'februari',
+            'maret',
+            'april',
+            'mei',
+            'juni',
+            'juli',
+            'agustus',
+            'september',
+            'oktober',
+            'november',
+            'desember'
+        ];
+
+        $namaBulan = ucfirst($daftar_bulan[$bulan - 1]);
+
+        Log::info('nama bulan yg didapet', [$namaBulan]);
+
+        $nomor_rt = Auth::user()->rukunTetangga->nomor_rt ?? null;
+        $nomor_rw = Auth::user()->rw->nomor_rw ?? null;
+
+        if ($currentRole === 'rw') {
+            $transaksi = Transaksi::where(function ($query) use ($idRw) {
+                $query->where(function ($q) use ($idRw) {
+                    $q->whereNotNull('tagihan_id')
+                        ->whereHas('tagihan.iuran', function ($subQuery) use ($idRw) {
+                            $subQuery->where('id_rw', $idRw);
+                        });
+                })
+                    ->orWhere(function ($q) use ($idRw) {
+                        $q->whereNull('tagihan_id')
+                            ->whereHas('rukunTetangga', function ($subQuery) use ($idRw) {
+                                $subQuery->where('id_rw', $idRw);
+                            });
+                    });
+            })
+                ->when($tahun, fn($q) => $q->whereYear('tanggal', $tahun))
+                ->when($bulan, fn($q) => $q->whereMonth('tanggal', $bulan))
+                ->orderBy('tanggal', 'desc');
+        }
+
+        if ($currentRole === 'rt') {
+            $transaksi = Transaksi::where(function ($query) use ($idRt) {
+                $query->where(function ($q) use ($idRt) {
+                    $q->whereNotNull('tagihan_id')
+                        ->whereHas('tagihan.iuran', function ($subQuery) use ($idRt) {
+                            $subQuery->where('id_rt', $idRt);
+                        });
+                })
+                    ->orWhere(function ($q) use ($idRt) {
+                        $q->whereNull('tagihan_id')
+                            ->whereHas('rukunTetangga', function ($subQuery) use ($idRt) {
+                                $subQuery->where('id', $idRt);
+                            });
+                    });
+            })
+                ->when($tahun, fn($q) => $q->whereYear('tanggal', $tahun))
+                ->when($bulan, fn($q) => $q->whereMonth('tanggal', $bulan))
+                ->orderBy('tanggal', 'desc');
+        }
+
+        if (!$bulan) {
+            $transaksi->whereMonth('tanggal', now()->month);
+        }
+
+        if (!$tahun) {
+            $transaksi->whereYear('tanggal', now()->year);
+        }
+
+        $totalPemasukan = (clone $transaksi)->where('jenis', 'pemasukan')->sum('nominal');
+        $totalPengeluaran = (clone $transaksi)->where('jenis', 'pengeluaran')->sum('nominal');
+        $totalKeuangan = $totalPemasukan - $totalPengeluaran;
+
+        $allTransaksi = (clone $transaksi)->get();
+
+        $formatBulan = strtolower($namaBulan);
+
+        $pdf = Pdf::loadView('laporan-keuangan-pdf', [
+            'transaksi' => $allTransaksi,
+            'bulan' => $namaBulan,
+            'tahun' => $tahun,
+            'totalPemasukan' => $totalPemasukan,
+            'totalPengeluaran' => $totalPengeluaran,
+            'totalKeuangan' => $totalKeuangan,
+            'role' => $currentRole,
+            'nomor_rt' => $nomor_rt,
+            'nomor_rw' => $nomor_rw,
+        ]);
+
+        Log::info('ini yg pdf');
+
+        return $pdf->download("laporan-keuangan-"
+            . ($currentRole === 'rt'
+                ? "rt{$nomor_rt}-rw{$nomor_rw}"
+                : "rw{$nomor_rw}")
+            . "-{$formatBulan}-{$tahun}.pdf");
+    }
+
+    public function exportlaporanPengaduan(Request $request)
+    {
+        $currentRole = session('active_role');
+        $idRw = Auth::user()->rw->id ?? null;
+        $idRt = Auth::user()->rukunTetangga->id ?? null;
+
+        $search = $request->input('search');
+        $tahun = $request->input('tahun') ?? now()->year;
+        $bulan = $request->input('bulan');
+        $kategori = $request->input('kategori');
+        $status = $request->input('status');
+
+        Log::info('request yg masuk', [$request->all()]);
+
+        $daftar_bulan = [
+            'januari',
+            'februari',
+            'maret',
+            'april',
+            'mei',
+            'juni',
+            'juli',
+            'agustus',
+            'september',
+            'oktober',
+            'november',
+            'desember'
+        ];
+
+        $namaBulan = ucfirst($daftar_bulan[$bulan - 1 < 0 ? now()->month - 1 : $bulan - 1]) ?? null;
+
+        Log::info('nama bulan yg didapet', [$namaBulan]);
+
+        $nomor_rt = Auth::user()->rukunTetangga->nomor_rt ?? null;
+        $nomor_rw = Auth::user()->rw->nomor_rw ?? null;
+
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setTitle('Transaksi');
+        $sheet->getStyle("A1:Z3")->getFont()->setBold(true);
+        $sheet->getStyle('A1:AZ3')->getAlignment()->applyFromArray([
+            'horizontal' => Alignment::HORIZONTAL_CENTER,
+            'vertical'   => Alignment::VERTICAL_CENTER,
+            'wrapText'   => true,
+        ]);
+
+        $maxCol = Coordinate::columnIndexFromString('AZ');
+        for ($i = 1; $i <= $maxCol; $i++) {
+            $colLetter = Coordinate::stringFromColumnIndex($i);
+            $sheet->getColumnDimension($colLetter)->setAutoSize(true);
+        }
+
+        $no = 1;
+        $row = 4;
+
+        if ($currentRole === 'rw') {
+            $pengaduan = Pengaduan::with(['warga'])->where(function ($query) use ($idRw) {
+                $query->where(function ($q) use ($idRw) {
+                    $q->where('level', 'rw')
+                        ->whereHas('warga.kartuKeluarga.rw', function ($subQuery) use ($idRw) {
+                            $subQuery->where('id', $idRw);
+                        });
+                })->orWhere(function ($q) use ($idRw) {
+                    $q->where('level', 'rt')
+                        ->whereHas('warga.kartuKeluarga.rukunTetangga.rw', function ($subQuery) use ($idRw) {
+                            $subQuery->where('id', $idRw);
+                        });
+                });
+            })->when($search, fn($q) => $q->where('nama_transaksi', 'like', '%' . $search . '%'))
+                ->when($tahun, fn($q) => $q->whereYear('created_at', $tahun))
+                ->when($bulan, fn($q) => $q->whereMonth('created_at', $bulan))
+                ->when($kategori, fn($q) => $q->where('level', $kategori))
+                ->when($status, fn($q) => $q->where('status', $status))
+                ->orderBy('created_at', 'desc');
+        }
+
+        if ($currentRole === 'rt') {
+            $pengaduan = Pengaduan::with(['warga'])->where(function ($query) use ($idRt) {
+                $query->where(function ($q) use ($idRt) {
+                    $q->where('level', 'rt')
+                        ->whereHas('warga.kartuKeluarga.rukunTetangga', function ($subQuery) use ($idRt) {
+                            $subQuery->where('id', $idRt);
+                        });
+                });
+            })->when($search, fn($q) => $q->where('nama_transaksi', 'like', '%' . $search . '%'))
+                ->when($tahun, fn($q) => $q->whereYear('created_at', $tahun))
+                ->when($bulan, fn($q) => $q->whereMonth('created_at', $bulan))
+                ->when($kategori, fn($q) => $q->where('level', $kategori))
+                ->when($status, fn($q) => $q->where('status', $status))
+                ->orderBy('created_at', 'desc');
+        }
+
+        $allPengaduan = (clone $pengaduan)->get();
+
+        $sheet->setCellValue('B1', "Laporan Pengaduan " . ($currentRole === 'rt' ? "RT {$nomor_rt}/RW {$nomor_rw}" : "RW {$nomor_rw}"));
+        $sheet->mergeCells('B1:G1');
+        $sheet->setCellValue('B2', "{$namaBulan} {$tahun}");
+        $sheet->mergeCells('B2:G2');
+
+        $sheet->setCellValue('B3', 'No.');
+        $sheet->setCellValue('C3', 'Tanggal');
+        $sheet->setCellValue('D3', 'NIK');
+        $sheet->setCellValue('E3', 'Nama Pelapor');
+        $sheet->setCellValue('F3', 'Aduan');
+        $sheet->setCellValue('G3', 'Status');
+
+        foreach ($allPengaduan as $pengaduan) {
+            $sheet->setCellValue("B{$row}", $no);
+            $sheet->setCellValue("C{$row}", date('d/m/Y', strtotime($pengaduan->created_at)) ?? '-');
+            $sheet->setCellValue("D{$row}", $pengaduan->nik_warga ?? '-');
+            $sheet->setCellValue("E{$row}", $pengaduan->warga->nama ?? '-');
+            $sheet->setCellValue("F{$row}", $pengaduan->judul ?? '-');
+            $sheet->setCellValue("G{$row}", $pengaduan->status ?? '-');
+            $row++;
+            $no++;
+        }
+
+        $selesai = $allPengaduan->where('status', 'selesai')->count();
+        $diproses = $allPengaduan->where('status', 'diproses')->count();
+        $belum = $allPengaduan->where('status', 'belum')->count();
+
+        $sheet->setCellValue("B" . $row + 1, 'Keterangan: ');
+        $sheet->setCellValue("B" . $row + 2, 'Selesai: ' . $selesai);
+        $sheet->setCellValue("B" . $row + 3, 'Diproses: ' . $diproses);
+        $sheet->setCellValue("B" . $row + 4, 'Belum: ' . $belum);
+        $sheet->mergeCells("B" . $row + 1 . ":C" . $row + 1);
+        $sheet->mergeCells("B" . $row + 2 . ":C" . $row + 2);
+        $sheet->mergeCells("B" . $row + 3 . ":C" . $row + 3);
+        $sheet->mergeCells("B" . $row + 4 . ":C" . $row + 4);
+        $sheet->getStyle("B" . $row + 1)->getFont()->setBold(true);
+
+        $rowDataEnd = $row - 1;
+        $sheet->getStyle("B4:G{$rowDataEnd}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+
+        $sheet->getStyle("B1:G{$rowDataEnd}")->applyFromArray([
+            'borders' => [
+                'allBorders' => [
+                    'borderStyle' => Border::BORDER_THIN,
+                    'color' => ['argb' => 'FF000000'],
+                ],
+            ],
+        ]);
+
+        $formatBulan = strtolower($namaBulan);
+
+        $writer = new Xlsx($spreadsheet);
+        $filename = "laporan-pengaduan-" . ($currentRole === 'rt' ? "rt{$nomor_rt}/rw{$nomor_rw}" : "rw{$nomor_rw}") . "-{$formatBulan}-{$tahun}.xlsx";
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header("Content-Disposition: attachment; filename=\"$filename\"");
+        $writer->save("php://output");
+        exit;
+    }
+
+    public function exportLaporanPengaduanPdf(Request $request)
+    {
+        $currentRole = session('active_role');
+        $idRw = Auth::user()->rw->id ?? null;
+        $idRt = Auth::user()->rukunTetangga->id ?? null;
+
+        $search = $request->input('search');
+        $tahun = $request->input('tahun') ?? now()->year;
+        $bulan = $request->input('bulan');
+        $kategori = $request->input('kategori');
+        $status = $request->input('status');
+
+        Log::info('bulan sama tahun yg masuk', [$bulan, $tahun]);
+
+        $daftar_bulan = [
+            'januari',
+            'februari',
+            'maret',
+            'april',
+            'mei',
+            'juni',
+            'juli',
+            'agustus',
+            'september',
+            'oktober',
+            'november',
+            'desember'
+        ];
+
+        $namaBulan = ucfirst($daftar_bulan[$bulan - 1 < 0 ? now()->month - 1 : $bulan - 1]) ?? null;
+
+        Log::info('nama bulan yg didapet', [$namaBulan]);
+
+        $nomor_rt = Auth::user()->rukunTetangga->nomor_rt ?? null;
+        $nomor_rw = Auth::user()->rw->nomor_rw ?? null;
+
+        if ($currentRole === 'rw') {
+            $pengaduan = Pengaduan::with(['warga'])->where(function ($query) use ($idRw) {
+                $query->where(function ($q) use ($idRw) {
+                    $q->where('level', 'rw')
+                        ->whereHas('warga.kartuKeluarga.rw', function ($subQuery) use ($idRw) {
+                            $subQuery->where('id', $idRw);
+                        });
+                })->orWhere(function ($q) use ($idRw) {
+                    $q->where('level', 'rt')
+                        ->whereHas('warga.kartuKeluarga.rukunTetangga.rw', function ($subQuery) use ($idRw) {
+                            $subQuery->where('id', $idRw);
+                        });
+                });
+            })->when($search, fn($q) => $q->where('nama_transaksi', 'like', '%' . $search . '%'))
+                ->when($tahun, fn($q) => $q->whereYear('created_at', $tahun))
+                ->when($bulan, fn($q) => $q->whereMonth('created_at', $bulan))
+                ->when($kategori, fn($q) => $q->where('level', $kategori))
+                ->when($status, fn($q) => $q->where('status', $status))
+                ->orderBy('created_at', 'desc');
+        }
+
+        if ($currentRole === 'rt') {
+            $pengaduan = Pengaduan::with(['warga'])->where(function ($query) use ($idRt) {
+                $query->where(function ($q) use ($idRt) {
+                    $q->where('level', 'rt')
+                        ->whereHas('warga.kartuKeluarga.rukunTetangga', function ($subQuery) use ($idRt) {
+                            $subQuery->where('id', $idRt);
+                        });
+                });
+            })->when($search, fn($q) => $q->where('nama_transaksi', 'like', '%' . $search . '%'))
+                ->when($tahun, fn($q) => $q->whereYear('created_at', $tahun))
+                ->when($bulan, fn($q) => $q->whereMonth('created_at', $bulan))
+                ->when($kategori, fn($q) => $q->where('level', $kategori))
+                ->when($status, fn($q) => $q->where('status', $status))
+                ->orderBy('created_at', 'desc');
+        }
+
+        $allPengaduan = (clone $pengaduan)->get();
+
+        $formatBulan = strtolower($namaBulan);
+
+        $pdf = Pdf::loadView('laporan-pengaduan-pdf', [
+            'pengaduan' => $allPengaduan,
+            'bulan' => $namaBulan,
+            'tahun' => $tahun,
+            'role' => $currentRole,
+            'nomor_rt' => $nomor_rt,
+            'nomor_rw' => $nomor_rw,
+        ]);
+
+        Log::info('ini yg pdf');
+
+        return $pdf->download("laporan-pengaduan-"
+            . ($currentRole === 'rt'
+                ? "rt{$nomor_rt}-rw{$nomor_rw}"
+                : "rw{$nomor_rw}")
+            . "-{$formatBulan}-{$tahun}.pdf");
     }
 }
