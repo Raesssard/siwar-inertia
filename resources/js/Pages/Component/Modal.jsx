@@ -2349,6 +2349,9 @@ export function DetailKK({ selectedData, detailShow, onClose, role, userData }) 
     const [showModal, setShowModal] = useState(false)
     const [windowWidth, setWindowWidth] = useState(window.innerWidth)
     const [windowHeight, setWindowHeight] = useState(window.innerHeight)
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [wargaToDelete, setWargaToDelete] = useState(null);
+
 
     useEffect(() => {
         function handleResize() {
@@ -2664,13 +2667,8 @@ export function DetailKK({ selectedData, detailShow, onClose, role, userData }) 
                                                                     {/* Hapus */}
                                                                     <button
                                                                         onClick={() => {
-                                                                            if (confirm(`Hapus warga ${data.nama}?`)) {
-                                                                                const routeName = role === "admin" ? "admin.warga.destroy" : "rw.warga.destroy";
-                                                                                router.delete(route(routeName, data.id), {
-                                                                                    onSuccess: () => alert("Warga berhasil dihapus"),
-                                                                                    onError: () => alert("Gagal menghapus warga"),
-                                                                                });
-                                                                            }
+                                                                            setWargaToDelete(data);
+                                                                            setShowDeleteModal(true);
                                                                         }}
                                                                         className="inline-flex items-center justify-center rounded-md bg-red-500 hover:bg-red-600 text-white px-2 py-2 text-xs transition-all"
                                                                         style={{ borderRadius: '0.25rem' }}
@@ -2839,8 +2837,144 @@ export function DetailKK({ selectedData, detailShow, onClose, role, userData }) 
                 detailShow={showModal}
                 onClose={() => setShowModal(false)}
             />
+            <ModalDeleteWarga
+                show={showDeleteModal}
+                warga={wargaToDelete}
+                onClose={() => setShowDeleteModal(false)}
+                onSubmit={(keterangan) => {
+                    const routeName = role === "admin" ? "admin.warga.destroy" : "rw.warga.destroy";
+
+                    router.delete(route(routeName, wargaToDelete.id), {
+                        data: { keterangan },
+                        onSuccess: () => {
+                            alert("Warga berhasil dihapus dan history tersimpan");
+                            setShowDeleteModal(false);
+                        },
+                        onError: () => {
+                            alert("Gagal menghapus warga");
+                        },
+                    });
+                }}
+            />
         </>
     )
+}
+
+export default function ModalDeleteWarga({ show, onClose, onSubmit, warga }) {
+    const [alasan, setAlasan] = useState("");
+    const [keteranganManual, setKeteranganManual] = useState("");
+    const [error, setError] = useState("");
+
+    useEffect(() => {
+        if (!show) {
+            // Reset saat modal ditutup
+            setAlasan("");
+            setKeteranganManual("");
+            setError("");
+        }
+    }, [show]);
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+
+        if (alasan === "") {
+            setError("Silakan pilih alasan");
+            return;
+        }
+
+        let finalKeterangan =
+            alasan === "lainnya" ? keteranganManual.trim() : alasan;
+
+        if (alasan === "lainnya" && finalKeterangan === "") {
+            setError("Silakan isi keterangan manual");
+            return;
+        }
+
+        onSubmit(finalKeterangan); // kirim ke parent
+    };
+
+    if (!show) return null;
+
+    return (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" style={{ zIndex: 99999 }}>
+            <div className="bg-white rounded-xl w-full max-w-lg shadow-lg" style={{ zIndex: 100000 }}>
+                <form onSubmit={handleSubmit}>
+                    <div className="p-4 border-b bg-red-600 text-white rounded-t-xl">
+                        <h2 className="text-lg font-bold">
+                            Hapus Warga – {warga?.nama?.toUpperCase()}
+                        </h2>
+                    </div>
+
+                    <div className="p-4 space-y-3">
+                        <p>
+                            Apakah Anda yakin ingin menghapus warga{" "}
+                            <strong>{warga?.nama?.toUpperCase()}</strong> dengan
+                            NIK <strong>{warga?.nik}</strong>?
+                        </p>
+
+                        <div>
+                            <label className="font-medium">
+                                Pilih Alasan
+                            </label>
+                            <select
+                                className="mt-1 w-full border rounded p-2"
+                                value={alasan}
+                                onChange={(e) => {
+                                    setAlasan(e.target.value);
+                                    setError("");
+                                }}
+                            >
+                                <option value="">-- Pilih Alasan --</option>
+                                <option value="Keluar dari kampung/desa">
+                                    Keluar dari kampung/desa
+                                </option>
+                                <option value="Meninggal dunia">
+                                    Meninggal dunia
+                                </option>
+                                <option value="lainnya">Lainnya</option>
+                            </select>
+                        </div>
+
+                        {alasan === "lainnya" && (
+                            <div>
+                                <label className="font-medium">
+                                    Keterangan Manual
+                                </label>
+                                <textarea
+                                    className="mt-1 w-full border rounded p-2"
+                                    rows="3"
+                                    value={keteranganManual}
+                                    onChange={(e) =>
+                                        setKeteranganManual(e.target.value)
+                                    }
+                                ></textarea>
+                            </div>
+                        )}
+
+                        {error && (
+                            <p className="text-red-600 text-sm">{error}</p>
+                        )}
+                    </div>
+
+                    <div className="p-4 flex justify-end gap-2 border-t">
+                        <button
+                            type="button"
+                            className="px-4 py-2 bg-gray-300 rounded"
+                            onClick={onClose}
+                        >
+                            Batal
+                        </button>
+                        <button
+                            type="submit"
+                            className="px-4 py-2 bg-red-600 text-white rounded"
+                        >
+                            Hapus & Simpan History
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    );
 }
 
 export function DetailPengumuman({ kategori, selectedData, detailShow, onClose, onUpdated, onDeleted, userData, role }) {
