@@ -1049,7 +1049,7 @@ export function DetailPengaduan({ selectedData, detailShow, onClose, onUpdated, 
                 console.error(err)
             })
     }
-console.log(selectedData)
+    console.log(selectedData)
     const handleConfirm = () => {
         const komen = role === "rw" ? "" : "Sudah diteruskan ke RW untuk ditindaklanjuti"
         axios.put(`/${role}/pengaduan/${selectedData.id}/konfirmasi`, {
@@ -1277,6 +1277,12 @@ console.log(selectedData)
                                                 komentar.map((komen, i) => (
                                                     <div key={i} className="mb-3">
                                                         <small className="fw-bold"><strong>{komen?.user?.nama}</strong></small>{" "}
+                                                        <small className="fw-bold text-muted">
+                                                            {komen?.role_snapshot?.length <= 2
+                                                                ? `• ${komen?.role_snapshot?.toUpperCase() ?? ''}`
+                                                                : `• ${komen?.role_snapshot?.replace(/\b\w/g, (char) => char.toUpperCase()) ?? ''}`
+                                                            }
+                                                        </small>{" "}
                                                         <small className="text-muted">
                                                             • <FormatWaktu createdAt={komen?.created_at} />
                                                         </small>
@@ -3264,7 +3270,28 @@ export function DetailPengumuman({ kategori, selectedData, detailShow, onClose, 
                                                             className="btn komen btn-primary my-auto px-1"
                                                             title="Export Pengumuman ke PDF"
                                                             style={{ border: "none" }}
-                                                            onClick={() => window.location.href = `/${role}/pengumuman/${selectedData.id}/export-pdf`}
+                                                            onClick={() => {
+                                                                // window.location.href = `/${role}/pengumuman/${selectedData.id}/export-pdf`
+
+                                                                axios({
+                                                                    url: `/${role}/pengumuman/${selectedData.id}/export-pdf`,
+                                                                    method: "GET",
+                                                                    responseType: "blob"
+                                                                })
+                                                                    .then((response) => {
+                                                                        const url = window.URL.createObjectURL(new Blob([response.data]))
+                                                                        const link = document.createElement("a")
+                                                                        link.href = url
+                                                                        link.setAttribute(
+                                                                            "download",
+                                                                            `Pengumuman-${selectedData.judul}.pdf`
+                                                                        )
+                                                                        document.body.appendChild(link)
+                                                                        link.click()
+                                                                        link.remove()
+                                                                    })
+                                                                    .catch((err) => console.error(err))
+                                                            }}
                                                         >
                                                             <i className="far fa-file-pdf me-2"></i>
                                                         </button>
@@ -3331,6 +3358,12 @@ export function DetailPengumuman({ kategori, selectedData, detailShow, onClose, 
                                                 komentar.map((komen, i) => (
                                                     <div key={i} className="mb-3">
                                                         <small className="fw-bold"><strong>{komen.user?.nama}</strong></small>{" "}
+                                                        <small className="fw-bold text-muted">
+                                                            {komen?.role_snapshot?.length <= 2
+                                                                ? `• ${komen?.role_snapshot?.toUpperCase() ?? ''}`
+                                                                : `• ${komen?.role_snapshot?.replace(/\b\w/g, (char) => char.toUpperCase()) ?? ''}`
+                                                            }
+                                                        </small>{" "}
                                                         <small className="text-muted">
                                                             • <FormatWaktu createdAt={komen.created_at} />
                                                         </small>

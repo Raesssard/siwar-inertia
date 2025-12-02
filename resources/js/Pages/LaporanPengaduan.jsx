@@ -22,7 +22,7 @@ export default function InformasiPengaduan() {
         kategori: '',
         status: '',
     })
-console.log(pengaduan)
+
     const filter = (e) => {
         e.preventDefault()
         get('/laporan-pengaduan', { preserveState: true, preserveScroll: true })
@@ -42,6 +42,84 @@ console.log(pengaduan)
         setPengaduan(pengaduanFromServer.data)
     }, [pengaduanFromServer])
 
+    const handleExportLaporan = (e) => {
+        e.preventDefault()
+
+        // let bulanExport = bulanIni.bulan == bulan.bulan ? bulan.bulan : data.bulan
+
+        // let nama_bulan = daftar_bulan.find((b, index) => index + 1 == bulanExport)
+
+        // window.location.href = `/export/laporan-keuangan/${bulanExport}/${data.tahun}`
+
+        axios({
+            url: "/export/laporan-pengaduan",
+            method: "GET",
+            params: {
+                search: data.search,
+                tahun: data.tahun,
+                bulan: data.bulan,
+                kategori: data.kategori,
+                status: data.status,
+            },
+            responseType: "blob"
+        })
+            .then((response) => {
+                const url = window.URL.createObjectURL(new Blob([response.data]))
+                const link = document.createElement("a")
+                link.href = url
+                link.setAttribute(
+                    "download",
+                    `laporan-pengaduan-${role === 'rt'
+                        ? `rt${user.rukun_tetangga.nomor_rt}-rw${user.rw.nomor_rw}`
+                        : `rw${user.rw.nomor_rw}`
+                    }.xlsx`
+                )
+                document.body.appendChild(link)
+                link.click()
+                link.remove() // bersih2
+            })
+            .catch((err) => console.error(err))
+    }
+
+    const handleExportLaporanPdf = (e) => {
+        e.preventDefault()
+
+        // let bulanExport = bulanIni.bulan == bulan.bulan ? bulan.bulan : data.bulan
+
+        // let nama_bulan = daftar_bulan.find((b, index) => index + 1 == bulanExport)
+
+        // window.location.href = "/export/laporan-pengaduan-pdf"
+
+        axios({
+            url: "/export/laporan-pengaduan-pdf",
+            method: "GET",
+            params: {
+                search: data.search,
+                tahun: data.tahun,
+                bulan: data.bulan,
+                kategori: data.kategori,
+                status: data.status,
+            },
+            responseType: "blob"
+        })
+            .then((response) => {
+                const url = window.URL.createObjectURL(new Blob([response.data]))
+                const link = document.createElement("a")
+                link.href = url
+                link.setAttribute(
+                    "download",
+                    `laporan-pengaduan-${role === 'rt'
+                        ? `rt${user.rukun_tetangga.nomor_rt}-rw${user.rw.nomor_rw}`
+                        : `rw${user.rw.nomor_rw}`
+                    }.pdf`
+                )
+                document.body.appendChild(link)
+                link.click()
+                link.remove() // bersih2
+            })
+            .catch((err) => console.error(err))
+    }
+
     return (
         <Layout>
             <Head title={`${title} - ${role.length <= 2
@@ -51,6 +129,8 @@ console.log(pengaduan)
                 pengaduan={pengaduan}
                 data={data}
                 setData={setData}
+                exportExcel={handleExportLaporan}
+                exportPdf={handleExportLaporanPdf}
                 daftar_tahun={daftar_tahun}
                 daftar_bulan={daftar_bulan}
                 filter={filter}

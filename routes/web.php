@@ -76,6 +76,9 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/profile/update-photo', [SettingsController::class, 'updatePhoto'])->name('profile.updatePhoto');
     Route::delete('/profile/delete-photo', [SettingsController::class, 'deletePhoto'])->name('profile.deletePhoto');
     Route::get('/export/laporan-keuangan/{bulan}/{tahun}', [ExportController::class, 'exportLaporanKeuangan'])->name('laporan-keuangan.export');
+    Route::get('/export/laporan-keuangan-pdf/{bulan}/{tahun}', [ExportController::class, 'exportLaporanKeuanganPdf'])->name('laporan-keuangan-pdf.export');
+    Route::get('/export/laporan-pengaduan', [ExportController::class, 'exportLaporanPengaduan'])->name('laporan-pengaduan.export');
+    Route::get('/export/laporan-pengaduan-pdf', [ExportController::class, 'exportLaporanPengaduanPdf'])->name('laporan-keuangan-pdf.export');
 
     /*
     |--------------------------------------------------------------------------
@@ -426,13 +429,13 @@ Route::middleware(['auth'])->group(function () {
                 ->except(['create', 'edit', 'show'])
                 ->middleware(CheckPermission::class . ':view.pengumuman');
 
-            Route::get('pengumuman/create', [RwPengumumanController::class, 'create'])
-                ->middleware(CheckPermission::class . ':create.pengumuman')
-                ->name('pengumuman.create');
+            // Route::get('pengumuman/create', [RwPengumumanController::class, 'create'])
+            //     ->middleware(CheckPermission::class . ':create.pengumuman')
+            //     ->name('pengumuman.create');
 
-            Route::get('pengumuman/{id}/edit', [RwPengumumanController::class, 'edit'])
-                ->middleware(CheckPermission::class . ':edit.pengumuman')
-                ->name('pengumuman.edit');
+            // Route::get('pengumuman/{id}/edit', [RwPengumumanController::class, 'edit'])
+            //     ->middleware(CheckPermission::class . ':edit.pengumuman')
+            //     ->name('pengumuman.edit');
 
             Route::get('pengumuman/{id}/export-pdf', [RwPengumumanController::class, 'exportPDF'])
                 ->middleware(CheckPermission::class . ':export.pengumuman')

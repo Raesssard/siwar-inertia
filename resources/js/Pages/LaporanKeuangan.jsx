@@ -32,9 +32,9 @@ export default function LaporanKeuangan() {
     const [tahun, setTahun] = useState(getTahun[0]?.tahun || new Date().getFullYear())
     const defaultBulan = getBulan[0]
         ? { bulan: getBulan[0].bulan, nama_bulan: getBulan[0].nama_bulan }
-        : bulanIni;
+        : bulanIni
 
-    const [bulan, setBulan] = useState(defaultBulan);
+    const [bulan, setBulan] = useState(defaultBulan)
     const { get, data, setData, reset } = useForm({
         search: '',
         tahun: tahun || '',
@@ -101,52 +101,86 @@ export default function LaporanKeuangan() {
     const daftarBulanObj = daftar_bulan.map((nama, index) => ({
         bulan: index + 1,
         nama_bulan: nama
-    }));
+    }))
 
     const handleChangeBulan = (e) => {
-        const value = Number(e.target.value);
-        const bulanObj = daftarBulanObj.find(b => b.bulan === value);
+        const value = Number(e.target.value)
+        const bulanObj = daftarBulanObj.find(b => b.bulan === value)
 
-        // setBulan(bulanObj || null);
-        setData("bulan", value);
-    };
+        // setBulan(bulanObj || null)
+        setData("bulan", value)
+    }
 
     useEffect(() => {
         if (typeof bulan === "string") {
-            const num = daftar_bulan.indexOf(bulan) + 1;
-            setBulan({ bulan: num, nama_bulan: bulan });
+            const num = daftar_bulan.indexOf(bulan) + 1
+            setBulan({ bulan: num, nama_bulan: bulan })
         }
-    }, [bulan]);
-
-    console.log(data)
+    }, [bulan])
 
     const handleExportLaporan = (e) => {
-        e.preventDefault();
-        console.log("diklik");
+        e.preventDefault()
 
         let bulanExport = bulanIni.bulan == bulan.bulan ? bulan.bulan : data.bulan
+
+        let nama_bulan = daftar_bulan.find((b, index) => index + 1 == bulanExport)
+
+        // window.location.href = `/export/laporan-keuangan/${bulanExport}/${data.tahun}`
 
         axios({
             url: `/export/laporan-keuangan/${bulanExport}/${data.tahun}`,
             method: "GET",
-            responseType: "blob" // <-- WAJIB
+            responseType: "blob"
         })
             .then((response) => {
-                console.log("export cuy");
-
-                const url = window.URL.createObjectURL(new Blob([response.data]));
-                const link = document.createElement("a");
-                link.href = url;
+                const url = window.URL.createObjectURL(new Blob([response.data]))
+                const link = document.createElement("a")
+                link.href = url
                 link.setAttribute(
                     "download",
-                    `laporan_keuangan_${data.bulan}_${data.tahun}.xlsx`
-                );
-                document.body.appendChild(link);
-                link.click();
-                link.remove(); // bersih2
+                    `laporan-keuangan-${role === 'rt'
+                        ? `rt${user.rukun_tetangga.nomor_rt}-rw${user.rw.nomor_rw}`
+                        : `rw${user.rw.nomor_rw}`
+                    }-${nama_bulan}-${data.tahun}.xlsx`
+                )
+                document.body.appendChild(link)
+                link.click()
+                link.remove() // bersih2
             })
-            .catch((err) => console.error(err));
-    };
+            .catch((err) => console.error(err))
+    }
+
+    const handleExportLaporanPdf = (e) => {
+        e.preventDefault()
+
+        let bulanExport = bulanIni.bulan == bulan.bulan ? bulan.bulan : data.bulan
+
+        let nama_bulan = daftar_bulan.find((b, index) => index + 1 == bulanExport)
+
+        // window.location.href = `/export/laporan-keuangan-pdf/${bulanExport}/${data.tahun}`
+
+        axios({
+            url: `/export/laporan-keuangan-pdf/${bulanExport}/${data.tahun}`,
+            method: "GET",
+            responseType: "blob"
+        })
+            .then((response) => {
+                const url = window.URL.createObjectURL(new Blob([response.data]))
+                const link = document.createElement("a")
+                link.href = url
+                link.setAttribute(
+                    "download",
+                    `laporan-keuangan-${role === 'rt'
+                        ? `rt${user.rukun_tetangga.nomor_rt}-rw${user.rw.nomor_rw}`
+                        : `rw${user.rw.nomor_rw}`
+                    }-${nama_bulan}-${data.tahun}.pdf`
+                )
+                document.body.appendChild(link)
+                link.click()
+                link.remove() // bersih2
+            })
+            .catch((err) => console.error(err))
+    }
 
     return (
         <Layout>
@@ -155,7 +189,8 @@ export default function LaporanKeuangan() {
                 : role.charAt(0).toUpperCase() + role.slice(1)}`} />
             <FilterLaporanKeuangan
                 transaksi={transaksi}
-                exportLaporan={handleExportLaporan}
+                exportExcel={handleExportLaporan}
+                exportPdf={handleExportLaporanPdf}
                 handleChangeBulan={handleChangeBulan}
                 data={data}
                 setData={setData}

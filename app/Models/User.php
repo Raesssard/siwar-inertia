@@ -70,6 +70,11 @@ class User extends Authenticatable
     {
         $roles = $this->roles->pluck('name')->toArray();
 
+        // Kalau user gak punya role sama sekali
+        if (empty($roles)) {
+            return null; // atau 'guest', terserah kebutuhan sistem
+        }
+
         // Jika hanya punya 1 role, itu role utamanya
         if (count($roles) === 1) {
             return $roles[0];
@@ -77,12 +82,12 @@ class User extends Authenticatable
 
         // Jika ada role RT dan role lain → pakai role lain
         if (in_array('rt', $roles)) {
-            return collect($roles)->first(fn ($r) => $r !== 'rt');
+            return collect($roles)->first(fn($r) => $r !== 'rt');
         }
 
         // Jika ada role RW dan role lain → pakai role lain
         if (in_array('rw', $roles)) {
-            return collect($roles)->first(fn ($r) => $r !== 'rw');
+            return collect($roles)->first(fn($r) => $r !== 'rw');
         }
 
         // Default kalau tidak ada RT/RW

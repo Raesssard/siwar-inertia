@@ -56,7 +56,7 @@ export default function Dashboard() {
           <div key={cIndex} className={`${sideRoles.length > 0 ? "col" : "row"} px-3`}>
             {!sideRoles.length > 0 && (
               <div className="mb-3 w-100" style={{ borderBottom: "1px solid lightgray" }}>
-                <p className="w-100 mb-1 ml-2">
+                <p className="w-100 mb-1 ms-2">
                   <span style={{ fontWeight: "600", fontSize: "1.15rem" }}>
                     {card.kategori}
                   </span>

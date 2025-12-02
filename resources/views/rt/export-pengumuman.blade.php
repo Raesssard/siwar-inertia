@@ -51,7 +51,7 @@
         <h2>PEMERINTAH {{ strtoupper($kabupaten) }}</h2>
         <h3>KECAMATAN {{ strtoupper($kecamatan) }}</h3>
         <h3>KELURAHAN {{ strtoupper($kelurahan) }}</h3>
-        <p>RT {{ $rt }} / RW {{ $rw }}</p>
+        <p>{{ $rt ? "RT{$rt}/RW{$rw}" : "RW{$rw}" }}</p>
     </div>
     <div class="line"></div>
     <br>
