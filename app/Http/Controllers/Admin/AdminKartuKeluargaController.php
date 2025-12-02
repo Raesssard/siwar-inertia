@@ -71,18 +71,19 @@ class AdminKartuKeluargaController extends Controller
 
         $kategori_iuran = Kategori_golongan::select('id', 'jenis')->get();
         $daftar_rt = Rt::select('id', 'nomor_rt', 'id_rw')
-            ->with(['rw', 'user.roles'])
-            ->whereHas('user', function ($q) {
-                $q->whereHas('roles', function ($r) {
-                    // Hanya ambil user dengan role utama RT (Ketua RT)
-                    $r->where('name', 'rt');
+        ->with(['rw', 'user.roles'])
+        ->where(function ($q) {
+            $q->whereHas('user', function ($u) {
+                $u->whereHas('roles', function ($r) {
+                    $r->where('name', 'rt'); // Ketua RT
                 })
-                // Pastikan user tersebut tidak punya role tambahan (sekretaris/bendahara/seksi)
                 ->whereDoesntHave('roles', function ($r) {
                     $r->whereIn('name', ['sekretaris', 'bendahara', 'seksi']);
                 });
             })
-            ->get();
+            ->orDoesntHave('user'); // RT yang belum memiliki user
+        })
+        ->get();
 
         return Inertia::render('FormKK', [
             'title' => $title,
@@ -141,18 +142,19 @@ class AdminKartuKeluargaController extends Controller
 
         $kategori_iuran = Kategori_golongan::select('id', 'jenis')->get();
         $daftar_rt = Rt::select('id', 'nomor_rt', 'id_rw')
-            ->with(['rw', 'user.roles'])
-            ->whereHas('user', function ($q) {
-                $q->whereHas('roles', function ($r) {
-                    // Hanya ambil user dengan role utama RT (Ketua RT)
-                    $r->where('name', 'rt');
+        ->with(['rw', 'user.roles'])
+        ->where(function ($q) {
+            $q->whereHas('user', function ($u) {
+                $u->whereHas('roles', function ($r) {
+                    $r->where('name', 'rt'); // Ketua RT
                 })
-                // Pastikan user tersebut tidak punya role tambahan (sekretaris/bendahara/seksi)
                 ->whereDoesntHave('roles', function ($r) {
                     $r->whereIn('name', ['sekretaris', 'bendahara', 'seksi']);
                 });
             })
-            ->get();
+            ->orDoesntHave('user'); // RT yang masih kosong
+        })
+        ->get();
 
         return Inertia::render('FormKK', [
             'title' => $title,

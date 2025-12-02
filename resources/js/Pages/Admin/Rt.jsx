@@ -15,6 +15,7 @@ export default function Rt({ rukun_tetangga, filters, nomorRtList, rwList, title
 
     const [form, setForm] = useState({
         nik: "",
+        id_rw: "",
         nomor_rt: "",
         nama_anggota_rt: "",
         mulai_menjabat: "",
@@ -37,6 +38,7 @@ export default function Rt({ rukun_tetangga, filters, nomorRtList, rwList, title
                 setShowAdd(false)
                 setForm({
                     nik: "",
+                    id_rw: "",
                     nomor_rt: "",
                     nama_anggota_rt: "",
                     mulai_menjabat: "",
@@ -69,6 +71,7 @@ export default function Rt({ rukun_tetangga, filters, nomorRtList, rwList, title
     const openEdit = (item) => {
         setForm({
             nik: item.nik || "",
+            id_rw: item.id_rw || "",
             nomor_rt: item.nomor_rt || "",
             nama_anggota_rt: item.nama_anggota_rt || "",
             mulai_menjabat: item.mulai_menjabat || "",
