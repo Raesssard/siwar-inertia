@@ -279,9 +279,13 @@ class RwRukunTetanggaController extends Controller
         if ($request->filled('nik') && $request->filled('nama_anggota_rt')) {
 
             if ($user) {
+                // Jika NIK berubah → cek unik tapi ignor dirinya sendiri
                 if ($user->nik != $request->nik) {
-                    // Cek nik unik di users sebelum update
-                    if (User::where('nik', $request->nik)->exists()) {
+                    $nikDipakai = User::where('nik', $request->nik)
+                        ->where('id', '!=', $user->id)
+                        ->exists();
+
+                    if ($nikDipakai) {
                         return back()
                             ->with('error', "NIK {$request->nik} sudah digunakan user lain!")
                             ->withInput();

@@ -333,15 +333,19 @@ class AdminRtController extends Controller
 
 
             if ($user) {
+                // Jika NIK berubah → cek unik tapi ignor dirinya sendiri
                 if ($user->nik != $request->nik) {
-                    // Cek nik unik di users sebelum update
-                    if (User::where('nik', $request->nik)->exists()) {
+                    $nikDipakai = User::where('nik', $request->nik)
+                        ->where('id', '!=', $user->id)
+                        ->exists();
+
+                    if ($nikDipakai) {
                         return back()
                             ->with('error', "NIK {$request->nik} sudah digunakan user lain!")
                             ->withInput();
                     }
                 }
-            
+                // Update user
                 $user->update([
                     'nik' => $request->nik,
                     'nama' => $request->nama_anggota_rt,
