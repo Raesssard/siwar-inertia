@@ -302,11 +302,24 @@ class RwRukunTetanggaController extends Controller
                 ]);
             }
 
-            $roles = ['rt'];
-            if ($jabatan !== 'ketua' && Role::where('name', $jabatan)->exists()) {
-                $roles[] = $jabatan;
+            // 🟢 Ambil role lama user
+            $existingRoles = $user->roles->pluck('name')->toArray();
+
+            // 🟢 Role wajib untuk RW
+            $newRoles = ['rt'];
+
+            // 🟢 Tambahkan role tambahan jika bukan ketua
+            if ($request->filled('jabatan') && $request->jabatan !== 'ketua') {
+                if (Role::where('name', $request->jabatan)->exists()) {
+                    $newRoles[] = $request->jabatan;
+                }
             }
-            $user->syncRoles($roles);
+
+            // 🟢 Gabungkan role lama + role RW + role tambahan
+            $mergedRoles = array_unique(array_merge($existingRoles, $newRoles));
+
+            // 🟢 Terapkan tanpa menghilangkan role warga
+            $user->syncRoles($mergedRoles);
         } else {
             if ($user) $user->delete();
         }

@@ -150,7 +150,7 @@ class AdminRwController extends Controller
                 'nama'     => $request->nama_anggota_rw,
                 'password' => Hash::make('password'),
                 'id_rw'    => $rw->id,
-                'id_rt'    => $warga?->id_rt, // ← otomatis isi dari data warga
+                'id_rt'    => $warga?->kartuKeluarga?->id_rt // ← otomatis isi dari data warga
             ]);
 
             /*
@@ -268,6 +268,7 @@ class AdminRwController extends Controller
         */
 
         $user = User::where('id_rw', $rw->id)->first();
+        $warga = Warga::where('nik', $request->nik)->first();
 
         if ($request->filled('nik') && $request->filled('nama_anggota_rw')) {
 
@@ -283,6 +284,7 @@ class AdminRwController extends Controller
                     'nama' => $request->nama_anggota_rw,
                     'password' => Hash::make('password'),
                     'id_rw' => $rw->id,
+                    'id_rt' => $warga?->kartuKeluarga?->id_rt
                 ]);
             }
 
@@ -296,15 +298,24 @@ class AdminRwController extends Controller
             |--------------------------------------------------------------------------
             */
 
-            $roles = ['rw']; // ketua tetap hanya rw
+            // 🟢 Ambil role lama user
+            $existingRoles = $user->roles->pluck('name')->toArray();
 
+            // 🟢 Role wajib untuk RW
+            $newRoles = ['rw'];
+
+            // 🟢 Tambahkan role tambahan jika bukan ketua
             if ($request->filled('jabatan') && $request->jabatan !== 'ketua') {
                 if (Role::where('name', $request->jabatan)->exists()) {
-                    $roles[] = $request->jabatan;
+                    $newRoles[] = $request->jabatan;
                 }
             }
 
-            $user->syncRoles($roles);
+            // 🟢 Gabungkan role lama + role RW + role tambahan
+            $mergedRoles = array_unique(array_merge($existingRoles, $newRoles));
+
+            // 🟢 Terapkan tanpa menghilangkan role warga
+            $user->syncRoles($mergedRoles);
         } else {
             if ($user) $user->delete();
         }
