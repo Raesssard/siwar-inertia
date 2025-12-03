@@ -26,7 +26,7 @@ class AdminRtController extends Controller
         if ($request->filled('keyword')) {
             $query->where(function ($q) use ($request) {
                 $q->where('nik', 'like', '%' . $request->keyword . '%')
-                ->orWhere('nama_anggota_rt', 'like', '%' . $request->keyword . '%');
+                    ->orWhere('nama_anggota_rt', 'like', '%' . $request->keyword . '%');
             });
         }
 
@@ -446,7 +446,8 @@ class AdminRtController extends Controller
 
             // Jika jabatannya sama → tolak
             if ($existingJabatan === $jabatanUser) {
-                return back()->with('error',
+                return back()->with(
+                    'error',
                     "RT {$rt->nomor_rt} sudah memiliki {$existingJabatan} aktif. Nonaktifkan yang lama dulu!"
                 );
             }
@@ -460,7 +461,8 @@ class AdminRtController extends Controller
         // Aktifkan RT baru
         $rt->update(['status' => 'aktif']);
 
-        return back()->with('success',
+        return back()->with(
+            'success',
             "RT {$rt->nomor_rt} dengan jabatan {$jabatanUser} berhasil diaktifkan."
         );
     }

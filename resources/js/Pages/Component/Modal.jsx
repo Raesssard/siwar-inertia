@@ -3005,6 +3005,7 @@ export function DetailPengumuman({ kategori, selectedData, detailShow, onClose, 
     const fileInputRef = useRef(null)
     const textRef = useRef(null)
     const komenRef = useRef(null)
+    const isMobile = useIsMobile()
 
     const handleClear = () => {
         setData("file", null)
@@ -3187,7 +3188,10 @@ export function DetailPengumuman({ kategori, selectedData, detailShow, onClose, 
                 tabIndex="-1"
                 style={{
                     display: "block",
-                    backgroundColor: "rgba(0,0,0,0.5)"
+                    backgroundColor: "rgba(0,0,0,0.5)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
                 }}
                 onClick={() => {
                     onClose()
@@ -3195,10 +3199,10 @@ export function DetailPengumuman({ kategori, selectedData, detailShow, onClose, 
                 }}
             >
                 <div
-                    className="modal-dialog modal-komen modal-lg modal-dialog-scrollable modal-dialog-centered"
+                    className={`modal-dialog modal-komen modal-lg modal-dialog-scrollable modal-dialog-centered ${isMobile ? 'mobile' : 'desktop'}`}
                     onClick={(e) => e.stopPropagation()}
                 >
-                    <div className="modal-content modal-komen shadow-lg border-0">
+                    <div className={`modal-content modal-komen shadow-lg border-0 ${isMobile ? 'mobile' : 'desktop'}`}>
                         <div className="modal-body p-0 m-0">
                             {isEdit ? (
                                 <EditPengumuman
@@ -3216,7 +3220,7 @@ export function DetailPengumuman({ kategori, selectedData, detailShow, onClose, 
                                     role={role}
                                 />
                             ) : (
-                                <div className="d-flex flex-row modal-komen">
+                                <div className={`d-flex flex-row modal-komen ${isMobile ? 'mobile' : 'desktop'}`}>
                                     {selectedData?.dokumen_path ? (
                                         <div className="flex-fill border-end bg-black d-flex align-items-center justify-content-center" style={{ maxWidth: "50%" }}>
                                             {selectedData.dokumen_path ? (
@@ -3771,8 +3775,10 @@ export function EditPengumuman({ editKategori, toggle, onUpdated, onDeleted, pen
         return `/storage/${src}`
     }
 
+    const isMobile = useIsMobile()
+
     return (
-        <div className="d-flex flex-row modal-komen">
+        <div className={`d-flex flex-row modal-komen ${isMobile ? 'mobile' : 'desktop'}`}>
             {previewUrl ? (
                 <div className="flex-fill border-end bg-black d-flex align-items-center justify-content-center" style={{ maxWidth: "50%" }}>
                     <div id="preview">
@@ -4048,6 +4054,8 @@ export function TambahPengumuman({ kategori, tambahShow, onClose, onAdded, role 
         return `/storage/${src}`
     }
 
+    const isMobile = useIsMobile()
+
     if (!tambahShow) return null
 
     return (
@@ -4057,19 +4065,22 @@ export function TambahPengumuman({ kategori, tambahShow, onClose, onAdded, role 
                 tabIndex="-1"
                 style={{
                     display: "block",
-                    backgroundColor: "rgba(0,0,0,0.5)"
+                    backgroundColor: "rgba(0,0,0,0.5)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
                 }}
                 onClick={() => {
                     onClose()
                 }}
             >
                 <div
-                    className="modal-dialog modal-komen modal-lg modal-dialog-scrollable modal-dialog-centered"
+                    className={`modal-dialog modal-komen modal-lg modal-dialog-scrollable modal-dialog-centered ${isMobile ? 'mobile' : 'desktop'}`}
                     onClick={(e) => e.stopPropagation()}
                 >
-                    <div className="modal-content modal-komen shadow-lg border-0">
+                    <div className={`modal-content modal-komen shadow-lg border-0 ${isMobile ? 'mobile' : 'desktop'}`}>
                         <div className="modal-body p-0 m-0">
-                            <div className="d-flex flex-row modal-komen">
+                            <div className={`d-flex flex-row modal-komen ${isMobile ? 'mobile' : 'desktop'}`}>
                                 {previewUrl ? (
                                     <div className="flex-fill border-end bg-black d-flex align-items-center justify-content-center" style={{ maxWidth: "50%" }}>
                                         <div id="preview">

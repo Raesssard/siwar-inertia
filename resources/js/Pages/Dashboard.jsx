@@ -55,13 +55,13 @@ export default function Dashboard() {
         return (
           <div key={cIndex} className="row px-3">
             {/* {!sideRoles.length > 0 && ( */}
-              <div className="mb-3 w-100" style={{ borderBottom: "1px solid lightgray" }}>
-                <p className="w-100 mb-1 ms-2">
-                  <span style={{ fontWeight: "600", fontSize: "1.15rem" }}>
-                    {card.kategori}
-                  </span>
-                </p>
-              </div>
+            <div className="mb-3 w-100" style={{ borderBottom: "1px solid lightgray" }}>
+              <p className="w-100 mb-1 ms-2">
+                <span style={{ fontWeight: "600", fontSize: "1.15rem" }}>
+                  {card.kategori}
+                </span>
+              </p>
+            </div>
             {/* )} */}
 
             <div className="row mt-2">
