@@ -292,12 +292,18 @@ class RwPengumumanController extends Controller
             $filePath = $file->storeAs('file_pengumuman', $fileName, 'public');
         }
 
+        $validRoles = ['admin', 'rw', 'rt', 'warga'];
+        $sideRoles = $user->roles()
+            ->whereNotIn('name', $validRoles)
+            ->pluck('name')
+            ->first();
+
         $komentar = $pengaduan->komen()->create([
             'user_id' => Auth::id(),
             'isi_komentar' => $request->isi_komentar,
             'file_path' => $filePath,
             'file_name' => $fileName,
-            'role_snapshot' => session('active_role') ?? $user->getRoleNames()->first()
+            'role_snapshot' => $sideRoles ? $sideRoles : session('active_role') ?? $user->getRoleNames()->first()
         ]);
 
         $komentar->load('user');

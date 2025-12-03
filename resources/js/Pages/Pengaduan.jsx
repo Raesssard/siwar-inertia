@@ -285,7 +285,7 @@ export default function Pengaduan() {
                                         {items.map((item, index) => {
                                             const labelMap = {
                                                 belum: "Belum dibaca",
-                                                diproses_menunggu: "Menunggu konfirmasi",
+                                                diproses_menunggu: "Menunggu konfirmasi RW",
                                                 diproses_sudah: "Sedang diproses",
                                                 diproses_default: "Sedang diproses",
                                                 selesai: "Selesai"
