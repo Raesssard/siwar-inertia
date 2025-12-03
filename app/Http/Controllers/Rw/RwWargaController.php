@@ -336,7 +336,7 @@ class RwWargaController extends Controller
             ->with('success', 'Data warga berhasil diperbarui.');
     }
 
-    public function destroy($id)
+        public function destroy(Request $request, $id)
     {
         $warga = Warga::findOrFail($id);
 
@@ -344,13 +344,13 @@ class RwWargaController extends Controller
             'warga_nik' => $warga->nik,
             'nama' => $warga->nama,
             'jenis' => 'keluar',
-            'keterangan' => 'Data warga dihapus',
-            'tanggal' => now()->toDateString(),
+            'keterangan' => $request->keterangan,
+            'tanggal' => now(),
         ]);
 
         $warga->delete();
 
-        return redirect()->route('rw.kartuKeluarga.index')->with('success', 'Warga berhasil dihapus dan dicatat ke history.');
+        return back()->with('success', 'Warga berhasil dihapus dan dicatat ke history.');
     }
 
     public function getOrangTua($no_kk)

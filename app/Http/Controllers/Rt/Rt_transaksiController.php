@@ -74,7 +74,7 @@ class Rt_transaksiController extends Controller
 
         $list_kk = Kartu_keluarga::where('id_rt', $idRt)->get();
 
-        return Inertia::render('RT/Transaksi', [
+        return Inertia::render('Transaksi', [
             'title' => $title,
             'transaksi' => $allTransaksi,
             'transaksiWarga' => $transaksiWarga,

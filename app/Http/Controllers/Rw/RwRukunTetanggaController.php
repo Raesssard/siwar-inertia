@@ -106,6 +106,21 @@ class RwRukunTetanggaController extends Controller
         }
 
         /**
+         * =========================================================================
+         * 🚫 VALIDASI BATAS MAKSIMAL RT DALAM SATU RW
+         * =========================================================================
+         */
+        $maxRT = Setting::where('key', 'max_rt_per_rw')->value('value') ?? 0;
+
+        $currentRTCount = Rt::where('id_rw', $request->id_rw)->count();
+
+        if ($maxRT > 0 && $currentRTCount >= $maxRT) {
+            return back()
+                ->with('error', "RW ini sudah memiliki jumlah RT maksimal ({$maxRT}). Tidak dapat menambah RT baru.")
+                ->withInput();
+        }
+        
+        /**
          * ===============================================================
          * 🚫 VALIDASI: Cegah Jabatan Ganda Aktif (SAMA DENGAN ADMIN)
          * ===============================================================
@@ -264,6 +279,19 @@ class RwRukunTetanggaController extends Controller
         if ($request->filled('nik') && $request->filled('nama_anggota_rt')) {
 
             if ($user) {
+                // Jika NIK berubah → cek unik tapi ignor dirinya sendiri
+                if ($user->nik != $request->nik) {
+                    $nikDipakai = User::where('nik', $request->nik)
+                        ->where('id', '!=', $user->id)
+                        ->exists();
+
+                    if ($nikDipakai) {
+                        return back()
+                            ->with('error', "NIK {$request->nik} sudah digunakan user lain!")
+                            ->withInput();
+                    }
+                }
+
                 $user->update([
                     'nik' => $request->nik,
                     'nama' => $request->nama_anggota_rt,
@@ -278,11 +306,24 @@ class RwRukunTetanggaController extends Controller
                 ]);
             }
 
-            $roles = ['rt'];
-            if ($jabatan !== 'ketua' && Role::where('name', $jabatan)->exists()) {
-                $roles[] = $jabatan;
+            // 🟢 Ambil role lama user
+            $existingRoles = $user->roles->pluck('name')->toArray();
+
+            // 🟢 Role wajib untuk RW
+            $newRoles = ['rt'];
+
+            // 🟢 Tambahkan role tambahan jika bukan ketua
+            if ($request->filled('jabatan') && $request->jabatan !== 'ketua') {
+                if (Role::where('name', $request->jabatan)->exists()) {
+                    $newRoles[] = $request->jabatan;
+                }
             }
-            $user->syncRoles($roles);
+
+            // 🟢 Gabungkan role lama + role RW + role tambahan
+            $mergedRoles = array_unique(array_merge($existingRoles, $newRoles));
+
+            // 🟢 Terapkan tanpa menghilangkan role warga
+            $user->syncRoles($mergedRoles);
         } else {
             if ($user) $user->delete();
         }

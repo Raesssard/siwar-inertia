@@ -88,8 +88,8 @@ class AdminPengumumanController extends Controller
             'kategori' => 'required',
             'tanggal' => 'nullable|date',
             'tempat' => 'nullable',
-            'id_rw' => 'required|exists:rw,id',
-            'id_rt' => 'nullable|exists:rukun_tetangga,id',
+            // 'id_rw' => 'required|exists:rw,id',
+            // 'id_rt' => 'nullable|exists:rukun_tetangga,id',
             'dokumen' => 'nullable|file|mimes:doc,docx,xls,xlsx,pdf,jpg,jpeg,png,gif,mp4,mkv|max:20480',
         ]);
 

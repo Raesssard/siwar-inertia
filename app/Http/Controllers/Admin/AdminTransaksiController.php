@@ -1,80 +1,60 @@
 <?php
 
-namespace App\Http\Controllers\Rw;
+namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Kartu_keluarga;
 use App\Models\Transaksi;
 use App\Models\Rt;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 
-class RwTransaksiController extends Controller
+class AdminTransaksiController extends Controller
 {
-    // Controller: Rw/TransaksiController (method index)
+    /**
+     * INDEX — Admin melihat SEMUA transaksi dari semua RW/RT.
+     */
     public function index(Request $request)
     {
-        $title = "Transaksi RW";
-
-        // Ambil user dan RW terkait
-        $user = $request->user();
-        $userRwData = $user?->rw;
-
-        if (!$userRwData) {
-            return redirect()->back()->with('error', 'Data RW Anda tidak ditemukan.');
-        }
-
-        // id RW dan nomor RW user sekarang pasti ada
-        $idRw = $userRwData->id;
-        $nomorRwUser = $userRwData->nomor_rw;
+        $title = "Transaksi Admin";
 
         $search = $request->search;
         $tahun = $request->tahun;
         $bulan = $request->bulan;
         $rt = $request->rt;
 
-        // Daftar RT yang termasuk di RW user (kembalikan nomor_rt)
-        $daftar_rt = Rt::where('id_rw', $idRw)
-            ->orderBy('nomor_rt')
-            ->pluck('nomor_rt') // array of nomor_rt (misalnya ['01','02',...])
+        // Semua daftar RT (nomor_rt)
+        $daftar_rt = Rt::orderBy('nomor_rt')
+            ->pluck('nomor_rt')
             ->toArray();
 
-        // Query transaksi (hanya untuk RW user)
-        $query = Transaksi::whereHas('rukunTetangga.rw', function ($q) use ($nomorRwUser) {
-                $q->where('nomor_rw', $nomorRwUser);
-            })
+        // Query transaksi tanpa batas RW/RT
+        $query = Transaksi::with(['rukunTetangga.rw'])
             ->when($search, fn($q) => $q->where('nama_transaksi', 'like', "%{$search}%"))
             ->when($tahun, fn($q) => $q->whereYear('tanggal', $tahun))
             ->when($bulan, fn($q) => $q->whereMonth('tanggal', $bulan))
-            ->when($rt, fn($q) => $q->whereHas('rukunTetangga', function ($qr) use ($rt, $idRw) {
-                // filter transaksi berdasarkan nomor_rt yang dipilih dan RW user
-                $qr->where('nomor_rt', $rt)->where('id_rw', $idRw);
+            ->when($rt, fn($q) => $q->whereHas('rukunTetangga', function ($qr) use ($rt) {
+                $qr->where('nomor_rt', $rt);
             }));
 
         $transaksi = $query->orderBy('tanggal', 'desc')
             ->paginate(10)
             ->withQueryString();
 
-        // Daftar tahun distinct untuk filter
-        $daftar_tahun = Transaksi::whereHas('rukunTetangga.rw', function ($q) use ($nomorRwUser) {
-                $q->where('nomor_rw', $nomorRwUser);
-            })
-            ->selectRaw('YEAR(tanggal) as tahun')
+        // Daftar tahun (distinct)
+        $daftar_tahun = Transaksi::selectRaw('YEAR(tanggal) as tahun')
             ->distinct()
             ->orderBy('tahun', 'desc')
             ->pluck('tahun');
 
-        // daftar bulan statis
+        // Daftar bulan statis
         $daftar_bulan = [
             'januari','februari','maret','april','mei','juni',
             'juli','agustus','september','oktober','november','desember'
         ];
 
-        // Ambil semua KK untuk RW user, sertakan relasi rukunTetangga supaya frontend bisa filter berdasarkan nomor_rt
+        // Semua KK (admin boleh lihat semua)
         $list_kk = Kartu_keluarga::with('rukunTetangga')
-            ->where('id_rw', $idRw)
             ->orderBy('no_kk')
             ->get();
 
@@ -94,6 +74,9 @@ class RwTransaksiController extends Controller
         ]);
     }
 
+    /**
+     * Store transaksi (bebas, tidak terikat RW/RT)
+     */
     public function store(Request $request)
     {
         $request->validate([
@@ -122,14 +105,17 @@ class RwTransaksiController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Transaksi RW berhasil dibuat.',
+            'message' => 'Transaksi berhasil dibuat.',
             'transaksi' => $transaksi
         ]);
     }
 
+    /**
+     * Update transaksi
+     */
     public function update(Request $request, string $id)
     {
-        $rw_transaksi = Transaksi::findOrFail($id);
+        $transaksi = Transaksi::findOrFail($id);
 
         $validated = $request->validate([
             'tanggal' => 'required|date',
@@ -138,23 +124,27 @@ class RwTransaksiController extends Controller
             'keterangan' => 'nullable|string',
         ]);
 
-        $rw_transaksi->update($validated);
+        $transaksi->update($validated);
 
         return response()->json([
             'success' => true,
-            'message' => 'Transaksi RW berhasil diubah',
-            'transaksi' => $rw_transaksi
+            'message' => 'Transaksi berhasil diubah',
+            'transaksi' => $transaksi
         ]);
     }
 
+    /**
+     * Delete transaksi
+     */
     public function destroy(string $id)
     {
-        $rw_transaksi = Transaksi::findOrFail($id);
-        $rw_transaksi->delete();
+        $transaksi = Transaksi::findOrFail($id);
+        $transaksi->delete();
 
         return response()->json([
             'success' => true,
-            'message' => 'Transaksi RW berhasil dihapus.',
+            'message' => 'Transaksi berhasil dihapus.',
         ]);
     }
 }
+

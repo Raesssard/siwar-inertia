@@ -300,6 +300,72 @@ export function getAdminCards({ ...rest }) {
             ]
         },
         {
+            kategori: 'Keuangan',
+            isi: [
+                {
+                    href: "/rw/iuran",
+                    color: "success",
+                    title: "Total Iuran Masuk Bulan Ini",
+                    value: formatRupiah(rest.total_iuran_bulan_ini),
+                    icon: "circle-dollar-to-slot",
+                    permission: "view.iuran",
+                },
+                {
+                    href: "/rw/transaksi",
+                    color: "success",
+                    title: "Total Pemasukan",
+                    value: formatRupiah(rest.total_pemasukan),
+                    icon: "dollar-sign",
+                    permission: "view.transaksi",
+                },
+                {
+                    href: "/rw/transaksi",
+                    color: "danger",
+                    title: "Total Pengeluaran",
+                    value: formatRupiah(rest.total_pengeluaran),
+                    icon: "money-bill-wave",
+                    permission: "view.transaksi",
+                },
+                {
+                    href: "/rw/transaksi",
+                    color: "primary",
+                    title: "Saldo Akhir",
+                    value: formatRupiah(rest.total_saldo_akhir),
+                    icon: "wallet",
+                    permission: "view.transaksi",
+                },
+            ],
+        },
+                {
+            kategori: 'Informasi',
+            isi: [
+                {
+                    href: "/admin/pengaduan",
+                    color: "warning",
+                    title: "Pengaduan",
+                    value: rest.jumlah_pengaduan,
+                    icon: "paper-plane",
+                    permission: "view.pengaduan",
+                },
+                {
+                    href: "/admin/pengumuman",
+                    color: "warning",
+                    title: "Pengumuman RW",
+                    value: rest.jumlah_pengumuman_rw,
+                    icon: "comments",
+                    permission: "view.pengumuman",
+                },
+                {
+                    href: "/admin/pengumuman",
+                    color: "warning",
+                    title: "Pengumuman RT",
+                    value: rest.jumlah_pengumuman_rt,
+                    icon: "clipboard-list",
+                    permission: "view.pengumuman",
+                },
+            ],
+        },
+        {
             kategori: 'Pengaturan Sistem',
             isi: [
                 {
@@ -327,35 +393,6 @@ export function getAdminCards({ ...rest }) {
                     permission: "view.permission",
                 },
             ]
-        },
-        {
-            kategori: 'Informasi',
-            isi: [
-                {
-                    href: "/admin/pengaduan",
-                    color: "warning",
-                    title: "Pengaduan",
-                    value: rest.pengaduan,
-                    icon: "paper-plane",
-                    permission: "view.pengaduan",
-                },
-                {
-                    href: "/admin/pengumuman",
-                    color: "warning",
-                    title: "Pengumuman RW",
-                    value: rest.pengumuman_rw,
-                    icon: "comments",
-                    permission: "view.pengumuman",
-                },
-                {
-                    href: "/admin/pengumuman",
-                    color: "warning",
-                    title: "Pengumuman RT",
-                    value: rest.pengumuman_rt,
-                    icon: "clipboard-list",
-                    permission: "view.pengumuman",
-                },
-            ],
         },
     ];
 }
@@ -395,6 +432,48 @@ export function getAdminLinks() {
                 "view.kartu_keluarga",
                 "view.rw",
                 "view.rt",
+            ]
+        },
+        {
+            text: "Keuangan",
+            icon: "wallet",
+            children: [
+                {
+                    href: "/admin/iuran",
+                    text: "Iuran Warga",
+                    icon: "file-invoice-dollar",
+                    permission: "view.iuran",
+                },
+                {
+                    href: "/admin/tagihan",
+                    text: "Tagihan Warga",
+                    icon: "hand-holding-usd",
+                    permission: "view.tagihan",
+                },
+                {
+                    href: "/admin/transaksi",
+                    text: "Transaksi Warga",
+                    icon: "money-bill-wave",
+                    permission: "view.transaksi",
+                },
+            ],
+        },
+        {
+            text: "Laporan",
+            icon: "file-alt",
+            children: [
+                {
+                    href: "/laporan-keuangan",
+                    text: "Laporan Keuangan",
+                    icon: "money-check-alt",
+                    permission: "view.transaksi",
+                },
+                {
+                    href: "/laporan-pengaduan",
+                    text: "Laporan Pengaduan",
+                    icon: "file-contract",
+                    permission: "view.pengaduan",
+                },
             ]
         },
         {

@@ -146,7 +146,7 @@ export default function Rw({ rw, filters, nomorRwList, title, roles }) {
                 <div className="table-header d-flex justify-content-between align-items-center">
                     <h4>Data RW</h4>
                     <button
-                        className="btn btn-primary btn-sm"
+                        className="btn btn-success btn-sm"
                         onClick={() => setShowAdd(true)}
                     >
                         Tambah RW
@@ -181,18 +181,17 @@ export default function Rw({ rw, filters, nomorRwList, title, roles }) {
                                         <td className="text-center">{item.mulai_menjabat || "-"}</td>
                                         <td className="text-center">{item.akhir_jabatan || "-"}</td>
                                         <td className="text-center align-middle">
-                                        <span
-                                            className={`inline-block px-2 py-1 rounded text-sm font-medium ${
-                                            item.status === "aktif"
-                                                ? "bg-green-100 text-green-700"
-                                                : "bg-red-100 text-red-700"
-                                            }`}
+                                            <span
+                                                className={`inline-block px-2 py-1 rounded text-sm font-medium ${item.status === "aktif"
+                                                    ? "bg-green-100 text-green-700"
+                                                    : "bg-red-100 text-red-700"
+                                                    }`}
                                                 onClick={() => handleToggleStatus(item.id)}
                                                 style={{ cursor: 'pointer', width: '4.25rem' }}
-                                                title="Ganti status RT"
-                                        >
-                                            {item.status || "-"}
-                                        </span>
+                                                title="Ganti status RW"
+                                            >
+                                                {item.status || "-"}
+                                            </span>
                                         </td>
                                         <td className="text-center">
                                             <div className="d-flex justify-content-center gap-2">
