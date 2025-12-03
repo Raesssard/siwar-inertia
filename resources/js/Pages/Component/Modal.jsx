@@ -1049,7 +1049,7 @@ export function DetailPengaduan({ selectedData, detailShow, onClose, onUpdated, 
                 console.error(err)
             })
     }
-    console.log(selectedData)
+
     const handleConfirm = () => {
         const komen = role === "rw" ? "" : "Sudah diteruskan ke RW untuk ditindaklanjuti"
         axios.put(`/${role}/pengaduan/${selectedData.id}/konfirmasi`, {
@@ -1278,9 +1278,9 @@ export function DetailPengaduan({ selectedData, detailShow, onClose, onUpdated, 
                                                     <div key={i} className="mb-3">
                                                         <small className="fw-bold"><strong>{komen?.user?.nama}</strong></small>{" "}
                                                         <small className="fw-bold text-muted">
-                                                            {komen?.role_snapshot?.length <= 2
-                                                                ? `• ${komen?.role_snapshot?.toUpperCase() ?? ''}`
-                                                                : `• ${komen?.role_snapshot?.replace(/\b\w/g, (char) => char.toUpperCase()) ?? ''}`
+                                                            • {komen?.role_snapshot?.length <= 2
+                                                                ? `${komen?.role_snapshot?.toUpperCase() ?? '(role tidak ada)'}`
+                                                                : `${komen?.role_snapshot?.replace(/\b\w/g, (char) => char.toUpperCase()) ?? '(role tidak ada)'}`
                                                             }
                                                         </small>{" "}
                                                         <small className="text-muted">
@@ -3359,9 +3359,9 @@ export function DetailPengumuman({ kategori, selectedData, detailShow, onClose, 
                                                     <div key={i} className="mb-3">
                                                         <small className="fw-bold"><strong>{komen.user?.nama}</strong></small>{" "}
                                                         <small className="fw-bold text-muted">
-                                                            {komen?.role_snapshot?.length <= 2
-                                                                ? `• ${komen?.role_snapshot?.toUpperCase() ?? ''}`
-                                                                : `• ${komen?.role_snapshot?.replace(/\b\w/g, (char) => char.toUpperCase()) ?? ''}`
+                                                            • {komen?.role_snapshot?.length <= 2
+                                                                ? `${komen?.role_snapshot?.toUpperCase() ?? '(role tidak ada)'}`
+                                                                : `${komen?.role_snapshot?.replace(/\b\w/g, (char) => char.toUpperCase()) ?? '(role tidak ada)'}`
                                                             }
                                                         </small>{" "}
                                                         <small className="text-muted">

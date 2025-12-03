@@ -769,6 +769,11 @@ export function getRwLinks() {
                     permission: "view.transaksi",
                 },
             ],
+            permissions: [
+                "view.iuran",
+                "view.tagihan",
+                "view.transaksi",
+            ],
         },
         {
             text: "Laporan",
@@ -786,7 +791,11 @@ export function getRwLinks() {
                     icon: "file-contract",
                     permission: "view.pengaduan",
                 },
-            ]
+            ],
+            permissions: [
+                "view.transaksi",
+                "view.pengaduan",
+            ],
         },
         {
             href: "/rw/pengumuman",
