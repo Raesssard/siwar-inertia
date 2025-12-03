@@ -26,7 +26,7 @@ class AdminRtController extends Controller
         if ($request->filled('keyword')) {
             $query->where(function ($q) use ($request) {
                 $q->where('nik', 'like', '%' . $request->keyword . '%')
-                ->orWhere('nama_anggota_rt', 'like', '%' . $request->keyword . '%');
+                    ->orWhere('nama_anggota_rt', 'like', '%' . $request->keyword . '%');
             });
         }
 
@@ -316,7 +316,21 @@ class AdminRtController extends Controller
 
         if ($request->filled('nik') && $request->filled('nama_anggota_rt')) {
 
+
             if ($user) {
+                // Jika NIK berubah → cek unik tapi ignor dirinya sendiri
+                if ($user->nik != $request->nik) {
+                    $nikDipakai = User::where('nik', $request->nik)
+                        ->where('id', '!=', $user->id)
+                        ->exists();
+
+                    if ($nikDipakai) {
+                        return back()
+                            ->with('error', "NIK {$request->nik} sudah digunakan user lain!")
+                            ->withInput();
+                    }
+                }
+                // Update user
                 $user->update([
                     'nik' => $request->nik,
                     'nama' => $request->nama_anggota_rt,
@@ -331,14 +345,24 @@ class AdminRtController extends Controller
                 ]);
             }
 
-            $roles = ['rt']; // default
+            // 🟢 Ambil role lama user
+            $existingRoles = $user->roles->pluck('name')->toArray();
 
-            if ($jabatan !== 'ketua' && Role::where('name', $jabatan)->exists()) {
-                $roles[] = $jabatan;
+            // 🟢 Role wajib untuk RW
+            $newRoles = ['rt'];
+
+            // 🟢 Tambahkan role tambahan jika bukan ketua
+            if ($request->filled('jabatan') && $request->jabatan !== 'ketua') {
+                if (Role::where('name', $request->jabatan)->exists()) {
+                    $newRoles[] = $request->jabatan;
+                }
             }
 
-            $user->syncRoles($roles);
+            // 🟢 Gabungkan role lama + role RW + role tambahan
+            $mergedRoles = array_unique(array_merge($existingRoles, $newRoles));
 
+            // 🟢 Terapkan tanpa menghilangkan role warga
+            $user->syncRoles($mergedRoles);
         } else {
             // Jika user dihapus
             if ($user) $user->delete();
@@ -374,7 +398,7 @@ class AdminRtController extends Controller
         $ignoredRoles = ['rt', 'warga'];
 
         // Ambil user pemegang jabatan
-        $user = $rt->users()->first();
+        $user = $rt->user()->first();
 
         // Ambil jabatan user selain role inti → default ke ketua
         $jabatanUser = $user?->roles()
@@ -407,7 +431,8 @@ class AdminRtController extends Controller
 
             // Jika jabatannya sama → tolak
             if ($existingJabatan === $jabatanUser) {
-                return back()->with('error',
+                return back()->with(
+                    'error',
                     "RT {$rt->nomor_rt} sudah memiliki {$existingJabatan} aktif. Nonaktifkan yang lama dulu!"
                 );
             }
@@ -421,7 +446,8 @@ class AdminRtController extends Controller
         // Aktifkan RT baru
         $rt->update(['status' => 'aktif']);
 
-        return back()->with('success',
+        return back()->with(
+            'success',
             "RT {$rt->nomor_rt} dengan jabatan {$jabatanUser} berhasil diaktifkan."
         );
     }

@@ -336,9 +336,8 @@ ul.navbar-nav.sidebar#accordionSidebar {
 }
 
 div.modal-komen {
-    min-height: 700px;
-    max-height: 700px !important;
     width: 100%;
+    margin: auto;
 }
 
 .modal-dialog.modal-komen {
@@ -346,6 +345,24 @@ div.modal-komen {
     align-items: center;
     justify-content: center;
     min-height: calc(100vh - 3.5rem);
+}
+
+/* MOBILE */
+.modal-komen.mobile {
+    width: 90vw;
+    max-height: calc(100vh - 25%);
+    min-height: unset;
+}
+
+.modal-komen.mobile .komen-section{
+    max-height: 10rem;
+}
+
+/* DESKTOP */
+.modal-komen.desktop {
+    width: 700px;
+    min-height: 700px;
+    max-height: 700px;
 }
 
 p.isi-pengaduan,

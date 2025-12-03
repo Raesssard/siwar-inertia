@@ -115,10 +115,10 @@ export default function Sidebar({ toggleKeParent, localStorageHistory }) {
             return []
         }
 
-        // 3) ROLE SAMPINGAN → ortu sudah pergi, anaknya mandiri tapi ortu yang single tetep hidup
+        // 3) ROLE SAMPINGAN → anak mandiri, ortu gak numpang kalau gak dibutuhin 🥀🥀
         if (!mainRoles.includes(activeRole)) {
 
-            // kalau ada anak yang boleh → anaknya dh gede & mandiri 🔥
+            // Kalau ada anak allowed → tampil anak aja
             if (childrenAllowed.length > 0) {
                 return childrenAllowed.map(child => {
                     const { children, ...rest } = child
@@ -126,12 +126,13 @@ export default function Sidebar({ toggleKeParent, localStorageHistory }) {
                 })
             }
 
-            // kalau gak punya anak tapi ortu/single boleh tampil 🥀🥀
-            if (parentAllowed) {
+            // kalau parent punya permission khusus → tampil
+            if (link.permission && permissions.includes(link.permission)) {
                 const { children, ...rest } = link
                 return [rest]
             }
 
+            // kalau sampai sini → buang parent karena dia cuma frame kosong 💀
             return []
         }
 

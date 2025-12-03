@@ -190,13 +190,16 @@ export default function Rt({ rukun_tetangga, filters, nomorRtList, rwList, title
                                                         ? "bg-green-100 text-green-700"
                                                         : "bg-red-100 text-red-700"
                                                 }`}
+                                                onClick={() => handleToggleStatus(item.id)}
+                                                style={{ cursor: 'pointer', width: '4.25rem' }}
+                                                title="Ganti status RT"
                                             >
                                                 {item.status || "-"}
                                             </span>
                                         </td>
                                         <td className="text-center">
                                             <div className="d-flex justify-content-center gap-2">
-                                                <button
+                                                {/* <button
                                                     className={`btn btn-sm ${
                                                         item.status === "aktif"
                                                             ? "btn-secondary"
@@ -207,20 +210,20 @@ export default function Rt({ rukun_tetangga, filters, nomorRtList, rwList, title
                                                     {item.status === "aktif"
                                                         ? "Nonaktifkan"
                                                         : "Aktifkan"}
-                                                </button>
+                                                </button> */}
 
                                                 <button
                                                     className="btn btn-warning btn-sm"
                                                     onClick={() => openEdit(item)}
                                                 >
-                                                    Edit
+                                                    <i className="fas fa-edit"></i>
                                                 </button>
 
                                                 <button
                                                     className="btn btn-danger btn-sm"
                                                     onClick={() => handleDelete(item.id)}
                                                 >
-                                                    Hapus
+                                                    <i className="fas fa-trash"></i>
                                                 </button>
                                             </div>
                                         </td>

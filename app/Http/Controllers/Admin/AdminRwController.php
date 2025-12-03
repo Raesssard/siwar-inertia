@@ -338,7 +338,7 @@ class AdminRwController extends Controller
         $ignoredRoles = ['rw', 'warga'];
 
         // 🔎 Ambil user RW
-        $user = $rw->users()->first();
+        $user = $rw->user()->first();
 
         // Ambil role selain ignoredRoles, jika tidak ada → ketua
         $jabatanUser = $user?->roles()
