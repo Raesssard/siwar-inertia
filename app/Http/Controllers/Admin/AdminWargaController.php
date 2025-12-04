@@ -277,8 +277,14 @@ class AdminWargaController extends Controller
          * ===============================================================
          */
 
-        // Simpan no_kk_lama
-        $validated['no_kk_lama'] = $kk_lama;
+        // Jika no_kk berubah → update no_kk_lama
+        if ($kk_baru !== $kk_lama) {
+            $validated['no_kk_lama'] = $kk_lama;
+            // catatan: ini menyimpan KK lama SEBELUM berpindah
+        } else {
+            // Jika tidak berubah, jangan sentuh no_kk_lama
+            unset($validated['no_kk_lama']);
+        }
 
         $warga->update($validated);
 
