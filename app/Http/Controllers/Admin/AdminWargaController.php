@@ -170,7 +170,7 @@ class AdminWargaController extends Controller
             }
         }
 
-        return redirect()->route('admin.kartuKeluarga.index')
+        return redirect()->route('rw.kartuKeluarga.index')
             ->with('success', 'Warga berhasil ditambahkan.');
     }
 
@@ -310,7 +310,7 @@ class AdminWargaController extends Controller
         }
 
 
-        return redirect()->route('admin.kartuKeluarga.index')
+        return redirect()->route('rw.kartuKeluarga.index')
             ->with('success', 'Data warga berhasil diperbarui.');
     }
 
