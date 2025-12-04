@@ -199,7 +199,7 @@ export function ModalSidebar({ modalIsOpen, modalShow, localStorageHistory }) {
 //     )
 // }
 
-export function AddRwModal({ form, handleChange, handleAdd, onClose, roles = [] }) {
+export function AddRwModal({ dataWarga, form, handleChange, handleSelectChange, handleAdd, onClose, roles = [] }) {
     return (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 fade-in">
             <div className="bg-white rounded-2xl shadow-lg w-full max-w-md animate-scaleIn">
@@ -208,11 +208,40 @@ export function AddRwModal({ form, handleChange, handleAdd, onClose, roles = [] 
                         <h5 className="text-lg font-semibold">Tambah RW</h5>
                         <button type="button" onClick={onClose} className="text-gray-500 hover:text-gray-700">✕</button>
                     </div>
-
+                    {console.log(form.nik)}
+                    {console.log(form)}
                     <div className="space-y-3">
                         <div>
                             <label className="block text-sm font-medium">NIK</label>
-                            <input type="text" name="nik" value={form.nik || ""} onChange={handleChange} className="w-full border rounded-md p-2" />
+                            <Select
+                                name="nik"
+                                options={dataWarga?.map((item) => ({
+                                    value: item.nik,
+                                    label: item.nik,
+                                }))}
+                                value={
+                                    form.nik
+                                        ? {
+                                            value: form.nik,
+                                            label: dataWarga?.find((x) => x.nik == form.nik)?.nik || "",
+                                        }
+                                        : null
+                                }
+                                onChange={(val) => handleSelectChange("nik", val)}
+                                placeholder="Pilih/Ketik NIK Warga..."
+                                isSearchable={true}
+                                className="react-select-container"
+                                classNamePrefix="react-select"
+                                noOptionsMessage={() => "Tidak ada NIK"}
+                                styles={{
+                                    control: (base) => ({
+                                        ...base,
+                                        height: '2.6rem',
+                                        borderColor: 'lightgray',
+                                    }),
+                                }}
+                            />
+                            {/* <input type="text" name="nik" value={form.nik || ""} onChange={handleChange} className="w-full border rounded-md p-2" /> */}
                         </div>
                         <div>
                             <label className="block text-sm font-medium">Nomor RW</label>
@@ -272,7 +301,7 @@ export function AddRwModal({ form, handleChange, handleAdd, onClose, roles = [] 
     )
 }
 
-export function EditRwModal({ form, handleChange, handleEdit, onClose, roles = [] }) {
+export function EditRwModal({ dataWarga, form, handleChange, handleEdit, onClose, roles = [] }) {
     return (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 fade-in">
             <div className="bg-white rounded-2xl shadow-lg w-full max-w-md animate-scaleIn">

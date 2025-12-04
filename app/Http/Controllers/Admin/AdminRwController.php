@@ -24,7 +24,7 @@ class AdminRwController extends Controller
         if ($request->filled('keyword')) {
             $query->where(function ($q) use ($request) {
                 $q->where('nik', 'like', '%' . $request->keyword . '%')
-                ->orWhere('nama_anggota_rw', 'like', '%' . $request->keyword . '%');
+                    ->orWhere('nama_anggota_rw', 'like', '%' . $request->keyword . '%');
             });
         }
 
@@ -43,12 +43,19 @@ class AdminRwController extends Controller
         // 🔹 Tambahkan manual “Ketua RW” di paling atas
         $roles = collect(['ketua'])->merge($roles)->values();
 
+        // warga yg termasuk anggota rt gk bisa jadi anggota rw, dan juga sebaliknya 🔥🔥🥀🥀🗿🤣🤔🤔
+        // kepencet emot 🤔🤔🤣🤣
+        $warga = Warga::whereDoesntHave('user.roles', function ($q) {
+            $q->where('name', 'rt');
+        })->get();
+
         return Inertia::render('Admin/Rw', [
             'rw' => $rw,
             'filters' => $request->only(['keyword', 'nomor_rw']),
             'nomorRwList' => $nomorRwList,
             'roles' => $roles,
             'title' => $title,
+            'warga' => $warga,
         ]);
     }
 
@@ -381,7 +388,8 @@ class AdminRwController extends Controller
 
             // Jika jabatannya sama → tolak
             if ($existingJabatan === $jabatanUser) {
-                return back()->with('error',
+                return back()->with(
+                    'error',
                     "RW {$rw->nomor_rw} sudah memiliki {$existingJabatan} aktif. Nonaktifkan yang lama dulu!"
                 );
             }
@@ -390,7 +398,8 @@ class AdminRwController extends Controller
         // ✔ Aktifkan RW baru
         $rw->update(['status' => 'aktif']);
 
-        return back()->with('success',
+        return back()->with(
+            'success',
             "RW {$rw->nomor_rw} dengan jabatan {$jabatanUser} berhasil diaktifkan."
         );
     }
