@@ -183,7 +183,7 @@ class RwWargaController extends Controller
             }
         }
 
-        return redirect()->route('rw.kartuKeluarga.index')
+        return redirect()->route('rw.kartu_keluarga.index')
             ->with('success', 'Warga berhasil ditambahkan.');
     }
 
@@ -311,28 +311,47 @@ class RwWargaController extends Controller
          * ===============================================================
          */
 
+        /**
+         * ===============================================================
+         * 👤 HANDLE USER & ROLE KETIKA JADI KEPALA KELUARGA
+         * ===============================================================
+         */
         if ($status_baru === 'kepala keluarga' && $status_lama !== 'kepala keluarga') {
 
             // Cek apakah user sudah ada
             $existingUser = User::where('nik', $warga->nik)->first();
 
+            // Ambil RT & RW dari KK baru
+            $kk = Kartu_keluarga::where('no_kk', $kk_baru)->first();
+
             if (!$existingUser) {
-
-                // Ambil RT & RW dari KK barunya
-                $kk = Kartu_keluarga::where('no_kk', $kk_baru)->first();
-
-                User::create([
+                // Jika user belum ada → buat dan beri role warga
+                $existingUser = User::create([
                     'nik'      => $warga->nik,
                     'nama'     => $warga->nama,
                     'password' => Hash::make('password'),
                     'id_rt'    => $kk->id_rt,
                     'id_rw'    => $kk->id_rw,
-                ])->assignRole('warga'); // default role
+                ]);
+
+                $existingUser->assignRole('warga');
+
+            } else {
+
+                // Update RT / RW apabila pindah KK
+                $existingUser->update([
+                    'id_rt' => $kk->id_rt,
+                    'id_rw' => $kk->id_rw,
+                ]);
+
+                // Jika tidak punya role warga, tambahkan tanpa hapus role lain
+                if (!$existingUser->hasRole('warga')) {
+                    $existingUser->assignRole('warga');
+                }
             }
         }
 
-
-        return redirect()->route('rw.kartuKeluarga.index')
+        return redirect()->route('rw.kartu_keluarga.index')
             ->with('success', 'Data warga berhasil diperbarui.');
     }
 
