@@ -170,7 +170,7 @@ class AdminWargaController extends Controller
             }
         }
 
-        return redirect()->route('rw.kartuKeluarga.index')
+        return redirect()->route('admin.kartu_keluarga.index')
             ->with('success', 'Warga berhasil ditambahkan.');
     }
 

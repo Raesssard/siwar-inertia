@@ -336,7 +336,7 @@ export function getAdminCards({ ...rest }) {
                 },
             ],
         },
-                {
+        {
             kategori: 'Informasi',
             isi: [
                 {
@@ -457,6 +457,11 @@ export function getAdminLinks() {
                     permission: "view.transaksi",
                 },
             ],
+            permissions: [
+                "view.iuran",
+                "view.tagihan",
+                "view.transaksi",
+            ],
         },
         {
             text: "Laporan",
@@ -474,6 +479,10 @@ export function getAdminLinks() {
                     icon: "file-contract",
                     permission: "view.pengaduan",
                 },
+            ],
+            permissions: [
+                "view.transaksi",
+                "view.pengaduan",
             ]
         },
         {
