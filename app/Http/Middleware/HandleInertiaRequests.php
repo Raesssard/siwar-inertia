@@ -62,7 +62,8 @@ class HandleInertiaRequests extends Middleware
             ->pluck('name')
             ->toArray();
 
-        $roleName = !empty($sideRoles) ? $sideRoles[0] : $currentRole;
+        $isWarga = $currentRole === 'warga';
+        $roleName = (!empty($sideRoles) && !$isWarga) ? $sideRoles[0] : $currentRole;
 
         $role = Role::findByName($roleName);
 
