@@ -80,6 +80,11 @@ class AdminRtController extends Controller
         // Tambahkan manual “Ketua RT”
         $roles = collect(['ketua'])->merge($roles)->values();
 
+        // warga yg termasuk anggota rw gk bisa jadi anggota rt, dan juga sebaliknya 🔥🔥🥀🥀🗿🤣🤔🤔
+        $warga = Warga::whereDoesntHave('user.roles', function ($q) {
+            $q->where('name', 'rw');
+        })->get();
+
         return Inertia::render('Admin/Rt', [
             'rukun_tetangga' => $rukun_tetangga,
             'filters' => $request->only(['keyword', 'nomor_rt']),
@@ -87,6 +92,7 @@ class AdminRtController extends Controller
             'rwList' => $rwList,
             'roles' => $roles,
             'title' => $title,
+            'warga' => $warga,
         ]);
     }
 

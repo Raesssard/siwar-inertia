@@ -1,11 +1,18 @@
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import Layout from "@/Layouts/Layout"
 import { route } from "ziggy-js"
 import { Head, Link, router, usePage } from "@inertiajs/react"
 import { AddRwModal, EditRwModal } from "@/Pages/Component/Modal"
 import "../../../css/kk.css" // biar gaya tabelnya sama
 
-export default function Rw({ rw, filters, nomorRwList, title, roles }) {
+export default function Rw() {
+    const {
+        rw,
+        filters,
+        nomorRwList,
+        title,
+        warga,
+        roles } = usePage().props
     const { props } = usePage()
     const role = props.auth?.currentRole
 
@@ -27,7 +34,29 @@ export default function Rw({ rw, filters, nomorRwList, title, roles }) {
     })
 
     // --- Form Handlers ---
-    const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value })
+    const handleChange = (e) =>
+        setForm({
+            ...form,
+            [e.target.name]: e.target.value
+        })
+
+    const handleSelectChange = (name, selected) => {
+        setForm({
+            ...form,
+            [name]: selected?.value || ""
+        });
+    };
+
+    useEffect(() => {
+        if (form.nik) {
+            const namaWarga = form.nik ? warga.find(n => n.nik === form.nik).nama : ""
+
+            setForm({
+                ...form,
+                nama_anggota_rw: namaWarga
+            })
+        }
+    }, [form.nik])
 
     const handleAdd = (e) => {
         e.preventDefault()
@@ -97,11 +126,10 @@ export default function Rw({ rw, filters, nomorRwList, title, roles }) {
     return (
         <Layout>
             <Head
-                title={`${title} - ${
-                    role.length <= 2
-                        ? role.toUpperCase()
-                        : role.charAt(0).toUpperCase() + role.slice(1)
-                }`}
+                title={`${title} - ${role.length <= 2
+                    ? role.toUpperCase()
+                    : role.charAt(0).toUpperCase() + role.slice(1)
+                    }`}
             />
 
             {/* 🔹 Filter Section */}
@@ -248,9 +276,8 @@ export default function Rw({ rw, filters, nomorRwList, title, roles }) {
                                 return (
                                     <li
                                         key={index}
-                                        className={`page-item ${
-                                            link.active ? "active" : ""
-                                        } ${!link.url ? "disabled" : ""}`}
+                                        className={`page-item ${link.active ? "active" : ""
+                                            } ${!link.url ? "disabled" : ""}`}
                                     >
                                         <Link
                                             href={link.url || ""}
@@ -267,8 +294,10 @@ export default function Rw({ rw, filters, nomorRwList, title, roles }) {
             {/* 🔹 Modal Tambah/Edit */}
             {showAdd && (
                 <AddRwModal
+                    dataWarga={warga}
                     form={form}
                     handleChange={handleChange}
+                    handleSelectChange={handleSelectChange}
                     handleAdd={handleAdd}
                     onClose={() => setShowAdd(false)}
                     roles={roles}
@@ -277,8 +306,10 @@ export default function Rw({ rw, filters, nomorRwList, title, roles }) {
 
             {showEdit && (
                 <EditRwModal
+                    dataWarga={warga}
                     form={form}
                     handleChange={handleChange}
+                    handleSelectChange={handleSelectChange}
                     handleEdit={handleEdit}
                     onClose={() => setShowEdit(null)}
                     roles={roles}
