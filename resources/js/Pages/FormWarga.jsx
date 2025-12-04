@@ -174,6 +174,7 @@ export default function FormWarga({
                   required
                 >
                   <option value="">-- Pilih Agama --</option>
+                  <option value="Tak Beragama">Tak Beragama</option>
                   <option value="Islam">Islam</option>
                   <option value="Buddha">Buddha</option>
                   <option value="Hindu">Hindu</option>
