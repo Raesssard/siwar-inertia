@@ -360,24 +360,39 @@ class AdminRtController extends Controller
                 ]);
             }
 
-            // 🟢 Ambil role lama user
-            $existingRoles = $user->roles->pluck('name')->toArray();
+        // 🟢 Ambil role lama user
+        $existingRoles = $user->roles->pluck('name')->toArray();
 
-            // 🟢 Role wajib untuk RW
-            $newRoles = ['rt'];
+        // 🟢 Cek apakah user punya role 'warga' sebelumnya
+        $hasWarga = in_array('warga', $existingRoles);
 
-            // 🟢 Tambahkan role tambahan jika bukan ketua
-            if ($request->filled('jabatan') && $request->jabatan !== 'ketua') {
-                if (Role::where('name', $request->jabatan)->exists()) {
-                    $newRoles[] = $request->jabatan;
-                }
+        // 🟢 Tentukan role dasar
+        $finalRoles = ['rt']; // role wajib
+
+        // 🟢 Tambahkan role jabatan baru (jika bukan ketua)
+        if ($request->filled('jabatan') && $request->jabatan !== 'ketua') {
+            $jabatanBaru = $request->jabatan;
+
+            // Role jabatan valid?
+            if (Role::where('name', $jabatanBaru)->exists()) {
+
+                // Bersihkan role jabatan lama (sekretaris/bendahara)
+                $finalRoles = array_filter($finalRoles, function ($r) {
+                    return !in_array($r, ['sekretaris', 'bendahara']);
+                });
+
+                // Tambahkan jabatan baru
+                $finalRoles[] = $jabatanBaru;
             }
+        }
 
-            // 🟢 Gabungkan role lama + role RW + role tambahan
-            $mergedRoles = array_unique(array_merge($existingRoles, $newRoles));
+        // 🟢 Jangan hilangkan role warga jika sebelumnya sudah ada
+        if ($hasWarga) {
+            $finalRoles[] = 'warga';
+        }
 
-            // 🟢 Terapkan tanpa menghilangkan role warga
-            $user->syncRoles($mergedRoles);
+        // 🟢 Terapkan ke user
+        $user->syncRoles(array_unique($finalRoles));
         } else {
             // Jika user dihapus
             if ($user) $user->delete();
