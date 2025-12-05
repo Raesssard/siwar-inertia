@@ -109,7 +109,7 @@ class AdminPengumumanController extends Controller
             'tanggal' => Carbon::parse($request->tanggal)->format('Y-m-d H:i:s'),
             'tempat' => $request->tempat ?? '-',
             'id_rw' => 1,
-            'id_rt' => 1,
+            'id_rt' => null,
             'dokumen_path' => $path,
             'dokumen_name' => $name,
         ]);

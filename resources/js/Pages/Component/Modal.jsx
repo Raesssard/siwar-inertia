@@ -3295,7 +3295,7 @@ export function DetailPengumuman({ kategori, selectedData, detailShow, onClose, 
                                     )}
                                     <div className="flex-fill d-flex flex-column" style={selectedData?.dokumen_path ? { maxWidth: "50%" } : { maxWidth: "100%" }}>
                                         <div className="p-3 border-bottom caption-section">
-                                            {(userData?.rukun_tetangga?.id === selectedData.id_rt || userData?.rw?.id === selectedData.id_rw) ? (
+                                            {(userData?.rukun_tetangga?.id === selectedData.id_rt || userData?.rw?.id === selectedData.id_rw || role === 'admin') ? (
                                                 <div className="d-flex">
                                                     <h5 className="fw-bold mb-1 mt-2 me-auto">{selectedData.judul}</h5>
                                                     <Role role={["rt", "rw", 'sekretaris', 'admin']}>
