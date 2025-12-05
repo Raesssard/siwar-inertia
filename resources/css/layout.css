@@ -350,7 +350,7 @@ div.modal-komen {
 /* MOBILE */
 .modal-komen.mobile {
     width: 90vw;
-    max-height: calc(100vh - 25%);
+    max-height: calc(100vh - 15%);
     min-height: unset;
 }
 
