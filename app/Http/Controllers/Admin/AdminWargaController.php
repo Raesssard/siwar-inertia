@@ -336,7 +336,7 @@ class AdminWargaController extends Controller
         }
 
 
-        return redirect()->route('rw.kartu_keluarga.index')
+        return redirect()->route('admin.kartu_keluarga.index')
             ->with('success', 'Data warga berhasil diperbarui.');
     }
 
