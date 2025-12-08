@@ -17,15 +17,12 @@ class CheckPermission
             abort(403, 'User tidak ditemukan.');
         }
 
-        // Ambil role efektif (rt/rw di-skip jika ada role lain)
         $effectiveRole = $user->effectiveRole();
 
-        // Pastikan user memang punya role efektif
         if (!$user->hasRole($effectiveRole)) {
             abort(403, 'Role tidak valid.');
         }
 
-        // Cek permission berdasarkan role efektif
         if (!$user->can($permission)) {
             abort(403, 'Anda tidak punya izin untuk mengakses halaman ini.');
         }

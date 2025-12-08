@@ -64,10 +64,8 @@ class RwWargaController extends Controller
             return back()->with('error', 'Data RW tidak ditemukan.');
         }
 
-        // ✔️ Ambil nomor RW user
         $nomorRwUser = $userRw->nomor_rw;
 
-        // ✔️ Filter KK berdasarkan nomor RW (TANPA pakai nomor_rw di tabel KK)
         $daftarKK = Kartu_keluarga::whereHas('rw', function ($q) use ($nomorRwUser) {
                 $q->where('nomor_rw', $nomorRwUser);
             })
@@ -105,7 +103,6 @@ class RwWargaController extends Controller
             'nama_ibu' => 'required|string',
             'status_warga' => 'required|in:penduduk,pendatang',
 
-            // WNA
             'no_paspor' => 'nullable|string|max:50',
             'tgl_terbit_paspor' => 'nullable|date',
             'tgl_berakhir_paspor' => 'nullable|date',
@@ -116,18 +113,12 @@ class RwWargaController extends Controller
             'tgl_terbit_kitap' => 'nullable|date',
             'tgl_berakhir_kitap' => 'nullable|date',
 
-            // Pendatang
             'alamat_asal' => 'nullable|string',
             'alamat_domisili' => 'nullable|string',
             'tanggal_mulai_tinggal' => 'nullable|date',
             'tujuan_pindah' => 'nullable|string',
         ]);
 
-        /**
-         * ===========================================================
-         * 🚫 VALIDASI: dilarang ada 2 kepala keluarga dalam 1 KK
-         * ===========================================================
-         */
         if ($validated['status_hubungan_dalam_keluarga'] === 'kepala keluarga') {
 
             $cekKK = Warga::where('no_kk', $validated['no_kk'])
@@ -142,11 +133,6 @@ class RwWargaController extends Controller
             }
         }
 
-        /**
-         * ===========================================================
-         * 💾 SIMPAN DATA WARGA
-         * ===========================================================
-         */
         $warga = Warga::create($validated);
 
         HistoryWarga::create([
@@ -157,17 +143,10 @@ class RwWargaController extends Controller
             'tanggal' => now()->toDateString(),
         ]);
 
-        /**
-         * ===========================================================
-         * 👤 AUTO-BUAT USER UNTUK KEPALA KELUARGA
-         * ===========================================================
-         */
         if ($warga->status_hubungan_dalam_keluarga === 'kepala keluarga') {
 
-            // Cek jika sudah ada user dengan nik ini
             if (!User::where('nik', $warga->nik)->exists()) {
 
-                // Cari id_rt & id_rw warga berdasarkan tabel Kartu Keluarga
                 $kk = Kartu_keluarga::where('no_kk', $warga->no_kk)->first();
 
                 $id_rt = $kk ? $kk->id_rt : null;
@@ -179,11 +158,11 @@ class RwWargaController extends Controller
                     'password' => Hash::make('password'),
                     'id_rt'    => $id_rt,
                     'id_rw'    => $id_rw,
-                ])->assignRole('warga'); // default role
+                ])->assignRole('warga'); 
             }
         }
 
-        return redirect()->route('rw.kartuKeluarga.index')
+        return redirect()->route('rw.kartu_keluarga.index')
             ->with('success', 'Warga berhasil ditambahkan.');
     }
 
@@ -213,7 +192,7 @@ class RwWargaController extends Controller
     public function update(Request $request, $id)
     {
         $warga = Warga::findOrFail($id);
-        $kk_lama = $warga->no_kk; // simpan kk lama
+        $kk_lama = $warga->no_kk; 
 
         $validated = $request->validate([
             'nik' => 'required|digits:16|unique:warga,nik,' . $id,
@@ -233,7 +212,6 @@ class RwWargaController extends Controller
             'nama_ibu' => 'required|string',
             'status_warga' => 'required|in:penduduk,pendatang',
 
-            // WNA
             'no_paspor' => 'nullable|string|max:50',
             'tgl_terbit_paspor' => 'nullable|date',
             'tgl_berakhir_paspor' => 'nullable|date',
@@ -244,31 +222,20 @@ class RwWargaController extends Controller
             'tgl_terbit_kitap' => 'nullable|date',
             'tgl_berakhir_kitap' => 'nullable|date',
 
-            // pendatang
             'alamat_asal' => 'nullable|string',
             'alamat_domisili' => 'nullable|string',
             'tanggal_mulai_tinggal' => 'nullable|date',
             'tujuan_pindah' => 'nullable|string',
         ]);
 
-
-        /**
-         * ===============================================================
-         * ❗ VALIDASI: CEGAH 2 KEPALA KELUARGA DALAM 1 KK
-         * ===============================================================
-         */
-
         $kk_baru = $validated['no_kk'];
         $status_baru = $validated['status_hubungan_dalam_keluarga'];
         $status_lama = $warga->status_hubungan_dalam_keluarga;
 
-        // Jika dia menjadi kepala keluarga
         if ($status_baru === 'kepala keluarga') {
 
-            // Jika no_kk tidak berubah
             if ($kk_baru == $kk_lama) {
 
-                // Cek apakah sudah ada kepala keluarga lain (selain dirinya sendiri)
                 $kepala = Warga::where('no_kk', $kk_baru)
                     ->where('status_hubungan_dalam_keluarga', 'kepala keluarga')
                     ->where('id', '!=', $warga->id)
@@ -280,7 +247,6 @@ class RwWargaController extends Controller
                 }
 
             } else {
-                // no_kk berpindah → cek KK baru
                 $kepala = Warga::where('no_kk', $kk_baru)
                     ->where('status_hubungan_dalam_keluarga', 'kepala keluarga')
                     ->first();
@@ -292,47 +258,45 @@ class RwWargaController extends Controller
             }
         }
 
-
-        /**
-         * ===============================================================
-         * 💾 UPDATE DATA WARGA
-         * ===============================================================
-         */
-
-        // Simpan no_kk_lama
-        $validated['no_kk_lama'] = $kk_lama;
+        if ($kk_baru !== $kk_lama) {
+            $validated['no_kk_lama'] = $kk_lama;
+        } else {
+            unset($validated['no_kk_lama']);
+        }
 
         $warga->update($validated);
 
-
-        /**
-         * ===============================================================
-         * 👤 JIKA STATUS BARU = KEPALA KELUARGA → BUAT USER JIKA BELUM ADA
-         * ===============================================================
-         */
-
         if ($status_baru === 'kepala keluarga' && $status_lama !== 'kepala keluarga') {
 
-            // Cek apakah user sudah ada
             $existingUser = User::where('nik', $warga->nik)->first();
 
+            $kk = Kartu_keluarga::where('no_kk', $kk_baru)->first();
+
             if (!$existingUser) {
-
-                // Ambil RT & RW dari KK barunya
-                $kk = Kartu_keluarga::where('no_kk', $kk_baru)->first();
-
-                User::create([
+                $existingUser = User::create([
                     'nik'      => $warga->nik,
                     'nama'     => $warga->nama,
                     'password' => Hash::make('password'),
                     'id_rt'    => $kk->id_rt,
                     'id_rw'    => $kk->id_rw,
-                ])->assignRole('warga'); // default role
+                ]);
+
+                $existingUser->assignRole('warga');
+
+            } else {
+
+                $existingUser->update([
+                    'id_rt' => $kk->id_rt,
+                    'id_rw' => $kk->id_rw,
+                ]);
+
+                if (!$existingUser->hasRole('warga')) {
+                    $existingUser->assignRole('warga');
+                }
             }
         }
 
-
-        return redirect()->route('rw.kartuKeluarga.index')
+        return redirect()->route('rw.kartu_keluarga.index')
             ->with('success', 'Data warga berhasil diperbarui.');
     }
 

@@ -46,10 +46,8 @@ class AdminKartuKeluargaController extends Controller
             ->with(['rw', 'user.roles'])
             ->whereHas('user', function ($q) {
                 $q->whereHas('roles', function ($r) {
-                    // Hanya ambil user dengan role utama RT (Ketua RT)
                     $r->where('name', 'rt');
                 })
-                // Pastikan user tersebut tidak punya role tambahan (sekretaris/bendahara/seksi)
                 ->whereDoesntHave('roles', function ($r) {
                     $r->whereIn('name', ['sekretaris', 'bendahara', 'seksi']);
                 });
@@ -75,13 +73,13 @@ class AdminKartuKeluargaController extends Controller
         ->where(function ($q) {
             $q->whereHas('user', function ($u) {
                 $u->whereHas('roles', function ($r) {
-                    $r->where('name', 'rt'); // Ketua RT
+                    $r->where('name', 'rt'); 
                 })
                 ->whereDoesntHave('roles', function ($r) {
                     $r->whereIn('name', ['sekretaris', 'bendahara', 'seksi']);
                 });
             })
-            ->orDoesntHave('user'); // RT yang belum memiliki user
+            ->orDoesntHave('user'); 
         })
         ->get();
 
@@ -118,7 +116,6 @@ class AdminKartuKeluargaController extends Controller
 
             Log::info('Admin Data KK diterima:', $request->all());
 
-            // Jika id_rt diisi, otomatis ambil id_rw dari RT
             if ($request->filled('id_rt')) {
                 $rt = Rt::find($request->id_rt);
                 $validated['id_rw'] = $rt ? $rt->id_rw : null;
@@ -146,13 +143,13 @@ class AdminKartuKeluargaController extends Controller
         ->where(function ($q) {
             $q->whereHas('user', function ($u) {
                 $u->whereHas('roles', function ($r) {
-                    $r->where('name', 'rt'); // Ketua RT
+                    $r->where('name', 'rt'); 
                 })
                 ->whereDoesntHave('roles', function ($r) {
                     $r->whereIn('name', ['sekretaris', 'bendahara', 'seksi']);
                 });
             })
-            ->orDoesntHave('user'); // RT yang masih kosong
+            ->orDoesntHave('user'); 
         })
         ->get();
 
@@ -188,7 +185,6 @@ class AdminKartuKeluargaController extends Controller
                 'nip_kepala_dukcapil' => 'nullable|string|max:255',
             ]);
 
-            // 🔹 Otomatis isi id_rw sesuai RT
             if ($request->filled('id_rt')) {
                 $rt = Rt::find($request->id_rt);
                 $validated['id_rw'] = $rt ? $rt->id_rw : null;

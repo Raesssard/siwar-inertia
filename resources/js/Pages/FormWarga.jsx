@@ -148,7 +148,6 @@ export default function FormWarga({
                 { name: "nama", label: "Nama Lengkap", type: "text" },
                 { name: "tempat_lahir", label: "Tempat Lahir", type: "text" },
                 { name: "tanggal_lahir", label: "Tanggal Lahir", type: "date" },
-                { name: "agama", label: "Agama", type: "text" },
                 { name: "pendidikan", label: "Pendidikan", type: "text" },
               ].map((f) => (
                 <div key={f.name}>
@@ -165,7 +164,30 @@ export default function FormWarga({
                 </div>
               ))}
               {/* Pekerjaan */}
-              {/* Pekerjaan */}
+              {/* Agama */}
+              <div>
+                <label className="font-medium text-gray-700">Agama</label>
+                <select
+                  value={data.agama}
+                  onChange={(e) => setData("agama", e.target.value)}
+                  className={inputBase}
+                  required
+                >
+                  <option value="">-- Pilih Agama --</option>
+                  <option value="Tak Beragama">Tak Beragama</option>
+                  <option value="Islam">Islam</option>
+                  <option value="Buddha">Buddha</option>
+                  <option value="Hindu">Hindu</option>
+                  <option value="Kong Hu Cu">Kong Hu Cu</option>
+                  <option value="Kristen Katholik">Kristen Katholik</option>
+                  <option value="Kristen Protestan">Kristen Protestan</option>
+                  <option value="Atheis">Atheis</option>
+                </select>
+
+                {errors.agama && (
+                  <p className="text-red-500 text-sm">{errors.agama}</p>
+                )}
+              </div>
               <div>
                 <label className="font-medium text-gray-700">Pekerjaan</label>
                 <select

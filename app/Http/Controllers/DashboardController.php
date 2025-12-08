@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use App\Models\Rt;
 use App\Models\Rw;
-use App\Models\Kategori_golongan; // sesuaikan nama model jika beda
+use App\Models\Kategori_golongan; 
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
 use App\Http\Controllers\Controller;
@@ -28,10 +28,6 @@ class DashboardController extends Controller
         $user = Auth::user();
         $role = session('active_role') ?? $user->getRoleNames()->first();
 
-        // kalo render dashboardnya di satu controller, 
-        // berarti role lain gk usah buat controller dashboardnya masing masing. 
-        // cukup lempar datanya dari sini 🗿
-
         $data = [
             'title' => 'Dashboard',
             'role' => $role,
@@ -45,13 +41,10 @@ class DashboardController extends Controller
             $total_pemasukan_transaksi = Transaksi::where('jenis', 'pemasukan')->sum('nominal');
             $total_pengeluaran = Transaksi::where('jenis', 'pengeluaran')->sum('nominal');
 
-            // Total pemasukan keseluruhan
             $total_pemasukan = $total_pemasukan_transaksi;
 
-            // Saldo akhir
             $total_saldo_akhir = $total_pemasukan - $total_pengeluaran;
 
-            // Total iuran masuk bulan ini
             $total_iuran_bulan_ini = Tagihan::where('status_bayar', 'sudah_bayar')
                 ->whereMonth('updated_at', Carbon::now()->month)
                 ->whereYear('updated_at', Carbon::now()->year)
@@ -242,21 +235,16 @@ class DashboardController extends Controller
 
             $jumlah_rt = Rt::count();
 
-            // Total pemasukan dari iuran yang sudah dibayar
             $total_pemasukan_iuran = Tagihan::where('status_bayar', 'sudah_bayar')
                 ->sum('nominal');
 
-            // Total pemasukan & pengeluaran dari tabel transaksi
             $total_pemasukan_transaksi = Transaksi::where('jenis', 'pemasukan')->sum('nominal');
             $total_pengeluaran = Transaksi::where('jenis', 'pengeluaran')->sum('nominal');
 
-            // Total pemasukan keseluruhan
             $total_pemasukan = $total_pemasukan_transaksi;
 
-            // Saldo akhir
             $total_saldo_akhir = $total_pemasukan - $total_pengeluaran;
 
-            // Total iuran masuk bulan ini
             $total_iuran_bulan_ini = Tagihan::where('status_bayar', 'sudah_bayar')
                 ->whereMonth('updated_at', Carbon::now()->month)
                 ->whereYear('updated_at', Carbon::now()->year)

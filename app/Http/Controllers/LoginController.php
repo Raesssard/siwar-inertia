@@ -90,7 +90,6 @@ class LoginController extends Controller
 
     private function redirectByRole(string $role, $user)
     {
-        // Khusus warga cek apakah Kepala Keluarga
         if ($role === 'warga') {
             $warga = $user->warga;
             if (!$warga || strtolower($warga->status_hubungan_dalam_keluarga) !== 'kepala keluarga') {
@@ -109,7 +108,6 @@ class LoginController extends Controller
         ]);
     }
 
-    // Halaman pilih role
     public function chooseRole()
     {
         /** @var User $user */
@@ -118,7 +116,6 @@ class LoginController extends Controller
         return Inertia::render('ChooseRole', compact('user', 'roles'));
     }
 
-    // Simpan role yang dipilih
     public function setRole(Request $request)
     {
         /** @var User $user */

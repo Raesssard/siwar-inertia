@@ -17,9 +17,6 @@ use Inertia\Inertia;
 
 class Rt_tagihanController extends Controller
 {
-    /**
-     * Menampilkan daftar tagihan manual dengan filter dan total nominal.
-     */
     public function index(Request $request)
     {
         $title = 'Tagihan';
@@ -32,14 +29,12 @@ class Rt_tagihanController extends Controller
         $status = $request->status;
         $no_kk_filter = $request->no_kk_filter;
 
-        // Ambil daftar KK sesuai RT (buat filter dropdown)
         $kartuKeluargaForFilter = Kartu_keluarga::where('id_rt', $idRt)
             ->select('no_kk')
             ->distinct()
             ->orderBy('no_kk')
             ->get();
 
-        // Base query (untuk dipakai manual & otomatis)
         $baseQuery = Tagihan::with([
             'iuran',
             'kartuKeluarga.warga',
@@ -170,9 +165,6 @@ class Rt_tagihanController extends Controller
         ], 201);
     }
 
-    /**
-     * Memperbarui tagihan manual.
-     */
     public function update(Request $request, $id)
     {
         $tagihan = Tagihan::findOrFail($id);
@@ -250,9 +242,6 @@ class Rt_tagihanController extends Controller
         }
     }
 
-    /**
-     * Menghapus tagihan manual.
-     */
     public function destroy($id)
     {
         try {

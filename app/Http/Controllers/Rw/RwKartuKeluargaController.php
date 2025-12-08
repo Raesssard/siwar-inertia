@@ -22,21 +22,17 @@ class RwKartuKeluargaController extends Controller
         $search = $request->search;
         $title = 'Kartu Keluarga';
 
-        // Ambil data RW user
         $userRwData = Auth::user()->rw;
         if (!$userRwData) {
             return redirect()->back()->with('error', 'Data RW Anda tidak ditemukan.');
         }
 
-        // Ambil nomor RW user
         $nomorRwUser = $userRwData->nomor_rw;
 
-        // ✔️ TOTAL KK DIPERBAIKI — menggunakan relasi ke RW
         $total_kk = Kartu_keluarga::whereHas('rw', function ($q) use ($nomorRwUser) {
             $q->where('nomor_rw', $nomorRwUser);
         })->count();
 
-        // ✔️ QUERY KK DIPERBAIKI — tidak lagi memakai nomor_rw di tabel KK
         $kartu_keluarga = Kartu_keluarga::with([
                 'warga.kartuKeluarga.rukunTetangga',
                 'rukunTetangga.rw',
@@ -62,7 +58,6 @@ class RwKartuKeluargaController extends Controller
 
         $kategori_iuran = Kategori_golongan::select('id', 'jenis')->get();
 
-        // ✔️ DAFTAR RT DIPERBAIKI — juga tidak punya kolom nomor_rw
         $daftar_rt = Rt::whereHas('rw', function ($q) use ($nomorRwUser) {
                 $q->where('nomor_rw', $nomorRwUser);
             })
@@ -91,7 +86,6 @@ class RwKartuKeluargaController extends Controller
 
         $kategori_iuran = Kategori_golongan::select('id', 'jenis')->get();
 
-        // RT yang berada dalam RW user
         $daftar_rt = Rt::select('id', 'nomor_rt', 'id_rw')
             ->with([
                 'rw',

@@ -24,7 +24,7 @@ class SettingsController extends Controller
         ];
         return Inertia::render('Settings', [
             'user' => $user,
-            'settings' => $settings, // ⬅️ kirim ke frontend
+            'settings' => $settings, 
         ]);
     }
 
@@ -42,12 +42,10 @@ class SettingsController extends Controller
 
         $user = Auth::user();
 
-        // Pastikan password lama benar
         if (!Hash::check($request->current_password, $user->password)) {
             return back()->withErrors(['current_password' => 'Password lama tidak cocok.']);
         }
 
-        // Update password user
         $user->password = Hash::make($request->password);
         $user->save();
 
@@ -73,11 +71,9 @@ class SettingsController extends Controller
     {
         $user = Auth::user();
 
-        // Ambil model RT & RW berdasarkan id_rt dan id_rw dari user
         $rt = Rt::find($user->id_rt);
         $rw = Rw::find($user->id_rw);
 
-        // Ambil no_kk berdasarkan nik user
         $kk = Kartu_keluarga::whereHas('warga', function ($q) use ($user) {
             $q->where('nik', $user->nik);
         })
@@ -85,9 +81,9 @@ class SettingsController extends Controller
 
         return inertia('ProfilePage', [
             'user' => $user,
-            'rt' => $rt,        // berisi: id, nomor_rt, dst
-            'rw' => $rw,        // berisi: id, nomor_rw, dst
-            'kk' => $kk,        // berisi: no_kk
+            'rt' => $rt,        
+            'rw' => $rw,        
+            'kk' => $kk,        
         ]);
     }
 
@@ -97,7 +93,6 @@ class SettingsController extends Controller
             /** @var User $user */
             $user = Auth::user();
 
-            // Validasi
             $request->validate([
                 'foto_profil' => 'required|file|mimes:jpeg,png,jpg|max:2048',
             ]);
@@ -108,15 +103,12 @@ class SettingsController extends Controller
                 Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)) .
                 '.' . $file->getClientOriginalExtension();
 
-            // Hapus foto lama
             if ($user->foto_profil) {
                 Storage::disk('public')->delete($user->foto_profil);
             }
 
-            // Simpan file BARU
             $path = $file->storeAs('profil', $fileName, 'public');
 
-            // UPDATE DATABASE
             $user->update([
                 'foto_profil' => $path
             ]);
@@ -136,12 +128,10 @@ class SettingsController extends Controller
             /** @var User $user */
             $user = Auth::user();
 
-            // Hapus foto dari storage
             if ($user->foto_profil) {
                 Storage::disk('public')->delete($user->foto_profil);
             }
 
-            // Update database
             $user->update([
                 'foto_profil' => null
             ]);

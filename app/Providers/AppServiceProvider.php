@@ -12,7 +12,7 @@ class AppServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        //
+        
     }
 
     public function boot(): void
@@ -21,8 +21,6 @@ class AppServiceProvider extends ServiceProvider
             /** @var User $user */
             $user = Auth::user();
 
-            // Jika belum ada active_role → ambil role pertama ❌
-            //                              ambil role yg terakhir dipake ✅
             if (!Session::has('active_role')) {
                 if ($user->last_role && $user->hasRole($user->last_role)) {
                     Session::put('active_role', $user->last_role);
@@ -33,8 +31,6 @@ class AppServiceProvider extends ServiceProvider
             }
         }
         Carbon::setLocale('id');
-
-        // Share global data ke semua halaman Inertia
         Inertia::share([
             'flash' => function () {
                 return [

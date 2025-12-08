@@ -13,7 +13,6 @@ class Kartu_keluarga extends Model
 
     protected $table = 'kartu_keluarga';
 
-    // Gunakan id auto increment
     protected $primaryKey = 'id';
     public $incrementing = true;
     protected $keyType = 'int';

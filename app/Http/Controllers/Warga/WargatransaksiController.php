@@ -21,13 +21,11 @@ class WargatransaksiController extends Controller
         $tahun = $request->input('tahun');
         $bulan = $request->input('bulan');
 
-        // Cek akses dan data warga serta kartu keluarga
         if (!$user || !$user->hasRole('warga') || !$user->warga || !$user->warga->kartuKeluarga || !$user->warga->kartuKeluarga->rukunTetangga) {
             Log::warning("Akses tidak sah ke halaman transaksi warga atau data RT/KK tidak ditemukan.", ['user_id' => $user->id ?? 'guest']);
             return redirect('/')->with('error', 'Anda tidak memiliki akses ke halaman ini atau data RT/KK Anda tidak lengkap.');
         }
 
-        // Ambil id_rt dari kartu_keluarga yang terkait dengan user
         $idRt = $user->warga->kartuKeluarga->rukunTetangga->id;
 
         if (!$idRt) {

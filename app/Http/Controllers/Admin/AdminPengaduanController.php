@@ -14,13 +14,11 @@ class AdminPengaduanController extends Controller
     {
         $title = 'Pengaduan';
 
-        // Filter
         $tahun = $request->input('tahun');
         $bulan = $request->input('bulan');
         $search = $request->input('search');
         $kategori = $request->input('kategori');
 
-        // Admin → tampilkan semua pengaduan
         $pengaduan = Pengaduan::query()
             ->with([
                 'warga',
@@ -60,9 +58,6 @@ class AdminPengaduanController extends Controller
         ]);
     }
 
-    /**
-     * 🔹 Admin boleh update status langsung (diproses / selesai)
-     */
     public function updateStatus(Request $request, $id)
     {
         $pengaduan = Pengaduan::findOrFail($id);
@@ -75,19 +70,14 @@ class AdminPengaduanController extends Controller
         ]);
     }
 
-    /**
-     * 🔹 Admin → update konfirmasi RW tanpa batasan
-     */
     public function updateKonfirmasi(Request $request, $id)
     {
         $pengaduan = Pengaduan::findOrFail($id);
 
-        // Admin langsung ubah jadi 'sudah'
         $pengaduan->update([
             'konfirmasi_rw' => 'sudah',
         ]);
 
-        // Jika admin menambah komentar
         if ($request->filled('isi_komentar') || $request->hasFile('file')) {
             $isi = $request->input('isi_komentar');
             $filePath = null;

@@ -27,17 +27,13 @@ class Tagihan extends Model
         'id_iuran',
         'kategori_pembayaran',
         'bukti_transfer',
-        'tercatat_transaksi', // <<< Tambahkan ini
+        'tercatat_transaksi',
     ];
 
-    // Jika Anda ingin Laravel secara otomatis mengkonversi nilai boolean
     protected $casts = [
         'tercatat_transaksi' => 'boolean',
     ];
 
-    /**
-     * Relasi ke KartuKeluarga
-     */
     public function kartuKeluarga()
     {
         return $this->belongsTo(Kartu_keluarga::class, 'no_kk', 'no_kk');

@@ -13,7 +13,6 @@ class AdminRoleController extends Controller
     public function index(Request $request)
     {
         $title = 'Roles';
-        // 🔹 Filter nama role
         $filterName = $request->input('name');
 
         $roles = Role::with('permissions')
@@ -56,15 +55,14 @@ class AdminRoleController extends Controller
         return redirect()->back()->with('success', 'Role berhasil diperbarui.');
     }
 
-    public function destroy($id)
-    {
-        $role = Role::findOrFail($id);
-        $role->delete();
+    // public function destroy($id)
+    // {
+    //     $role = Role::findOrFail($id);
+    //     $role->delete();
 
-        return redirect()->back()->with('success', 'Role berhasil dihapus.');
-    }
+    //     return redirect()->back()->with('success', 'Role berhasil dihapus.');
+    // }
 
-    // 🔹 Update permission untuk role tertentu
     public function updatePermissions(Request $request, $id)
     {
         $role = Role::findOrFail($id);

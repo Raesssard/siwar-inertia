@@ -14,9 +14,6 @@ use Inertia\Inertia;
 
 class PengaduanController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index(Request $request)
     {
         /** @var User $user */
@@ -110,17 +107,11 @@ class PengaduanController extends Controller
         ]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
-        //
+        
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
         $request->validate([
@@ -152,7 +143,6 @@ class PengaduanController extends Controller
                 'konfirmasi_rw' => $request->level === 'rt' ? 'belum' : 'menunggu',
             ]);
 
-            // load relasi biar React langsung dapat data lengkap
             $pengaduan->load(['warga', 'komentar.user', 'warga.kartuKeluarga.rukunTetangga', 'warga.kartuKeluarga.rw']);
 
             if ($request->wantsJson()) {
@@ -165,25 +155,16 @@ class PengaduanController extends Controller
         }
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(string $id)
     {
-        //
+
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(string $id)
     {
-        //
+
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, $id)
     {
         $nik_user = Auth::user()->warga->nik;
@@ -241,9 +222,6 @@ class PengaduanController extends Controller
             ->with('success', 'Pengaduan berhasil diperbarui.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Request $request, $id)
     {
         $nik_user = Auth::user()->warga->nik;

@@ -14,9 +14,6 @@ use Inertia\Inertia;
 
 class Rt_pengumumanController extends Controller
 {
-    /**
-     * Tampilkan daftar pengumuman milik RT yang login (berdasarkan nomor RT).
-     */
     public function index(Request $request)
     {
         $search = $request->input('search');
@@ -263,9 +260,6 @@ class Rt_pengumumanController extends Controller
             ->with('success', 'Pengumuman berhasil diperbarui.');
     }
 
-    /**
-     * Hapus pengumuman.
-     */
     public function destroy($id)
     {
 

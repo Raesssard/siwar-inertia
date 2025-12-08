@@ -174,12 +174,12 @@ export default function Roles({ roles, permissions, filters, title }) {
                                                     Permissions
                                                 </Link>
 
-                                                <button
+                                                {/* <button
                                                     className="btn btn-danger btn-sm"
                                                     onClick={() => handleDelete(item.id)}
                                                 >
                                                     Hapus
-                                                </button>
+                                                </button> */}
                                             </div>
                                         </td>
                                     </tr>

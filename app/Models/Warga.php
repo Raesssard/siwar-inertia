@@ -14,7 +14,6 @@ class Warga extends Model
 
     protected $table = 'warga';
 
-    // Gunakan id auto increment sebagai primary
     protected $primaryKey = 'id';
     public $incrementing = true;
     protected $keyType = 'int';
@@ -38,7 +37,6 @@ class Warga extends Model
         'nama_ibu',
         'status_warga',
 
-        // --- Data tambahan untuk WNA ---
         'no_paspor',
         'tgl_terbit_paspor',
         'tgl_berakhir_paspor',
@@ -49,7 +47,6 @@ class Warga extends Model
         'tgl_terbit_kitap',
         'tgl_berakhir_kitap',
 
-        // --- Data tambahan untuk pendatang ---
         'alamat_asal',
         'alamat_domisili',
         'tanggal_mulai_tinggal',

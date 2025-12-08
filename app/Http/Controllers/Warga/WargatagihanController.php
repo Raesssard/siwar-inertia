@@ -13,9 +13,6 @@ use Inertia\Inertia;
 class WargatagihanController extends Controller
 {
 
-    /**
-     * Menampilkan daftar tagihan untuk warga yang sedang login.
-     */
     public function index(Request $request)
     {
         /** @var User $user */

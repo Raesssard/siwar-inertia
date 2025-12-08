@@ -12,7 +12,7 @@ use App\Models\Tagihan;
 use App\Models\Warga;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth; // Tetap diperlukan jika ada filter iuran per RT
+use Illuminate\Support\Facades\Auth; 
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 
@@ -94,7 +94,6 @@ class RtIuranController extends Controller
             'nominal' => 'required_if:jenis,manual|nullable|numeric|min:0|max:99999999',
         ]);
 
-        // 🔹 Tentukan scope RT atau RW
         $data = [
             'nama' => $request->nama,
             'tgl_tagih' => $request->tgl_tagih,
@@ -108,14 +107,12 @@ class RtIuranController extends Controller
 
         $iuran = Iuran::create($data);
 
-        // 🔹 Ambil KK sesuai scope
         $kkList = $iuran->level === 'rt'
             ? Kartu_keluarga::where('id_rt', $iuran->id_rt)->get()
             : Kartu_keluarga::where('id_rw', $iuran->id_rw)->get();
 
 
         if ($request->jenis === 'otomatis') {
-            // Simpan nominal per golongan
             $golonganList = Kategori_golongan::all();
 
             foreach ($golonganList as $golongan) {

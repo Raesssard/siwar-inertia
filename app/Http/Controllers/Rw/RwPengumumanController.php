@@ -21,13 +21,11 @@ class RwPengumumanController extends Controller
     {
         $title = 'Pengumuman';
 
-        // Ambil data RW user
         $userRwData = Auth::user()->rw;
         if (!$userRwData) {
             return redirect()->back()->with('error', 'Data RW Anda tidak ditemukan.');
         }
 
-        // Ambil nomor RW user
         $nomorRwUser = $userRwData->nomor_rw;
 
         $search = $request->input('search');
@@ -36,7 +34,6 @@ class RwPengumumanController extends Controller
         $kategori = $request->input('kategori');
         $level = $request->input('level');
 
-        // ✔ Query hanya yang berada di RW ini (pakai nomor_rw)
         $baseQuery = Pengumuman::with([
             'rukunTetangga',
             'rw',
@@ -47,10 +44,8 @@ class RwPengumumanController extends Controller
                 $q->where('nomor_rw', $nomorRwUser);
             });
 
-        // Hitung total
         $total_pengumuman = (clone $baseQuery)->count();
 
-        // Setelah filter
         $pengumuman = (clone $baseQuery)
             ->when($search, function ($q) use ($search) {
                 $q->where(function ($sub) use ($search) {
@@ -71,7 +66,6 @@ class RwPengumumanController extends Controller
             ->orderByDesc('tanggal')
             ->get();
 
-        // Tahun dan kategori
         $daftar_tahun = Pengumuman::selectRaw('YEAR(tanggal) as tahun')
             ->distinct()
             ->orderByDesc('tahun')
@@ -81,7 +75,6 @@ class RwPengumumanController extends Controller
             ->distinct()
             ->pluck('kategori');
 
-        // Nama bulan
         $list_bulan = [
             'januari',
             'februari',
