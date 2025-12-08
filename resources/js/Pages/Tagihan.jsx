@@ -1,6 +1,6 @@
 import Layout from "@/Layouts/Layout"
 import { Head, Link, useForm, usePage } from "@inertiajs/react"
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import { formatRupiah, formatTanggal } from "./Component/GetPropRole"
 import Swal from "sweetalert2"
 import { FilterTagihan } from "./Component/Filter"
@@ -23,6 +23,8 @@ export default function Tagihan() {
     const role = props.auth?.currentRole
     const { get, data, setData } = useForm({
         search: '',
+        no_kk_filter: '',
+        status: '',
     })
     const modalEdit = (item) => {
         setSelected(item)
@@ -31,14 +33,21 @@ export default function Tagihan() {
 
     const filter = (e) => {
         e.preventDefault()
-        get(`/${role}/tagihan`, { preserveState: true, preserveScroll: true })
+        get(`/${role}/tagihan`, { preserveScroll: true, preserveState: true })
     }
 
     const resetFilter = () => {
         setData({
             search: '',
+            no_kk_filter: '',
+            status: '',
         })
     }
+
+    useEffect(() => {
+        setTagihanManualList(tagihanManualFromServer.data ?? [])
+        setTagihanOtomatisList(tagihanOtomatisFromServer.data ?? [])
+    }, [tagihanManualFromServer, tagihanOtomatisFromServer])
 
     const handleDelete = (id) => {
         Swal.fire({
@@ -118,7 +127,7 @@ export default function Tagihan() {
                                                 item.kartu_keluarga?.kepala_keluarga?.nama ?? '-'
                                             }
                                         </td>
-                                        <td className="text-end px-0">{formatRupiah(item.nominal) ?? '-'}</td>
+                                        <td className="text-end" style={{ whiteSpace: 'nowrap' }}>{formatRupiah(item.nominal) ?? '-'}</td>
                                         <td className="text-center">{formatTanggal(item.tgl_tagih)}</td>
                                         <td className="text-center">{formatTanggal(item.tgl_tempo)}</td>
                                         <td className="text-center">

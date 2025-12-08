@@ -304,6 +304,18 @@ export function FilterTagihan({ tagihanManual, tagihanOtomatis, data, setData, f
                             </option>
                         ))}
                     </select>
+                    <select
+                        name="status"
+                        value={data.status}
+                        onChange={(e) => setData('status', e.target.value)}
+                        className="form-select form-select-sm w-auto flex-fill my-2 mx-0"
+                    >
+                        <option value="">Semua Status</option>
+                        <option value="sudah_bayar">Sudah Bayar</option>
+                        <option value="belum_bayar">Belum Bayar</option>
+                        <option value="sudah_lunas">Sudah Lunas</option>
+                        <option value="belum_lunas">Belum Lunas</option>
+                    </select>
                     <button type="submit" className="btn-input btn btn-sm btn-primary flex-fill p-0 mx-0" title="Filter Tagihan" style={{ maxWidth: "3rem", minWidth: "3rem" }}>
                         <i className="fas fa-filter"></i>
                     </button>

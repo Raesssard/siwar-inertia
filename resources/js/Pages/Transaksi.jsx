@@ -170,7 +170,7 @@ export default function Transaksi() {
                                                 </span>
                                             )}
                                         </td>
-                                        <td className="text-center">
+                                        <td className="text-end" style={{ whiteSpace: 'nowrap' }}>
                                             {formatRupiah(item.nominal)}
                                         </td>
                                         <td className="text-center">

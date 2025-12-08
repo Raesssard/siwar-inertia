@@ -16,35 +16,35 @@ use Inertia\Inertia;
 
 class AdminWargaController extends Controller
 {
-    // public function index(Request $request)
-    // {
-    //     $title = 'Manajemen Warga';
-    //     $search = $request->search;
-    //     $jenis_kelamin = $request->jenis_kelamin;
+    public function index(Request $request)
+    {
+        $title = 'Manajemen Warga';
+        $search = $request->search;
+        $jenis_kelamin = $request->jenis_kelamin;
 
-    //     $total_warga = Warga::count();
+        $total_warga = Warga::count();
 
-    //     $warga = Warga::with(['kartuKeluarga', 'kartuKeluarga.rukunTetangga', 'kartuKeluarga.rw'])
-    //         ->when($search, function ($query) use ($search) {
-    //             $query->where(function ($q) use ($search) {
-    //                 $q->where('nama', 'like', "%{$search}%")
-    //                   ->orWhere('nik', 'like', "%{$search}%")
-    //                   ->orWhere('no_kk', 'like', "%{$search}%");
-    //             });
-    //         })
-    //         ->when($jenis_kelamin, function ($query) use ($jenis_kelamin) {
-    //             $query->where('jenis_kelamin', $jenis_kelamin);
-    //         })
-    //         ->paginate(10)
-    //         ->withQueryString();
+        $warga = Warga::with(['kartuKeluarga', 'kartuKeluarga.rukunTetangga', 'kartuKeluarga.rw'])
+            ->when($search, function ($query) use ($search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('nama', 'like', "%{$search}%")
+                      ->orWhere('nik', 'like', "%{$search}%")
+                      ->orWhere('no_kk', 'like', "%{$search}%");
+                });
+            })
+            ->when($jenis_kelamin, function ($query) use ($jenis_kelamin) {
+                $query->where('jenis_kelamin', $jenis_kelamin);
+            })
+            ->paginate(10)
+            ->withQueryString();
 
-    //     return Inertia::render('Admin/DataWarga', [
-    //         'title' => $title,
-    //         'warga' => $warga,
-    //         'search' => $search,
-    //         'total_warga' => $total_warga,
-    //     ]);
-    // }
+        return Inertia::render('Admin/DataWarga', [
+            'title' => $title,
+            'warga' => $warga,
+            'search' => $search,
+            'total_warga' => $total_warga,
+        ]);
+    }
 
     public function create(Request $request)
     {

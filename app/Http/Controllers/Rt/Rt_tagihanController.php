@@ -29,6 +29,7 @@ class Rt_tagihanController extends Controller
         $idRt = $user->id_rt;
         $idRw = $user->id_rw;
         $search = $request->search;
+        $status = $request->status;
         $no_kk_filter = $request->no_kk_filter;
 
         // Ambil daftar KK sesuai RT (buat filter dropdown)
@@ -53,10 +54,7 @@ class Rt_tagihanController extends Controller
                         $q->where('id_rw', $idRw);
                     }
                 });
-            });
-
-        $tagihanManual = (clone $baseQuery)
-            ->where('jenis', 'manual')
+            })
             ->when($search, function ($query) use ($search) {
                 $query->where(function ($q) use ($search) {
                     $q->where('nama', 'like', "%$search%")
@@ -66,22 +64,29 @@ class Rt_tagihanController extends Controller
             })
             ->when($no_kk_filter, function ($kk) use ($no_kk_filter) {
                 $kk->where('no_kk', $no_kk_filter);
-            })
+            });
+
+        $filterStatus = function ($q) use ($status) {
+            if (!$status) return;
+
+            if ($status === 'sudah_lunas') {
+                $q->whereColumn('nominal_bayar', '>=', 'nominal');
+            } elseif ($status === 'belum_lunas') {
+                $q->whereColumn('nominal_bayar', '<', 'nominal');
+            } else {
+                $q->where('status_bayar', $status);
+            }
+        };
+
+        $tagihanManual = (clone $baseQuery)
+            ->where('jenis', 'manual')
+            ->where($filterStatus)
             ->orderBy('tgl_tagih', 'desc')
             ->paginate(10, ['*'], 'manual_page');
 
         $tagihanOtomatis = (clone $baseQuery)
             ->where('jenis', 'otomatis')
-            ->when($search, function ($query) use ($search) {
-                $query->where(function ($q) use ($search) {
-                    $q->where('nama', 'like', "%$search%")
-                        ->orWhere('nominal', 'like', "%$search%")
-                        ->orWhere('no_kk', 'like', "%$search%");
-                });
-            })
-            ->when($no_kk_filter, function ($kk) use ($no_kk_filter) {
-                $kk->where('no_kk', $no_kk_filter);
-            })
+            ->where($filterStatus)
             ->orderBy('tgl_tagih', 'desc')
             ->paginate(10, ['*'], 'otomatis_page');
 

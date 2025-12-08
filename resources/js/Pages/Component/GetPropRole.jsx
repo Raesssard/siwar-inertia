@@ -21,6 +21,43 @@ export function formatTanggal(tanggal) {
 export function getWargaCards({ ...rest }) {
     return [
         {
+            kategori: 'Keuangan RT/RW',
+            isi: [
+                // {
+                //     href: "",
+                //     color: "primary",
+                //     title: "Transaksi",
+                //     value: rest.jumlah_transaksi,
+                //     icon: "money-bill-wave",
+                //     permission: "view.transaksi",
+                // },
+                {
+                    href: "",
+                    color: rest.pemasukan < 1 ? 'warning' : 'success',
+                    title: "Total Pemasukan",
+                    value: formatRupiah(rest.pemasukan),
+                    icon: "dollar-sign",
+                    permission: "view.transaksi",
+                },
+                {
+                    href: "",
+                    color: rest.pengeluaran < 1 ? 'success' : 'danger',
+                    title: "Total Pengeluaran",
+                    value: formatRupiah(rest.pengeluaran),
+                    icon: "donate",
+                    permission: "view.transaksi",
+                },
+                {
+                    href: "",
+                    color: "primary",
+                    title: "Total Saldo",
+                    value: formatRupiah(rest.total_saldo_akhir),
+                    icon: "wallet",
+                    permission: "view.transaksi",
+                },
+            ]
+        },
+        {
             kategori: 'Informasi',
             isi: [
                 {
@@ -93,43 +130,6 @@ export function getWargaCards({ ...rest }) {
                     value: formatRupiah(rest.total_tagihan_sudah_bayar),
                     icon: "circle-dollar-to-slot",
                     permission: "view.tagihan",
-                },
-            ]
-        },
-        {
-            kategori: 'Keuangan RT/RW',
-            isi: [
-                {
-                    href: "",
-                    color: "primary",
-                    title: "Transaksi",
-                    value: rest.jumlah_transaksi,
-                    icon: "money-bill-wave",
-                    permission: "view.transaksi",
-                },
-                {
-                    href: "",
-                    color: rest.pemasukan < 1 ? 'warning' : 'success',
-                    title: "Pemasukan",
-                    value: formatRupiah(rest.pemasukan),
-                    icon: "dollar-sign",
-                    permission: "view.transaksi",
-                },
-                {
-                    href: "",
-                    color: rest.pengeluaran < 1 ? 'success' : 'danger',
-                    title: "Pengeluaran",
-                    value: formatRupiah(rest.pengeluaran),
-                    icon: "donate",
-                    permission: "view.transaksi",
-                },
-                {
-                    href: "",
-                    color: "primary",
-                    title: "Total Saldo",
-                    value: formatRupiah(rest.total_saldo_akhir),
-                    icon: "wallet",
-                    permission: "view.transaksi",
                 },
             ]
         },
