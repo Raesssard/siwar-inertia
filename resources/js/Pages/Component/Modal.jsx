@@ -4217,13 +4217,15 @@ export function EditPengumuman({ editKategori, toggle, onUpdated, onDeleted, pen
     )
 }
 
-export function TambahPengumuman({ kategori, tambahShow, onClose, onAdded, role }) {
+export function TambahPengumuman({ kategori, tambahShow, onClose, onAdded, role, rwList, rtList }) {
     const { data, setData } = useForm({
         judul: "",
         kategori: "",
         tanggal: "",
         tempat: "",
         isi: "",
+        id_rw: "",
+        id_rt: "",
         dokumen: null,
     }, { forceFormData: true })
 
@@ -4275,6 +4277,9 @@ export function TambahPengumuman({ kategori, tambahShow, onClose, onAdded, role 
         formData.append('kategori', data.kategori)
         formData.append('tanggal', data.tanggal)
         formData.append('tempat', data.tempat)
+        formData.append('id_rw', data.id_rw ?? "")
+        formData.append('id_rt', data.id_rt ?? "")
+
         if (data.dokumen) formData.append('dokumen', data.dokumen)
 
         axios.post(`/${role}/pengumuman`, formData)
@@ -4310,6 +4315,7 @@ export function TambahPengumuman({ kategori, tambahShow, onClose, onAdded, role 
     }
 
     const isMobile = useIsMobile()
+    const [filteredRt, setFilteredRt] = useState([]);
 
     if (!tambahShow) return null
 
@@ -4412,6 +4418,65 @@ export function TambahPengumuman({ kategori, tambahShow, onClose, onAdded, role 
                                 >
                                     <div className="p-3" style={{ height: "100%", width: '100%' }}>
                                         <form onSubmit={handleSubmit}>
+                                            <Role role={['admin']}>
+                                                {/* PILIH RW */}
+                                                <div className="mb-3">
+                                                    <label className="form-label">RW</label>
+                                                    <small>-Wajib dipilih</small>
+                                                    <select
+                                                        className="form-control"
+                                                        value={data.id_rw || ""}
+                                                        onChange={(e) => {
+                                                            const rwId = e.target.value;
+                                                            setData("id_rw", rwId);
+
+                                                            // Reset RT agar tidak salah pilih
+                                                            setData("id_rt", "");
+
+                                                            // Filter RT berdasar RW
+                                                            const list = rtList.filter(rt => rt.id_rw == rwId);
+                                                            setFilteredRt(list);
+                                                        }}
+                                                        required
+                                                        style={{
+                                                            border: "0",
+                                                            borderBottom: "1px solid lightgray",
+                                                            borderRadius: "0",
+                                                        }}
+                                                    >
+                                                        <option value="" disabled>-- Pilih RW --</option>
+                                                        {rwList.map((rw) => (
+                                                            <option key={rw.id} value={rw.id}>
+                                                                RW {rw.nomor_rw} - {rw.nama_anggota_rw}
+                                                            </option>
+                                                        ))}
+                                                    </select>
+                                                </div>
+
+                                                {/* PILIH RT */}
+                                                <div className="mb-3">
+                                                    <label className="form-label">RT</label>
+                                                    <small>-Opsional (jika untuk pengumuman rw, kosongkan)</small>
+                                                    <select
+                                                        className="form-control"
+                                                        value={data.id_rt || ""}
+                                                        onChange={(e) => setData("id_rt", e.target.value)}
+                                                        disabled={filteredRt.length === 0}
+                                                        style={{
+                                                            border: "0",
+                                                            borderBottom: "1px solid lightgray",
+                                                            borderRadius: "0",
+                                                        }}
+                                                    >
+                                                        <option value="" disabled>-- Pilih RT --</option>
+                                                        {filteredRt.map((rt) => (
+                                                            <option key={rt.id} value={rt.id}>
+                                                                RT {rt.nomor_rt} - {rt.nama_anggota_rt}
+                                                            </option>
+                                                        ))}
+                                                    </select>
+                                                </div>
+                                            </Role>
                                             <div className="mb-2">
                                                 <label className="form-label">Judul</label>
                                                 <input

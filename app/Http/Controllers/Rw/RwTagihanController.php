@@ -48,10 +48,6 @@ class RwTagihanController extends Controller
             ->whereHas('kartuKeluarga.rw', function ($q) use ($nomorRwUser) {
                 $q->where('nomor_rw', $nomorRwUser);
             })
-            });
-
-        $tagihanManual = (clone $baseQuery)
-            ->where('jenis', 'manual')
             ->when($search, function ($query) use ($search) {
                 $query->where(function ($q) use ($search) {
                     $q->where('nama', 'like', "%$search%")

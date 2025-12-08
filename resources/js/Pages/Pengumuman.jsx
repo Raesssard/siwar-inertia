@@ -294,6 +294,8 @@ export default function Pengumuman() {
                         setShowModalDetail(true)
                     }}
                     role={role}
+                    rwList={props.rwList}
+                    rtList={props.rtList}
                 />
             </div>
         </Layout>
