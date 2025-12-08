@@ -16,9 +16,6 @@ use Illuminate\Database\Eloquent\Collection;
 
 class AdminTagihanController extends Controller
 {
-    /**
-     * Menampilkan SEMUA tagihan untuk ADMIN (semua RW & RT).
-     */
     public function index(Request $request)
     {
         $title = 'Tagihan (Admin)';
@@ -26,13 +23,11 @@ class AdminTagihanController extends Controller
         $search = $request->search;
         $no_kk_filter = $request->no_kk_filter;
 
-        // ✔ Admin melihat SEMUA KK untuk filter
         $kartuKeluargaForFilter = Kartu_keluarga::select('no_kk')
             ->distinct()
             ->orderBy('no_kk')
             ->get();
 
-        // ✔ Base query tanpa filter RW/RT
         $baseQuery = Tagihan::with([
             'iuran',
             'kartuKeluarga.warga',
@@ -41,7 +36,6 @@ class AdminTagihanController extends Controller
             'kartuKeluarga.rt',
         ]);
 
-        // Tagihan manual
         $tagihanManual = (clone $baseQuery)
             ->where('jenis', 'manual')
             ->when($search, function ($query) use ($search) {
@@ -55,7 +49,6 @@ class AdminTagihanController extends Controller
             ->orderBy('tgl_tagih', 'desc')
             ->paginate(10, ['*'], 'manual_page');
 
-        // Tagihan otomatis
         $tagihanOtomatis = (clone $baseQuery)
             ->where('jenis', 'otomatis')
             ->when($search, function ($query) use ($search) {
@@ -69,7 +62,6 @@ class AdminTagihanController extends Controller
             ->orderBy('tgl_tagih', 'desc')
             ->paginate(10, ['*'], 'otomatis_page');
 
-        // ✔ Admin mendapatkan semua iuran manual untuk semua RW
         $iuran_for_tagihan = Iuran::with(['iuran_golongan', 'iuran_golongan.golongan', 'rw'])
             ->where('level', 'rw')
             ->where('jenis', 'manual')
@@ -84,10 +76,6 @@ class AdminTagihanController extends Controller
         ]);
     }
 
-
-    /**
-     * Admin membuat tagihan manual untuk RW manapun.
-     */
     public function store(Request $request)
     {
         $request->validate([
@@ -99,7 +87,6 @@ class AdminTagihanController extends Controller
 
         $iuran = Iuran::findOrFail($request->id_iuran);
 
-        // ✔ Admin mengikuti RW mana yang dipilih lewat iuran
         $kkQuery = Kartu_keluarga::where('id_rw', $iuran->id_rw);
 
         if ($request->no_kk && $request->no_kk !== 'semua') {
@@ -142,10 +129,6 @@ class AdminTagihanController extends Controller
         ], 201);
     }
 
-
-    /**
-     * Update status bayar tagihan.
-     */
     public function update(Request $request, $id)
     {
         $tagihan = Tagihan::findOrFail($id);
@@ -177,7 +160,6 @@ class AdminTagihanController extends Controller
                 'bukti_transfer' => $buktiPath,
             ]);
 
-            // Buat transaksi jika otomatis
             if ($validated['status_bayar'] === 'sudah_bayar' && !$tagihan->transaksi) {
                 $tagihan->transaksi()->create([
                     'tagihan_id' => $tagihan->id,
@@ -191,7 +173,6 @@ class AdminTagihanController extends Controller
                 ]);
             }
 
-            // Jika dikembalikan ke belum bayar
             if ($validated['status_bayar'] === 'belum_bayar') {
                 if ($tagihan->transaksi) {
                     $tagihan->transaksi->delete();
@@ -221,7 +202,6 @@ class AdminTagihanController extends Controller
             ], 500);
         }
     }
-
 
     public function destroy($id)
     {

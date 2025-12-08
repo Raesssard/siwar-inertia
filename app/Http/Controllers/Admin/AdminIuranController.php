@@ -21,16 +21,14 @@ class AdminIuranController extends Controller
     {
         $search = $request->input('search');
 
-        // Query Iuran untuk ADMIN → ambil semua RW & RT
         $query = Iuran::with(['iuran_golongan', 'rw', 'rt'])
-            ->where('level', 'rw') // Level RW saja (sesuai yg kamu pakai)
+            ->where('level', 'rw') 
             ->orderBy('tgl_tagih', 'desc');
 
         if ($search) {
             $query->where('nama', 'like', "%{$search}%");
         }
 
-        // Pagination
         $iuranOtomatis = (clone $query)
             ->where('jenis', 'otomatis')
             ->paginate(10)
@@ -41,19 +39,14 @@ class AdminIuranController extends Controller
             ->paginate(10)
             ->withQueryString();
 
-        // Semua golongan
         $golongan_list = Kategori_golongan::with('iuranGolongan')->get();
 
-        // Semua RT
         $rt_list = Rt::select('id', 'nomor_rt', 'id_rw')->get();
 
-        // Semua RW
         $rw_list = Rw::select('id', 'nomor_rw')->get();
 
-        // Semua warga (NIK)
         $nik_list = Warga::select('nik')->get();
 
-        // Semua KK
         $no_kk_list = Kartu_keluarga::select('no_kk')->orderBy('no_kk')->get();
 
         return Inertia::render('Iuran', [
@@ -73,7 +66,6 @@ class AdminIuranController extends Controller
         try {
             Log::info('[ADMIN IURAN STORE] Request:', $request->all());
 
-            // Validasi
             $request->validate([
                 'nama' => 'required|string|max:255',
                 'tgl_tagih' => 'required|date',
@@ -84,7 +76,6 @@ class AdminIuranController extends Controller
                 'id_rt' => 'nullable|exists:rt,id',
             ]);
 
-            // Buat iuran
             $iuran = Iuran::create([
                 'id_rw' => 1,
                 'id_rt' => $request->id_rt,
@@ -98,15 +89,10 @@ class AdminIuranController extends Controller
 
             Log::info('Iuran RW dibuat:', ['id' => $iuran->id]);
 
-            // Ambil semua KK berdasarkan RW
             $kkList = Kartu_keluarga::where('id_rw', $iuran->id_rw)->get();
 
-            /**
-             * === OTOMATIS ===
-             */
             if ($request->jenis === 'otomatis') {
 
-                // Simpan golongan nominal
                 foreach (Kategori_golongan::all() as $golongan) {
                     $nominal = $request->input("nominal_{$golongan->id}");
                     $periode = $request->input("periode_{$golongan->id}", 1);
@@ -121,12 +107,10 @@ class AdminIuranController extends Controller
                     }
                 }
 
-                // Mapping nominal golongan
                 $iuranNominals = IuranGolongan::where('id_iuran', $iuran->id)
                     ->pluck('nominal', 'id_golongan')
                     ->toArray();
 
-                // Generate Tagihan
                 foreach ($kkList as $kk) {
                     $kategoriId = $kk->kategori_iuran ?? null;
 
@@ -211,7 +195,6 @@ class AdminIuranController extends Controller
                 return response()->json(['success' => true, 'message' => 'Iuran otomatis RW dihapus.']);
             }
 
-            // manual
             Iuran::findOrFail($id)->delete();
 
             return response()->json(['success' => true, 'message' => 'Iuran manual RW dihapus.']);

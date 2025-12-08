@@ -20,11 +20,8 @@ use PhpOffice\PhpSpreadsheet\Cell\DataType;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Border;
 
-// export ini sementara aj, nanti diganti lagi
-
 class ExportController extends Controller
 {
-    // Export Iuran
     public function exportIuran()
     {
         $id_rt = Auth::user()->id_rt;
@@ -99,7 +96,7 @@ class ExportController extends Controller
                 $sheet->setCellValue("I{$row_otomatis}", $no);
                 $sheet->setCellValue("J{$row_otomatis}", $iuran->nama);
 
-                $colIndex = 11; // kolom K = 11
+                $colIndex = 11; 
                 foreach ($starCol as $golongan) {
                     $col = Coordinate::stringFromColumnIndex($colIndex);
                     $nominal = $iuran->iuran_golongan->firstWhere('id_golongan', $golongan->id)->nominal ?? 0;
@@ -135,7 +132,6 @@ class ExportController extends Controller
         exit;
     }
 
-    // Export Tagihan
     public function exportTagihan()
     {
         $id_rt = Auth::user()->id_rt;
@@ -243,7 +239,6 @@ class ExportController extends Controller
         exit;
     }
 
-    // Export Transaksi
     public function exportTransaksi()
     {
         $id_rt = Auth::user()->id_rt;

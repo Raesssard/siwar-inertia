@@ -17,9 +17,6 @@ use Illuminate\Database\Eloquent\Collection;
 
 class RwTagihanController extends Controller
 {
-    /**
-     * Menampilkan daftar tagihan RW.
-     */
     public function index(Request $request)
     {
         $title = 'Tagihan RW';
@@ -29,13 +26,11 @@ class RwTagihanController extends Controller
             return back()->with('error', 'Data RW Anda tidak ditemukan.');
         }
 
-        // ✔ Ambil nomor RW user
         $nomorRwUser = $userRwData->nomor_rw;
 
         $search = $request->search;
         $no_kk_filter = $request->no_kk_filter;
 
-        // ✔ Daftar KK untuk filter — berdasar nomor RW
         $kartuKeluargaForFilter = Kartu_keluarga::whereHas('rw', function ($q) use ($nomorRwUser) {
                 $q->where('nomor_rw', $nomorRwUser);
             })
@@ -44,7 +39,6 @@ class RwTagihanController extends Controller
             ->orderBy('no_kk')
             ->get();
 
-        // Base query — PENTING: pakai nomor_rw
         $baseQuery = Tagihan::with([
                 'iuran',
                 'kartuKeluarga.warga',
@@ -54,7 +48,6 @@ class RwTagihanController extends Controller
                 $q->where('nomor_rw', $nomorRwUser);
             });
 
-        // Tagihan manual
         $tagihanManual = (clone $baseQuery)
             ->where('jenis', 'manual')
             ->when($search, function ($query) use ($search) {
@@ -68,7 +61,6 @@ class RwTagihanController extends Controller
             ->orderBy('tgl_tagih', 'desc')
             ->paginate(10, ['*'], 'manual_page');
 
-        // Tagihan otomatis
         $tagihanOtomatis = (clone $baseQuery)
             ->where('jenis', 'otomatis')
             ->when($search, function ($query) use ($search) {
@@ -82,7 +74,6 @@ class RwTagihanController extends Controller
             ->orderBy('tgl_tagih', 'desc')
             ->paginate(10, ['*'], 'otomatis_page');
 
-        // ✔ iuran RW — FILTER PAKAI nomor_rw
         $iuran_for_tagihan = Iuran::with(['iuran_golongan', 'iuran_golongan.golongan'])
             ->whereHas('rw', function ($q) use ($nomorRwUser) {
                 $q->where('nomor_rw', $nomorRwUser);
@@ -100,10 +91,6 @@ class RwTagihanController extends Controller
         ]);
     }
 
-
-    /**
-     * Membuat tagihan RW manual.
-     */
     public function store(Request $request)
     {
         $request->validate([
@@ -166,9 +153,6 @@ class RwTagihanController extends Controller
         ], 201);
     }
 
-    /**
-     * Update status bayar tagihan RW.
-     */
     public function update(Request $request, $id)
     {
         $tagihan = Tagihan::findOrFail($id);

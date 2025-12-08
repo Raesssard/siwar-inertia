@@ -13,12 +13,10 @@ use Inertia\Inertia;
 
 class RwTransaksiController extends Controller
 {
-    // Controller: Rw/TransaksiController (method index)
     public function index(Request $request)
     {
         $title = "Transaksi RW";
 
-        // Ambil user dan RW terkait
         $user = $request->user();
         $userRwData = $user?->rw;
 
@@ -26,7 +24,6 @@ class RwTransaksiController extends Controller
             return redirect()->back()->with('error', 'Data RW Anda tidak ditemukan.');
         }
 
-        // id RW dan nomor RW user sekarang pasti ada
         $idRw = $userRwData->id;
         $nomorRwUser = $userRwData->nomor_rw;
 
@@ -35,13 +32,11 @@ class RwTransaksiController extends Controller
         $bulan = $request->bulan;
         $rt = $request->rt;
 
-        // Daftar RT yang termasuk di RW user (kembalikan nomor_rt)
         $daftar_rt = Rt::where('id_rw', $idRw)
             ->orderBy('nomor_rt')
-            ->pluck('nomor_rt') // array of nomor_rt (misalnya ['01','02',...])
+            ->pluck('nomor_rt') 
             ->toArray();
 
-        // Query transaksi (hanya untuk RW user)
         $query = Transaksi::whereHas('rukunTetangga.rw', function ($q) use ($nomorRwUser) {
                 $q->where('nomor_rw', $nomorRwUser);
             })
@@ -49,7 +44,6 @@ class RwTransaksiController extends Controller
             ->when($tahun, fn($q) => $q->whereYear('tanggal', $tahun))
             ->when($bulan, fn($q) => $q->whereMonth('tanggal', $bulan))
             ->when($rt, fn($q) => $q->whereHas('rukunTetangga', function ($qr) use ($rt, $idRw) {
-                // filter transaksi berdasarkan nomor_rt yang dipilih dan RW user
                 $qr->where('nomor_rt', $rt)->where('id_rw', $idRw);
             }));
 
@@ -57,7 +51,6 @@ class RwTransaksiController extends Controller
             ->paginate(10)
             ->withQueryString();
 
-        // Daftar tahun distinct untuk filter
         $daftar_tahun = Transaksi::whereHas('rukunTetangga.rw', function ($q) use ($nomorRwUser) {
                 $q->where('nomor_rw', $nomorRwUser);
             })
@@ -66,13 +59,11 @@ class RwTransaksiController extends Controller
             ->orderBy('tahun', 'desc')
             ->pluck('tahun');
 
-        // daftar bulan statis
         $daftar_bulan = [
             'januari','februari','maret','april','mei','juni',
             'juli','agustus','september','oktober','november','desember'
         ];
 
-        // Ambil semua KK untuk RW user, sertakan relasi rukunTetangga supaya frontend bisa filter berdasarkan nomor_rt
         $list_kk = Kartu_keluarga::with('rukunTetangga')
             ->where('id_rw', $idRw)
             ->orderBy('no_kk')

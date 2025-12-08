@@ -11,9 +11,6 @@ use Inertia\Inertia;
 
 class AdminTransaksiController extends Controller
 {
-    /**
-     * INDEX — Admin melihat SEMUA transaksi dari semua RW/RT.
-     */
     public function index(Request $request)
     {
         $title = "Transaksi Admin";
@@ -23,12 +20,10 @@ class AdminTransaksiController extends Controller
         $bulan = $request->bulan;
         $rt = $request->rt;
 
-        // Semua daftar RT (nomor_rt)
         $daftar_rt = Rt::orderBy('nomor_rt')
             ->pluck('nomor_rt')
             ->toArray();
 
-        // Query transaksi tanpa batas RW/RT
         $query = Transaksi::with(['rukunTetangga.rw'])
             ->when($search, fn($q) => $q->where('nama_transaksi', 'like', "%{$search}%"))
             ->when($tahun, fn($q) => $q->whereYear('tanggal', $tahun))
@@ -41,19 +36,16 @@ class AdminTransaksiController extends Controller
             ->paginate(10)
             ->withQueryString();
 
-        // Daftar tahun (distinct)
         $daftar_tahun = Transaksi::selectRaw('YEAR(tanggal) as tahun')
             ->distinct()
             ->orderBy('tahun', 'desc')
             ->pluck('tahun');
 
-        // Daftar bulan statis
         $daftar_bulan = [
             'januari','februari','maret','april','mei','juni',
             'juli','agustus','september','oktober','november','desember'
         ];
 
-        // Semua KK (admin boleh lihat semua)
         $list_kk = Kartu_keluarga::with('rukunTetangga')
             ->orderBy('no_kk')
             ->get();
@@ -74,9 +66,6 @@ class AdminTransaksiController extends Controller
         ]);
     }
 
-    /**
-     * Store transaksi (bebas, tidak terikat RW/RT)
-     */
     public function store(Request $request)
     {
         $request->validate([
@@ -110,9 +99,6 @@ class AdminTransaksiController extends Controller
         ]);
     }
 
-    /**
-     * Update transaksi
-     */
     public function update(Request $request, string $id)
     {
         $transaksi = Transaksi::findOrFail($id);
@@ -133,9 +119,6 @@ class AdminTransaksiController extends Controller
         ]);
     }
 
-    /**
-     * Delete transaksi
-     */
     public function destroy(string $id)
     {
         $transaksi = Transaksi::findOrFail($id);

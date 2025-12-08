@@ -24,9 +24,6 @@ class Rt extends Model
         'id_rw',
         'status',
     ];
-    /**
-     * Default nilai awal
-     */
     protected $attributes = [
         'status' => 'aktif',
     ];
@@ -36,40 +33,28 @@ class Rt extends Model
         return $this->hasManyThrough(
             Warga::class,
             Kartu_keluarga::class,
-            'id_rt',     // foreign key di tabel KK
-            'no_kk',     // foreign key di tabel warga
-            'id',        // local key di RT
-            'no_kk'      // local key di KK
+            'id_rt',    
+            'no_kk',    
+            'id',       
+            'no_kk'      
         );
     }
 
-    /**
-     * Relasi ke pengumuman (banyak)
-     */
     public function pengumuman(): HasMany
     {
         return $this->hasMany(Pengumuman::class, 'id_rt');
     }
 
-    /**
-     * Relasi ke kartu keluarga (banyak)
-     */
     public function kartuKeluarga(): HasMany
     {
         return $this->hasMany(Kartu_keluarga::class, 'id_rt');
     }
 
-    /**
-     * Relasi ke RW (satu)
-     */
     public function rw(): BelongsTo
     {
         return $this->belongsTo(Rw::class, 'id_rw');
     }
 
-    /**
-     * Relasi ke user (satu)
-     */
     public function user(): HasOne
     {
         return $this->hasOne(User::class, 'id_rt', 'id');

@@ -15,7 +15,6 @@ class AdminKategoriGolonganController extends Controller
         $title = 'Kategori Golongan';
         $query = Kategori_golongan::query();
 
-        // 🔍 Pencarian teks (LIKE)
         if ($request->filled('jenis')) {
             $query->where('jenis', 'like', '%' . $request->jenis . '%');
         }

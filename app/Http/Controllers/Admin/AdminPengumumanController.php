@@ -23,9 +23,8 @@ class AdminPengumumanController extends Controller
         $tahun = $request->input('tahun');
         $bulan = $request->input('bulan');
         $kategori = $request->input('kategori');
-        $level = $request->input('level'); // rt / rw
+        $level = $request->input('level'); 
 
-        // Admin melihat semua
         $baseQuery = Pengumuman::with([
             'rukunTetangga',
             'rw',

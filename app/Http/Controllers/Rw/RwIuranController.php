@@ -22,18 +22,15 @@ class RwIuranController extends Controller
 
         $user = Auth::user();
 
-        // Ambil data RW dari relasi user
         $userRwData = $user->rw;
         if (!$userRwData) {
             return back()->with('error', 'Data RW Anda tidak ditemukan.');
         }
 
-        // Nomor RW user
         $nomorRwUser = $userRwData->nomor_rw;
 
         $search = $request->input('search');
 
-        // Query utama Iuran berdasarkan relasi RW
         $query = Iuran::with('iuran_golongan')
             ->where('level', 'rw')
             ->whereHas('rw', function ($q) use ($nomorRwUser) {
@@ -44,11 +41,9 @@ class RwIuranController extends Controller
             $query->where('nama', 'like', "%{$search}%");
         }
 
-        // Golongan
         $golongan_list = Kategori_golongan::with('iuranGolongan')->get();
         $title = 'Iuran RW';
 
-        // Pagination
         $iuranOtomatis = (clone $query)
             ->where('jenis', 'otomatis')
             ->orderBy('tgl_tagih', 'desc')
@@ -59,13 +54,11 @@ class RwIuranController extends Controller
             ->orderBy('tgl_tagih', 'desc')
             ->paginate(10);
 
-        // RT list berdasarkan relasi nomor_rw
         $rt_list = Rt::whereHas('rw', function ($q) use ($nomorRwUser) {
                 $q->where('nomor_rw', $nomorRwUser);
             })
             ->get(['id', 'nomor_rt']);
 
-        // NIK & No KK list berdasarkan relasi RW
         $nik_list = Warga::whereHas('kartuKeluarga.rw', function ($q) use ($nomorRwUser) {
                 $q->where('nomor_rw', $nomorRwUser);
             })
@@ -97,19 +90,17 @@ class RwIuranController extends Controller
 
             $user = Auth::user();
 
-            // Validasi dasar
-            // Di RwIuranController@store
             $request->validate([
                 'nama' => 'required|string|max:255',
                 'tgl_tagih' => 'required|date',
                 'tgl_tempo' => 'required|date',
                 'jenis' => 'required|in:manual,otomatis',
                 'nominal' => 'required_if:jenis,manual|nullable|numeric|min:0|max:99999999',
-                'id_rt' => 'nullable|exists:rt,id', // 👈 validasi tambahan
+                'id_rt' => 'nullable|exists:rt,id', 
             ]);
 
             $iuran = Iuran::create([
-                'id_rt' => $request->id_rt, // 👈 simpan di sini
+                'id_rt' => $request->id_rt, 
                 'nama' => $request->nama,
                 'tgl_tagih' => $request->tgl_tagih,
                 'tgl_tempo' => $request->tgl_tempo,
@@ -121,29 +112,8 @@ class RwIuranController extends Controller
 
             Log::info('✅ Iuran RW dibuat:', ['id' => $iuran->id]);
 
-            // Ambil semua KK milik RW ini
             $kkList = Kartu_keluarga::where('id_rw', $iuran->id_rw)->get();
 
-            // manual gk langsung dipakai buat tagihan
-            // Manual: buat tagihan per KK
-            // if ($request->jenis === 'manual') {
-            //     Log::info('🟦 Membuat tagihan manual untuk ' . count($kkList) . ' KK');
-
-            //     foreach ($kkList as $kk) {
-            //         Tagihan::create([
-            //             'nama' => $iuran->nama,
-            //             'nominal' => $iuran->nominal,
-            //             'tgl_tagih' => $iuran->tgl_tagih,
-            //             'tgl_tempo' => $iuran->tgl_tempo,
-            //             'jenis' => 'manual',
-            //             'no_kk' => $kk->no_kk,
-            //             'status_bayar' => 'belum_bayar',
-            //             'id_iuran' => $iuran->id,
-            //         ]);
-            //     }
-            // }
-
-            // Otomatis: simpan iuran_golongan lalu buat tagihan sesuai kategori KK
             if ($request->jenis === 'otomatis') {
                 Log::info('🟨 Iuran otomatis, simpan data golongan...');
                 $golonganList = Kategori_golongan::all();
@@ -162,7 +132,6 @@ class RwIuranController extends Controller
                     }
                 }
 
-                // ambil mapping id_golongan => nominal
                 $iuranNominals = IuranGolongan::where('id_iuran', $iuran->id)
                     ->pluck('nominal', 'id_golongan')
                     ->toArray();
@@ -170,7 +139,6 @@ class RwIuranController extends Controller
                 Log::info('🔸 Data nominal per golongan:', $iuranNominals);
 
                 foreach ($kkList as $kk) {
-                    // jika KK tidak punya kategori_iuran, amankan jadi 0
                     $kategoriId = $kk->kategori_iuran ?? null;
                     $nominalTagihan = ($kategoriId && isset($iuranNominals[$kategoriId]))
                         ? $iuranNominals[$kategoriId]

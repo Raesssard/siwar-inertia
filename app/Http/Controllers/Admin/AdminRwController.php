@@ -35,16 +35,12 @@ class AdminRwController extends Controller
         $rw = $query->orderBy('nomor_rw')->paginate(10)->withQueryString();
         $nomorRwList = Rw::select('nomor_rw')->distinct()->orderBy('nomor_rw')->get();
 
-        // 🔹 Ambil role dari database, kecuali role utama
         $roles = Role::pluck('name')
             ->filter(fn($r) => !in_array(strtolower($r), ['admin', 'rw', 'rt', 'warga']))
             ->values();
 
-        // 🔹 Tambahkan manual “Ketua RW” di paling atas
         $roles = collect(['ketua'])->merge($roles)->values();
 
-        // warga yg termasuk anggota rt gk bisa jadi anggota rw, dan juga sebaliknya 🔥🔥🥀🥀🗿🤣🤔🤔
-        // kepencet emot 🤔🤔🤣🤣
         $warga = Warga::whereDoesntHave('user.roles', function ($q) {
             $q->where('name', 'rt');
         })->get();
@@ -86,20 +82,8 @@ class AdminRwController extends Controller
             return back()->withErrors($validator)->withInput();
         }
 
-        /*
-        |----------------------------------------------------------------------
-        | 🚫 VALIDASI ROLE — SAMA DENGAN UPDATE()
-        |----------------------------------------------------------------------
-        | Ketentuan:
-        | - Ketua = user yang TIDAK punya role lain selain "rw" (abaikan "warga")
-        | - Jika jabatan kosong → dianggap ketua
-        | - Tidak boleh ada jabatan yang sama di RW yang sama jika masih aktif
-        |----------------------------------------------------------------------
-        */
-
         $targetRole = $request->jabatan ?: 'ketua';
 
-        // cari semua RW dengan nomor yang sama & status aktif
         $rwAktif = Rw::where('nomor_rw', $request->nomor_rw)
             ->where('status', 'aktif')
             ->get();
@@ -109,7 +93,6 @@ class AdminRwController extends Controller
             $u = $r->users()->first();
             if (!$u) continue;
 
-            // ambil role selain rw & warga
             $extraRole = $u->roles()
                 ->whereNotIn('name', ['warga', 'rw'])
                 ->pluck('name')
@@ -117,7 +100,6 @@ class AdminRwController extends Controller
 
             $existingRole = $extraRole ?: 'ketua';
 
-            // jika jabatan sama → tolak
             if ($existingRole === $targetRole) {
                 return back()->with(
                     'error',
@@ -126,11 +108,6 @@ class AdminRwController extends Controller
             }
         }
 
-        /*
-        |----------------------------------------------------------------------
-        | 💾 SIMPAN DATA RW
-        |----------------------------------------------------------------------
-        */
         $rw = Rw::create([
             'nik' => $request->nik,
             'no_kk' => $request->filled('nik')
@@ -143,11 +120,6 @@ class AdminRwController extends Controller
             'status' => $request->status,
         ]);
 
-        /*
-        |----------------------------------------------------------------------
-        | 👤 BUAT USER JIKA DIISI
-        |----------------------------------------------------------------------
-        */
         if ($request->filled('nik') && $request->filled('nama_anggota_rw')) {
 
             $warga = Warga::where('nik', $request->nik)->first();
@@ -157,16 +129,9 @@ class AdminRwController extends Controller
                 'nama'     => $request->nama_anggota_rw,
                 'password' => Hash::make('password'),
                 'id_rw'    => $rw->id,
-                'id_rt'    => $warga?->kartuKeluarga?->id_rt // ← otomatis isi dari data warga
+                'id_rt'    => $warga?->kartuKeluarga?->id_rt 
             ]);
 
-            /*
-            |----------------------------------------------------------------------
-            | 🔐 SET ROLE USER
-            | - Default = rw
-            | - Jika jabatan != ketua → tambahkan role jabatan
-            |----------------------------------------------------------------------
-            */
             $roles = ['rw'];
 
             if ($request->filled('jabatan') && $request->jabatan !== 'ketua') {
@@ -210,20 +175,8 @@ class AdminRwController extends Controller
             return back()->withErrors($validator)->withInput();
         }
 
-        /*
-        |--------------------------------------------------------------------------
-        | 🚫 CEGAH ROLE GANDA DALAM RW YANG SAMA
-        |--------------------------------------------------------------------------
-        | Ketentuan:
-        | - "ketua" = user yang hanya punya role "rw" saja (abaikan role warga)
-        | - Selain itu role = sekretaris, bendahara, dll
-        | - Tidak boleh ada role yang sama pada nomor_rw & RW lain yang masih aktif
-        |--------------------------------------------------------------------------
-        */
+        $targetRole = $request->jabatan ?: 'ketua'; 
 
-        $targetRole = $request->jabatan ?: 'ketua'; // jika kosong → ketua
-
-        // Ambil rw lain dengan nomor_rw yg sama
         $rwLain = Rw::where('nomor_rw', $request->nomor_rw)
             ->where('id', '!=', $rw->id)
             ->where('status', 'aktif')
@@ -234,13 +187,11 @@ class AdminRwController extends Controller
 
             if (!$u) continue;
 
-            // Ambil role selain warga & rw
             $extraRole = $u->roles()
                 ->whereNotIn('name', ['warga', 'rw'])
                 ->pluck('name')
                 ->first();
 
-            // Tentukan jabatan user RW tersebut
             $jabatanExisting = $extraRole ?: 'ketua';
 
             if ($jabatanExisting === $targetRole) {
@@ -251,11 +202,6 @@ class AdminRwController extends Controller
             }
         }
 
-        /*
-        |--------------------------------------------------------------------------
-        | 🔄 UPDATE RW
-        |--------------------------------------------------------------------------
-        */
         $rw->update([
             'nik' => $request->nik,
             'no_kk' => $request->filled('nik')
@@ -268,18 +214,11 @@ class AdminRwController extends Controller
             'status' => $request->status,
         ]);
 
-        /*
-        |--------------------------------------------------------------------------
-        | 👤 UPDATE / CREATE USER
-        |--------------------------------------------------------------------------
-        */
-
         $user = User::where('id_rw', $rw->id)->first();
         $warga = Warga::where('nik', $request->nik)->first();
 
         if ($request->filled('nik') && $request->filled('nama_anggota_rw')) {
 
-            // Update atau create user
             if ($user) {
                 $user->update([
                     'nik' => $request->nik,
@@ -295,47 +234,31 @@ class AdminRwController extends Controller
                 ]);
             }
 
-            /*
-            |--------------------------------------------------------------------------
-            | 🔐 ATUR ROLE USER
-            |--------------------------------------------------------------------------
-            | - default = 'rw'
-            | - jika jabatan tambahan → tambahkan role tsb
-            | - jabatan 'ketua' berarti hanya role 'rw'
-            |--------------------------------------------------------------------------
-            */
-
         $existingRoles = $user->roles->pluck('name')->toArray();
 
-        // 🟢 Cek apakah user punya role 'warga' sebelumnya
         $hasWarga = in_array('warga', $existingRoles);
 
-        // 🟢 Tentukan role dasar
-        $finalRoles = ['rt']; // role wajib
+        $coreRoles = ['admin', 'rw', 'rt', 'warga'];
 
-        // 🟢 Tambahkan role jabatan baru (jika bukan ketua)
+        $finalRoles = ['rt'];
+
         if ($request->filled('jabatan') && $request->jabatan !== 'ketua') {
             $jabatanBaru = $request->jabatan;
 
-            // Role jabatan valid?
             if (Role::where('name', $jabatanBaru)->exists()) {
 
-                // Bersihkan role jabatan lama (sekretaris/bendahara)
-                $finalRoles = array_filter($finalRoles, function ($r) {
-                    return !in_array($r, ['sekretaris', 'bendahara']);
+                $finalRoles = array_filter($finalRoles, function ($role) use ($coreRoles) {
+                    return !in_array($role, $coreRoles);
                 });
 
-                // Tambahkan jabatan baru
                 $finalRoles[] = $jabatanBaru;
             }
         }
 
-        // 🟢 Jangan hilangkan role warga jika sebelumnya sudah ada
         if ($hasWarga) {
             $finalRoles[] = 'warga';
         }
 
-        // 🟢 Terapkan ke user
         $user->syncRoles(array_unique($finalRoles));
         } else {
             if ($user) $user->delete();
@@ -366,25 +289,20 @@ class AdminRwController extends Controller
     {
         $rw = Rw::findOrFail($id);
 
-        // 🎯 Role yang harus diabaikan (tidak dianggap jabatan)
         $ignoredRoles = ['rw', 'warga'];
 
-        // 🔎 Ambil user RW
         $user = $rw->user()->first();
 
-        // Ambil role selain ignoredRoles, jika tidak ada → ketua
         $jabatanUser = $user?->roles()
             ->whereNotIn('name', $ignoredRoles)
             ->pluck('name')
             ->first() ?? 'ketua';
 
-        // Jika sedang aktif → nonaktifkan
         if ($rw->status === 'aktif') {
             $rw->update(['status' => 'nonaktif']);
             return back()->with('success', "RW {$rw->nomor_rw} berhasil dinonaktifkan.");
         }
 
-        // 🔍 Cek RW lain aktif dengan nomor RW sama
         $existingActive = Rw::where('nomor_rw', $rw->nomor_rw)
             ->where('status', 'aktif')
             ->where('id', '!=', $rw->id)
@@ -392,7 +310,6 @@ class AdminRwController extends Controller
 
         if ($existingActive) {
 
-            // 🎯 Ambil jabatan existing RW
             $existingUser = $existingActive->users()->first();
 
             $existingJabatan = $existingUser?->roles()
@@ -400,7 +317,6 @@ class AdminRwController extends Controller
                 ->pluck('name')
                 ->first() ?? 'ketua';
 
-            // Jika jabatannya sama → tolak
             if ($existingJabatan === $jabatanUser) {
                 return back()->with(
                     'error',
@@ -409,7 +325,6 @@ class AdminRwController extends Controller
             }
         }
 
-        // ✔ Aktifkan RW baru
         $rw->update(['status' => 'aktif']);
 
         return back()->with(

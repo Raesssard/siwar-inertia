@@ -20,8 +20,8 @@ class Pengumuman extends Model
         'tempat',
         'id_rt',
         'id_rw',
-        'dokumen_path', // Tambahkan ini
-        'dokumen_name', // Tambahkan ini
+        'dokumen_path', 
+        'dokumen_name', 
     ];
 
     public function rukunTetangga()

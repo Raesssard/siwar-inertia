@@ -15,7 +15,6 @@ class RwPengaduanController extends Controller
     {
         $title = 'Pengaduan';
 
-        // Ambil nomor RW user
         $userRwData = Auth::user()->rw;
 
         if (!$userRwData) {
@@ -24,13 +23,11 @@ class RwPengaduanController extends Controller
 
         $nomorRwUser = $userRwData->nomor_rw;
 
-        // Filter request
         $tahun = $request->input('tahun');
         $bulan = $request->input('bulan');
         $search = $request->input('search');
         $kategori = $request->input('kategori');
 
-        // ✔ Query diperbaiki: memakai nomor_rw dan di-group
         $pengaduan = Pengaduan::query()
             ->whereHas('warga.kartuKeluarga.rw', function ($q) use ($nomorRwUser) {
                 $q->where('nomor_rw', $nomorRwUser);
@@ -52,12 +49,10 @@ class RwPengaduanController extends Controller
             ->orderByDesc('created_at')
             ->get();
 
-        // ✔ Total pengaduan di RW ini
         $total_pengaduan = Pengaduan::whereHas('warga.kartuKeluarga.rw', function ($q) use ($nomorRwUser) {
             $q->where('nomor_rw', $nomorRwUser);
         })->count();
 
-        // Daftar filter
         $list_bulan = [
             'januari',
             'februari',
@@ -91,11 +86,6 @@ class RwPengaduanController extends Controller
         ]);
     }
 
-    /**
-     * 🔹 Update status (diproses / selesai)
-     * Hanya RW yang bisa ubah langsung.
-     * RT tidak bisa ubah ke selesai sebelum konfirmasi disetujui.
-     */
     public function updateStatus(Request $request, $id)
     {
         $pengaduan = Pengaduan::findOrFail($id);
@@ -114,23 +104,15 @@ class RwPengaduanController extends Controller
         ]);
     }
 
-    /**
-     * 🔹 Update konfirmasi RW
-     * - RT memanggil: dari `belum` ke `menunggu`
-     * - RW memanggil: dari `menunggu` ke `sudah`
-     * - RW (jika level RW): langsung set `sudah`
-     */
     public function updateKonfirmasi(Request $request, $id)
     {
         $pengaduan = Pengaduan::findOrFail($id);
         $user = Auth::user();
-        $role = $user->roles->pluck('name')->first(); // 'rt' atau 'rw'
+        $role = $user->roles->pluck('name')->first();
 
         if ($pengaduan->level === 'rw') {
-            // Langsung disetujui otomatis
             $pengaduan->update(['konfirmasi_rw' => 'sudah']);
         } else {
-            // level = 'rt'
             if ($role === 'rt' && $pengaduan->konfirmasi_rw === 'belum' && $pengaduan->level === 'rt') {
                 $pengaduan->update(['konfirmasi_rw' => 'menunggu']);
             } elseif ($role === 'rw' && $pengaduan->konfirmasi_rw === 'menunggu' && $pengaduan->level === 'rt') {

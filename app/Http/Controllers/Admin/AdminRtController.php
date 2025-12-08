@@ -22,7 +22,6 @@ class AdminRtController extends Controller
         $title = 'Rukun Tetangga';
         $query = Rt::with('rw');
 
-        // 🔍 Filter pencarian
         if ($request->filled('keyword')) {
             $query->where(function ($q) use ($request) {
                 $q->where('nik', 'like', '%' . $request->keyword . '%')
@@ -37,7 +36,6 @@ class AdminRtController extends Controller
         $rukun_tetangga = $query->orderBy('nomor_rt')->paginate(10)->withQueryString();
         $nomorRtList = Rt::select('nomor_rt')->distinct()->orderBy('nomor_rt')->pluck('nomor_rt');
 
-        // ⭐ FILTER RW berdasarkan role user ⭐
         $rwList = Rw::with('users.roles')
             ->get()
             ->filter(function ($rw) {
@@ -72,15 +70,12 @@ class AdminRtController extends Controller
                 'nama_anggota_rw' => $rw->nama_anggota_rw,
             ]);
 
-        // 🔹 Ambil role dari database kecuali role utama
         $roles = Role::pluck('name')
             ->filter(fn($r) => !in_array(strtolower($r), ['admin', 'rw', 'rt', 'warga']))
             ->values();
 
-        // Tambahkan manual “Ketua RT”
         $roles = collect(['ketua'])->merge($roles)->values();
 
-        // warga yg termasuk anggota rw gk bisa jadi anggota rt, dan juga sebaliknya 🔥🔥🥀🥀🗿🤣🤔🤔
         $warga = Warga::whereDoesntHave('user.roles', function ($q) {
             $q->where('name', 'rw');
         })->get();
@@ -123,11 +118,6 @@ class AdminRtController extends Controller
             return back()->withErrors($validator)->withInput();
         }
 
-        /**
-         * =========================================================================
-         * 🚫 VALIDASI BATAS MAKSIMAL RT DALAM SATU RW
-         * =========================================================================
-         */
         $maxRT = Setting::where('key', 'max_rt_per_rw')->value('value') ?? 0;
 
         $currentRTCount = Rt::where('id_rw', $request->id_rw)->count();
@@ -137,16 +127,6 @@ class AdminRtController extends Controller
                 ->with('error', "RW ini sudah memiliki jumlah RT maksimal ({$maxRT}). Tidak dapat menambah RT baru.")
                 ->withInput();
         }
-
-        /**
-         * =========================================================================
-         * 🚫 VALIDASI: CEGAH JABATAN GANDA AKTIF PADA RT & RW YANG SAMA
-         * =========================================================================
-         * - Role RT boleh sama jika beda RW → selalu diperbolehkan.
-         * - Role RT tidak boleh sama pada RW yang sama jika RT lain masih AKTIF.
-         * - Role 'warga' diabaikan.
-         * =========================================================================
-         */
 
         $jabatan = $request->jabatan ?: 'ketua'; // default ketua
 
@@ -158,14 +138,12 @@ class AdminRtController extends Controller
 
         if ($jabatan) {
 
-            // Cari RT lain dengan RW & nomor RT sama
             $rtAktif = Rt::where('id_rw', $request->id_rw)
                 ->where('nomor_rt', $request->nomor_rt)
                 ->where('status', 'aktif')
                 ->first();
 
             if ($rtAktif) {
-                // Ambil user-nya
                 $existingUser = User::where('id_rt', $rtAktif->id)->first();
 
                 if ($existingUser) {
@@ -186,11 +164,6 @@ class AdminRtController extends Controller
             }
         }
 
-        /**
-         * =========================================================================
-         * 💾 SIMPAN DATA RT
-         * =========================================================================
-         */
         $rt = Rt::create([
             'nik' => $request->nik,
             'no_kk' => $request->filled('nik')
@@ -204,12 +177,6 @@ class AdminRtController extends Controller
             'status' => $request->status ?? 'nonaktif',
         ]);
 
-        /**
-         * =========================================================================
-         * 👤 BUAT USER RT
-         * =========================================================================
-         */
-
         if ($request->filled('nik') && $request->filled('nama_anggota_rt')) {
 
             $user = User::create([
@@ -220,9 +187,8 @@ class AdminRtController extends Controller
                 'id_rw' => $request->id_rw,
             ]);
 
-            $roles = ['rt']; // default
+            $roles = ['rt'];
 
-            // Tambah role khusus jika bukan ketua
             if ($jabatan !== 'ketua' && Role::where('name', $jabatan)->exists()) {
                 $roles[] = $jabatan;
             }
@@ -261,26 +227,14 @@ class AdminRtController extends Controller
             return back()->withErrors($validator)->withInput();
         }
 
-        /**
-         * =========================================================================
-         * 🚫 VALIDASI: CEGAH JABATAN GANDA AKTIF (SAMA EXACT DENGAN STORE)
-         * =========================================================================
-         * - Role RT boleh sama jika beda RW → diperbolehkan.
-         * - Tidak boleh role sama pada RW & nomor RT yang sama jika RT lain masih aktif.
-         * - Ketua = user tanpa role tambahan (hanya role 'rt')
-         * =========================================================================
-         */
-
         $jabatan = $request->jabatan ?: 'ketua';
 
-        // ketua = tanpa role khusus
         if ($jabatan === 'ketua') {
             $roleToCheck = null;
         } else {
             $roleToCheck = $jabatan;
         }
 
-        // Cari RT lain yang masih aktif dengan nomor_RT & RW sama
         $rtAktif = Rt::where('id_rw', $request->id_rw)
             ->where('nomor_rt', $request->nomor_rt)
             ->where('id', '!=', $rt->id)
@@ -291,7 +245,6 @@ class AdminRtController extends Controller
             $existingUser = User::where('id_rt', $rtAktif->id)->first();
 
             if ($existingUser) {
-                // role selain rt + warga
                 $existingExtraRole = $existingUser->roles()
                     ->whereNotIn('name', ['rt', 'warga'])
                     ->pluck('name')
@@ -308,12 +261,6 @@ class AdminRtController extends Controller
             }
         }
 
-        /**
-         * =========================================================================
-         * 🔄 UPDATE DATA RT
-         * =========================================================================
-         */
-
         $rt->update([
             'nik' => $request->nik,
             'no_kk' => $request->filled('nik')
@@ -327,19 +274,12 @@ class AdminRtController extends Controller
             'status' => $request->status ?? 'nonaktif',
         ]);
 
-        /**
-         * =========================================================================
-         * 👤 UPDATE / CREATE USER RT
-         * =========================================================================
-         */
-
         $user = User::where('id_rt', $rt->id)->first();
 
         if ($request->filled('nik') && $request->filled('nama_anggota_rt')) {
 
 
             if ($user) {
-                // Jika NIK berubah → cek unik tapi ignor dirinya sendiri
                 if ($user->nik != $request->nik) {
                     $nikDipakai = User::where('nik', $request->nik)
                         ->where('id', '!=', $user->id)
@@ -351,7 +291,6 @@ class AdminRtController extends Controller
                             ->withInput();
                     }
                 }
-                // Update user
                 $user->update([
                     'nik' => $request->nik,
                     'nama' => $request->nama_anggota_rt,
@@ -366,41 +305,34 @@ class AdminRtController extends Controller
                 ]);
             }
 
-        // 🟢 Ambil role lama user
         $existingRoles = $user->roles->pluck('name')->toArray();
 
-        // 🟢 Cek apakah user punya role 'warga' sebelumnya
         $hasWarga = in_array('warga', $existingRoles);
 
-        // 🟢 Tentukan role dasar
-        $finalRoles = ['rt']; // role wajib
+        $coreRoles = ['admin', 'rw', 'rt', 'warga'];
 
-        // 🟢 Tambahkan role jabatan baru (jika bukan ketua)
+        $finalRoles = ['rt'];
+
         if ($request->filled('jabatan') && $request->jabatan !== 'ketua') {
             $jabatanBaru = $request->jabatan;
 
-            // Role jabatan valid?
             if (Role::where('name', $jabatanBaru)->exists()) {
 
-                // Bersihkan role jabatan lama (sekretaris/bendahara)
-                $finalRoles = array_filter($finalRoles, function ($r) {
-                    return !in_array($r, ['sekretaris', 'bendahara']);
+                $finalRoles = array_filter($finalRoles, function ($role) use ($coreRoles) {
+                    return !in_array($role, $coreRoles);
                 });
 
-                // Tambahkan jabatan baru
                 $finalRoles[] = $jabatanBaru;
             }
         }
 
-        // 🟢 Jangan hilangkan role warga jika sebelumnya sudah ada
         if ($hasWarga) {
             $finalRoles[] = 'warga';
         }
 
-        // 🟢 Terapkan ke user
         $user->syncRoles(array_unique($finalRoles));
         } else {
-            // Jika user dihapus
+
             if ($user) $user->delete();
         }
 

@@ -13,15 +13,13 @@ use Symfony\Component\HttpFoundation\Response;
 class CheckRememberCookie
 {
     /**
-     * Handle an incoming request.
-     *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
     public function handle(Request $request, Closure $next): Response
     {
         if (!Auth::check() && $request->hasCookie('custom_auth_token')) {
             try {
-                $token = $request->cookie('custom_auth_token'); // plain
+                $token = $request->cookie('custom_auth_token'); 
             } catch (\Exception $e) {
                 Log::error("Cookie decrypt error: " . $e->getMessage());
                 return $next($request);

@@ -139,9 +139,6 @@ class PengumumanWargaController extends Controller
     }
 
     /**
-     * Helper method untuk mengkonversi nama hari dalam Bahasa Indonesia ke Bahasa Inggris.
-     * Metode ini diasumsikan ada di dalam controller yang sama.
-     *
      * @param string $indoDay
      * @return string|null
      */
