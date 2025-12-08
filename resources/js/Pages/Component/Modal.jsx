@@ -963,7 +963,7 @@ export function DetailPengaduan({ selectedData, detailShow, onClose, onUpdated, 
     const previewVideoRef = useRef(null)
     const fileInputRef = useRef(null)
     // const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
-    const mobile = useIsMobile();
+    const isMobile = useIsMobile();
 
     // useEffect(() => {
     //     function handleResize() {
@@ -1180,6 +1180,9 @@ export function DetailPengaduan({ selectedData, detailShow, onClose, onUpdated, 
                 style={{
                     display: "block",
                     backgroundColor: "rgba(0,0,0,0.5)",
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
                 }}
                 onClick={() => {
                     onClose()
@@ -1188,10 +1191,10 @@ export function DetailPengaduan({ selectedData, detailShow, onClose, onUpdated, 
                 }}
             >
                 <div
-                    className="modal-dialog modal-komen modal-lg modal-dialog-scrollable modal-dialog-centered"
+                    className={`modal-dialog modal-komen modal-lg modal-dialog-scrollable modal-dialog-centered ${isMobile ? 'mobile' : 'desktop'}`}
                     onClick={(e) => e.stopPropagation()}
                 >
-                    <div className="modal-content modal-komen shadow-lg border-0">
+                    <div className={`modal-content modal-komen shadow-lg border-0 ${isMobile ? 'mobile' : 'desktop'}`}>
                         <div className="modal-body p-0 m-0">
                             {isEdit ? (
                                 <EditPengaduan
@@ -1207,9 +1210,27 @@ export function DetailPengaduan({ selectedData, detailShow, onClose, onUpdated, 
                                     }}
                                 />
                             ) : (
-                                <div className="d-flex flex-row modal-komen">
+                                <div className={`d-flex modal-komen ${isMobile ? 'flex-col mobile' : 'flex-row desktop'}`}>
                                     {selectedData?.file_path ? (
-                                        <div className="flex-fill border-end bg-black d-flex align-items-center justify-content-center" style={{ maxWidth: "50%" }}>
+                                        <div className="flex-fill border-end bg-black d-flex align-items-center justify-content-center"
+                                            style={
+                                                isMobile
+                                                    ? {
+                                                        width: "100%",
+                                                        height: "50vh", // jadi 50% tinggi modal/layar
+                                                        order: -1, // pindah ke atas
+                                                        display: "flex",
+                                                        justifyContent: "center",
+                                                        alignItems: "center",
+                                                    }
+                                                    : {
+                                                        maxWidth: "50%",
+                                                        height: "100%",
+                                                        display: "flex",
+                                                        justifyContent: "center",
+                                                        alignItems: "center",
+                                                    }
+                                            }>
                                             {selectedData.file_path ? (
                                                 <>
                                                     {fileName.endsWith(".jpg") || fileName.endsWith(".jpeg") || fileName.endsWith(".png") || fileName.endsWith(".gif") ? (
@@ -1217,7 +1238,11 @@ export function DetailPengaduan({ selectedData, detailShow, onClose, onUpdated, 
                                                             src={`/storage/${selectedData.file_path}`}
                                                             alt={selectedData.file_name}
                                                             className="img-fluid"
-                                                            style={{ maxHeight: "80vh", objectFit: "contain" }}
+                                                            style={{
+                                                                maxHeight: isMobile ? "100%" : "80vh",
+                                                                maxWidth: "100%",
+                                                                objectFit: "contain",
+                                                            }}
                                                         />
                                                     ) : fileName.endsWith(".mp4") || fileName.endsWith(".webm") || fileName.endsWith(".avi") ? (
                                                         <video
@@ -1227,13 +1252,21 @@ export function DetailPengaduan({ selectedData, detailShow, onClose, onUpdated, 
                                                             autoPlay={!previewBukti}
                                                             loop
                                                             className="w-100"
-                                                            style={{ maxHeight: "80vh", objectFit: "contain" }}
+                                                            style={{
+                                                                maxHeight: isMobile ? "100%" : "80vh",
+                                                                maxWidth: "100%",
+                                                                objectFit: "contain",
+                                                            }}
                                                         />
                                                     ) : fileName.endsWith(".pdf") ? (
                                                         <embed
                                                             src={`/storage/${selectedData.file_path}`}
                                                             type="application/pdf"
                                                             className="pdf-preview"
+                                                            style={{
+                                                                width: "100%",
+                                                                height: isMobile ? "100%" : "80vh",
+                                                            }}
                                                         />
                                                     ) : (
                                                         <div className="p-3 text-center text-white">
@@ -1252,8 +1285,17 @@ export function DetailPengaduan({ selectedData, detailShow, onClose, onUpdated, 
                                     ) : (
                                         ""
                                     )}
-                                    <div className="flex-fill d-flex flex-column" style={selectedData?.file_path ? { maxWidth: "50%" } : { maxWidth: "100%" }}>
-                                        <div className="p-3 border-bottom caption-section">
+                                    <div className="flex-fill d-flex flex-column"
+                                        style={isMobile
+                                            ? {
+                                                width: "100%",
+                                                display: "flex",
+                                            }
+                                            : selectedData?.file_path
+                                                ? { maxWidth: "50%" }
+                                                : { maxWidth: "100%" }}
+                                    >
+                                        <div className="p-3 border-bottom caption-section" style={{ width: '100%' }}>
                                             {(userData.nik === selectedData.nik_warga && role === 'warga') ? (
                                                 <div className="d-flex justify-between">
                                                     <h5 className="fw-bold mb-1 mt-2">{selectedData.judul}</h5>
@@ -1477,7 +1519,14 @@ export function DetailPengaduan({ selectedData, detailShow, onClose, onUpdated, 
                                                 </div>
                                             )}
                                         </div>
-                                        <div className="komen p-3 border-top">
+                                        <div className="komen p-3 border-top" style={
+                                            isMobile
+                                                ? {
+                                                    position: 'sticky',
+                                                    bottom: '0',
+                                                    backgroundColor: 'white',
+                                                } : {}
+                                        }>
                                             {((role.includes('rt') || role.includes('rw')) && !isConfirm && selectedData.level === 'rt') ? (
                                                 <button className="btn btn-primary w-100" type="button" onClick={handleConfirm}>
                                                     <i className="fas fa-check me-2"></i>
@@ -1623,7 +1672,7 @@ export function EditPengaduan({ toggle, onUpdated, onDeleted, pengaduan }) {
 
     const [previewUrl, setPreviewUrl] = useState(null)
     const [showAlert, setShowAlert] = useState(false)
-
+    const isMobile = useIsMobile()
     const deletePengaduan = () => {
         setShowAlert(true)
     }
@@ -1729,15 +1778,38 @@ export function EditPengaduan({ toggle, onUpdated, onDeleted, pengaduan }) {
     }
 
     return (
-        <div className="d-flex flex-row modal-komen">
+        <div className={`d-flex modal-komen ${isMobile ? 'flex-col mobile' : 'flex-row desktop'}`}>
             {previewUrl ? (
-                <div className="flex-fill border-end bg-black d-flex align-items-center justify-content-center" style={{ maxWidth: "50%" }}>
+                <div className="flex-fill border-end bg-black d-flex align-items-center justify-content-center"
+                    style={
+                        isMobile
+                            ? {
+                                width: "100%",
+                                height: "50vh", // jadi 50% tinggi modal/layar
+                                order: -1, // pindah ke atas
+                                display: "flex",
+                                justifyContent: "center",
+                                alignItems: "center",
+                            }
+                            : {
+                                maxWidth: "50%",
+                                height: "100%",
+                                display: "flex",
+                                justifyContent: "center",
+                                alignItems: "center",
+                            }
+                    }
+                >
                     <div id="preview">
                         {previewUrl && previewUrl.type === "image" && (
                             <img
                                 src={getFileUrl(previewUrl.src)}
                                 alt="Preview"
-                                style={{ maxHeight: "80vh", objectFit: "contain" }}
+                                style={{
+                                    maxHeight: isMobile ? "100%" : "80vh",
+                                    maxWidth: "100%",
+                                    objectFit: "contain",
+                                }}
                             />
                         )}
                         {previewUrl && previewUrl.type === "video" && (
@@ -1746,7 +1818,11 @@ export function EditPengaduan({ toggle, onUpdated, onDeleted, pengaduan }) {
                                 controls
                                 autoPlay
                                 loop
-                                style={{ maxHeight: "80vh", objectFit: "contain" }}
+                                style={{
+                                    maxHeight: isMobile ? "100%" : "80vh",
+                                    maxWidth: "100%",
+                                    objectFit: "contain",
+                                }}
                             />
                         )}
                         {previewUrl && previewUrl.type === "pdf" && (
@@ -1754,6 +1830,11 @@ export function EditPengaduan({ toggle, onUpdated, onDeleted, pengaduan }) {
                                 src={getFileUrl(previewUrl.src)}
                                 type="application/pdf"
                                 className="pdf-preview"
+                                style={{
+                                    width: "100%",
+                                    height: isMobile ? "100%" : "80vh",
+                                }}
+
                             />
                         )}
                         {previewUrl && previewUrl.type === "other" && <p>File dipilih: {previewUrl.name}</p>}
@@ -1762,8 +1843,18 @@ export function EditPengaduan({ toggle, onUpdated, onDeleted, pengaduan }) {
             ) : (
                 ""
             )}
-            <div className="flex-fill d-flex flex-column" style={previewUrl ? { maxWidth: "50%" } : { maxWidth: "100%" }}>
-                <div className="p-3" style={{ height: "100%" }}>
+            <div className="flex-fill d-flex flex-column" style={isMobile
+                ? {
+                    width: "100%",
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                }
+                : previewUrl
+                    ? { maxWidth: "50%" }
+                    : { maxWidth: "100%" }}
+            >
+                <div className="p-3" style={{ height: "100%", width: '100%' }}>
                     <div className="d-flex justify-content-end w-100">
                         <button
                             type="button"
@@ -1898,6 +1989,7 @@ export function TambahPengaduan({ tambahShow, onClose, onAdded }) {
 
     const [previewUrl, setPreviewUrl] = useState(null)
     const fileInputRef = useRef(null)
+    const isMobile = useIsMobile()
 
     useEffect(() => {
         const handleEsc = (e) => {
@@ -1981,27 +2073,53 @@ export function TambahPengaduan({ tambahShow, onClose, onAdded }) {
                 tabIndex="-1"
                 style={{
                     display: "block",
-                    backgroundColor: "rgba(0,0,0,0.5)"
+                    backgroundColor: "rgba(0,0,0,0.5)",
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
                 }}
                 onClick={() => {
                     onClose()
                 }}
             >
                 <div
-                    className="modal-dialog modal-komen modal-lg modal-dialog-scrollable modal-dialog-centered"
+                    className={`modal-dialog modal-komen modal-lg modal-dialog-scrollable modal-dialog-centered ${isMobile ? 'mobile' : 'desktop'}`}
                     onClick={(e) => e.stopPropagation()}
                 >
-                    <div className="modal-content modal-komen shadow-lg border-0">
+                    <div className={`modal-content modal-komen shadow-lg border-0 ${isMobile ? 'mobile' : 'desktop'}`}>
                         <div className="modal-body p-0 m-0">
-                            <div className="d-flex flex-row modal-komen">
+                            <div className={`d-flex modal-komen ${isMobile ? 'flex-col mobile' : 'flex-row desktop'}`}>
                                 {previewUrl ? (
-                                    <div className="flex-fill border-end bg-black d-flex align-items-center justify-content-center" style={{ maxWidth: "50%" }}>
+                                    <div className="flex-fill border-end bg-black d-flex align-items-center justify-content-center"
+                                        style={
+                                            isMobile
+                                                ? {
+                                                    width: "100%",
+                                                    height: "50vh", // jadi 50% tinggi modal/layar
+                                                    order: -1, // pindah ke atas
+                                                    display: "flex",
+                                                    justifyContent: "center",
+                                                    alignItems: "center",
+                                                }
+                                                : {
+                                                    maxWidth: "50%",
+                                                    height: "100%",
+                                                    display: "flex",
+                                                    justifyContent: "center",
+                                                    alignItems: "center",
+                                                }
+                                        }
+                                    >
                                         <div id="preview">
                                             {previewUrl && previewUrl.type === "image" && (
                                                 <img
                                                     src={getFileUrl(previewUrl.src)}
                                                     alt="Preview"
-                                                    style={{ maxHeight: "80vh", objectFit: "contain" }}
+                                                    style={{
+                                                        maxHeight: isMobile ? "100%" : "80vh",
+                                                        maxWidth: "100%",
+                                                        objectFit: "contain",
+                                                    }}
                                                 />
                                             )}
                                             {previewUrl && previewUrl.type === "video" && (
@@ -2010,7 +2128,11 @@ export function TambahPengaduan({ tambahShow, onClose, onAdded }) {
                                                     controls
                                                     autoPlay
                                                     loop
-                                                    style={{ maxHeight: "80vh", objectFit: "contain" }}
+                                                    style={{
+                                                        maxHeight: isMobile ? "100%" : "80vh",
+                                                        maxWidth: "100%",
+                                                        objectFit: "contain",
+                                                    }}
                                                 />
                                             )}
                                             {previewUrl && previewUrl.type === "pdf" && (
@@ -2018,6 +2140,11 @@ export function TambahPengaduan({ tambahShow, onClose, onAdded }) {
                                                     src={getFileUrl(previewUrl.src)}
                                                     type="application/pdf"
                                                     className="pdf-preview"
+                                                    style={{
+                                                        width: "100%",
+                                                        height: isMobile ? "100%" : "80vh",
+                                                    }}
+
                                                 />
                                             )}
                                             {previewUrl && previewUrl.type === "other" && <p>File dipilih: {previewUrl.name}</p>}
@@ -2026,8 +2153,18 @@ export function TambahPengaduan({ tambahShow, onClose, onAdded }) {
                                 ) : (
                                     ""
                                 )}
-                                <div className="flex-fill d-flex flex-column" style={previewUrl ? { maxWidth: "50%" } : { maxWidth: "100%" }}>
-                                    <div className="p-3" style={{ height: "100%" }}>
+                                <div className="flex-fill d-flex flex-column" style={isMobile
+                                    ? {
+                                        width: "100%",
+                                        display: "flex",
+                                        justifyContent: "center",
+                                        alignItems: "center",
+                                    }
+                                    : previewUrl
+                                        ? { maxWidth: "50%" }
+                                        : { maxWidth: "100%" }}
+                                >
+                                    <div className="p-3" style={{ height: "100%", width: '100%' }}>
                                         <form onSubmit={handleSubmit}>
                                             <div className="mb-2">
                                                 <label className="form-label">Judul</label>
@@ -3249,9 +3386,27 @@ export function DetailPengumuman({ kategori, selectedData, detailShow, onClose, 
                                     role={role}
                                 />
                             ) : (
-                                <div className={`d-flex flex-row modal-komen ${isMobile ? 'mobile' : 'desktop'}`}>
+                                <div className={`d-flex modal-komen ${isMobile ? 'flex-col mobile' : 'flex-row desktop'}`}>
                                     {selectedData?.dokumen_path ? (
-                                        <div className="flex-fill border-end bg-black d-flex align-items-center justify-content-center" style={{ maxWidth: "50%" }}>
+                                        <div className="flex-fill border-end bg-black d-flex align-items-center justify-content-center"
+                                            style={
+                                                isMobile
+                                                    ? {
+                                                        width: "100%",
+                                                        height: "50vh", // jadi 50% tinggi modal/layar
+                                                        order: -1, // pindah ke atas
+                                                        display: "flex",
+                                                        justifyContent: "center",
+                                                        alignItems: "center",
+                                                    }
+                                                    : {
+                                                        maxWidth: "50%",
+                                                        height: "100%",
+                                                        display: "flex",
+                                                        justifyContent: "center",
+                                                        alignItems: "center",
+                                                    }
+                                            }>
                                             {selectedData.dokumen_path ? (
                                                 <>
                                                     {fileName.endsWith(".jpg") || fileName.endsWith(".jpeg") || fileName.endsWith(".png") || fileName.endsWith(".gif") ? (
@@ -3259,7 +3414,11 @@ export function DetailPengumuman({ kategori, selectedData, detailShow, onClose, 
                                                             src={`/storage/${selectedData.dokumen_path}`}
                                                             alt={selectedData.dokumen_name}
                                                             className="img-fluid"
-                                                            style={{ maxHeight: "80vh", objectFit: "contain" }}
+                                                            style={{
+                                                                maxHeight: isMobile ? "100%" : "80vh",
+                                                                maxWidth: "100%",
+                                                                objectFit: "contain",
+                                                            }}
                                                         />
                                                     ) : fileName.endsWith(".mp4") || fileName.endsWith(".webm") || fileName.endsWith(".avi") ? (
                                                         <video
@@ -3268,13 +3427,21 @@ export function DetailPengumuman({ kategori, selectedData, detailShow, onClose, 
                                                             controls
                                                             autoPlay
                                                             loop
-                                                            style={{ maxHeight: "80vh", objectFit: "contain", width: "100%" }}
+                                                            style={{
+                                                                maxHeight: isMobile ? "100%" : "80vh",
+                                                                maxWidth: "100%",
+                                                                objectFit: "contain",
+                                                            }}
                                                         />
                                                     ) : fileName.endsWith(".pdf") ? (
                                                         <embed
                                                             src={`/storage/${selectedData.dokumen_path}`}
                                                             type="application/pdf"
                                                             className="pdf-preview"
+                                                            style={{
+                                                                width: "100%",
+                                                                height: isMobile ? "100%" : "80vh",
+                                                            }}
                                                         />
                                                     ) : (
                                                         <div className="p-3 text-center text-white">
@@ -3293,7 +3460,15 @@ export function DetailPengumuman({ kategori, selectedData, detailShow, onClose, 
                                     ) : (
                                         ""
                                     )}
-                                    <div className="flex-fill d-flex flex-column" style={selectedData?.dokumen_path ? { maxWidth: "50%" } : { maxWidth: "100%" }}>
+                                    <div className="flex-fill d-flex flex-column" style={
+                                        isMobile
+                                            ? {
+                                                width: "100%",
+                                                display: "flex",
+                                            }
+                                            : selectedData?.dokumen_path
+                                                ? { maxWidth: "50%" }
+                                                : { maxWidth: "100%" }}>
                                         <div className="p-3 border-bottom caption-section">
                                             {(userData?.rukun_tetangga?.id === selectedData.id_rt || userData?.rw?.id === selectedData.id_rw || role === 'admin') ? (
                                                 <div className="d-flex">
@@ -3564,7 +3739,14 @@ export function DetailPengumuman({ kategori, selectedData, detailShow, onClose, 
                                                 </div>
                                             )}
                                         </div>
-                                        <div className="komen p-3 border-top">
+                                        <div className="komen p-3 border-top" style={
+                                            isMobile
+                                                ? {
+                                                    position: 'sticky',
+                                                    bottom: '0',
+                                                    backgroundColor: 'white',
+                                                } : {}
+                                        }>
                                             {previewFileKomen && (
                                                 <div
                                                     className="flex-fill border-end bg-black d-flex align-items-center justify-content-center mb-3"
@@ -3807,15 +3989,37 @@ export function EditPengumuman({ editKategori, toggle, onUpdated, onDeleted, pen
     const isMobile = useIsMobile()
 
     return (
-        <div className={`d-flex flex-row modal-komen ${isMobile ? 'mobile' : 'desktop'}`}>
+        <div className={`d-flex modal-komen ${isMobile ? 'flex-col mobile' : 'flex-row desktop'}`}>
             {previewUrl ? (
-                <div className="flex-fill border-end bg-black d-flex align-items-center justify-content-center" style={{ maxWidth: "50%" }}>
+                <div className="flex-fill border-end bg-black d-flex align-items-center justify-content-center"
+                    style={
+                        isMobile
+                            ? {
+                                width: "100%",
+                                height: "50vh", // jadi 50% tinggi modal/layar
+                                order: -1, // pindah ke atas
+                                display: "flex",
+                                justifyContent: "center",
+                                alignItems: "center",
+                            }
+                            : {
+                                maxWidth: "50%",
+                                height: "100%",
+                                display: "flex",
+                                justifyContent: "center",
+                                alignItems: "center",
+                            }
+                    }>
                     <div id="preview">
                         {previewUrl && previewUrl.type === "image" && (
                             <img
                                 src={getFileUrl(previewUrl.src)}
                                 alt="Preview"
-                                style={{ maxHeight: "80vh", objectFit: "contain" }}
+                                style={{
+                                    maxHeight: isMobile ? "100%" : "80vh",
+                                    maxWidth: "100%",
+                                    objectFit: "contain",
+                                }}
                             />
                         )}
                         {previewUrl && previewUrl.type === "video" && (
@@ -3824,7 +4028,11 @@ export function EditPengumuman({ editKategori, toggle, onUpdated, onDeleted, pen
                                 controls
                                 autoPlay
                                 loop
-                                style={{ maxHeight: "80vh", objectFit: "contain" }}
+                                style={{
+                                    maxHeight: isMobile ? "100%" : "80vh",
+                                    maxWidth: "100%",
+                                    objectFit: "contain",
+                                }}
                             />
                         )}
                         {previewUrl && previewUrl.type === "pdf" && (
@@ -3832,6 +4040,11 @@ export function EditPengumuman({ editKategori, toggle, onUpdated, onDeleted, pen
                                 src={getFileUrl(previewUrl.src)}
                                 type="application/pdf"
                                 className="pdf-preview"
+                                style={{
+                                    width: "100%",
+                                    height: isMobile ? "100%" : "80vh",
+                                }}
+
                             />
                         )}
                         {previewUrl && previewUrl.type === "other" && <p>File dipilih: {previewUrl.name}</p>}
@@ -3840,8 +4053,18 @@ export function EditPengumuman({ editKategori, toggle, onUpdated, onDeleted, pen
             ) : (
                 ""
             )}
-            <div className="flex-fill d-flex flex-column" style={previewUrl ? { maxWidth: "50%" } : { maxWidth: "100%" }}>
-                <div className="p-3" style={{ height: "100%" }}>
+            <div className="flex-fill d-flex flex-column" style={isMobile
+                ? {
+                    width: "100%",
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                }
+                : previewUrl
+                    ? { maxWidth: "50%" }
+                    : { maxWidth: "100%" }}
+            >
+                <div className="p-3" style={{ height: "100%", width: '100%' }}>
                     <div className="d-flex justify-content-end w-100">
                         <button
                             type="button"
@@ -4109,15 +4332,37 @@ export function TambahPengumuman({ kategori, tambahShow, onClose, onAdded, role 
                 >
                     <div className={`modal-content modal-komen shadow-lg border-0 ${isMobile ? 'mobile' : 'desktop'}`}>
                         <div className="modal-body p-0 m-0">
-                            <div className={`d-flex flex-row modal-komen ${isMobile ? 'mobile' : 'desktop'}`}>
+                            <div className={`d-flex modal-komen ${isMobile ? 'flex-col mobile' : 'flex-row desktop'}`}>
                                 {previewUrl ? (
-                                    <div className="flex-fill border-end bg-black d-flex align-items-center justify-content-center" style={{ maxWidth: "50%" }}>
+                                    <div className="flex-fill border-end bg-black d-flex align-items-center justify-content-center" style={
+                                        isMobile
+                                            ? {
+                                                width: "100%",
+                                                height: "50vh", // jadi 50% tinggi modal/layar
+                                                order: -1, // pindah ke atas
+                                                display: "flex",
+                                                justifyContent: "center",
+                                                alignItems: "center",
+                                            }
+                                            : {
+                                                maxWidth: "50%",
+                                                height: "100%",
+                                                display: "flex",
+                                                justifyContent: "center",
+                                                alignItems: "center",
+                                            }
+                                    }
+                                    >
                                         <div id="preview">
                                             {previewUrl && previewUrl.type === "image" && (
                                                 <img
                                                     src={getFileUrl(previewUrl.src)}
                                                     alt="Preview"
-                                                    style={{ maxHeight: "80vh", objectFit: "contain" }}
+                                                    style={{
+                                                        maxHeight: isMobile ? "100%" : "80vh",
+                                                        maxWidth: "100%",
+                                                        objectFit: "contain",
+                                                    }}
                                                 />
                                             )}
                                             {previewUrl && previewUrl.type === "video" && (
@@ -4126,7 +4371,11 @@ export function TambahPengumuman({ kategori, tambahShow, onClose, onAdded, role 
                                                     controls
                                                     autoPlay
                                                     loop
-                                                    style={{ maxHeight: "80vh", objectFit: "contain" }}
+                                                    style={{
+                                                        maxHeight: isMobile ? "100%" : "80vh",
+                                                        maxWidth: "100%",
+                                                        objectFit: "contain",
+                                                    }}
                                                 />
                                             )}
                                             {previewUrl && previewUrl.type === "pdf" && (
@@ -4134,6 +4383,11 @@ export function TambahPengumuman({ kategori, tambahShow, onClose, onAdded, role 
                                                     src={getFileUrl(previewUrl.src)}
                                                     type="application/pdf"
                                                     className="pdf-preview"
+                                                    style={{
+                                                        width: "100%",
+                                                        height: isMobile ? "100%" : "80vh",
+                                                    }}
+
                                                 />
                                             )}
                                             {previewUrl && previewUrl.type === "other" && <p>File dipilih: {previewUrl.name}</p>}
@@ -4142,8 +4396,18 @@ export function TambahPengumuman({ kategori, tambahShow, onClose, onAdded, role 
                                 ) : (
                                     ""
                                 )}
-                                <div className="flex-fill d-flex flex-column" style={previewUrl ? { maxWidth: "50%" } : { maxWidth: "100%" }}>
-                                    <div className="p-3" style={{ height: "100%" }}>
+                                <div className="flex-fill d-flex flex-column" style={isMobile
+                                    ? {
+                                        width: "100%",
+                                        display: "flex",
+                                        justifyContent: "center",
+                                        alignItems: "center",
+                                    }
+                                    : previewUrl
+                                        ? { maxWidth: "50%" }
+                                        : { maxWidth: "100%" }}
+                                >
+                                    <div className="p-3" style={{ height: "100%", width: '100%' }}>
                                         <form onSubmit={handleSubmit}>
                                             <div className="mb-2">
                                                 <label className="form-label">Judul</label>
@@ -4251,7 +4515,7 @@ export function TambahPengumuman({ kategori, tambahShow, onClose, onAdded, role 
                                             </div>
 
                                             <div className="d-flex justify-content-end" style={{ marginTop: "auto" }}>
-                                                <button type="submit" className="btn btn-primary">
+                                                <button type="submit" className="btn btn-primary my-auto">
                                                     <i className="fas fa-save me-2"></i>
                                                     Simpan
                                                 </button>

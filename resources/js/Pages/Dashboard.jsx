@@ -8,9 +8,7 @@ import { getAdminCards, getRtCards, getWargaCards, getRwCards } from "./Componen
 export default function Dashboard() {
   const { role, title, auth, ...rest } = usePage().props;
   const permissions = auth?.permissions || [];
-  const sideRoles = auth?.sideRoles || [];
-  const roles = auth?.roles || []
-console.log(roles)
+
   let statCards = [];
   // Ambil card sesuai role
   switch (role) {
