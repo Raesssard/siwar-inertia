@@ -404,8 +404,9 @@ export default function ProfilePage({ user, rt, rw, kk }) {
                         {/* BUTTON */}
                         <button
                             type="submit"
-                            disabled={processing}
+                            disabled={(processing || !isPhotoDirty)}
                             className="bg-green-600 text-white px-5 py-2 rounded w-100"
+                            style={(processing || !isPhotoDirty) && { opacity: '0.5' }}
                         >
                             Simpan Perubahan
                         </button>

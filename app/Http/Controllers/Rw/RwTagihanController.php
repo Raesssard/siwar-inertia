@@ -30,22 +30,24 @@ class RwTagihanController extends Controller
 
         $search = $request->search;
         $no_kk_filter = $request->no_kk_filter;
+        $status = $request->status;
 
         $kartuKeluargaForFilter = Kartu_keluarga::whereHas('rw', function ($q) use ($nomorRwUser) {
-                $q->where('nomor_rw', $nomorRwUser);
-            })
+            $q->where('nomor_rw', $nomorRwUser);
+        })
             ->select('no_kk')
             ->distinct()
             ->orderBy('no_kk')
             ->get();
 
         $baseQuery = Tagihan::with([
-                'iuran',
-                'kartuKeluarga.warga',
-                'kartuKeluarga.kepalaKeluarga',
-            ])
+            'iuran',
+            'kartuKeluarga.warga',
+            'kartuKeluarga.kepalaKeluarga',
+        ])
             ->whereHas('kartuKeluarga.rw', function ($q) use ($nomorRwUser) {
                 $q->where('nomor_rw', $nomorRwUser);
+            })
             });
 
         $tagihanManual = (clone $baseQuery)
@@ -57,20 +59,29 @@ class RwTagihanController extends Controller
                         ->orWhere('no_kk', 'like', "%$search%");
                 });
             })
-            ->when($no_kk_filter, fn($q) => $q->where('no_kk', $no_kk_filter))
+            ->when($no_kk_filter, fn($q) => $q->where('no_kk', $no_kk_filter));
+
+        $filterStatus = function ($q) use ($status) {
+            if (!$status) return;
+
+            if ($status === 'sudah_lunas') {
+                $q->whereColumn('nominal_bayar', '>=', 'nominal');
+            } elseif ($status === 'belum_lunas') {
+                $q->whereColumn('nominal_bayar', '<', 'nominal');
+            } else {
+                $q->where('status_bayar', $status);
+            }
+        };
+
+        $tagihanManual = (clone $baseQuery)
+            ->where('jenis', 'manual')
+            ->where($filterStatus)
             ->orderBy('tgl_tagih', 'desc')
             ->paginate(10, ['*'], 'manual_page');
 
         $tagihanOtomatis = (clone $baseQuery)
             ->where('jenis', 'otomatis')
-            ->when($search, function ($query) use ($search) {
-                $query->where(function ($q) use ($search) {
-                    $q->where('nama', 'like', "%$search%")
-                        ->orWhere('nominal', 'like', "%$search%")
-                        ->orWhere('no_kk', 'like', "%$search%");
-                });
-            })
-            ->when($no_kk_filter, fn($q) => $q->where('no_kk', $no_kk_filter))
+            ->where($filterStatus)
             ->orderBy('tgl_tagih', 'desc')
             ->paginate(10, ['*'], 'otomatis_page');
 

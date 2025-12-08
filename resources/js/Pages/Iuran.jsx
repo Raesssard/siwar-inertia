@@ -1,6 +1,6 @@
 import Layout from "@/Layouts/Layout"
 import { Head, Link, useForm, usePage } from "@inertiajs/react"
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import { FilterIuran } from "./Component/Filter"
 import { formatRupiah, formatTanggal } from "./Component/GetPropRole"
 import { EditIuranManual, EditIuranOtomatis, TambahIuran } from "./Component/Modal"
@@ -55,6 +55,11 @@ export default function Iuran() {
             search: '',
         })
     }
+
+    useEffect(() => {
+        setIuranListOtomatis(iuranOtomatisFromServer.data ?? [])
+        setIuranListManual(iuranManualFromServer.data ?? [])
+    }, [iuranOtomatisFromServer, iuranManualFromServer])
 
     const handleAdded = (newIuran) => {
         if (newIuran.jenis === "otomatis") {
@@ -111,7 +116,7 @@ export default function Iuran() {
                             <td className="text-center">
                                 {gol.jenis.charAt(0).toUpperCase() + gol.jenis.slice(1)}
                             </td>
-                            <td className="text-end">{formatRupiah(matched.nominal)}</td>
+                            <td className="text-end" style={{ whiteSpace: 'nowrap' }}>{formatRupiah(matched.nominal)}</td>
                             <td className="text-center">{formatTanggal(item.tgl_tagih) ?? '-'}</td>
                             <td className="text-center">{formatTanggal(item.tgl_tempo) ?? '-'}</td>
                             <Role role={['rw', 'bendahara', 'admin']}>
@@ -155,7 +160,7 @@ export default function Iuran() {
                 role={role}
                 tambahShow={() => setShowModalTambah(true)}
             />
-            
+
             {/* Table Iuran Manual */}
             <div className="table-container">
                 <div className="table-header">
@@ -181,7 +186,7 @@ export default function Iuran() {
                                     <tr key={item.id}>
                                         <td className="text-center">{index + 1}</td>
                                         <td className="text-center">{item.nama ?? '-'}</td>
-                                        <td className="text-end">{formatRupiah(item.nominal) ?? '-'}</td>
+                                        <td className="text-end" style={{ whiteSpace: 'nowrap' }}>{formatRupiah(item.nominal) ?? '-'}</td>
                                         <td className="text-center">{formatTanggal(item.tgl_tagih) ?? '-'}</td>
                                         <td className="text-center">{formatTanggal(item.tgl_tempo) ?? '-'}</td>
                                         <Role role={['rw', 'bendahara', 'admin']}>

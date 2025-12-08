@@ -218,7 +218,7 @@ export default function LaporanKeuangan() {
                     <table className="table-custom">
                         <thead>
                             <tr>
-                                <th className="px-3 text-center" scope="col">No.</th>
+                                <th className="px-3 text-center" scope="col" style={{ borderLeft: '1px solid lightGray' }}>No.</th>
                                 <th className="px-3 text-center" scope="col">Tanggal</th>
                                 <th className="px-3 text-center" scope="col">Keterangan</th>
                                 {/* <th className="px-3 text-center" scope="col">Jenis</th> */}
@@ -232,7 +232,7 @@ export default function LaporanKeuangan() {
                                 <>
                                     {transaksi.map((item, index) => (
                                         <tr key={item.id}>
-                                            <td className="text-center">{index + 1}</td>
+                                            <td className="text-center" style={{ borderLeft: '1px solid lightGray' }}>{index + 1}</td>
                                             <td className="text-center">{formatTanggal(item.tanggal)}</td>
                                             <td className="text-center">{item.nama_transaksi ?? '-'}</td>
                                             {/* <td className="text-center">
@@ -242,8 +242,8 @@ export default function LaporanKeuangan() {
                                                     <span className="badge bg-danger text-white">Pengeluaran</span>
                                                 )}
                                             </td> */}
-                                            <td className="text-end" style={batasNominal}>{item.jenis === 'pemasukan' ? formatRupiah(item.nominal) : ' '}</td>
-                                            <td className="text-end" style={batasNominal}>{item.jenis === 'pengeluaran' ? formatRupiah(item.nominal) : ' '}</td>
+                                            <td className="text-end" style={{ ...batasNominal, whiteSpace: 'nowrap' }}>{item.jenis === 'pemasukan' ? formatRupiah(item.nominal) : ' '}</td>
+                                            <td className="text-end" style={{ ...batasNominal, whiteSpace: 'nowrap' }}>{item.jenis === 'pengeluaran' ? formatRupiah(item.nominal) : ' '}</td>
                                             <td style={{ ...batasNominal, borderBottom: 'none', borderTop: 'none' }}></td>
                                         </tr>
                                     ))}

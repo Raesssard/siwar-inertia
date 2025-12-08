@@ -133,6 +133,11 @@ class DashboardController extends Controller
 
             $kk = Kartu_keluarga::where('no_kk', $user->warga->no_kk)->with('kepalaKeluarga')->first();
 
+            $pengaduanWarga = Pengaduan::whereHas('warga.user', function ($pengaduan) use ($userRtId, $userRwId) {
+                $pengaduan->where('id_rw', $userRwId)
+                    ->orWhere('id_rt', $userRtId);
+            })->count();
+
             $data = array_merge(
                 $data,
                 [
@@ -146,7 +151,7 @@ class DashboardController extends Controller
                     'pemasukan' => $pemasukan,
                     'pengeluaran' => $pengeluaran,
                     'total_saldo_akhir' => $total_saldo_akhir,
-                    'pengaduan' => Pengaduan::where('nik_warga', $nik)->count(),
+                    'pengaduan' => $pengaduanWarga,
                 ]
             );
         }
@@ -223,7 +228,7 @@ class DashboardController extends Controller
             $pengumuman_rw = Pengumuman::where('id_rw', $id_rw)
                 ->whereNull('id_rt')
                 ->count();
-      
+
             $pengumuman_rt = Pengumuman::where('id_rw', $id_rw)
                 ->whereNotNull('id_rt')
                 ->count();
