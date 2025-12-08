@@ -1104,6 +1104,7 @@ export function DetailPengaduan({ selectedData, detailShow, onClose, onUpdated, 
     }, [data.isi_komentar, selectedData])
 
     const fileName = selectedData?.file_name?.toLowerCase() || ""
+    const filePath = selectedData?.file_path?.toLowerCase() || ""
 
     const handleCheckboxChange = (checked) => {
         const newStatus = checked ? 'selesai' : 'diproses'
@@ -1231,6 +1232,65 @@ export function DetailPengaduan({ selectedData, detailShow, onClose, onUpdated, 
                                                         alignItems: "center",
                                                     }
                                             }>
+                                            {isMobile && (
+                                                <>
+                                                    <button
+                                                        onClick={() =>
+                                                            setPreview({
+                                                                show: true,
+                                                                type: fileName.endsWith(".pdf")
+                                                                    ? "pdf"
+                                                                    : fileName.match(/\.(mp4|webm|avi)$/)
+                                                                        ? "video"
+                                                                        : "image",
+                                                                src: getFileUrl(filePath),
+                                                            })
+                                                        }
+                                                        style={{
+                                                            position: "absolute",
+                                                            top: "5px",
+                                                            left: "5px",
+                                                            zIndex: 10,
+                                                            background: "rgba(0, 0, 0, 0.5)",
+                                                            color: "white",
+                                                            border: "none",
+                                                            borderRadius: "50%",
+                                                            width: "25px",
+                                                            height: "25px",
+                                                            cursor: "pointer",
+                                                            fontWeight: "bold",
+                                                            lineHeight: "1",
+                                                        }}
+                                                        title="Expand"
+                                                    >
+                                                        <i className="fa-solid fa-expand"></i>
+                                                    </button>
+                                                    <button
+                                                        onClick={() => {
+                                                            onClose()
+                                                            setIsEdit(false)
+                                                        }}
+                                                        style={{
+                                                            position: "absolute",
+                                                            top: "5px",
+                                                            right: "5px",
+                                                            zIndex: 10,
+                                                            background: "rgba(0, 0, 0, 0.5)",
+                                                            color: "white",
+                                                            border: "none",
+                                                            borderRadius: "50%",
+                                                            width: "25px",
+                                                            height: "25px",
+                                                            cursor: "pointer",
+                                                            fontWeight: "bold",
+                                                            lineHeight: "1",
+                                                        }}
+                                                        title="Tutup"
+                                                    >
+                                                        ✕
+                                                    </button>
+                                                </>
+                                            )}
                                             {selectedData.file_path ? (
                                                 <>
                                                     {fileName.endsWith(".jpg") || fileName.endsWith(".jpeg") || fileName.endsWith(".png") || fileName.endsWith(".gif") ? (
@@ -1296,6 +1356,17 @@ export function DetailPengaduan({ selectedData, detailShow, onClose, onUpdated, 
                                                 : { maxWidth: "100%" }}
                                     >
                                         <div className="p-3 border-bottom caption-section" style={{ width: '100%' }}>
+                                            {(!isMobile || !selectedData?.file_path) && (
+                                                <div className="d-flex justify-content-end w-100">
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => onClose()}
+                                                        title="Tutup"
+                                                    >
+                                                        ✕
+                                                    </button>
+                                                </div>
+                                            )}
                                             {(userData.nik === selectedData.nik_warga && role === 'warga') ? (
                                                 <div className="d-flex justify-between">
                                                     <h5 className="fw-bold mb-1 mt-2">{selectedData.judul}</h5>
@@ -1481,11 +1552,37 @@ export function DetailPengaduan({ selectedData, detailShow, onClose, onUpdated, 
                                                         zIndex: 9999,
                                                     }}
                                                 >
+                                                    <button
+                                                        onClick={() => setPreview({ show: false, src: "", type: "" })}
+                                                        style={{
+                                                            position: "absolute",
+                                                            top: "5px",
+                                                            right: "5px",
+                                                            zIndex: 10,
+                                                            background: "rgba(0, 0, 0, 0.5)",
+                                                            color: "white",
+                                                            border: "none",
+                                                            borderRadius: "50%",
+                                                            width: "25px",
+                                                            height: "25px",
+                                                            cursor: "pointer",
+                                                            fontWeight: "bold",
+                                                            lineHeight: "1",
+                                                        }}
+                                                        title="Tutup"
+                                                    >
+                                                        ✕
+                                                    </button>
                                                     {preview.type === "image" ? (
                                                         <img
                                                             src={preview.src}
                                                             alt="Preview"
-                                                            style={{
+                                                            style={isMobile ? {
+                                                                maxWidth: "90%",
+                                                                maxHeight: "80%",
+                                                                objectFit: "contain",
+                                                                borderRadius: "10px",
+                                                            } : {
                                                                 maxWidth: "90%",
                                                                 maxHeight: "90%",
                                                                 objectFit: "contain",
@@ -1497,7 +1594,12 @@ export function DetailPengaduan({ selectedData, detailShow, onClose, onUpdated, 
                                                             src={preview.src}
                                                             controls
                                                             autoPlay
-                                                            style={{
+                                                            style={isMobile ? {
+                                                                maxWidth: "90%",
+                                                                maxHeight: "80%",
+                                                                borderRadius: "10px",
+                                                                backgroundColor: "black",
+                                                            } : {
                                                                 maxWidth: "90%",
                                                                 maxHeight: "90%",
                                                                 borderRadius: "10px",
@@ -1508,7 +1610,12 @@ export function DetailPengaduan({ selectedData, detailShow, onClose, onUpdated, 
                                                         <embed
                                                             src={preview.src}
                                                             type="application/pdf"
-                                                            style={{
+                                                            style={isMobile ? {
+                                                                width: "90%",
+                                                                height: "80%",
+                                                                borderRadius: "10px",
+                                                                backgroundColor: "white",
+                                                            } : {
                                                                 width: "80%",
                                                                 height: "90%",
                                                                 borderRadius: "10px",
@@ -1669,9 +1776,15 @@ export function EditPengaduan({ toggle, onUpdated, onDeleted, pengaduan }) {
         level: pengaduan.level || "",
         file: null,
     }, { forceFormData: true })
-
+    const [preview, setPreview] = useState({
+        show: false,
+        type: "",
+        src: "",
+    })
     const [previewUrl, setPreviewUrl] = useState(null)
     const [showAlert, setShowAlert] = useState(false)
+    const fileName = previewUrl?.src?.split('/').pop().toLowerCase() || ""
+    const filePath = previewUrl?.src?.toLowerCase() || ""
     const isMobile = useIsMobile()
     const deletePengaduan = () => {
         setShowAlert(true)
@@ -1800,6 +1913,62 @@ export function EditPengaduan({ toggle, onUpdated, onDeleted, pengaduan }) {
                             }
                     }
                 >
+                    {isMobile && (
+                        <>
+                            <button
+                                onClick={() =>
+                                    setPreview({
+                                        show: true,
+                                        type: fileName.endsWith(".pdf")
+                                            ? "pdf"
+                                            : fileName.match(/\.(mp4|webm|avi)$/)
+                                                ? "video"
+                                                : "image",
+                                        src: getFileUrl(filePath),
+                                    })
+                                }
+                                style={{
+                                    position: "absolute",
+                                    top: "5px",
+                                    left: "5px",
+                                    zIndex: 10,
+                                    background: "rgba(0, 0, 0, 0.5)",
+                                    color: "white",
+                                    border: "none",
+                                    borderRadius: "50%",
+                                    width: "25px",
+                                    height: "25px",
+                                    cursor: "pointer",
+                                    fontWeight: "bold",
+                                    lineHeight: "1",
+                                }}
+                                title="Expand"
+                            >
+                                <i className="fa-solid fa-expand"></i>
+                            </button>
+                            <button
+                                onClick={() => toggle()}
+                                style={{
+                                    position: "absolute",
+                                    top: "5px",
+                                    right: "5px",
+                                    zIndex: 10,
+                                    background: "rgba(0, 0, 0, 0.5)",
+                                    color: "white",
+                                    border: "none",
+                                    borderRadius: "50%",
+                                    width: "25px",
+                                    height: "25px",
+                                    cursor: "pointer",
+                                    fontWeight: "bold",
+                                    lineHeight: "1",
+                                }}
+                                title="Kembali"
+                            >
+                                <i className="fas fa-arrow-left"></i>
+                            </button>
+                        </>
+                    )}
                     <div id="preview">
                         {previewUrl && previewUrl.type === "image" && (
                             <img
@@ -1855,15 +2024,17 @@ export function EditPengaduan({ toggle, onUpdated, onDeleted, pengaduan }) {
                     : { maxWidth: "100%" }}
             >
                 <div className="p-3" style={{ height: "100%", width: '100%' }}>
-                    <div className="d-flex justify-content-end w-100">
-                        <button
-                            type="button"
-                            onClick={() => toggle()}
-                            title="Kembali"
-                        >
-                            <i className="fas fa-arrow-left"></i>
-                        </button>
-                    </div>
+                    {(!isMobile || !previewUrl) && (
+                        <div className="d-flex justify-content-end w-100">
+                            <button
+                                type="button"
+                                onClick={() => toggle()}
+                                title="Kembali"
+                            >
+                                <i className="fas fa-arrow-left"></i>
+                            </button>
+                        </div>
+                    )}
 
                     <form onSubmit={handleSubmit}>
                         <div className="mb-2">
@@ -1973,6 +2144,96 @@ export function EditPengaduan({ toggle, onUpdated, onDeleted, pengaduan }) {
                             </div>
                         )}
                     </form>
+                    {preview.show && (
+                        <div
+                            className="preview-overlay"
+                            onClick={() => setPreview({ show: false, src: "", type: "" })}
+                            style={{
+                                position: "fixed",
+                                top: 0,
+                                left: 0,
+                                width: "100vw",
+                                height: "100vh",
+                                background: "rgba(0,0,0,0.8)",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                zIndex: 9999,
+                            }}
+                        >
+                            <button
+                                onClick={() => setPreview({ show: false, src: "", type: "" })}
+                                style={{
+                                    position: "absolute",
+                                    top: "5px",
+                                    right: "5px",
+                                    zIndex: 10,
+                                    background: "rgba(0, 0, 0, 0.5)",
+                                    color: "white",
+                                    border: "none",
+                                    borderRadius: "50%",
+                                    width: "25px",
+                                    height: "25px",
+                                    cursor: "pointer",
+                                    fontWeight: "bold",
+                                    lineHeight: "1",
+                                }}
+                                title="Tutup"
+                            >
+                                ✕
+                            </button>
+                            {preview.type === "image" ? (
+                                <img
+                                    src={preview.src}
+                                    alt="Preview"
+                                    style={isMobile ? {
+                                        maxWidth: "90%",
+                                        maxHeight: "80%",
+                                        objectFit: "contain",
+                                        borderRadius: "10px",
+                                    } : {
+                                        maxWidth: "90%",
+                                        maxHeight: "90%",
+                                        objectFit: "contain",
+                                        borderRadius: "10px",
+                                    }}
+                                />
+                            ) : preview.type === "video" ? (
+                                <video
+                                    src={preview.src}
+                                    controls
+                                    autoPlay
+                                    style={isMobile ? {
+                                        maxWidth: "90%",
+                                        maxHeight: "80%",
+                                        borderRadius: "10px",
+                                        backgroundColor: "black",
+                                    } : {
+                                        maxWidth: "90%",
+                                        maxHeight: "90%",
+                                        borderRadius: "10px",
+                                        backgroundColor: "black",
+                                    }}
+                                />
+                            ) : preview.type === "pdf" ? (
+                                <embed
+                                    src={preview.src}
+                                    type="application/pdf"
+                                    style={isMobile ? {
+                                        width: "90%",
+                                        height: "80%",
+                                        borderRadius: "10px",
+                                        backgroundColor: "white",
+                                    } : {
+                                        width: "80%",
+                                        height: "90%",
+                                        borderRadius: "10px",
+                                        backgroundColor: "white",
+                                    }}
+                                />
+                            ) : null}
+                        </div>
+                    )}
                 </div>
             </div>
         </div>
@@ -1988,6 +2249,11 @@ export function TambahPengaduan({ tambahShow, onClose, onAdded }) {
     }, { forceFormData: true })
 
     const [previewUrl, setPreviewUrl] = useState(null)
+    const [preview, setPreview] = useState({
+        show: false,
+        type: "",
+        src: "",
+    })
     const fileInputRef = useRef(null)
     const isMobile = useIsMobile()
 
@@ -2110,6 +2376,62 @@ export function TambahPengaduan({ tambahShow, onClose, onAdded }) {
                                                 }
                                         }
                                     >
+                                        {isMobile && (
+                                            <>
+                                                <button
+                                                    onClick={() =>
+                                                        setPreview({
+                                                            show: true,
+                                                            type: previewUrl?.type === ("pdf")
+                                                                ? "pdf"
+                                                                : previewUrl?.type === ("video")
+                                                                    ? "video"
+                                                                    : "image",
+                                                            src: getFileUrl(previewUrl?.src),
+                                                        })
+                                                    }
+                                                    style={{
+                                                        position: "absolute",
+                                                        top: "5px",
+                                                        left: "5px",
+                                                        zIndex: 10,
+                                                        background: "rgba(0, 0, 0, 0.5)",
+                                                        color: "white",
+                                                        border: "none",
+                                                        borderRadius: "50%",
+                                                        width: "25px",
+                                                        height: "25px",
+                                                        cursor: "pointer",
+                                                        fontWeight: "bold",
+                                                        lineHeight: "1",
+                                                    }}
+                                                    title="Expand"
+                                                >
+                                                    <i className="fa-solid fa-expand"></i>
+                                                </button>
+                                                <button
+                                                    onClick={() => onClose()}
+                                                    style={{
+                                                        position: "absolute",
+                                                        top: "5px",
+                                                        right: "5px",
+                                                        zIndex: 10,
+                                                        background: "rgba(0, 0, 0, 0.5)",
+                                                        color: "white",
+                                                        border: "none",
+                                                        borderRadius: "50%",
+                                                        width: "25px",
+                                                        height: "25px",
+                                                        cursor: "pointer",
+                                                        fontWeight: "bold",
+                                                        lineHeight: "1",
+                                                    }}
+                                                    title="Tutup"
+                                                >
+                                                    ✕
+                                                </button>
+                                            </>
+                                        )}
                                         <div id="preview">
                                             {previewUrl && previewUrl.type === "image" && (
                                                 <img
@@ -2165,6 +2487,15 @@ export function TambahPengaduan({ tambahShow, onClose, onAdded }) {
                                         : { maxWidth: "100%" }}
                                 >
                                     <div className="p-3" style={{ height: "100%", width: '100%' }}>
+                                        {(!isMobile || !previewUrl) && (<div className="d-flex justify-content-end w-100">
+                                            <button
+                                                type="button"
+                                                onClick={() => onClose()}
+                                                title="Tutup"
+                                            >
+                                                ✕
+                                            </button>
+                                        </div>)}
                                         <form onSubmit={handleSubmit}>
                                             <div className="mb-2">
                                                 <label className="form-label">Judul</label>
@@ -2243,6 +2574,96 @@ export function TambahPengaduan({ tambahShow, onClose, onAdded }) {
                                                 </button>
                                             </div>
                                         </form>
+                                        {preview.show && (
+                                            <div
+                                                className="preview-overlay"
+                                                onClick={() => setPreview({ show: false, src: "", type: "" })}
+                                                style={{
+                                                    position: "fixed",
+                                                    top: 0,
+                                                    left: 0,
+                                                    width: "100vw",
+                                                    height: "100vh",
+                                                    background: "rgba(0,0,0,0.8)",
+                                                    display: "flex",
+                                                    alignItems: "center",
+                                                    justifyContent: "center",
+                                                    zIndex: 9999,
+                                                }}
+                                            >
+                                                <button
+                                                    onClick={() => setPreview({ show: false, src: "", type: "" })}
+                                                    style={{
+                                                        position: "absolute",
+                                                        top: "5px",
+                                                        right: "5px",
+                                                        zIndex: 10,
+                                                        background: "rgba(0, 0, 0, 0.5)",
+                                                        color: "white",
+                                                        border: "none",
+                                                        borderRadius: "50%",
+                                                        width: "25px",
+                                                        height: "25px",
+                                                        cursor: "pointer",
+                                                        fontWeight: "bold",
+                                                        lineHeight: "1",
+                                                    }}
+                                                    title="Tutup"
+                                                >
+                                                    ✕
+                                                </button>
+                                                {preview.type === "image" ? (
+                                                    <img
+                                                        src={getFileUrl(preview.src)}
+                                                        alt="Preview"
+                                                        style={isMobile ? {
+                                                            maxWidth: "90%",
+                                                            maxHeight: "80%",
+                                                            objectFit: "contain",
+                                                            borderRadius: "10px",
+                                                        } : {
+                                                            maxWidth: "90%",
+                                                            maxHeight: "90%",
+                                                            objectFit: "contain",
+                                                            borderRadius: "10px",
+                                                        }}
+                                                    />
+                                                ) : preview.type === "video" ? (
+                                                    <video
+                                                        src={getFileUrl(preview.src)}
+                                                        controls
+                                                        autoPlay
+                                                        style={isMobile ? {
+                                                            maxWidth: "90%",
+                                                            maxHeight: "80%",
+                                                            borderRadius: "10px",
+                                                            backgroundColor: "black",
+                                                        } : {
+                                                            maxWidth: "90%",
+                                                            maxHeight: "90%",
+                                                            borderRadius: "10px",
+                                                            backgroundColor: "black",
+                                                        }}
+                                                    />
+                                                ) : preview.type === "pdf" ? (
+                                                    <embed
+                                                        src={getFileUrl(preview.src)}
+                                                        type="application/pdf"
+                                                        style={isMobile ? {
+                                                            width: "90%",
+                                                            height: "80%",
+                                                            borderRadius: "10px",
+                                                            backgroundColor: "white",
+                                                        } : {
+                                                            width: "80%",
+                                                            height: "90%",
+                                                            borderRadius: "10px",
+                                                            backgroundColor: "white",
+                                                        }}
+                                                    />
+                                                ) : null}
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                             </div>
@@ -3331,6 +3752,7 @@ export function DetailPengumuman({ kategori, selectedData, detailShow, onClose, 
     }
 
     const fileName = selectedData.dokumen_name?.toLowerCase() || ""
+    const filePath = selectedData.dokumen_path?.toLowerCase() || ""
 
     const date = new Date(selectedData.tanggal?.replace(" ", "T"))
 
@@ -3407,6 +3829,65 @@ export function DetailPengumuman({ kategori, selectedData, detailShow, onClose, 
                                                         alignItems: "center",
                                                     }
                                             }>
+                                            {isMobile && (
+                                                <>
+                                                    <button
+                                                        onClick={() =>
+                                                            setPreview({
+                                                                show: true,
+                                                                type: fileName.endsWith(".pdf")
+                                                                    ? "pdf"
+                                                                    : fileName.match(/\.(mp4|webm|avi)$/)
+                                                                        ? "video"
+                                                                        : "image",
+                                                                src: getFileUrl(filePath),
+                                                            })
+                                                        }
+                                                        style={{
+                                                            position: "absolute",
+                                                            top: "5px",
+                                                            left: "5px",
+                                                            zIndex: 10,
+                                                            background: "rgba(0, 0, 0, 0.5)",
+                                                            color: "white",
+                                                            border: "none",
+                                                            borderRadius: "50%",
+                                                            width: "25px",
+                                                            height: "25px",
+                                                            cursor: "pointer",
+                                                            fontWeight: "bold",
+                                                            lineHeight: "1",
+                                                        }}
+                                                        title="Expand"
+                                                    >
+                                                        <i className="fa-solid fa-expand"></i>
+                                                    </button>
+                                                    <button
+                                                        onClick={() => {
+                                                            onClose()
+                                                            setIsEdit(false)
+                                                        }}
+                                                        style={{
+                                                            position: "absolute",
+                                                            top: "5px",
+                                                            right: "5px",
+                                                            zIndex: 10,
+                                                            background: "rgba(0, 0, 0, 0.5)",
+                                                            color: "white",
+                                                            border: "none",
+                                                            borderRadius: "50%",
+                                                            width: "25px",
+                                                            height: "25px",
+                                                            cursor: "pointer",
+                                                            fontWeight: "bold",
+                                                            lineHeight: "1",
+                                                        }}
+                                                        title="Tutup"
+                                                    >
+                                                        ✕
+                                                    </button>
+                                                </>
+                                            )}
                                             {selectedData.dokumen_path ? (
                                                 <>
                                                     {fileName.endsWith(".jpg") || fileName.endsWith(".jpeg") || fileName.endsWith(".png") || fileName.endsWith(".gif") ? (
@@ -3470,6 +3951,17 @@ export function DetailPengumuman({ kategori, selectedData, detailShow, onClose, 
                                                 ? { maxWidth: "50%" }
                                                 : { maxWidth: "100%" }}>
                                         <div className="p-3 border-bottom caption-section">
+                                            {(!isMobile || !selectedData?.dokumen_path) && (
+                                                <div className="d-flex justify-content-end w-100">
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => onClose()}
+                                                        title="Tutup"
+                                                    >
+                                                        ✕
+                                                    </button>
+                                                </div>
+                                            )}
                                             {(userData?.rukun_tetangga?.id === selectedData.id_rt || userData?.rw?.id === selectedData.id_rw || role === 'admin') ? (
                                                 <div className="d-flex">
                                                     <h5 className="fw-bold mb-1 mt-2 me-auto">{selectedData.judul}</h5>
@@ -3521,11 +4013,11 @@ export function DetailPengumuman({ kategori, selectedData, detailShow, onClose, 
                                                 RW {selectedData.rw?.nomor_rw}{" "}
                                                 • <FormatWaktu createdAt={selectedData.created_at} />
                                             </small>
-                                            <p
+                                            <div
                                                 ref={textRef}
-                                                className={`mt-2 isi-pengumuman ${captionExpanded ? "expanded" : "clamped"}`}
+                                                className={`my-2 isi-pengumuman ${captionExpanded ? "expanded" : "clamped"}`}
                                             >
-                                                <table className="mb-3">
+                                                <table className={`${isMobile ? 'mb-2' : 'mb-3'}`}>
                                                     {selectedData.tanggal &&
                                                         <>
                                                             <tr>
@@ -3548,8 +4040,8 @@ export function DetailPengumuman({ kategori, selectedData, detailShow, onClose, 
                                                         </tr>
                                                     }
                                                 </table>
-                                                {selectedData.isi}
-                                            </p>
+                                                <div dangerouslySetInnerHTML={{ __html: selectedData.isi }} />
+                                            </div>
                                             {
                                                 isOverflowing && (
                                                     <button
@@ -3603,7 +4095,6 @@ export function DetailPengumuman({ kategori, selectedData, detailShow, onClose, 
                                                                         position: "absolute",
                                                                         top: "5px",
                                                                         right: "5px",
-                                                                        zIndex: 10,
                                                                         background: "rgba(0, 0, 0, 0.5)",
                                                                         color: "white",
                                                                         border: "none",
@@ -3701,11 +4192,37 @@ export function DetailPengumuman({ kategori, selectedData, detailShow, onClose, 
                                                         zIndex: 9999,
                                                     }}
                                                 >
+                                                    <button
+                                                        onClick={() => setPreview({ show: false, src: "", type: "" })}
+                                                        style={{
+                                                            position: "absolute",
+                                                            top: "5px",
+                                                            right: "5px",
+                                                            zIndex: 10,
+                                                            background: "rgba(0, 0, 0, 0.5)",
+                                                            color: "white",
+                                                            border: "none",
+                                                            borderRadius: "50%",
+                                                            width: "25px",
+                                                            height: "25px",
+                                                            cursor: "pointer",
+                                                            fontWeight: "bold",
+                                                            lineHeight: "1",
+                                                        }}
+                                                        title="Tutup"
+                                                    >
+                                                        ✕
+                                                    </button>
                                                     {preview.type === "image" ? (
                                                         <img
                                                             src={preview.src}
                                                             alt="Preview"
-                                                            style={{
+                                                            style={isMobile ? {
+                                                                maxWidth: "90%",
+                                                                maxHeight: "80%",
+                                                                objectFit: "contain",
+                                                                borderRadius: "10px",
+                                                            } : {
                                                                 maxWidth: "90%",
                                                                 maxHeight: "90%",
                                                                 objectFit: "contain",
@@ -3717,7 +4234,12 @@ export function DetailPengumuman({ kategori, selectedData, detailShow, onClose, 
                                                             src={preview.src}
                                                             controls
                                                             autoPlay
-                                                            style={{
+                                                            style={isMobile ? {
+                                                                maxWidth: "90%",
+                                                                maxHeight: "80%",
+                                                                borderRadius: "10px",
+                                                                backgroundColor: "black",
+                                                            } : {
                                                                 maxWidth: "90%",
                                                                 maxHeight: "90%",
                                                                 borderRadius: "10px",
@@ -3728,7 +4250,12 @@ export function DetailPengumuman({ kategori, selectedData, detailShow, onClose, 
                                                         <embed
                                                             src={preview.src}
                                                             type="application/pdf"
-                                                            style={{
+                                                            style={isMobile ? {
+                                                                width: "90%",
+                                                                height: "80%",
+                                                                borderRadius: "10px",
+                                                                backgroundColor: "white",
+                                                            } : {
                                                                 width: "80%",
                                                                 height: "90%",
                                                                 borderRadius: "10px",
@@ -3879,6 +4406,11 @@ export function EditPengumuman({ editKategori, toggle, onUpdated, onDeleted, pen
 
     const [previewUrl, setPreviewUrl] = useState(null)
     const [showAlert, setShowAlert] = useState(false)
+    const [preview, setPreview] = useState({
+        show: false,
+        type: "",
+        src: "",
+    })
 
     const deletePengumuman = () => {
         setShowAlert(true)
@@ -3985,7 +4517,8 @@ export function EditPengumuman({ editKategori, toggle, onUpdated, onDeleted, pen
         if (src.startsWith("blob:")) return src
         return `/storage/${src}`
     }
-
+    const fileName = previewUrl?.src?.split('/').pop().toLowerCase() || ""
+    const filePath = previewUrl?.src?.toLowerCase() || ""
     const isMobile = useIsMobile()
 
     return (
@@ -4010,6 +4543,62 @@ export function EditPengumuman({ editKategori, toggle, onUpdated, onDeleted, pen
                                 alignItems: "center",
                             }
                     }>
+                    {isMobile && (
+                        <>
+                            <button
+                                onClick={() =>
+                                    setPreview({
+                                        show: true,
+                                        type: fileName.endsWith(".pdf")
+                                            ? "pdf"
+                                            : fileName.match(/\.(mp4|webm|avi)$/)
+                                                ? "video"
+                                                : "image",
+                                        src: getFileUrl(filePath),
+                                    })
+                                }
+                                style={{
+                                    position: "absolute",
+                                    top: "5px",
+                                    left: "5px",
+                                    zIndex: 10,
+                                    background: "rgba(0, 0, 0, 0.5)",
+                                    color: "white",
+                                    border: "none",
+                                    borderRadius: "50%",
+                                    width: "25px",
+                                    height: "25px",
+                                    cursor: "pointer",
+                                    fontWeight: "bold",
+                                    lineHeight: "1",
+                                }}
+                                title="Expand"
+                            >
+                                <i className="fa-solid fa-expand"></i>
+                            </button>
+                            <button
+                                onClick={() => toggle()}
+                                style={{
+                                    position: "absolute",
+                                    top: "5px",
+                                    right: "5px",
+                                    zIndex: 10,
+                                    background: "rgba(0, 0, 0, 0.5)",
+                                    color: "white",
+                                    border: "none",
+                                    borderRadius: "50%",
+                                    width: "25px",
+                                    height: "25px",
+                                    cursor: "pointer",
+                                    fontWeight: "bold",
+                                    lineHeight: "1",
+                                }}
+                                title="Kembali"
+                            >
+                                <i className="fas fa-arrow-left"></i>
+                            </button>
+                        </>
+                    )}
                     <div id="preview">
                         {previewUrl && previewUrl.type === "image" && (
                             <img
@@ -4065,7 +4654,7 @@ export function EditPengumuman({ editKategori, toggle, onUpdated, onDeleted, pen
                     : { maxWidth: "100%" }}
             >
                 <div className="p-3" style={{ height: "100%", width: '100%' }}>
-                    <div className="d-flex justify-content-end w-100">
+                    {(!isMobile || !previewUrl) && (<div className="d-flex justify-content-end w-100">
                         <button
                             type="button"
                             onClick={() => toggle()}
@@ -4073,7 +4662,7 @@ export function EditPengumuman({ editKategori, toggle, onUpdated, onDeleted, pen
                         >
                             <i className="fas fa-arrow-left"></i>
                         </button>
-                    </div>
+                    </div>)}
 
                     <form onSubmit={handleSubmit}>
                         <div className="mb-2">
@@ -4208,6 +4797,96 @@ export function EditPengumuman({ editKategori, toggle, onUpdated, onDeleted, pen
                             </div>
                         )}
                     </form>
+                    {preview.show && (
+                        <div
+                            className="preview-overlay"
+                            onClick={() => setPreview({ show: false, src: "", type: "" })}
+                            style={{
+                                position: "fixed",
+                                top: 0,
+                                left: 0,
+                                width: "100vw",
+                                height: "100vh",
+                                background: "rgba(0,0,0,0.8)",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                zIndex: 9999,
+                            }}
+                        >
+                            <button
+                                onClick={() => setPreview({ show: false, src: "", type: "" })}
+                                style={{
+                                    position: "absolute",
+                                    top: "5px",
+                                    right: "5px",
+                                    zIndex: 10,
+                                    background: "rgba(0, 0, 0, 0.5)",
+                                    color: "white",
+                                    border: "none",
+                                    borderRadius: "50%",
+                                    width: "25px",
+                                    height: "25px",
+                                    cursor: "pointer",
+                                    fontWeight: "bold",
+                                    lineHeight: "1",
+                                }}
+                                title="Tutup"
+                            >
+                                ✕
+                            </button>
+                            {preview.type === "image" ? (
+                                <img
+                                    src={preview.src}
+                                    alt="Preview"
+                                    style={isMobile ? {
+                                        maxWidth: "90%",
+                                        maxHeight: "80%",
+                                        objectFit: "contain",
+                                        borderRadius: "10px",
+                                    } : {
+                                        maxWidth: "90%",
+                                        maxHeight: "90%",
+                                        objectFit: "contain",
+                                        borderRadius: "10px",
+                                    }}
+                                />
+                            ) : preview.type === "video" ? (
+                                <video
+                                    src={preview.src}
+                                    controls
+                                    autoPlay
+                                    style={isMobile ? {
+                                        maxWidth: "90%",
+                                        maxHeight: "80%",
+                                        borderRadius: "10px",
+                                        backgroundColor: "black",
+                                    } : {
+                                        maxWidth: "90%",
+                                        maxHeight: "90%",
+                                        borderRadius: "10px",
+                                        backgroundColor: "black",
+                                    }}
+                                />
+                            ) : preview.type === "pdf" ? (
+                                <embed
+                                    src={preview.src}
+                                    type="application/pdf"
+                                    style={isMobile ? {
+                                        width: "90%",
+                                        height: "80%",
+                                        borderRadius: "10px",
+                                        backgroundColor: "white",
+                                    } : {
+                                        width: "80%",
+                                        height: "90%",
+                                        borderRadius: "10px",
+                                        backgroundColor: "white",
+                                    }}
+                                />
+                            ) : null}
+                        </div>
+                    )}
                 </div>
             </div>
         </div>
@@ -4226,7 +4905,11 @@ export function TambahPengumuman({ kategori, tambahShow, onClose, onAdded, role 
 
     const [previewUrl, setPreviewUrl] = useState(null)
     const fileInputRef = useRef(null)
-
+    const [preview, setPreview] = useState({
+        show: false,
+        type: "",
+        src: "",
+    })
     const { isiRef } = useRef(null)
 
     useEffect(() => {
@@ -4353,6 +5036,62 @@ export function TambahPengumuman({ kategori, tambahShow, onClose, onAdded, role 
                                             }
                                     }
                                     >
+                                        {isMobile && (
+                                            <>
+                                                <button
+                                                    onClick={() =>
+                                                        setPreview({
+                                                            show: true,
+                                                            type: previewUrl?.type === ("pdf")
+                                                                ? "pdf"
+                                                                : previewUrl?.type === ("video")
+                                                                    ? "video"
+                                                                    : "image",
+                                                            src: getFileUrl(previewUrl?.src),
+                                                        })
+                                                    }
+                                                    style={{
+                                                        position: "absolute",
+                                                        top: "5px",
+                                                        left: "5px",
+                                                        zIndex: 10,
+                                                        background: "rgba(0, 0, 0, 0.5)",
+                                                        color: "white",
+                                                        border: "none",
+                                                        borderRadius: "50%",
+                                                        width: "25px",
+                                                        height: "25px",
+                                                        cursor: "pointer",
+                                                        fontWeight: "bold",
+                                                        lineHeight: "1",
+                                                    }}
+                                                    title="Expand"
+                                                >
+                                                    <i className="fa-solid fa-expand"></i>
+                                                </button>
+                                                <button
+                                                    onClick={() => onClose()}
+                                                    style={{
+                                                        position: "absolute",
+                                                        top: "5px",
+                                                        right: "5px",
+                                                        zIndex: 10,
+                                                        background: "rgba(0, 0, 0, 0.5)",
+                                                        color: "white",
+                                                        border: "none",
+                                                        borderRadius: "50%",
+                                                        width: "25px",
+                                                        height: "25px",
+                                                        cursor: "pointer",
+                                                        fontWeight: "bold",
+                                                        lineHeight: "1",
+                                                    }}
+                                                    title="Tutup"
+                                                >
+                                                    ✕
+                                                </button>
+                                            </>
+                                        )}
                                         <div id="preview">
                                             {previewUrl && previewUrl.type === "image" && (
                                                 <img
@@ -4408,6 +5147,15 @@ export function TambahPengumuman({ kategori, tambahShow, onClose, onAdded, role 
                                         : { maxWidth: "100%" }}
                                 >
                                     <div className="p-3" style={{ height: "100%", width: '100%' }}>
+                                        {(!isMobile || !previewUrl) && (<div className="d-flex justify-content-end w-100">
+                                            <button
+                                                type="button"
+                                                onClick={() => onClose()}
+                                                title="Tutup"
+                                            >
+                                                ✕
+                                            </button>
+                                        </div>)}
                                         <form onSubmit={handleSubmit}>
                                             <div className="mb-2">
                                                 <label className="form-label">Judul</label>
@@ -4521,6 +5269,96 @@ export function TambahPengumuman({ kategori, tambahShow, onClose, onAdded, role 
                                                 </button>
                                             </div>
                                         </form>
+                                        {preview.show && (
+                                            <div
+                                                className="preview-overlay"
+                                                onClick={() => setPreview({ show: false, src: "", type: "" })}
+                                                style={{
+                                                    position: "fixed",
+                                                    top: 0,
+                                                    left: 0,
+                                                    width: "100vw",
+                                                    height: "100vh",
+                                                    background: "rgba(0,0,0,0.8)",
+                                                    display: "flex",
+                                                    alignItems: "center",
+                                                    justifyContent: "center",
+                                                    zIndex: 9999,
+                                                }}
+                                            >
+                                                <button
+                                                    onClick={() => setPreview({ show: false, src: "", type: "" })}
+                                                    style={{
+                                                        position: "absolute",
+                                                        top: "5px",
+                                                        right: "5px",
+                                                        zIndex: 10,
+                                                        background: "rgba(0, 0, 0, 0.5)",
+                                                        color: "white",
+                                                        border: "none",
+                                                        borderRadius: "50%",
+                                                        width: "25px",
+                                                        height: "25px",
+                                                        cursor: "pointer",
+                                                        fontWeight: "bold",
+                                                        lineHeight: "1",
+                                                    }}
+                                                    title="Tutup"
+                                                >
+                                                    ✕
+                                                </button>
+                                                {preview.type === "image" ? (
+                                                    <img
+                                                        src={getFileUrl(preview.src)}
+                                                        alt="Preview"
+                                                        style={isMobile ? {
+                                                            maxWidth: "90%",
+                                                            maxHeight: "80%",
+                                                            objectFit: "contain",
+                                                            borderRadius: "10px",
+                                                        } : {
+                                                            maxWidth: "90%",
+                                                            maxHeight: "90%",
+                                                            objectFit: "contain",
+                                                            borderRadius: "10px",
+                                                        }}
+                                                    />
+                                                ) : preview.type === "video" ? (
+                                                    <video
+                                                        src={getFileUrl(preview.src)}
+                                                        controls
+                                                        autoPlay
+                                                        style={isMobile ? {
+                                                            maxWidth: "90%",
+                                                            maxHeight: "80%",
+                                                            borderRadius: "10px",
+                                                            backgroundColor: "black",
+                                                        } : {
+                                                            maxWidth: "90%",
+                                                            maxHeight: "90%",
+                                                            borderRadius: "10px",
+                                                            backgroundColor: "black",
+                                                        }}
+                                                    />
+                                                ) : preview.type === "pdf" ? (
+                                                    <embed
+                                                        src={getFileUrl(preview.src)}
+                                                        type="application/pdf"
+                                                        style={isMobile ? {
+                                                            width: "90%",
+                                                            height: "80%",
+                                                            borderRadius: "10px",
+                                                            backgroundColor: "white",
+                                                        } : {
+                                                            width: "80%",
+                                                            height: "90%",
+                                                            borderRadius: "10px",
+                                                            backgroundColor: "white",
+                                                        }}
+                                                    />
+                                                ) : null}
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                             </div>
