@@ -20,6 +20,8 @@ class DatabaseSeeder extends Seeder
             KategoriGolonganSeeder::class,
             AdminSeeder::class,
             PermissionSeeder::class,
+            SettingsSeeder::class,
+            WargaSeeder::class,
         ]);
     }
 }

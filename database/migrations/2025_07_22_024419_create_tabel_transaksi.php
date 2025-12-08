@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('transaksi', function (Blueprint $table) {
             $table->id();
             $table->foreignId('tagihan_id')->nullable()->constrained('tagihan')->onDelete('cascade');
+            $table->char('no_kk', 16)->nullable();
             $table->string('rt');
             $table->date('tanggal');
             $table->enum('jenis', ['pemasukan', 'pengeluaran']);
@@ -21,6 +22,9 @@ return new class extends Migration
             $table->string('nama_transaksi');
             $table->text('keterangan')->nullable();
             $table->timestamps();
+
+            $table->foreign('no_kk')->references('no_kk')->on('kartu_keluarga')->onDelete('cascade');
+            $table->softDeletes();
         });
     }
 

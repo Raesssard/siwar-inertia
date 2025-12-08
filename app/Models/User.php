@@ -4,14 +4,21 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 
+/**
+ * @method bool hasRole(string $role)
+ * @method bool can(string $permission)
+ * @property \Illuminate\Support\Collection $roles
+ */
+
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable, HasRoles;
+    use HasApiTokens, HasFactory, Notifiable, HasRoles, SoftDeletes;
 
     protected $table = 'users';
 
@@ -19,9 +26,10 @@ class User extends Authenticatable
         'nik',
         'password',
         'nama',
-        'nomor_rw',
         'id_rw',
         'id_rt',
+        'last_role',
+        'foto_profil',
     ];
 
     public function warga()
@@ -52,25 +60,30 @@ class User extends Authenticatable
         ];
     }
 
-    public function isKetuaRt(): bool
-    {
-        return $this->hasRole('rt') 
-            && !$this->hasAnyRole(['sekretaris', 'bendahara']);
-    }
+    /**
+     * @return string
+     */
 
-    public function isKetuaRw(): bool
+    public function effectiveRole()
     {
-        return $this->hasRole('rw') 
-            && !$this->hasAnyRole(['sekretaris', 'bendahara']);
-    }
+        $roles = $this->roles->pluck('name')->toArray();
 
-    public function jabatan(): ?string
-    {
-        if ($this->hasRole('sekretaris')) return 'Sekretaris';
-        if ($this->hasRole('bendahara')) return 'Bendahara';
-        if ($this->isKetuaRt()) return 'Ketua RT';
-        if ($this->isKetuaRw()) return 'Ketua RW';
-        return null;
-    }
+        if (empty($roles)) {
+            return null;
+        }
 
+        if (count($roles) === 1) {
+            return $roles[0];
+        }
+
+        if (in_array('rt', $roles)) {
+            return collect($roles)->first(fn($r) => $r !== 'rt');
+        }
+
+        if (in_array('rw', $roles)) {
+            return collect($roles)->first(fn($r) => $r !== 'rw');
+        }
+
+        return $roles[0];
+    }
 }

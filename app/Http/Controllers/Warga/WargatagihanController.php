@@ -13,9 +13,6 @@ use Inertia\Inertia;
 class WargatagihanController extends Controller
 {
 
-    /**
-     * Menampilkan daftar tagihan untuk warga yang sedang login.
-     */
     public function index(Request $request)
     {
         /** @var User $user */
@@ -44,7 +41,7 @@ class WargatagihanController extends Controller
                 });
             })
             ->orderBy('created_at', 'desc')
-            ->paginate(10, ['*'], 'manual_page');
+            ->paginate(10, ['*'], 'sudah_page');
 
         $tagihanBelumDibayar = Tagihan::where('no_kk', $no_kk_warga)
             ->where('status_bayar', 'belum_bayar')
@@ -56,7 +53,7 @@ class WargatagihanController extends Controller
                 });
             })
             ->orderBy('created_at', 'desc')
-            ->paginate(10, ['*'], 'otomatis_page');
+            ->paginate(10, ['*'], 'belum_page');
 
         return Inertia::render('Warga/Tagihan', [
             'title' => $title,

@@ -8,10 +8,8 @@ import '../../../css/kk.css'
 export default function KartuKeluarga() {
     const {
         kartu_keluarga,
-        kategori_iuran,
-        warga,
+        total_kartu_keluarga,
         title,
-        total_kk,
     } = usePage().props
     const { props } = usePage()
     const user = props.auth?.user
@@ -49,6 +47,7 @@ export default function KartuKeluarga() {
                 filter={filter}
                 resetFilter={resetFilter}
                 role={role}
+                totalKK={total_kartu_keluarga}
             />
             <div className="table-container">
                 <div className="table-header">
@@ -76,8 +75,7 @@ export default function KartuKeluarga() {
                                         <td className="text-center">{index + 1}</td>
                                         <td className="text-center">{item.no_kk ?? '-'}</td>
                                         <td className="text-center">
-                                            {item.warga[index]?.status_hubungan_dalam_keluarga === 'kepala keluarga'
-                                                ? item.warga[index]?.nama : '-'}
+                                            {item.kepala_keluarga.nama ?? '-'}
                                         </td>
                                         <td className="text-center">{item.alamat ?? '-'}</td>
                                         <td className="text-center">{item.rukun_tetangga?.nomor_rt ?? '-'}</td>

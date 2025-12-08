@@ -5,6 +5,10 @@ namespace App\Http\Controllers;
 use App\Models\Warga;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cookie;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 
 class LoginController extends Controller
@@ -21,22 +25,43 @@ class LoginController extends Controller
             'password' => 'required',
         ]);
 
-        if (Auth::attempt($credentials)) {
+        if (Auth::attempt($credentials, $request->boolean('remember'))) {
             $request->session()->regenerate();
             $user = Auth::user();
 
-            // Kalau hanya punya 1 role → langsung ke dashboard
-            if ($user->roles->count() === 1) {
-                $role = $user->roles->first()->name;
+            $validRoles = ['admin', 'rw', 'rt', 'warga'];
+
+            $accountRoles = $user->roles->filter(
+                fn($r) => in_array($r->name, $validRoles)
+            )->values();
+
+            session()->put(
+                'need_cookie_confirmation',
+                !$request->boolean('remember')
+            );
+
+
+            if ($accountRoles->count() === 1) {
+                Log::info('User ' . $user->nik . ' logged in with role ' . $user->roles->first()->name);
+                $role = $accountRoles->first()->name;
                 session(['active_role' => $role]);
                 return $this->redirectByRole($role, $user);
             }
 
-            // Kalau punya banyak role → pilih role dulu
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'choose_role' => true,
+                    'roles' => $accountRoles->pluck('name'),
+                ]);
+            }
+
             return Inertia::location(route('choose-role'));
         }
 
-        // Jika gagal login
+        if ($request->expectsJson()) {
+            return response()->json(['error' => 'NIK atau password salah.'], 401);
+        }
+
         return back()->withErrors([
             'nik' => 'NIK atau password salah.',
             'password' => 'NIK atau password salah.',
@@ -45,15 +70,26 @@ class LoginController extends Controller
 
     public function logout(Request $request)
     {
+        /** @var User $user */
+        $user = Auth::user();
+        $user->last_role = null;
+        $user->save();
+
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-        return redirect('/login');
+
+        foreach ($_COOKIE as $key => $value) {
+            if (str_contains($key, 'remember_web')) {
+                Cookie::queue(Cookie::forget($key));
+            }
+        }
+
+        return redirect('/login')->withoutCookie('custom_auth_token');
     }
 
     private function redirectByRole(string $role, $user)
     {
-        // Khusus warga cek apakah Kepala Keluarga
         if ($role === 'warga') {
             $warga = $user->warga;
             if (!$warga || strtolower($warga->status_hubungan_dalam_keluarga) !== 'kepala keluarga') {
@@ -62,14 +98,16 @@ class LoginController extends Controller
                     'nik' => 'Hanya Kepala Keluarga yang bisa login.',
                 ]);
             }
-            return Inertia::location(route('dashboard'));
+            return response()->json([
+                'redirect' => route('dashboard')
+            ]);
         }
 
-        // Semua role diarahkan ke Dashboard.jsx
-        return Inertia::location(route('dashboard'));
+        return response()->json([
+            'redirect' => route('dashboard')
+        ]);
     }
 
-    // Halaman pilih role
     public function chooseRole()
     {
         /** @var User $user */
@@ -78,7 +116,6 @@ class LoginController extends Controller
         return Inertia::render('ChooseRole', compact('user', 'roles'));
     }
 
-    // Simpan role yang dipilih
     public function setRole(Request $request)
     {
         /** @var User $user */
@@ -86,11 +123,58 @@ class LoginController extends Controller
         $role = $request->input('role');
 
         if (!$user->hasRole($role)) {
-            return redirect()->route('choose-role')->with('error', 'Role tidak valid.');
+            return response()->json(['error' => 'Role tidak valid.'], 400);
         }
 
         session(['active_role' => $role]);
 
-        return $this->redirectByRole($role, $user);
+        $user->last_role = $role;
+        $user->save();
+
+        // session()->flash('need_cookie_confirmation', true);
+
+        return response()->json(['success' => true]);
+    }
+
+    public function requestCookie(Request $request)
+    {
+        /** @var User $user */
+        $user = Auth::user();
+
+        if (!$user) {
+            return response()->json(['error' => 'User tidak ditemukan'], 401);
+        }
+
+        $token = Str::random(60);
+        $user->remember_custom_token = $token;
+        $user->save();
+
+        cookie()->queue(
+            'custom_auth_token',
+            $token,
+            60 * 24 * 365 * 5
+        );
+
+        session()->put('need_cookie_confirmation', false);
+
+        return response()->json([
+            'message' => 'Remember token set'
+        ]);
+    }
+
+    public function rejectCookie()
+    {
+        /** @var User $user */
+        $user = Auth::user();
+
+        if (!$user) {
+            return response()->json(['error' => 'User tidak ditemukan'], 401);
+        }
+
+        session()->put('need_cookie_confirmation', false);
+
+        return response()->json([
+            'message' => 'Cookie rejected'
+        ]);
     }
 }

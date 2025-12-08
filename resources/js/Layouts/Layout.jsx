@@ -1,24 +1,59 @@
-import React, { useState, useEffect } from "react";
-import "../../css/layout.css";
-import Sidebar from "./Sidebar";
-import Footer from "./Footer";
-import Topbar from "./Topbar";
-import { ModalSidebar } from "../Pages/Component/Modal";
-import { usePage } from "@inertiajs/react";
+import React, { useState, useEffect } from "react"
+import "../../css/layout.css"
+import Sidebar from "./Sidebar"
+import Footer from "./Footer"
+import Topbar from "./Topbar"
+import { ModalSidebar } from "../Pages/Component/Modal"
+import { usePage } from "@inertiajs/react"
+import RoleCookieToast from "../Pages/Component/RoleCookieToast"
+import { useIsMobile } from "../Pages/Component/GetPropRole"
 
 export default function Layout({ children }) {
-    const [toggle, setToggle] = useState("");
-    const [showSidebar, setShowSidebar] = useState(false);
-    const [flashMessage, setFlashMessage] = useState(null);
-    const { flash } = usePage().props;
+    const [toggle, setToggle] = useState(() => {
+        return localStorage.getItem("sidebarCollapsed") === "true" ? "toggled" : ""
+    })
+    const [history, setHistory] = useState(false)
+    const [showSidebar, setShowSidebar] = useState(false)
+    const [flashMessage, setFlashMessage] = useState(null)
+    const { props } = usePage()
+    const users = props.auth?.user
+    const { flash, cookie_prompt } = usePage().props
+    const [showToast, setShowToast] = useState(false)
+    // const [isMobile, setIsMobile] = useState(window.innerWidth < 768)
+    const mobile = useIsMobile()
+
+    // useEffect(() => {
+    //     function handleResize() {
+    //         // setIsMobile(window.innerWidth < 768)
+    //         setMobile(useIsMobile)
+    //     }
+
+    //     window.addEventListener('resize', handleResize)
+    //     return () => window.removeEventListener('resize', handleResize)
+    // }, [])
+
+    useEffect(() => {
+        if (cookie_prompt?.need) {
+            setShowToast(true)
+        }
+    }, [cookie_prompt])
+
+    const toggleLocalStorage = () => {
+        setHistory(true)
+        setToggle("")
+        localStorage.removeItem("sidebarCollapsed")
+        localStorage.removeItem("openMenus")
+
+        setTimeout(() => setHistory(false), 200)
+    }
 
     const handleToggle = (t) => {
-        setToggle(t);
-    };
+        setToggle(t)
+    }
 
     const ModalSideShow = (condition) => {
-        setShowSidebar(condition);
-    };
+        setShowSidebar(condition)
+    }
 
     // 🔹 Tampilkan flash message ketika ada dari server
     useEffect(() => {
@@ -26,38 +61,44 @@ export default function Layout({ children }) {
             const message = {
                 type: flash.success ? "success" : "error",
                 text: flash.success || flash.error,
-            };
-            setFlashMessage(message);
+            }
+            setFlashMessage(message)
 
             // Hilangkan otomatis setelah 3 detik
-            const timer = setTimeout(() => setFlashMessage(null), 3000);
-            return () => clearTimeout(timer);
+            const timer = setTimeout(() => setFlashMessage(null), 3000)
+            return () => clearTimeout(timer)
         }
-    }, [flash]);
+    }, [flash])
 
     return (
         <>
             <div id="wrapper">
-                <Sidebar toggleKeParent={handleToggle} />
+                <Sidebar
+                    toggleKeParent={handleToggle}
+                    localStorageHistory={history}
+                />
                 <ModalSidebar
                     modalIsOpen={showSidebar}
                     modalShow={ModalSideShow}
+                    localStorageHistory={history}
                 />
                 <div
                     id="content-wrapper"
-                    className={`main-content d-flex flex-column ${toggle}`}
+                    className={`main-content d-flex flex-column ${mobile ? '' : toggle}`}
                 >
                     <div id="content">
-                        <Topbar modalShow={ModalSideShow} />
+                        <Topbar
+                            modalShow={ModalSideShow}
+                            hapusHistory={() => toggleLocalStorage()}
+                        />
 
                         {/* 🔹 Flash Message (Success / Error) */}
                         {flashMessage && (
                             <div
-                                className={`position-fixed top-0 end-0 mt-3 me-3 px-4 py-2 rounded shadow-lg text-white fw-semibold z-50 ${
-                                    flashMessage.type === "success"
-                                        ? "bg-success"
-                                        : "bg-danger"
-                                }`}
+                                className={`position-fixed top-0 end-0 mt-3 me-3 px-4 py-2 rounded shadow-lg text-white fw-semibold z-50 ${flashMessage.type === "success"
+                                    ? "bg-success"
+                                    : "bg-danger"
+                                    }`}
                                 style={{
                                     animation: "fadeInOut 3s ease-in-out",
                                     zIndex: 9999,
@@ -72,6 +113,9 @@ export default function Layout({ children }) {
                             <div className="row">{children}</div>
                         </div>
                     </div>
+                    {showToast &&
+                        <RoleCookieToast user={users} />
+                    }
                     <Footer />
                 </div>
             </div>
@@ -85,5 +129,5 @@ export default function Layout({ children }) {
                 }
             `}</style>
         </>
-    );
+    )
 }

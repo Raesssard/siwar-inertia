@@ -277,19 +277,19 @@ body {
 /* Responsive adjustments */
 @media (max-width: 767.98px) {
     .kk-container {
-        padding: 1rem;
+        padding: 1rem !important;
     }
 
     .kk-header-main-title h4 {
-        font-size: 1.5rem;
+        font-size: 1.5rem !important;
     }
 
     .no-kk-big {
-        font-size: 1.2rem;
+        font-size: 1rem !important;
     }
 
-    .kk-info-grid.row.row-cols-md-2 .col {
-        padding-bottom: 0.5rem;
+    .kk-info-grid .col {
+        padding-bottom: 0.5rem !important;
         /* Add some space between rows in single column layout */
     }
 
@@ -300,47 +300,62 @@ body {
     }
 
     .kk-footer .col-12 {
-        text-align: center;
-        margin-bottom: 1.5rem;
+        text-align: center !important;
+        margin-bottom: 1.5rem !important;
         /* Space between signature blocks on small screens */
     }
 
     .kk-document-upload .input-group {
-        flex-direction: column;
+        flex-direction: column !important;
     }
 
     .kk-document-upload .input-group input,
     .kk-document-upload .input-group button {
-        width: 100%;
+        width: 100% !important;
     }
 
     .kk-document-upload .input-group button {
-        margin-top: 0.5rem;
+        margin-top: 0.5rem !important;
     }
 
     .document-preview-wrapper {
-        max-width: 90%;
+        max-width: 90% !important;
         /* Smaller on small screens */
     }
 }
 
 @media (max-width: 575.98px) {
     .kk-header-top-line {
-        flex-direction: column;
-        align-items: center;
+        flex-direction: column !important;
+        align-items: center !important;
+        margin-bottom: 1.5rem !important;
+    }
+
+    .kk-header-top-line p {
+        font-size: 0.85rem !important;
     }
 
     .kk-header-right-reg {
-        text-align: center;
-        margin-top: 0.5rem;
+        text-align: center !important;
+        margin-top: 0 !important;
     }
 
-    .kk-info-grid.row.row-cols-md-2 {
-        display: block;
+    .kk-info-grid {
+        display: block !important;
         /* Force single column on very small screens */
     }
 
-    .kk-info-grid .col {
-        width: 100%;
+    .kk-info-grid .kk-info-item {
+        width: 100% !important;
+    }
+
+    .kk-info-grid p {
+        display: flex !important;
+        align-items: start;
+    }
+
+    .kk-info-grid p strong {
+        min-width: 20% !important;
+        width: 50% !important;
     }
 }

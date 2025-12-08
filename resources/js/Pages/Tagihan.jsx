@@ -1,14 +1,15 @@
 import Layout from "@/Layouts/Layout"
 import { Head, Link, useForm, usePage } from "@inertiajs/react"
-import React, { useState } from "react"
-import { formatRupiah, formatTanggal } from "../Component/GetPropRole"
+import React, { useEffect, useState } from "react"
+import { formatRupiah, formatTanggal } from "./Component/GetPropRole"
 import Swal from "sweetalert2"
-import { FilterTagihan } from "../Component/Filter"
-import { EditTagihan } from "../Component/Modal"
+import { FilterTagihan } from "./Component/Filter"
+import { EditTagihan, TambahTagihan } from "./Component/Modal"
 
 export default function Tagihan() {
     const {
         title,
+        iuran_for_tagihan,
         tagihanManual: tagihanManualFromServer,
         tagihanOtomatis: tagihanOtomatisFromServer,
         kartuKeluargaForFilter
@@ -16,16 +17,15 @@ export default function Tagihan() {
     const [selected, setSelected] = useState(null)
     const [tagihanManualList, setTagihanManualList] = useState(tagihanManualFromServer.data || [])
     const [tagihanOtomatisList, setTagihanOtomatisList] = useState(tagihanOtomatisFromServer.data || [])
+    const [showModalTambah, setShowModalTambah] = useState(false)
     const [showModalEdit, setShowModalEdit] = useState(false)
     const { props } = usePage()
     const role = props.auth?.currentRole
     const { get, data, setData } = useForm({
         search: '',
+        no_kk_filter: '',
+        status: '',
     })
-
-console.log(tagihanManualList)
-console.log(tagihanOtomatisList)
-
     const modalEdit = (item) => {
         setSelected(item)
         setShowModalEdit(true)
@@ -33,14 +33,21 @@ console.log(tagihanOtomatisList)
 
     const filter = (e) => {
         e.preventDefault()
-        get(`/${role}/tagihan`, { preserveState: true, preserveScroll: true })
+        get(`/${role}/tagihan`, { preserveScroll: true, preserveState: true })
     }
 
     const resetFilter = () => {
         setData({
             search: '',
+            no_kk_filter: '',
+            status: '',
         })
     }
+
+    useEffect(() => {
+        setTagihanManualList(tagihanManualFromServer.data ?? [])
+        setTagihanOtomatisList(tagihanOtomatisFromServer.data ?? [])
+    }, [tagihanManualFromServer, tagihanOtomatisFromServer])
 
     const handleDelete = (id) => {
         Swal.fire({
@@ -66,7 +73,6 @@ console.log(tagihanOtomatisList)
                     })
                     .catch(() => {
                         console.log(`/${role}/tagihan/${id}, ini rutenya salah mas🗿`)
-                        console.log(id)
                         Swal.fire("Gagal!", "Terjadi kesalahan saat menghapus data.", "error")
                     })
             }
@@ -79,16 +85,19 @@ console.log(tagihanOtomatisList)
                 ? role.toUpperCase()
                 : role.charAt(0).toUpperCase() + role.slice(1)}`} />
             <FilterTagihan
+                tagihanManual={tagihanManualList}
+                tagihanOtomatis={tagihanOtomatisList}
                 data={data}
                 setData={setData}
                 filter={filter}
                 resetFilter={resetFilter}
                 role={role}
                 kk_list={kartuKeluargaForFilter}
+                tambahShow={() => setShowModalTambah(true)}
             />
             <div className="table-container">
                 <div className="table-header">
-                    <h4>Data Tagihan Manual</h4>
+                    <h4>Tagihan Manual</h4>
                 </div>
                 <div className="table-scroll">
                     <table className="table-custom">
@@ -97,7 +106,7 @@ console.log(tagihanOtomatisList)
                                 <th className="px-3 text-center" scope="col">No.</th>
                                 <th className="px-3 text-center" scope="col">Nama Tagihan</th>
                                 <th className="px-3 text-center" scope="col">No. KK</th>
-                                <th className="px-3 text-center" scope="col">Nama Kepala Keluarga</th>
+                                <th className="px-3 text-center" scope="col">Kepala Keluarga</th>
                                 <th className="px-3 text-center" scope="col">Nominal</th>
                                 <th className="px-3 text-center" scope="col">Tanggal Tagih</th>
                                 <th className="px-3 text-center" scope="col">Tanggal Tempo</th>
@@ -112,18 +121,26 @@ console.log(tagihanOtomatisList)
                                     <tr key={item.id}>
                                         <td className="text-center">{index + 1}</td>
                                         <td className="text-center">{item.nama ?? '-'}</td>
-                                        <td className="text-center">{item.no_kk ?? '-'}</td>
+                                        <td className="text-center">{item.no_kk ? item.no_kk : (item.warga?.no_kk ?? '-')}</td>
                                         <td className="text-center">
-                                            {item.kartu_keluarga?.warga?.find(w => w.status_hubungan_dalam_keluarga === 'kepala keluarga')?.nama ?? '-'}
+                                            {
+                                                item.kartu_keluarga?.kepala_keluarga?.nama ?? '-'
+                                            }
                                         </td>
-                                        <td className="text-center">{formatRupiah(item.nominal) ?? '-'}</td>
+                                        <td className="text-end" style={{ whiteSpace: 'nowrap' }}>{formatRupiah(item.nominal) ?? '-'}</td>
                                         <td className="text-center">{formatTanggal(item.tgl_tagih)}</td>
                                         <td className="text-center">{formatTanggal(item.tgl_tempo)}</td>
-                                        <td className="text-center">{item.status_bayar === 'sudah_bayar' ? (
-                                            <span className="badge bg-success text-white">Sudah Bayar</span>
-                                        ) : (
-                                            <span className="badge bg-warning text-white">Belum Bayar</span>
-                                        )}
+                                        <td className="text-center">
+                                            {item.status_bayar === 'sudah_bayar' ? (
+                                                <span className="badge bg-success text-white">Sudah Bayar</span>
+                                            ) : (
+                                                <span className="badge bg-warning text-white">Belum Bayar</span>
+                                            )}
+                                            {item.status_bayar === 'sudah_bayar' && (item.nominal_bayar >= item.nominal) ? (
+                                                <span className="badge bg-primary text-white">Sudah Lunas</span>
+                                            ) : item.status_bayar === 'sudah_bayar' && (item.nominal_bayar < item.nominal) && (
+                                                <span className="badge bg-danger text-white">Belum Lunas</span>
+                                            )}
                                         </td>
                                         <td className="text-center">{formatTanggal(item.tgl_bayar)}</td>
                                         <td className="text-center">
@@ -179,7 +196,7 @@ console.log(tagihanOtomatisList)
             </div>
             <div className="table-container">
                 <div className="table-header">
-                    <h4>Data Tagihan Otomatis</h4>
+                    <h4>Tagihan Otomatis</h4>
                 </div>
                 <div className="table-scroll">
                     <table className="table-custom">
@@ -188,7 +205,7 @@ console.log(tagihanOtomatisList)
                                 <th className="px-3 text-center" scope="col">No.</th>
                                 <th className="px-3 text-center" scope="col">Nama Tagihan</th>
                                 <th className="px-3 text-center" scope="col">No. KK</th>
-                                <th className="px-3 text-center" scope="col">Nama Kepala Keluarga</th>
+                                <th className="px-3 text-center" scope="col">Kepala Keluarga</th>
                                 <th className="px-3 text-center" scope="col">Nominal</th>
                                 <th className="px-3 text-center" scope="col">Tanggal Tagih</th>
                                 <th className="px-3 text-center" scope="col">Tanggal Tempo</th>
@@ -205,16 +222,24 @@ console.log(tagihanOtomatisList)
                                         <td className="text-center">{item.nama ?? '-'}</td>
                                         <td className="text-center">{item.no_kk ?? '-'}</td>
                                         <td className="text-center">
-                                            {item.kartu_keluarga?.warga?.find(w => w.status_hubungan_dalam_keluarga === 'kepala keluarga')?.nama ?? '-'}
+                                            {
+                                                item.kartu_keluarga?.kepala_keluarga?.nama ?? '-'
+                                            }
                                         </td>
-                                        <td className="text-center">{formatRupiah(item.nominal) ?? '-'}</td>
+                                        <td className="text-end px-0">{formatRupiah(item.nominal) ?? '-'}</td>
                                         <td className="text-center">{formatTanggal(item.tgl_tagih)}</td>
                                         <td className="text-center">{formatTanggal(item.tgl_tempo)}</td>
-                                        <td className="text-center">{item.status_bayar === 'sudah_bayar' ? (
-                                            <span className="badge bg-success text-white">Sudah Bayar</span>
-                                        ) : (
-                                            <span className="badge bg-warning text-white">Belum Bayar</span>
-                                        )}
+                                        <td className="text-center">
+                                            {item.status_bayar === 'sudah_bayar' ? (
+                                                <span className="badge bg-success text-white">Sudah Bayar</span>
+                                            ) : (
+                                                <span className="badge bg-warning text-white">Belum Bayar</span>
+                                            )}
+                                            {item.status_bayar === 'sudah_bayar' && (item.nominal_bayar >= item.nominal) ? (
+                                                <span className="badge bg-primary text-white">Sudah Lunas</span>
+                                            ) : item.status_bayar === 'sudah_bayar' && (item.nominal_bayar < item.nominal) && (
+                                                <span className="badge bg-danger text-white">Belum Lunas</span>
+                                            )}
                                         </td>
                                         <td className="text-center">{formatTanggal(item.tgl_bayar)}</td>
                                         <td className="text-center">
@@ -268,6 +293,20 @@ console.log(tagihanOtomatisList)
                     </div>
                 )}
             </div>
+            <TambahTagihan
+                tambahShow={showModalTambah}
+                onClose={() => setShowModalTambah(false)}
+                onUpdated={(updated) => {
+                    if (Array.isArray(updated)) {
+                        setTagihanManualList(prev => [...updated, ...prev])
+                    } else {
+                        setTagihanManualList(prev => [updated, ...prev])
+                    }
+                }}
+                role={role}
+                iuran={iuran_for_tagihan}
+                kk_list={kartuKeluargaForFilter}
+            />
             <EditTagihan
                 editShow={showModalEdit}
                 onClose={() => setShowModalEdit(false)}
@@ -279,15 +318,12 @@ console.log(tagihanOtomatisList)
                                 item.id === updated.id ? updated : item
                             )
                         )
-                        console.log(tagihanManualList)
                     } else {
-
                         setTagihanOtomatisList(prev =>
                             prev.map(item =>
                                 item.id === updated.id ? updated : item
                             )
                         )
-                        console.log(tagihanOtomatisList)
                     }
                 }}
                 role={role}

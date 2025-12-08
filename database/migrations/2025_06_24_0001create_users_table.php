@@ -15,7 +15,6 @@ return new class extends Migration
             $table->id();
             $table->char('nik', 16)->unique();
             $table->string('nama');
-            $table->string('nomor_rw')->nullable();
 
             // Relasi ke RT
             $table->unsignedBigInteger('id_rt')->nullable();
@@ -31,9 +30,14 @@ return new class extends Migration
                 ->on('rw')
                 ->onDelete('cascade');
 
+            $table->string('foto_profil')->nullable(); // ← tambah disini
+
+
             $table->string('password');
+            $table->string('last_role')->nullable();
             $table->rememberToken(); // supaya login via Auth jalan
             $table->timestamps();
+            $table->softDeletes();
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {

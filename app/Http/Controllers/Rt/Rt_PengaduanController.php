@@ -43,9 +43,9 @@ class Rt_PengaduanController extends Controller
             $pengaduan_rt_saya->where('level', $request->kategori);
         }
 
-        $rt_pengaduan = $pengaduan_rt_saya->orderBy('created_at', 'desc')->get();
+        $pengaduan = $pengaduan_rt_saya->orderBy('created_at', 'desc')->get();
 
-        $total_pengaduan_rt = Pengaduan::whereHas(
+        $total_pengaduan = Pengaduan::whereHas(
             'warga.kartuKeluarga.rukunTetangga',
             function ($aduan) use ($pengaduan_rt) {
                 $aduan->where('level', 'rt')
@@ -53,7 +53,7 @@ class Rt_PengaduanController extends Controller
             }
         )->count();
 
-        $total_pengaduan_rt_filtered = $rt_pengaduan->count();
+        $total_pengaduan_filtered = $pengaduan->count();
 
         $list_bulan = [
             'januari',
@@ -82,11 +82,11 @@ class Rt_PengaduanController extends Controller
             ->distinct()
             ->pluck('level');
 
-        return Inertia::render('RT/Pengaduan', [
+        return Inertia::render('Pengaduan', [
             'title' => $title,
-            'rt_pengaduan' => $rt_pengaduan,
-            'total_pengaduan_rt' => $total_pengaduan_rt,
-            'total_pengaduan_rt_filtered' => $total_pengaduan_rt_filtered,
+            'pengaduan' => $pengaduan,
+            'total_pengaduan' => $total_pengaduan,
+            'total_pengaduan_filtered' => $total_pengaduan_filtered,
             'list_bulan' => $list_bulan,
             'list_tahun' => $list_tahun,
             'list_level' => $list_level,
@@ -122,6 +122,8 @@ class Rt_PengaduanController extends Controller
 
     public function updateKonfirmasi(Request $request, $id)
     {
+        /** @var User $user */
+        $user = Auth::user();
         $konfirmasi_rw = $request->input('konfirmasi_rw');
         $isi_komentar = $request->input('isi_komentar');
 
@@ -134,7 +136,8 @@ class Rt_PengaduanController extends Controller
 
         $komentar = $pengaduan->komentar()->create([
             'user_id' => Auth::id(),
-            'isi_komentar' => $isi_komentar
+            'isi_komentar' => $isi_komentar,
+            'role_snapshot' => session('active_role') ?? $user->getRoleNames()->first()
         ]);
 
         $komentar->load('user');
@@ -153,8 +156,19 @@ class Rt_PengaduanController extends Controller
             ->with('success', 'Pengaduan berhasil diperbarui.');
     }
 
+    public function baca(Request $request, $id)
+    {
+        $pengaduan = Pengaduan::findOrFail($id);
+
+        $pengaduan->update([
+            'status' => 'diproses',
+        ]);
+    }
+
     public function komen(Request $request, $id)
     {
+        /** @var User $user */
+        $user = Auth::user();
         $request->validate([
             'isi_komentar' => 'required_without:file|string|nullable|max:255',
             'file' => 'required_without:isi_komentar|nullable|file|mimes:jpg,jpeg,png,gif,mp4,mov,avi,mkv,doc,docx,pdf|max:20480',
@@ -171,11 +185,18 @@ class Rt_PengaduanController extends Controller
             $filePath = $file->storeAs('file_pengaduan', $fileName, 'public');
         }
 
+        $validRoles = ['admin', 'rw', 'rt', 'warga'];
+        $sideRoles = $user->roles()
+            ->whereNotIn('name', $validRoles)
+            ->pluck('name')
+            ->first();
+
         $komentar = $pengaduan->komentar()->create([
             'user_id' => Auth::id(),
             'isi_komentar' => $request->isi_komentar,
             'file_path' => $filePath,
             'file_name' => $fileName,
+            'role_snapshot' => $sideRoles ? $sideRoles : session('active_role') ?? $user->getRoleNames()->first()
         ]);
 
         $komentar->load('user');

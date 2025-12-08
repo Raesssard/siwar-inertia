@@ -1,8 +1,8 @@
 import Layout from "@/Layouts/Layout"
-import { Head, Link, useForm, usePage } from "@inertiajs/react";
-import React from "react";
-import { FilterTransaksi } from "../Component/Filter";
-import { formatRupiah, formatTanggal } from "../Component/GetPropRole";
+import { Head, Link, useForm, usePage } from "@inertiajs/react"
+import React from "react"
+import { FilterTransaksi } from "../Component/Filter"
+import { formatRupiah, formatTanggal } from "../Component/GetPropRole"
 
 export default function Transaksi() {
     const {
@@ -67,8 +67,12 @@ export default function Transaksi() {
                             {transaksi.data.length > 0 ? (
                                 transaksi.data.map((item, index) => (
                                     <tr key={item.id}>
-                                        <td className="text-center">{index + 1}</td>
-                                        <td className="text-center">{formatTanggal(item.tanggal)}</td>
+                                        <td className="text-center">
+                                            {index + 1}
+                                        </td>
+                                        <td className="text-center">
+                                            {formatTanggal(item.tanggal)}
+                                        </td>
                                         <td className="text-center">
                                             {item.jenis === 'pemasukan' ? (
                                                 <span className="badge bg-success text-white">Pemasukan</span>
@@ -76,9 +80,15 @@ export default function Transaksi() {
                                                 <span className="badge bg-danger text-white">Pengeluaran</span>
                                             )}
                                         </td>
-                                        <td className="text-left">{item.nama_transaksi}</td>
-                                        <td className="text-left">{item.keterangan}</td>
-                                        <td className="text-right">{formatRupiah(item.nominal)}</td>
+                                        <td className="text-left">
+                                            {item.nama_transaksi}
+                                        </td>
+                                        <td className="text-left">
+                                            {item.keterangan}
+                                        </td>
+                                        <td className="text-right">
+                                            {formatRupiah(item.nominal)}
+                                        </td>
                                     </tr>
                                 ))
                             ) : (
@@ -95,9 +105,9 @@ export default function Transaksi() {
                     <div className="pagination-container">
                         <ul className="pagination-custom">
                             {transaksi.links.map((link, index) => {
-                                let label = link.label;
-                                if (label.includes("Previous")) label = "&lt;";
-                                if (label.includes("Next")) label = "&gt;";
+                                let label = link.label
+                                if (label.includes("Previous")) label = "&lt;"
+                                if (label.includes("Next")) label = "&gt;"
 
                                 return (
                                     <li
@@ -114,7 +124,7 @@ export default function Transaksi() {
                                             title={`Pergi ke halaman ${label === "&lt;" ? 'sebelumnya' : label === "&gt;" ? 'selanjutnya' : label}`}
                                         />
                                     </li>
-                                );
+                                )
                             })}
                         </ul>
                     </div>

@@ -1,6 +1,10 @@
 <?php
 
+use App\Http\Middleware\CheckPermission;
+use App\Http\Middleware\CheckRememberCookie;
+use App\Http\Middleware\CustomEncryptCookies;
 use App\Http\Middleware\HandleInertiaRequests;
+use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -12,9 +16,20 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        // ini jangan lupa biar HandleInertiaRequests jalan
+        $middleware->web(prepend: [
+            CheckRememberCookie::class,
+        ]);
+
+        $middleware->web(replace: [
+            EncryptCookies::class => CustomEncryptCookies::class,
+        ]);
+
         $middleware->web(append: [
             HandleInertiaRequests::class,
+        ]);
+
+        $middleware->alias([
+            'permission' => CheckPermission::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

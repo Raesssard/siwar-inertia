@@ -3,7 +3,13 @@ import { useForm, router, Head } from "@inertiajs/react";
 import { route } from "ziggy-js";
 import Layout from "@/Layouts/Layout";
 
-export default function FormWarga({ warga = null, noKK, onClose, role, wargaList = [] }) {
+export default function FormWarga({
+  warga = null,
+  noKK,
+  onClose,
+  role,
+  wargaList = [],
+}) {
   const isEdit = !!warga;
 
   const { data, setData, post, put, processing, errors, reset } = useForm({
@@ -42,41 +48,52 @@ export default function FormWarga({ warga = null, noKK, onClose, role, wargaList
     tujuan_pindah: warga?.tujuan_pindah ?? "",
   });
 
+  // Auto set No KK untuk mode tambah
   useEffect(() => {
     if (!isEdit && noKK) setData("no_kk", noKK);
   }, [noKK]);
 
-  // 🔹 Auto isi nama ayah & ibu jika pilih anak
+  // Auto isi nama ayah & ibu jika anak
   useEffect(() => {
-    if (data.status_hubungan_dalam_keluarga === "anak" && wargaList.length > 0) {
-      const ayah = wargaList.find((w) => w.status_hubungan_dalam_keluarga === "kepala keluarga");
-      const ibu = wargaList.find((w) => w.status_hubungan_dalam_keluarga === "istri");
+    if (
+      !isEdit &&
+      data.status_hubungan_dalam_keluarga === "anak" &&
+      wargaList.length > 0
+    ) {
+      const ayah = wargaList.find(
+        (w) => w.status_hubungan_dalam_keluarga === "kepala keluarga"
+      );
+      const ibu = wargaList.find(
+        (w) => w.status_hubungan_dalam_keluarga === "istri"
+      );
 
       if (ayah && !data.nama_ayah) setData("nama_ayah", ayah.nama);
       if (ibu && !data.nama_ibu) setData("nama_ibu", ibu.nama);
     }
   }, [data.status_hubungan_dalam_keluarga, wargaList]);
 
+  // Tentukan route utama (baseRoute) untuk RW atau Admin
+  const baseRoute = role === "admin" ? "admin.warga" : "rw.warga";
+
+  // Tentukan route kembali (kartu keluarga index)
+  const kkRoute =
+    role === "admin" ? "admin.kartu_keluarga" : "rw.kartu_keluarga";
+
+  // Submit form
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    if (isEdit) {
-      put(route("rw.warga.update", warga.id), {
-        preserveScroll: true,
-        onSuccess: () => {
-          reset();
-          onClose?.();
-        },
-      });
-    } else {
-      post(route("rw.warga.store"), {
-        preserveScroll: true,
-        onSuccess: () => {
-          reset();
-          onClose?.();
-        },
-      });
-    }
+    const action = isEdit
+      ? put(route(`${baseRoute}.update`, warga.id), {
+          onSuccess: () => {
+            router.visit(route(`${kkRoute}.index`));
+          },
+        })
+      : post(route(`${baseRoute}.store`), {
+          onSuccess: () => {
+            router.visit(route(`${kkRoute}.index`));
+          },
+        });
   };
 
   const inputBase =
@@ -98,38 +115,40 @@ export default function FormWarga({ warga = null, noKK, onClose, role, wargaList
               Data Pribadi
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-
-              {/* 🔹 No KK (Read Only) */}
+              {/* No KK */}
               <div>
                 <label className="font-medium text-gray-700">No KK</label>
                 <input
                   type="text"
                   value={data.no_kk}
-                  readOnly
-                  className={`${inputBase} bg-gray-100 cursor-not-allowed`}
+                  onChange={(e) => setData("no_kk", e.target.value)}
+                  className={inputBase}
                 />
+                {errors.no_kk && (
+                  <p className="text-red-500 text-sm">{errors.no_kk}</p>
+                )}
               </div>
-
               {/* NIK */}
               <div>
                 <label className="font-medium text-gray-700">NIK</label>
                 <input
                   type="text"
                   value={data.nik}
+                  maxLength={16}
                   onChange={(e) => setData("nik", e.target.value)}
                   className={inputBase}
                 />
-                {errors.nik && <p className="text-red-500 text-sm">{errors.nik}</p>}
+                {errors.nik && (
+                  <p className="text-red-500 text-sm">{errors.nik}</p>
+                )}
               </div>
 
-              {/* Field lainnya */}
+              {/* Nama, tempat lahir, dll */}
               {[
                 { name: "nama", label: "Nama Lengkap", type: "text" },
                 { name: "tempat_lahir", label: "Tempat Lahir", type: "text" },
                 { name: "tanggal_lahir", label: "Tanggal Lahir", type: "date" },
-                { name: "agama", label: "Agama", type: "text" },
                 { name: "pendidikan", label: "Pendidikan", type: "text" },
-                { name: "pekerjaan", label: "Pekerjaan", type: "text" },
               ].map((f) => (
                 <div key={f.name}>
                   <label className="font-medium text-gray-700">{f.label}</label>
@@ -139,10 +158,62 @@ export default function FormWarga({ warga = null, noKK, onClose, role, wargaList
                     onChange={(e) => setData(f.name, e.target.value)}
                     className={inputBase}
                   />
-                  {errors[f.name] && <p className="text-red-500 text-sm">{errors[f.name]}</p>}
+                  {errors[f.name] && (
+                    <p className="text-red-500 text-sm">{errors[f.name]}</p>
+                  )}
                 </div>
               ))}
+              {/* Pekerjaan */}
+              {/* Agama */}
+              <div>
+                <label className="font-medium text-gray-700">Agama</label>
+                <select
+                  value={data.agama}
+                  onChange={(e) => setData("agama", e.target.value)}
+                  className={inputBase}
+                  required
+                >
+                  <option value="">-- Pilih Agama --</option>
+                  <option value="Tak Beragama">Tak Beragama</option>
+                  <option value="Islam">Islam</option>
+                  <option value="Buddha">Buddha</option>
+                  <option value="Hindu">Hindu</option>
+                  <option value="Kong Hu Cu">Kong Hu Cu</option>
+                  <option value="Kristen Katholik">Kristen Katholik</option>
+                  <option value="Kristen Protestan">Kristen Protestan</option>
+                  <option value="Atheis">Atheis</option>
+                </select>
 
+                {errors.agama && (
+                  <p className="text-red-500 text-sm">{errors.agama}</p>
+                )}
+              </div>
+              <div>
+                <label className="font-medium text-gray-700">Pekerjaan</label>
+                <select
+                  value={data.pekerjaan}
+                  onChange={(e) => setData("pekerjaan", e.target.value)}
+                  className={inputBase}
+                >
+                  <option value="">Pilih pekerjaan</option>
+                  <option value="pelajar/mahasiswa">Pelajar / Mahasiswa</option>
+                  <option value="pegawai negeri sipil">Pegawai Negeri Sipil (PNS)</option>
+                  <option value="karyawan swasta">Karyawan Swasta</option>
+                  <option value="pekerja lepas harian">Pekerja Lepas Harian</option>
+                  <option value="wirausaha">Wirausaha</option>
+                  <option value="petani">Petani</option>
+                  <option value="nelayan">Nelayan</option>
+                  <option value="tni">TNI</option>
+                  <option value="polri">POLRI</option>
+                  <option value="pensiunan">Pensiunan</option>
+                  <option value="ibu rumah tangga">Ibu Rumah Tangga</option>
+                  <option value="tidak bekerja">Tidak Bekerja</option>
+                  <option value="lainnya">Lainnya</option>
+                </select>
+                {errors.pekerjaan && (
+                  <p className="text-red-500 text-sm">{errors.pekerjaan}</p>
+                )}
+              </div>
               {/* Jenis Kelamin */}
               <div>
                 <label className="font-medium text-gray-700">Jenis Kelamin</label>
@@ -189,7 +260,7 @@ export default function FormWarga({ warga = null, noKK, onClose, role, wargaList
                 </select>
               </div>
 
-              {/* 🔹 Kewarganegaraan */}
+              {/* Kewarganegaraan */}
               <div>
                 <label className="font-medium text-gray-700">Kewarganegaraan</label>
                 <select
@@ -227,7 +298,9 @@ export default function FormWarga({ warga = null, noKK, onClose, role, wargaList
                 <label className="font-medium text-gray-700">Hubungan Dalam Keluarga</label>
                 <select
                   value={data.status_hubungan_dalam_keluarga}
-                  onChange={(e) => setData("status_hubungan_dalam_keluarga", e.target.value)}
+                  onChange={(e) =>
+                    setData("status_hubungan_dalam_keluarga", e.target.value)
+                  }
                   className={inputBase}
                 >
                   <option value="">Pilih hubungan</option>
@@ -289,7 +362,7 @@ export default function FormWarga({ warga = null, noKK, onClose, role, wargaList
             </div>
           </section>
 
-          {/* =================== DOMISILI (KHUSUS PENDATANG) =================== */}
+          {/* =================== DOMISILI (PENDATANG) =================== */}
           {data.status_warga === "pendatang" && (
             <section>
               <h3 className="text-lg font-semibold text-gray-700 mb-5 border-l-4 border-blue-500 pl-3">
@@ -345,7 +418,7 @@ export default function FormWarga({ warga = null, noKK, onClose, role, wargaList
             </button>
             <button
               type="button"
-              onClick={() => router.visit(route("rw.warga.index"))}
+              onClick={() => router.visit(route(`${kkRoute}.index`))}
               className="btn btn-secondary px-6 py-2 rounded-lg shadow-sm"
             >
               Batal

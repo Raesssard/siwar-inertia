@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Pengaduan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 
 class RwPengaduanController extends Controller
@@ -13,17 +14,28 @@ class RwPengaduanController extends Controller
     public function index(Request $request)
     {
         $title = 'Pengaduan';
-        $user = Auth::user();
-        $rw = $user->rw;
+
+        $userRwData = Auth::user()->rw;
+
+        if (!$userRwData) {
+            return back()->with('error', 'Data RW Anda tidak ditemukan.');
+        }
+
+        $nomorRwUser = $userRwData->nomor_rw;
 
         $tahun = $request->input('tahun');
         $bulan = $request->input('bulan');
         $search = $request->input('search');
         $kategori = $request->input('kategori');
 
-        // 🔹 Ambil SEMUA pengaduan di wilayah RW ini (baik RT maupun RW)
         $pengaduan = Pengaduan::query()
-            ->whereHas('warga.kartuKeluarga.rw', fn($q) => $q->where('id', $rw->id))
+            ->whereHas('warga.kartuKeluarga.rw', function ($q) use ($nomorRwUser) {
+                $q->where('nomor_rw', $nomorRwUser);
+            })
+            ->where(function ($q) {
+                $q->where('konfirmasi_rw', 'menunggu')
+                    ->orWhere('konfirmasi_rw', 'sudah');
+            })
             ->with([
                 'warga',
                 'komentar.user',
@@ -32,16 +44,28 @@ class RwPengaduanController extends Controller
             ])
             ->when($tahun, fn($q) => $q->whereYear('created_at', $tahun))
             ->when($bulan, fn($q) => $q->whereMonth('created_at', $bulan))
-            ->when($search, fn($q) => $q->where('judul', 'like', "%$search%"))
+            ->when($search, fn($q) => $q->where('judul', 'like', "%{$search}%"))
             ->when($kategori, fn($q) => $q->where('level', $kategori))
             ->orderByDesc('created_at')
             ->get();
 
-        $total_pengaduan_rw = Pengaduan::whereHas('warga.kartuKeluarga.rw', fn($q) => $q->where('id', $rw->id))->count();
+        $total_pengaduan = Pengaduan::whereHas('warga.kartuKeluarga.rw', function ($q) use ($nomorRwUser) {
+            $q->where('nomor_rw', $nomorRwUser);
+        })->count();
 
         $list_bulan = [
-            'januari', 'februari', 'maret', 'april', 'mei', 'juni',
-            'juli', 'agustus', 'september', 'oktober', 'november', 'desember'
+            'januari',
+            'februari',
+            'maret',
+            'april',
+            'mei',
+            'juni',
+            'juli',
+            'agustus',
+            'september',
+            'oktober',
+            'november',
+            'desember'
         ];
 
         $list_tahun = Pengaduan::selectRaw('YEAR(created_at) as tahun')
@@ -51,21 +75,17 @@ class RwPengaduanController extends Controller
 
         $list_level = Pengaduan::select('level')->distinct()->pluck('level');
 
-        return Inertia::render('Rw/Pengaduan', [
+        return Inertia::render('Pengaduan', [
             'title' => $title,
             'pengaduan' => $pengaduan,
-            'total_pengaduan_rw' => $total_pengaduan_rw,
+            'total_pengaduan' => $total_pengaduan,
+            'total_pengaduan_filtered' => $pengaduan->count(),
             'list_bulan' => $list_bulan,
             'list_tahun' => $list_tahun,
             'list_level' => $list_level,
         ]);
     }
 
-    /**
-     * 🔹 Update status (diproses / selesai)
-     * Hanya RW yang bisa ubah langsung.
-     * RT tidak bisa ubah ke selesai sebelum konfirmasi disetujui.
-     */
     public function updateStatus(Request $request, $id)
     {
         $pengaduan = Pengaduan::findOrFail($id);
@@ -84,41 +104,71 @@ class RwPengaduanController extends Controller
         ]);
     }
 
-    /**
-     * 🔹 Update konfirmasi RW
-     * - RT memanggil: dari `belum` ke `menunggu`
-     * - RW memanggil: dari `menunggu` ke `sudah`
-     * - RW (jika level RW): langsung set `sudah`
-     */
     public function updateKonfirmasi(Request $request, $id)
     {
         $pengaduan = Pengaduan::findOrFail($id);
         $user = Auth::user();
-        $role = $user->roles->pluck('name')->first(); // 'rt' atau 'rw'
+        $role = $user->roles->pluck('name')->first();
 
         if ($pengaduan->level === 'rw') {
-            // Langsung disetujui otomatis
             $pengaduan->update(['konfirmasi_rw' => 'sudah']);
         } else {
-            // level = 'rt'
-            if ($role === 'rt' && $pengaduan->konfirmasi_rw === 'belum') {
+            if ($role === 'rt' && $pengaduan->konfirmasi_rw === 'belum' && $pengaduan->level === 'rt') {
                 $pengaduan->update(['konfirmasi_rw' => 'menunggu']);
-            } elseif ($role === 'rw' && $pengaduan->konfirmasi_rw === 'menunggu') {
+            } elseif ($role === 'rw' && $pengaduan->konfirmasi_rw === 'menunggu' && $pengaduan->level === 'rt') {
                 $pengaduan->update(['konfirmasi_rw' => 'sudah']);
             }
         }
 
+        $komentar = null;
+
+        if ($role === 'rt') {
+            $isi_komentar = $request->input('isi_komentar');
+
+            $komentar = $pengaduan->komentar()->create([
+                'user_id' => Auth::id(),
+                'isi_komentar' => $isi_komentar
+            ]);
+
+            $komentar->load('user');
+        }
+
+
         return response()->json([
-            'pengaduan' => $pengaduan->fresh(['warga', 'komentar.user']),
+            'pengaduan' => $pengaduan->fresh([
+                'warga',
+                'komentar.user',
+                'warga.kartuKeluarga.rukunTetangga',
+                'warga.kartuKeluarga.rw'
+            ]),
+            'komentar' => $komentar
+        ]);
+    }
+
+    public function baca(Request $request, $id)
+    {
+        $pengaduan = Pengaduan::findOrFail($id);
+
+        $pengaduan->update([
+            'status' => 'diproses',
+            'konfirmasi_rw' => 'sudah',
         ]);
     }
 
     public function komen(Request $request, $id)
     {
+        /** @var User $user */
+        $user = Auth::user();
         $request->validate([
             'isi_komentar' => 'required_without:file|string|nullable|max:255',
             'file' => 'required_without:isi_komentar|nullable|file|mimes:jpg,jpeg,png,gif,mp4,mov,avi,mkv,doc,docx,pdf|max:20480',
         ]);
+
+        $validRoles = ['admin', 'rw', 'rt', 'warga'];
+        $sideRoles = $user->roles()
+            ->whereNotIn('name', $validRoles)
+            ->pluck('name')
+            ->first();
 
         $pengaduan = Pengaduan::findOrFail($id);
 
@@ -136,6 +186,7 @@ class RwPengaduanController extends Controller
             'isi_komentar' => $request->isi_komentar,
             'file_path' => $filePath,
             'file_name' => $fileName,
+            'role_snapshot' => $sideRoles ? $sideRoles : session('active_role') ?? $user->getRoleNames()->first()
         ]);
 
         $komentar->load('user');

@@ -5,30 +5,29 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Rw;
 use App\Models\User;
+use App\Models\Kartu_keluarga;
+use App\Models\Warga;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Hash;
 use Inertia\Inertia;
+use Spatie\Permission\Models\Role;
 
 class AdminRwController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index(Request $request)
     {
         $title = 'Rukun Warga';
         $query = Rw::query();
 
-        // 🔍 Pencarian berdasarkan NIK atau Nama Ketua RW
         if ($request->filled('keyword')) {
             $query->where(function ($q) use ($request) {
                 $q->where('nik', 'like', '%' . $request->keyword . '%')
-                    ->orWhere('nama_ketua_rw', 'like', '%' . $request->keyword . '%');
+                    ->orWhere('nama_anggota_rw', 'like', '%' . $request->keyword . '%');
             });
         }
 
-        // 🔽 Filter nomor RW
         if ($request->filled('nomor_rw')) {
             $query->where('nomor_rw', $request->nomor_rw);
         }
@@ -36,159 +35,245 @@ class AdminRwController extends Controller
         $rw = $query->orderBy('nomor_rw')->paginate(10)->withQueryString();
         $nomorRwList = Rw::select('nomor_rw')->distinct()->orderBy('nomor_rw')->get();
 
+        $roles = Role::pluck('name')
+            ->filter(fn($r) => !in_array(strtolower($r), ['admin', 'rw', 'rt', 'warga']))
+            ->values();
+
+        $roles = collect(['ketua'])->merge($roles)->values();
+
+        $warga = Warga::whereDoesntHave('user.roles', function ($q) {
+            $q->where('name', 'rt');
+        })->get();
+
         return Inertia::render('Admin/Rw', [
             'rw' => $rw,
             'filters' => $request->only(['keyword', 'nomor_rw']),
             'nomorRwList' => $nomorRwList,
-            'title' => $title
+            'roles' => $roles,
+            'title' => $title,
+            'warga' => $warga,
         ]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        // 🧾 Validasi input (jabatan tidak disimpan, hanya untuk assign role)
         $validator = Validator::make($request->all(), [
-            'nik' => 'required|unique:rw,nik',
-            'nomor_rw' => 'required|string',
-            'nama_ketua_rw' => 'required|string|max:255',
-            'mulai_menjabat' => 'required|date',
-            'akhir_jabatan' => 'required|date|after_or_equal:mulai_menjabat',
-            'status' => ['required', Rule::in(['aktif', 'nonaktif'])],
-            'jabatan' => ['required', Rule::in(['ketua', 'sekretaris', 'bendahara'])],
+            'nik' => [
+                'nullable',
+                'string',
+                'unique:rw,nik',
+                function ($attribute, $value, $fail) {
+                    if ($value && !Kartu_keluarga::where('no_kk', $value)
+                        ->orWhereHas('warga', fn($q) => $q->where('nik', $value))
+                        ->exists()) {
+                        $fail("NIK $value tidak ditemukan pada data Kartu Keluarga manapun.");
+                    }
+                },
+            ],
+            'nomor_rw' => 'required|string|max:3',
+            'nama_anggota_rw' => 'nullable|string|max:255',
+            'mulai_menjabat' => 'nullable|date',
+            'akhir_jabatan' => 'nullable|date|after_or_equal:mulai_menjabat',
+            'status' => ['nullable', Rule::in(['aktif', 'nonaktif'])],
+            'jabatan' => 'nullable|string|max:255',
         ]);
 
         if ($validator->fails()) {
-            return redirect()->back()->withErrors($validator)->withInput();
+            return back()->withErrors($validator)->withInput();
         }
 
-        // 🚫 Cegah jabatan ganda aktif di RW yang sama
-        $existing = User::whereHas('roles', function ($q) use ($request) {
-                $q->where('name', $request->jabatan);
-            })
-            ->whereHas('rw', function ($q) use ($request) {
-                $q->where('nomor_rw', $request->nomor_rw);
-            })
-            ->exists();
+        $targetRole = $request->jabatan ?: 'ketua';
 
-        if ($existing) {
-            return redirect()
-                ->back()
-                ->with('error', "RW {$request->nomor_rw} sudah memiliki {$request->jabatan} aktif!")
-                ->withInput();
+        $rwAktif = Rw::where('nomor_rw', $request->nomor_rw)
+            ->where('status', 'aktif')
+            ->get();
+
+        foreach ($rwAktif as $r) {
+
+            $u = $r->users()->first();
+            if (!$u) continue;
+
+            $extraRole = $u->roles()
+                ->whereNotIn('name', ['warga', 'rw'])
+                ->pluck('name')
+                ->first();
+
+            $existingRole = $extraRole ?: 'ketua';
+
+            if ($existingRole === $targetRole) {
+                return back()->with(
+                    'error',
+                    "RW {$request->nomor_rw} sudah memiliki {$existingRole} aktif!"
+                )->withInput();
+            }
         }
 
-        // 💾 Simpan RW (tanpa jabatan)
-        $rw = Rw::create($request->only([
-            'nik',
-            'nomor_rw',
-            'nama_ketua_rw',
-            'mulai_menjabat',
-            'akhir_jabatan',
-            'status',
-        ]));
-
-        // 👤 Buat user untuk RW
-        $user = User::create([
+        $rw = Rw::create([
             'nik' => $request->nik,
-            'nama' => $request->nama_ketua_rw,
-            'password' => bcrypt('password'),
-            'id_rw' => $rw->id,
+            'no_kk' => $request->filled('nik')
+                ? optional(Warga::where('nik', $request->nik)->first())->no_kk
+                : null,
+            'nomor_rw' => $request->nomor_rw,
+            'nama_anggota_rw' => $request->nama_anggota_rw,
+            'mulai_menjabat' => $request->mulai_menjabat,
+            'akhir_jabatan' => $request->akhir_jabatan,
+            'status' => $request->status,
         ]);
 
-        // 🧩 Assign role sesuai jabatan
-        if ($request->jabatan === 'ketua') {
-            $user->syncRoles(['rw']);
-        } elseif ($request->jabatan === 'sekretaris') {
-            $user->syncRoles(['rw', 'sekretaris']);
-        } elseif ($request->jabatan === 'bendahara') {
-            $user->syncRoles(['rw', 'bendahara']);
+        if ($request->filled('nik') && $request->filled('nama_anggota_rw')) {
+
+            $warga = Warga::where('nik', $request->nik)->first();
+
+            $user = User::create([
+                'nik'      => $request->nik,
+                'nama'     => $request->nama_anggota_rw,
+                'password' => Hash::make('password'),
+                'id_rw'    => $rw->id,
+                'id_rt'    => $warga?->kartuKeluarga?->id_rt 
+            ]);
+
+            $roles = ['rw'];
+
+            if ($request->filled('jabatan') && $request->jabatan !== 'ketua') {
+                if (Role::where('name', $request->jabatan)->exists()) {
+                    $roles[] = $request->jabatan;
+                }
+            }
+
+            $user->syncRoles($roles);
         }
 
-        return redirect()->route('admin.rw.index')->with('success', 'RW baru berhasil ditambahkan.');
+        return redirect()->route('admin.rw.index')
+            ->with('success', 'RW baru berhasil ditambahkan.');
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, string $id)
     {
         $rw = Rw::findOrFail($id);
 
         $validator = Validator::make($request->all(), [
-            'nik' => ['required', Rule::unique('rw')->ignore($id)],
-            'nomor_rw' => 'required|string',
-            'nama_ketua_rw' => 'required|string|max:255',
-            'mulai_menjabat' => 'required|date',
-            'akhir_jabatan' => 'required|date|after_or_equal:mulai_menjabat',
-            'jabatan' => ['required', Rule::in(['ketua', 'sekretaris', 'bendahara'])],
+            'nik' => [
+                'nullable',
+                Rule::unique('rw')->ignore($id),
+                function ($attribute, $value, $fail) {
+                    if ($value && !Kartu_keluarga::where('no_kk', $value)
+                        ->orWhereHas('warga', fn($q) => $q->where('nik', $value))
+                        ->exists()) {
+                        $fail("NIK $value tidak ditemukan pada data Kartu Keluarga manapun.");
+                    }
+                },
+            ],
+            'nomor_rw' => 'required|string|max:3',
+            'nama_anggota_rw' => 'nullable|string|max:255',
+            'mulai_menjabat' => 'nullable|date',
+            'akhir_jabatan' => 'nullable|date|after_or_equal:mulai_menjabat',
+            'status' => ['nullable', Rule::in(['aktif', 'nonaktif'])],
+            'jabatan' => 'nullable|string|max:255',
         ]);
 
         if ($validator->fails()) {
-            return redirect()->back()->withErrors($validator)->withInput();
+            return back()->withErrors($validator)->withInput();
         }
 
-        // 🚫 Cegah jabatan ganda aktif di RW yang sama
-        $existing = User::whereHas('roles', function ($q) use ($request) {
-                $q->where('name', $request->jabatan);
-            })
-            ->whereHas('rw', function ($q) use ($request, $rw) {
-                $q->where('nomor_rw', $request->nomor_rw)
-                  ->where('id', '!=', $rw->id);
-            })
-            ->exists();
+        $targetRole = $request->jabatan ?: 'ketua'; 
 
-        if ($existing) {
-            return redirect()
-                ->back()
-                ->with('error', "RW {$request->nomor_rw} sudah memiliki {$request->jabatan} aktif!")
-                ->withInput();
-        }
+        $rwLain = Rw::where('nomor_rw', $request->nomor_rw)
+            ->where('id', '!=', $rw->id)
+            ->where('status', 'aktif')
+            ->get();
 
-        // 🔄 Update data RW
-        $rw->update($request->only([
-            'nik',
-            'nomor_rw',
-            'nama_ketua_rw',
-            'mulai_menjabat',
-            'akhir_jabatan',
-        ]));
+        foreach ($rwLain as $rwl) {
+            $u = $rwl->users()->first();
 
-        // 🔁 Update user & role
-        $user = User::where('id_rw', $rw->id)->first();
+            if (!$u) continue;
 
-        if ($user) {
-            $user->update([
-                'nik' => $request->nik,
-                'nama' => $request->nama_ketua_rw,
-            ]);
+            $extraRole = $u->roles()
+                ->whereNotIn('name', ['warga', 'rw'])
+                ->pluck('name')
+                ->first();
 
-            if ($request->jabatan === 'ketua') {
-                $user->syncRoles(['rw']);
-            } elseif ($request->jabatan === 'sekretaris') {
-                $user->syncRoles(['rw', 'sekretaris']);
-            } elseif ($request->jabatan === 'bendahara') {
-                $user->syncRoles(['rw', 'bendahara']);
+            $jabatanExisting = $extraRole ?: 'ketua';
+
+            if ($jabatanExisting === $targetRole) {
+                return back()->with(
+                    'error',
+                    "RW {$request->nomor_rw} sudah memiliki {$jabatanExisting} aktif!"
+                )->withInput();
             }
+        }
+
+        $rw->update([
+            'nik' => $request->nik,
+            'no_kk' => $request->filled('nik')
+                ? optional(Warga::where('nik', $request->nik)->first())->no_kk
+                : null,
+            'nomor_rw' => $request->nomor_rw,
+            'nama_anggota_rw' => $request->nama_anggota_rw,
+            'mulai_menjabat' => $request->mulai_menjabat,
+            'akhir_jabatan' => $request->akhir_jabatan,
+            'status' => $request->status,
+        ]);
+
+        $user = User::where('id_rw', $rw->id)->first();
+        $warga = Warga::where('nik', $request->nik)->first();
+
+        if ($request->filled('nik') && $request->filled('nama_anggota_rw')) {
+
+            if ($user) {
+                $user->update([
+                    'nik' => $request->nik,
+                    'nama' => $request->nama_anggota_rw,
+                ]);
+            } else {
+                $user = User::create([
+                    'nik' => $request->nik,
+                    'nama' => $request->nama_anggota_rw,
+                    'password' => Hash::make('password'),
+                    'id_rw' => $rw->id,
+                    'id_rt' => $warga?->kartuKeluarga?->id_rt
+                ]);
+            }
+
+        $existingRoles = $user->roles->pluck('name')->toArray();
+
+        $hasWarga = in_array('warga', $existingRoles);
+
+        $coreRoles = ['admin', 'rw', 'rt', 'warga'];
+
+        $finalRoles = ['rt'];
+
+        if ($request->filled('jabatan') && $request->jabatan !== 'ketua') {
+            $jabatanBaru = $request->jabatan;
+
+            if (Role::where('name', $jabatanBaru)->exists()) {
+
+                $finalRoles = array_filter($finalRoles, function ($role) use ($coreRoles) {
+                    return !in_array($role, $coreRoles);
+                });
+
+                $finalRoles[] = $jabatanBaru;
+            }
+        }
+
+        if ($hasWarga) {
+            $finalRoles[] = 'warga';
+        }
+
+        $user->syncRoles(array_unique($finalRoles));
+        } else {
+            if ($user) $user->delete();
         }
 
         return redirect()->route('admin.rw.index')->with('success', 'Data RW berhasil diperbarui.');
     }
-
-    /**
-     * Remove the specified resource from storage.
-     */
 
     public function destroy(string $id)
     {
         try {
             $rw = Rw::findOrFail($id);
 
-            // 🚫 Cegah hapus jika RW masih aktif
             if ($rw->status === 'aktif') {
-                return redirect()->back()->with('error', 'RW masih berstatus aktif dan tidak bisa dihapus.');
+                return back()->with('error', 'RW masih berstatus aktif dan tidak bisa dihapus.');
             }
 
             User::where('id_rw', $rw->id)->delete();
@@ -196,7 +281,7 @@ class AdminRwController extends Controller
 
             return redirect()->route('admin.rw.index')->with('success', 'Data RW berhasil dihapus.');
         } catch (\Illuminate\Database\QueryException $e) {
-            return redirect()->back()->with('error', 'Tidak bisa menghapus RW karena masih digunakan.');
+            return back()->with('error', 'Tidak bisa menghapus RW karena masih digunakan.');
         }
     }
 
@@ -204,25 +289,47 @@ class AdminRwController extends Controller
     {
         $rw = Rw::findOrFail($id);
 
-        // Jika sedang aktif, ubah jadi nonaktif
+        $ignoredRoles = ['rw', 'warga'];
+
+        $user = $rw->user()->first();
+
+        $jabatanUser = $user?->roles()
+            ->whereNotIn('name', $ignoredRoles)
+            ->pluck('name')
+            ->first() ?? 'ketua';
+
         if ($rw->status === 'aktif') {
             $rw->update(['status' => 'nonaktif']);
-            return redirect()->back()->with('success', "RW {$rw->nomor_rw} berhasil dinonaktifkan.");
+            return back()->with('success', "RW {$rw->nomor_rw} berhasil dinonaktifkan.");
         }
 
-        // Jika ingin diaktifkan, pastikan tidak ada RW lain dengan nomor sama yang aktif
         $existingActive = Rw::where('nomor_rw', $rw->nomor_rw)
             ->where('status', 'aktif')
             ->where('id', '!=', $rw->id)
-            ->exists();
+            ->first();
 
         if ($existingActive) {
-            return redirect()->back()->with('error', "RW {$rw->nomor_rw} lainnya sudah aktif. Nonaktifkan dulu sebelum mengaktifkan yang ini.");
+
+            $existingUser = $existingActive->users()->first();
+
+            $existingJabatan = $existingUser?->roles()
+                ->whereNotIn('name', $ignoredRoles)
+                ->pluck('name')
+                ->first() ?? 'ketua';
+
+            if ($existingJabatan === $jabatanUser) {
+                return back()->with(
+                    'error',
+                    "RW {$rw->nomor_rw} sudah memiliki {$existingJabatan} aktif. Nonaktifkan yang lama dulu!"
+                );
+            }
         }
 
         $rw->update(['status' => 'aktif']);
 
-        return redirect()->back()->with('success', "RW {$rw->nomor_rw} berhasil diaktifkan.");
+        return back()->with(
+            'success',
+            "RW {$rw->nomor_rw} dengan jabatan {$jabatanUser} berhasil diaktifkan."
+        );
     }
-
 }

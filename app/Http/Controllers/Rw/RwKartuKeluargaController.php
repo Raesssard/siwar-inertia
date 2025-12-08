@@ -24,14 +24,26 @@ class RwKartuKeluargaController extends Controller
 
         $userRwData = Auth::user()->rw;
         if (!$userRwData) {
-            return redirect()->back()->with('error', 'Data RW Anda tidak ditemukan. Mohon hubungi administrator.');
+            return redirect()->back()->with('error', 'Data RW Anda tidak ditemukan.');
         }
 
-        $idRwUser = $userRwData->id;
-        $total_kk = Kartu_keluarga::where('id_rw', $idRwUser)->count();
+        $nomorRwUser = $userRwData->nomor_rw;
 
-        $kartu_keluarga = Kartu_keluarga::with(['warga', 'rukunTetangga.rw', 'rw', 'kategoriGolongan'])
-            ->where('id_rw', $idRwUser)
+        $total_kk = Kartu_keluarga::whereHas('rw', function ($q) use ($nomorRwUser) {
+            $q->where('nomor_rw', $nomorRwUser);
+        })->count();
+
+        $kartu_keluarga = Kartu_keluarga::with([
+                'warga.kartuKeluarga.rukunTetangga',
+                'rukunTetangga.rw',
+                'rw',
+                'warga.kartuKeluarga.rw',
+                'kategoriGolongan',
+                'kepalaKeluarga'
+            ])
+            ->whereHas('rw', function ($q) use ($nomorRwUser) {
+                $q->where('nomor_rw', $nomorRwUser);
+            })
             ->when($search, function ($query) use ($search) {
                 $query->where('alamat', 'like', "%{$search}%")
                     ->orWhere('no_kk', 'like', "%{$search}%")
@@ -45,7 +57,17 @@ class RwKartuKeluargaController extends Controller
             ->withQueryString();
 
         $kategori_iuran = Kategori_golongan::select('id', 'jenis')->get();
-        $daftar_rt = Rt::where('id_rw', $idRwUser)->select('id', 'nomor_rt', 'id_rw')->with('rw')->get();
+
+        $daftar_rt = Rt::whereHas('rw', function ($q) use ($nomorRwUser) {
+                $q->where('nomor_rw', $nomorRwUser);
+            })
+            ->select('id', 'nomor_rt', 'id_rw')
+            ->with(['rw', 'user.roles'])
+            ->whereHas('user', function ($q) {
+                $q->whereHas('roles', fn($r) => $r->where('name', 'rt'))
+                ->whereDoesntHave('roles', fn($r) => $r->whereIn('name', ['sekretaris', 'bendahara', 'seksi']));
+            })
+            ->get();
 
         return Inertia::render('Rw/KartuKeluarga', [
             'kartu_keluarga' => $kartu_keluarga,
@@ -53,6 +75,39 @@ class RwKartuKeluargaController extends Controller
             'daftar_rt' => $daftar_rt,
             'title' => $title,
             'total_kk' => $total_kk
+        ]);
+    }
+
+    public function create()
+    {
+        $title = 'Tambah Kartu Keluarga';
+
+        $userRw = Auth::user()->rw;
+
+        $kategori_iuran = Kategori_golongan::select('id', 'jenis')->get();
+
+        $daftar_rt = Rt::select('id', 'nomor_rt', 'id_rw')
+            ->with([
+                'rw',
+                'user' => function ($q) {
+                    $q->whereHas('roles', function ($r) {
+                            $r->where('name', 'rt');
+                        })
+                        ->whereDoesntHave('roles', function ($r) {
+                            $r->whereIn('name', ['sekretaris', 'bendahara', 'seksi']);
+                        });
+                },
+                'user.roles'
+            ])
+            ->where('id_rw', $userRw->id)
+            ->get();
+
+        return Inertia::render('FormKK', [
+            'title' => $title,
+            'kategori_iuran' => $kategori_iuran,
+            'daftar_rt' => $daftar_rt,
+            'mode' => 'create',
+            'kk' => null
         ]);
     }
 
@@ -91,6 +146,42 @@ class RwKartuKeluargaController extends Controller
             Log::error('Gagal menambahkan KK: ' . $e->getMessage());
             return back()->with('error', 'Gagal menambahkan data KK.');
         }
+    }
+
+    public function edit($id)
+    {
+        $title = 'Edit Kartu Keluarga';
+
+        $userRw = Auth::user()->rw;
+
+        $kk = Kartu_keluarga::with(['rukunTetangga', 'rw', 'kategoriGolongan', 'kepalaKeluarga'])
+            ->where('id_rw', $userRw->id)
+            ->findOrFail($id);
+
+        $kategori_iuran = Kategori_golongan::select('id', 'jenis')->get();
+        $daftar_rt = Rt::select('id', 'nomor_rt', 'id_rw')
+            ->with([
+                'rw',
+                'user' => function ($q) {
+                    $q->whereHas('roles', function ($r) {
+                            $r->where('name', 'rt');
+                        })
+                        ->whereDoesntHave('roles', function ($r) {
+                            $r->whereIn('name', ['sekretaris', 'bendahara', 'seksi']);
+                        });
+                },
+                'user.roles'
+            ])
+            ->where('id_rw', $userRw->id)
+            ->get();
+
+        return Inertia::render('FormKK', [
+            'title' => $title,
+            'kategori_iuran' => $kategori_iuran,
+            'daftar_rt' => $daftar_rt,
+            'mode' => 'edit',
+            'kk' => $kk
+        ]);
     }
 
     public function update(Request $request, $id)

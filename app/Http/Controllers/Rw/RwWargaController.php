@@ -5,67 +5,81 @@ namespace App\Http\Controllers\Rw;
 use App\Http\Controllers\Controller;
 use App\Models\Warga;
 use App\Models\HistoryWarga;
+use App\Models\Kartu_keluarga;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 
 class RwWargaController extends Controller
 {
-    public function index(Request $request)
-    {
-        $title = 'Manajemen Warga';
-        $search = $request->search;
-        $jenis_kelamin = $request->jenis_kelamin;
-        $rw_id = Auth::user()->rw->id;
+    // public function index(Request $request)
+    // {
+    //     $title = 'Manajemen Warga';
+    //     $search = $request->search;
+    //     $jenis_kelamin = $request->jenis_kelamin;
+    //     $rw_id = Auth::user()->rw->id;
 
-        $total_warga = Warga::whereHas('kartuKeluarga.rukunTetangga', function ($query) use ($rw_id) {
-            $query->where('id_rw', $rw_id);
-        })->count();
+    //     $total_warga = Warga::whereHas('kartuKeluarga.rukunTetangga', function ($query) use ($rw_id) {
+    //         $query->where('id_rw', $rw_id);
+    //     })->count();
 
-        $warga = Warga::with(['kartuKeluarga', 'kartuKeluarga.rukunTetangga', 'kartuKeluarga.rw'])
-            ->whereHas('kartuKeluarga.rukunTetangga', function ($query) use ($rw_id) {
-                $query->where('id_rw', $rw_id);
-            })
-            ->when($search, function ($query) use ($search) {
-                $query->where(function ($q) use ($search) {
-                    $q->where('nama', 'like', "%{$search}%")
-                      ->orWhere('nik', 'like', "%{$search}%")
-                      ->orWhere('no_kk', 'like', "%{$search}%");
-                });
-            })
-            ->when($jenis_kelamin, function ($query) use ($jenis_kelamin) {
-                $query->where('jenis_kelamin', $jenis_kelamin);
-            })
-            ->paginate(5)
-            ->withQueryString();
+    //     $warga = Warga::with(['kartuKeluarga', 'kartuKeluarga.rukunTetangga', 'kartuKeluarga.rw'])
+    //         ->whereHas('kartuKeluarga.rukunTetangga', function ($query) use ($rw_id) {
+    //             $query->where('id_rw', $rw_id);
+    //         })
+    //         ->when($search, function ($query) use ($search) {
+    //             $query->where(function ($q) use ($search) {
+    //                 $q->where('nama', 'like', "%{$search}%")
+    //                   ->orWhere('nik', 'like', "%{$search}%")
+    //                   ->orWhere('no_kk', 'like', "%{$search}%");
+    //             });
+    //         })
+    //         ->when($jenis_kelamin, function ($query) use ($jenis_kelamin) {
+    //             $query->where('jenis_kelamin', $jenis_kelamin);
+    //         })
+    //         ->paginate(5)
+    //         ->withQueryString();
 
-        return Inertia::render('Rw/DataWarga', [
-            'title' => $title,
-            'warga' => $warga,
-            'search' => $search,
-            'total_warga' => $total_warga,
-        ]);
-    }
+    //     return Inertia::render('Rw/DataWarga', [
+    //         'title' => $title,
+    //         'warga' => $warga,
+    //         'search' => $search,
+    //         'total_warga' => $total_warga,
+    //     ]);
+    // }
 
     public function create(Request $request)
     {
         $title = 'Tambah Warga';
-        $noKK = $request->query('no_kk'); // ambil dari URL query string
-        $wargaList = [];
+        $noKK = $request->query('no_kk');
 
-        if ($noKK) {
-            // Ambil semua warga dengan nomor KK tersebut (untuk autofill ayah & ibu)
-            $wargaList = Warga::where('no_kk', $noKK)->get();
+        $wargaList = $noKK ? Warga::where('no_kk', $noKK)->get() : [];
+
+        $userRw = Auth::user()->rw;
+        if (!$userRw) {
+            return back()->with('error', 'Data RW tidak ditemukan.');
         }
 
-        // Kirim data noKK dan wargaList ke komponen Inertia
-        return Inertia::render('Rw/FormWarga', [
+        $nomorRwUser = $userRw->nomor_rw;
+
+        $daftarKK = Kartu_keluarga::whereHas('rw', function ($q) use ($nomorRwUser) {
+                $q->where('nomor_rw', $nomorRwUser);
+            })
+            ->select('no_kk', 'alamat')
+            ->orderBy('no_kk')
+            ->get();
+
+        return Inertia::render('FormWarga', [
             'title' => $title,
+            'role' => 'rw',
             'warga' => null,
             'noKK' => $noKK,
             'wargaList' => $wargaList,
+            'daftarKK' => $daftarKK,
         ]);
     }
 
@@ -89,7 +103,6 @@ class RwWargaController extends Controller
             'nama_ibu' => 'required|string',
             'status_warga' => 'required|in:penduduk,pendatang',
 
-            // ✅ tambahan untuk WNA
             'no_paspor' => 'nullable|string|max:50',
             'tgl_terbit_paspor' => 'nullable|date',
             'tgl_berakhir_paspor' => 'nullable|date',
@@ -100,15 +113,26 @@ class RwWargaController extends Controller
             'tgl_terbit_kitap' => 'nullable|date',
             'tgl_berakhir_kitap' => 'nullable|date',
 
-            // ✅ tambahan untuk pendatang
             'alamat_asal' => 'nullable|string',
             'alamat_domisili' => 'nullable|string',
             'tanggal_mulai_tinggal' => 'nullable|date',
             'tujuan_pindah' => 'nullable|string',
         ]);
 
-        Log::info('Data Warga:', $request->all());
-        Log::info('Validasi Berhasil:', $validated);
+        if ($validated['status_hubungan_dalam_keluarga'] === 'kepala keluarga') {
+
+            $cekKK = Warga::where('no_kk', $validated['no_kk'])
+                ->where('status_hubungan_dalam_keluarga', 'kepala keluarga')
+                ->first();
+
+            if ($cekKK) {
+                return back()->withErrors([
+                    'status_hubungan_dalam_keluarga' =>
+                        "Dalam KK {$validated['no_kk']} sudah ada Kepala Keluarga: {$cekKK->nama}"
+                ])->withInput();
+            }
+        }
+
         $warga = Warga::create($validated);
 
         HistoryWarga::create([
@@ -116,25 +140,59 @@ class RwWargaController extends Controller
             'nama' => $warga->nama,
             'jenis' => 'masuk',
             'keterangan' => 'Warga baru ditambahkan',
-            'tanggal' => Carbon::now()->toDateString(),
+            'tanggal' => now()->toDateString(),
         ]);
 
-        return redirect()->route('rw.warga.index')->with('success', 'Warga berhasil ditambahkan.');
+        if ($warga->status_hubungan_dalam_keluarga === 'kepala keluarga') {
+
+            if (!User::where('nik', $warga->nik)->exists()) {
+
+                $kk = Kartu_keluarga::where('no_kk', $warga->no_kk)->first();
+
+                $id_rt = $kk ? $kk->id_rt : null;
+                $id_rw = $kk ? $kk->id_rw : null;
+
+                User::create([
+                    'nik'      => $warga->nik,
+                    'nama'     => $warga->nama,
+                    'password' => Hash::make('password'),
+                    'id_rt'    => $id_rt,
+                    'id_rw'    => $id_rw,
+                ])->assignRole('warga'); 
+            }
+        }
+
+        return redirect()->route('rw.kartu_keluarga.index')
+            ->with('success', 'Warga berhasil ditambahkan.');
     }
 
     public function edit($id)
     {
         $title = 'Edit Data Warga';
         $warga = Warga::findOrFail($id);
-        return Inertia::render('Rw/FormWarga', [
+
+        $userRw = Auth::user()->rw;
+        $nomorRwUser = $userRw->nomor_rw;
+
+        $daftarKK = Kartu_keluarga::whereHas('rw', fn($q) => 
+                $q->where('nomor_rw', $nomorRwUser)
+            )
+            ->select('no_kk', 'alamat')
+            ->orderBy('no_kk')
+            ->get();
+
+        return Inertia::render('FormWarga', [
             'title' => $title,
+            'role' => 'rw',
             'warga' => $warga,
+            'daftarKK' => $daftarKK,
         ]);
     }
 
     public function update(Request $request, $id)
     {
         $warga = Warga::findOrFail($id);
+        $kk_lama = $warga->no_kk; 
 
         $validated = $request->validate([
             'nik' => 'required|digits:16|unique:warga,nik,' . $id,
@@ -154,7 +212,6 @@ class RwWargaController extends Controller
             'nama_ibu' => 'required|string',
             'status_warga' => 'required|in:penduduk,pendatang',
 
-            // ✅ tambahan untuk WNA
             'no_paspor' => 'nullable|string|max:50',
             'tgl_terbit_paspor' => 'nullable|date',
             'tgl_berakhir_paspor' => 'nullable|date',
@@ -165,19 +222,85 @@ class RwWargaController extends Controller
             'tgl_terbit_kitap' => 'nullable|date',
             'tgl_berakhir_kitap' => 'nullable|date',
 
-            // ✅ tambahan untuk pendatang
             'alamat_asal' => 'nullable|string',
             'alamat_domisili' => 'nullable|string',
             'tanggal_mulai_tinggal' => 'nullable|date',
             'tujuan_pindah' => 'nullable|string',
         ]);
 
+        $kk_baru = $validated['no_kk'];
+        $status_baru = $validated['status_hubungan_dalam_keluarga'];
+        $status_lama = $warga->status_hubungan_dalam_keluarga;
+
+        if ($status_baru === 'kepala keluarga') {
+
+            if ($kk_baru == $kk_lama) {
+
+                $kepala = Warga::where('no_kk', $kk_baru)
+                    ->where('status_hubungan_dalam_keluarga', 'kepala keluarga')
+                    ->where('id', '!=', $warga->id)
+                    ->first();
+
+                if ($kepala) {
+                    return back()->with('error', "KK $kk_baru sudah memiliki Kepala Keluarga!")
+                        ->withInput();
+                }
+
+            } else {
+                $kepala = Warga::where('no_kk', $kk_baru)
+                    ->where('status_hubungan_dalam_keluarga', 'kepala keluarga')
+                    ->first();
+
+                if ($kepala) {
+                    return back()->with('error', "KK $kk_baru sudah memiliki Kepala Keluarga!")
+                        ->withInput();
+                }
+            }
+        }
+
+        if ($kk_baru !== $kk_lama) {
+            $validated['no_kk_lama'] = $kk_lama;
+        } else {
+            unset($validated['no_kk_lama']);
+        }
+
         $warga->update($validated);
 
-        return redirect()->route('rw.warga.index')->with('success', 'Data warga berhasil diperbarui.');
+        if ($status_baru === 'kepala keluarga' && $status_lama !== 'kepala keluarga') {
+
+            $existingUser = User::where('nik', $warga->nik)->first();
+
+            $kk = Kartu_keluarga::where('no_kk', $kk_baru)->first();
+
+            if (!$existingUser) {
+                $existingUser = User::create([
+                    'nik'      => $warga->nik,
+                    'nama'     => $warga->nama,
+                    'password' => Hash::make('password'),
+                    'id_rt'    => $kk->id_rt,
+                    'id_rw'    => $kk->id_rw,
+                ]);
+
+                $existingUser->assignRole('warga');
+
+            } else {
+
+                $existingUser->update([
+                    'id_rt' => $kk->id_rt,
+                    'id_rw' => $kk->id_rw,
+                ]);
+
+                if (!$existingUser->hasRole('warga')) {
+                    $existingUser->assignRole('warga');
+                }
+            }
+        }
+
+        return redirect()->route('rw.kartu_keluarga.index')
+            ->with('success', 'Data warga berhasil diperbarui.');
     }
 
-    public function destroy($id)
+        public function destroy(Request $request, $id)
     {
         $warga = Warga::findOrFail($id);
 
@@ -185,13 +308,13 @@ class RwWargaController extends Controller
             'warga_nik' => $warga->nik,
             'nama' => $warga->nama,
             'jenis' => 'keluar',
-            'keterangan' => 'Data warga dihapus',
-            'tanggal' => now()->toDateString(),
+            'keterangan' => $request->keterangan,
+            'tanggal' => now(),
         ]);
 
         $warga->delete();
 
-        return redirect()->route('rw.warga.index')->with('success', 'Warga berhasil dihapus dan dicatat ke history.');
+        return back()->with('success', 'Warga berhasil dihapus dan dicatat ke history.');
     }
 
     public function getOrangTua($no_kk)

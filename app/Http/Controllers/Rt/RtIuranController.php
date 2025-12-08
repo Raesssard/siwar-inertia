@@ -9,9 +9,10 @@ use App\Models\Kartu_keluarga;
 use App\Models\Kategori_golongan;
 use App\Models\Rukun_tetangga;
 use App\Models\Tagihan;
+use App\Models\Warga;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth; // Tetap diperlukan jika ada filter iuran per RT
+use Illuminate\Support\Facades\Auth; 
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 
@@ -47,25 +48,45 @@ class RtIuranController extends Controller
         $golongan_list = Kategori_golongan::with('iuranGolongan')->get();
         $title = 'Iuran';
 
-        $iuranOtomatis = (clone $query)->where('jenis', 'otomatis')->orderBy('tgl_tagih', 'desc')->paginate(10);
-        $iuranManual = (clone $query)->where('jenis', 'manual')->orderBy('tgl_tagih', 'desc')->paginate(10);
+        $iuranOtomatis = (clone $query)->where('jenis', 'otomatis')->orderBy('tgl_tagih', 'desc')->paginate(10, ['*'], 'manual_page');
+        $iuranManual = (clone $query)->where('jenis', 'manual')->orderBy('tgl_tagih', 'desc')->paginate(10, ['*'], 'otomatis_page');
 
-        return Inertia::render('RT/Iuran', [
+        $nik_list = Warga::whereHas('kartuKeluarga', function ($q) use ($user) {
+            if ($user->hasRole('rt')) {
+                $q->where('id_rt', $user->id_rt);
+            } elseif ($user->hasRole('rw')) {
+                $q->where('id_rw', $user->id_rw);
+            }
+        })->select('nik')
+            ->get();
+
+        $no_kk_list = Warga::whereHas('kartuKeluarga', function ($q) use ($user) {
+            if ($user->hasRole('rt')) {
+                $q->where('id_rt', $user->id_rt);
+            } elseif ($user->hasRole('rw')) {
+                $q->where('id_rw', $user->id_rw);
+            }
+        })->select('no_kk')
+            ->get();
+
+        return Inertia::render('Iuran', [
             'iuranOtomatis' => $iuranOtomatis,
             'iuranManual' => $iuranManual,
             'golongan_list' => $golongan_list,
+            'nik_list' => $nik_list,
+            'no_kk_list' => $no_kk_list,
             'title' => $title,
         ]);
     }
 
     public function store(Request $request)
     {
-        Log::info('request yg masuk:', $request->all());
-
         /** @var User $user */
         $user = Auth::user();
 
         $request->validate([
+            'nik' => 'nullable',
+            'no_kk' => 'nullable',
             'nama' => 'required|string|max:255',
             'tgl_tagih' => 'required|date',
             'tgl_tempo' => 'required|date',
@@ -73,7 +94,6 @@ class RtIuranController extends Controller
             'nominal' => 'required_if:jenis,manual|nullable|numeric|min:0|max:99999999',
         ]);
 
-        // 🔹 Tentukan scope RT atau RW
         $data = [
             'nama' => $request->nama,
             'tgl_tagih' => $request->tgl_tagih,
@@ -87,47 +107,27 @@ class RtIuranController extends Controller
 
         $iuran = Iuran::create($data);
 
-        // 🔹 Ambil KK sesuai scope
         $kkList = $iuran->level === 'rt'
             ? Kartu_keluarga::where('id_rt', $iuran->id_rt)->get()
             : Kartu_keluarga::where('id_rw', $iuran->id_rw)->get();
 
 
-        // Manual
-        if ($request->jenis === 'manual') {
-            foreach ($kkList as $kk) {
-                Tagihan::create([
-                    'nama' => $iuran->nama,
-                    'nominal' => $iuran->nominal,
-                    'tgl_tagih' => $iuran->tgl_tagih,
-                    'tgl_tempo' => $iuran->tgl_tempo,
-                    'jenis' => 'manual',
-                    'no_kk' => $kk->no_kk,
-                    'status_bayar' => 'belum_bayar',
-                    'id_iuran' => $iuran->id,
-                ]);
-            }
-        }
-
-        // Otomatis
         if ($request->jenis === 'otomatis') {
-            // Simpan nominal per golongan
-            $golonganList = Kategori_golongan::all(); // ambil semua golongan
+            $golonganList = Kategori_golongan::all();
 
             foreach ($golonganList as $golongan) {
                 $nominal = $request->input("nominal_{$golongan->id}");
-                $periode = $request->input("periode_{$golongan->id}", $request->periode ?? 1);
+                $periode = $request->input("periode_{$golongan->id}", 1);
                 if ($nominal !== null) {
                     IuranGolongan::create([
                         'id_iuran' => $iuran->id,
-                        'id_golongan' => $golongan->id, // pakai id_golongan
+                        'id_golongan' => $golongan->id,
                         'nominal' => $nominal,
                         'periode' => $periode,
                     ]);
                 }
             }
 
-            // Buat tagihan untuk semua KK sesuai RT/RW
             $iuranNominals = IuranGolongan::where('id_iuran', $iuran->id)
                 ->pluck('nominal', 'id_golongan');
 
@@ -156,37 +156,49 @@ class RtIuranController extends Controller
         ]);
     }
 
-    public function edit(string $id)
+    public function update(Request $request, string $id, $jenis)
     {
-        $iuran = Iuran::with('iuran_golongan')->findOrFail($id);
-        $golongan_list = Kartu_keluarga::select('golongan')->distinct()->pluck('golongan');
+        try {
+            if ($jenis === 'otomatis') {
+                $iuranGol = IuranGolongan::findOrFail($id);
 
-        return view('rt.iuran.edit', compact('iuran', 'golongan_list'));
-    }
+                $request->validate([
+                    'nominal' => 'required|numeric|min:0|max:99999999',
+                    'periode' => 'required|numeric|min:0|max:12',
+                ]);
 
-    public function update(Request $request, string $id)
-    {
-        $iuranGol = IuranGolongan::findOrFail($id);
+                $iuranGol->update([
+                    'nominal' => $request->nominal,
+                    'periode' => $request->periode,
+                ]);
 
-        $request->validate([
-            'nominal' => 'required|numeric|min:0|max:99999999',
-            'periode' => 'required|numeric|min:0|max:12',
-        ]);
+                $iuran = Iuran::findOrFail($iuranGol->id_iuran);
+            } elseif ($jenis === 'manual') {
+                $iuran = Iuran::findOrFail($id);
 
-        $iuranGol->update([
-            'nominal' => $request->nominal,
-            'periode' => $request->periode,
-        ]);
+                $request->validate([
+                    'nominal' => 'required|numeric|min:0|max:99999999',
+                ]);
 
-        $iuran = Iuran::findOrFail($iuranGol->id_iuran);
+                $iuran->update([
+                    'nominal' => $request->nominal,
+                ]);
+            }
 
-        $iuran->load(['iuran_golongan', 'iuran_golongan.golongan']);
+            $iuran->load(['iuran_golongan', 'iuran_golongan.golongan']);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Iuran berhasil diedit.',
-            'iuran' => $iuran
-        ]);
+            return response()->json([
+                'success' => true,
+                'message' => 'Iuran berhasil diedit.',
+                'iuran' => $iuran
+            ]);
+        } catch (\Exception $e) {
+            Log::error("Gagal update iuran: " . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan: ' . $e->getMessage(),
+            ], 500);
+        }
     }
 
     public function destroy(string $id, $jenis)
@@ -251,7 +263,7 @@ class RtIuranController extends Controller
         $iurans = Iuran::with('iuran_golongan')->where('jenis', 'otomatis')->get();
 
         foreach ($iurans as $iuran) {
-            Log::info("Cek iuran: {$iuran->nama}, level={$iuran->level}, golongan_count=" . $iuran->iuran_golongan->count());
+            Log::info("Cek iuran: {$iuran->nama}, level = {$iuran->level}, golongan_count = " . $iuran->iuran_golongan->count());
 
             $kkList = $iuran->level === 'rt'
                 ? Kartu_keluarga::where('id_rt', $iuran->id_rt)->get()

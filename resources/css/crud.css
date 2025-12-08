@@ -97,6 +97,13 @@
     z-index: 2;
 }
 
+.table-custom tfoot {
+    position: sticky;
+    bottom: 0;
+    background-color: rgb(241, 245, 249);
+    z-index: 2;
+}
+
 .table-scroll::-webkit-scrollbar {
     display: none;
 }
@@ -270,7 +277,7 @@
 
 .filter-form select {
     flex: 1;
-    min-width: 180px;
+    min-width: none;
     padding: 10px 12px;
     border: 1px solid #cbd5e1;
     border-radius: 6px;

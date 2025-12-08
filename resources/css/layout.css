@@ -20,6 +20,7 @@
     body.sidebar-toggled .sidebar {
         width: 80px;
     }
+
 }
 
 .scroll-table thead th {
@@ -76,6 +77,18 @@
         flex-grow: 1;
     }
 
+    .list-unstyled .nav-item .nav-link {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        font-size: 0.6rem !important;
+    }
+
+    .list-unstyled .nav-item .nav-link i {
+        margin: 0 !important;
+    }
+
     .modal-header {
         align-items: flex-start;
         padding-top: 1rem;
@@ -106,6 +119,17 @@
     justify-content: center;
     margin-top: auto;
     height: 60px;
+}
+
+.list-unstyled .nav-item .nav-link {
+    font-size: 0.75rem !important;
+}
+
+ul.toggled li.nav-item a.nav-link {
+    display: flex !important;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
 
 .sticky-footer {
@@ -214,6 +238,7 @@ div.card-body.pengaduan::-webkit-scrollbar,
 div.card-body.pengumuman::-webkit-scrollbar,
 div.komen-section::-webkit-scrollbar,
 div.tambah-body::-webkit-scrollbar,
+div.item-nav::-webkit-scrollbar,
 div.table-responsive::-webkit-scrollbar {
     display: none;
 }
@@ -236,7 +261,7 @@ div.card-body.pengumuman button.scroll-top-btn.show {
     transform: translateY(0);
 }
 
-div.komen input.komen,
+input.komen,
 input.edit-judul,
 input.tambah-judul,
 input.tambah-kategori,
@@ -246,7 +271,7 @@ input.edit-kategori {
     border-radius: 0;
 }
 
-div.komen input.komen:focus,
+input.komen:focus,
 input.edit-judul:focus,
 input.tambah-judul:focus,
 input.tambah-kategori:focus,
@@ -260,7 +285,7 @@ input.edit-kategori:focus {
     box-shadow: none;
 }
 
-div.komen input.komen:focus-visible,
+input.komen:focus-visible,
 input.edit-judul:focus-visible,
 input.tambah-judul:focus-visible,
 input.tambah-kategori:focus-visible,
@@ -274,7 +299,7 @@ input.edit-kategori:focus-visible {
     box-shadow: none;
 }
 
-div.komen button.komen {
+button.komen {
     border: none;
     border-radius: 0;
     color: gray;
@@ -285,11 +310,11 @@ div.komen button.komen {
     box-shadow: none;
 }
 
-div.komen button.komen:focus,
-div.komen button.komen:focus-visible,
-div.komen button.komen:hover,
-div.komen button.komen:disabled,
-div.komen button.komen.btn-primary:not(:disabled):not(.disabled):active {
+button.komen:focus,
+button.komen:focus-visible,
+button.komen:hover,
+button.komen:disabled,
+button.komen.btn-primary:not(:disabled):not(.disabled):active {
     background-color: transparent;
     color: #4e73df;
     border-bottom: 1px solid lightgray;
@@ -297,7 +322,7 @@ div.komen button.komen.btn-primary:not(:disabled):not(.disabled):active {
     box-shadow: none;
 }
 
-div.komen button.komen:disabled {
+button.komen:disabled {
     cursor: not-allowed;
 }
 
@@ -311,9 +336,8 @@ ul.navbar-nav.sidebar#accordionSidebar {
 }
 
 div.modal-komen {
-    min-height: 700px;
-    max-height: 700px !important;
     width: 100%;
+    margin: auto;
 }
 
 .modal-dialog.modal-komen {
@@ -321,6 +345,24 @@ div.modal-komen {
     align-items: center;
     justify-content: center;
     min-height: calc(100vh - 3.5rem);
+}
+
+/* MOBILE */
+.modal-komen.mobile {
+    width: 90vw;
+    max-height: calc(100vh - 15%);
+    min-height: unset;
+}
+
+.modal-komen.mobile .komen-section{
+    max-height: 10rem;
+}
+
+/* DESKTOP */
+.modal-komen.desktop {
+    width: 700px;
+    min-height: 700px;
+    max-height: 700px;
 }
 
 p.isi-pengaduan,
@@ -410,4 +452,65 @@ embed.pdf-preview {
 #preview .pdf-preview {
     width: 100%;
     height: 100%;
+}
+
+button:disabled {
+    cursor: not-allowed !important;
+}
+
+button.btn.transaksi:hover {
+    background: #4e73df !important;
+    color: white !important;
+}
+
+.collapse.show {
+    display: block !important;
+}
+
+ul.ps-3 {
+    margin-left: 1rem;
+}
+
+ul.ps-3 .nav-link {
+    font-size: 0.9rem;
+    color: #cfd2d6 !important;
+}
+
+ul.ps-3 .nav-item.active>.nav-link {
+    color: #fff !important;
+}
+
+.list-unstyled {
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+}
+
+.list-unstyled.open {
+    max-height: 500px;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.btn-opsi:focus,
+.btn-opsi:focus-visible,
+.btn-opsi:hover,
+.btn-opsi.btn-outline-primary:not(:disabled):not(.disabled):active {
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+.react-select__control {
+    min-height: 38px;
+}
+
+.react-select__menu {
+    z-index: 9999;
+}
+
+input[type="checkbox"] {
+    accent-color: #4e73df;
+    /* warna biru Bootstrap */
 }

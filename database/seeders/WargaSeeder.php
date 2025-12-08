@@ -8,38 +8,65 @@ use App\Models\Rt;
 use App\Models\Rw;
 use App\Models\User;
 use App\Models\Warga;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Role;
 
 class WargaSeeder extends Seeder
 {
-    /**
-     * UsersSeeder gk diketahui, mending buat WargaSeeder
-     */
     public function run(): void
     {
-                $roles = ['admin', 'rw', 'rt', 'warga', 'sekretaris', 'bendahara'];
+        // === 1. Pastikan role tersedia ===
+        $roles = ['admin', 'rw', 'rt', 'warga', 'sekretaris', 'bendahara'];
         foreach ($roles as $role) {
             Role::firstOrCreate(['name' => $role]);
         }
 
+        // === 2. Ambil kategori kampung untuk iuran (optional) ===
         $kampung = Kategori_golongan::where('jenis', 'kampung')->first();
 
+        // === 3. Buat RW ===
         $rw = Rw::create([
             'nik' => '1234567890123452',
+            'no_kk' => '1234567890123451',
             'nomor_rw' => '01',
-            'nama_ketua_rw' => 'Pak RW',
+            'nama_anggota_rw' => 'Pak RW',
+            'status' => 'aktif',
             'mulai_menjabat' => now(),
             'akhir_jabatan' => now()->addYears(3),
         ]);
+        // === 5. Ambil jumlah maksimal RT dari setting ===
+        $maxRT = (int) DB::table('settings')->where('key', 'max_rt_per_rw')->value('value') ?? 6;
 
-        $kk_rt = Kartu_keluarga::create([
+        // === 4. Buat RT pertama (aktif) ===
+        $rt = Rt::create([
             'no_kk' => '1111111111111111',
-            'no_registrasi' => '3404.0000001',
+            'nik' => '0000000000000002',
+            'nomor_rt' => '01',
+            'nama_anggota_rt' => 'Andi Kurniawan',
+            'status' => 'aktif',
+            'mulai_menjabat' => now(),
+            'akhir_jabatan' => now()->addYears(3),
+            'id_rw' => $rw->id,
+        ]);
+
+        // === 6. Generate RT sisanya (plain/no data) ===
+        for ($i = 2; $i <= $maxRT; $i++) {
+            Rt::create([
+                'nomor_rt' => str_pad($i, 2, '0', STR_PAD_LEFT),
+                'id_rw' => $rw->id,
+                'status' => 'nonaktif',
+            ]);
+        }
+
+        // === 7. Buat KK RW ===
+        $kk_rw = Kartu_keluarga::create([
+            'no_kk' => '1234567890123451',
+            'no_registrasi' => '3404.0000000',
             'alamat' => 'Jalan Melati',
             'id_rw' => $rw->id,
+            'id_rt' => $rt->id,
             'kelurahan' => 'Kelurahan Mawar',
             'kecamatan' => 'Kecamatan Indah',
             'kabupaten' => 'Kabupaten Damai',
@@ -53,22 +80,51 @@ class WargaSeeder extends Seeder
             'nip_kepala_dukcapil' => '123456789012345678',
         ]);
 
-        $rt = Rt::create([
-            'no_kk' => $kk_rt->no_kk,
-            'nik' => '0000000000000002',
-            'nomor_rt' => '01',
-            'nama_ketua_rt' => 'Andi Kurniawan',
-            'mulai_menjabat' => now(),
-            'akhir_jabatan' => now()->addYears(3),
+        // === 8. Buat KK RT ===
+        $kk_rt = Kartu_keluarga::create([
+            'no_kk' => '1111111111111111',
+            'no_registrasi' => '3404.0000001',
+            'alamat' => 'Jalan Melati',
             'id_rw' => $rw->id,
+            'id_rt' => $rt->id,
+            'kelurahan' => 'Kelurahan Mawar',
+            'kecamatan' => 'Kecamatan Indah',
+            'kabupaten' => 'Kabupaten Damai',
+            'provinsi' => 'Provinsi Sejahtera',
+            'kode_pos' => '12345',
+            'tgl_terbit' => now(),
+            'kategori_iuran' => $kampung->id ?? null,
+            'instansi_penerbit' => 'Dinas Dukcapil',
+            'kabupaten_kota_penerbit' => 'Kota Bandung',
+            'nama_kepala_dukcapil' => 'Budi Santoso S.Kom',
+            'nip_kepala_dukcapil' => '123456789012345678',
         ]);
 
-        $kk_rt->update(['id_rt' => $rt->id]);
+        // === 9. Buat Warga RW ===
+        Warga::create([
+            'no_kk' => $kk_rw->no_kk,
+            'nik' => $rw->nik,
+            'nama' => $rw->nama_anggota_rw,
+            'jenis_kelamin' => 'laki-laki',
+            'tempat_lahir' => 'Bandung',
+            'tanggal_lahir' => '1980-01-01',
+            'agama' => 'Islam',
+            'pendidikan' => 'S1',
+            'pekerjaan' => 'Wiraswasta',
+            'status_perkawinan' => 'menikah',
+            'status_hubungan_dalam_keluarga' => 'kepala keluarga',
+            'golongan_darah' => 'O',
+            'kewarganegaraan' => 'WNI',
+            'nama_ayah' => 'Slamet Riyadi',
+            'nama_ibu' => 'Dewi Sartika',
+            'status_warga' => 'penduduk',
+        ]);
 
+        // === 10. Buat Warga RT ===
         Warga::create([
             'no_kk' => $kk_rt->no_kk,
-            'nik' => '0000000000000002',
-            'nama' => 'Andi Kurniawan',
+            'nik' => $rt->nik,
+            'nama' => $rt->nama_anggota_rt,
             'jenis_kelamin' => 'laki-laki',
             'tempat_lahir' => 'Jakarta',
             'tanggal_lahir' => '2000-01-01',
@@ -84,27 +140,28 @@ class WargaSeeder extends Seeder
             'status_warga' => 'penduduk',
         ]);
 
-        $rw = User::updateOrCreate(
-            ['nik' => '1234567890123452'],
+        // === 11. Buat akun RW ===
+        $userRw = User::updateOrCreate(
+            ['nik' => $rw->nik],
             [
-                'nama' => 'Pak RW',
+                'nama' => $rw->nama_anggota_rw,
                 'password' => Hash::make('password'),
                 'id_rw' => $rw->id,
+                'id_rt' => $rt->id,
             ]
         );
-        $rw->syncRoles(['rw']);
+        $userRw->syncRoles(['rw', 'warga']);
 
-        // akun sementara, cuma buat tes
-        $warga = User::updateOrCreate(
-            ['nik' => '0000000000000002'],
+        // === 12. Buat akun RT ===
+        $userRt = User::updateOrCreate(
+            ['nik' => $rt->nik],
             [
-                'nama' => 'Andi Kurniawan',
+                'nama' => $rt->nama_anggota_rt,
                 'password' => Hash::make('password'),
-                'id_rw' => 1,
-                'id_rt' => 1,
+                'id_rw' => $rw->id,
+                'id_rt' => $rt->id,
             ]
         );
-
-        $warga->syncRoles(['warga', 'rt']);
+        $userRt->syncRoles(['rt', 'warga']);
     }
 }

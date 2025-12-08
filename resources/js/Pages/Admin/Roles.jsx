@@ -1,16 +1,18 @@
 import React, { useState } from "react";
+import Layout from "@/Layouts/Layout";
 import { Head, Link, router, usePage } from "@inertiajs/react";
 import { route } from "ziggy-js";
-import Layout from "@/Layouts/Layout";
 import {
     AddRoleModal,
     EditRoleModal,
     EditRolePermissionModal,
 } from "@/Pages/Component/Modal";
+import "../../../css/kk.css"; // biar tabel dan tombol seragam
 
 export default function Roles({ roles, permissions, filters, title }) {
-    const { props } = usePage()
-    const role = props.auth?.currentRole
+    const { props } = usePage();
+    const role = props.auth?.currentRole;
+
     const [showAdd, setShowAdd] = useState(false);
     const [showEdit, setShowEdit] = useState(null);
     const [showPermission, setShowPermission] = useState(null);
@@ -19,12 +21,9 @@ export default function Roles({ roles, permissions, filters, title }) {
     const [search, setSearch] = useState({ name: filters?.name || "" });
     const [selectedPerms, setSelectedPerms] = useState([]);
 
-    // 🔹 Handle input form tambah / edit
-    const handleChange = (e) => {
-        setForm({ ...form, [e.target.name]: e.target.value });
-    };
+    // --- Handler form ---
+    const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
-    // 🔹 Tambah role
     const handleAdd = (e) => {
         e.preventDefault();
         router.post(route("admin.roles.store"), form, {
@@ -36,34 +35,22 @@ export default function Roles({ roles, permissions, filters, title }) {
         });
     };
 
-    // 🔹 Edit role
     const handleEdit = (e) => {
         e.preventDefault();
-
-        if (!showEdit?.id) {
-            alert("ID role tidak ditemukan.");
-            return;
-        }
-
         router.put(route("admin.roles.update", showEdit.id), form, {
             preserveScroll: true,
             onSuccess: () => setShowEdit(null),
         });
     };
 
-    // 🔹 Hapus role
     const handleDelete = (id) => {
         if (confirm("Yakin ingin menghapus role ini?")) {
-            router.delete(route("admin.roles.destroy", id), {
-                preserveScroll: true,
-            });
+            router.delete(route("admin.roles.destroy", id), { preserveScroll: true });
         }
     };
 
-    // 🔹 Filter nama role
-    const handleSearchChange = (e) => {
-        setSearch({ ...search, [e.target.name]: e.target.value });
-    };
+    // --- Filter & Search ---
+    const handleSearchChange = (e) => setSearch({ ...search, [e.target.name]: e.target.value });
 
     const applyFilter = (e) => {
         e.preventDefault();
@@ -75,18 +62,13 @@ export default function Roles({ roles, permissions, filters, title }) {
 
     const resetFilter = () => {
         setSearch({ name: "" });
-        router.get(route("admin.roles.index"), {}, {
-            replace: true,
-            preserveScroll: true,
-        });
+        router.get(route("admin.roles.index"), {}, { replace: true, preserveScroll: true });
     };
 
-    // 🔹 Permissions
+    // --- Permission ---
     const togglePermission = (perm) => {
         setSelectedPerms((prev) =>
-            prev.includes(perm)
-                ? prev.filter((p) => p !== perm)
-                : [...prev, perm]
+            prev.includes(perm) ? prev.filter((p) => p !== perm) : [...prev, perm]
         );
     };
 
@@ -102,29 +84,33 @@ export default function Roles({ roles, permissions, filters, title }) {
         );
     };
 
-    // 🔹 Buka modal edit
-    const openEdit = (role) => {
-        setForm({ name: role.name || "" });
-        setShowEdit({ id: role.id, name: role.name });
+    const openEdit = (item) => {
+        setForm({ name: item.name || "" });
+        setShowEdit(item);
     };
 
     return (
         <Layout>
-            <Head title={`${title} - ${role.length <= 2
-                ? role.toUpperCase()
-                : role.charAt(0).toUpperCase() + role.slice(1)}`} />
-            {/* 🔍 Filter */}
-            <form onSubmit={applyFilter} className="filter-form mb-3 flex gap-2">
+            <Head
+                title={`${title} - ${
+                    role.length <= 2
+                        ? role.toUpperCase()
+                        : role.charAt(0).toUpperCase() + role.slice(1)
+                }`}
+            />
+
+            {/* 🔹 Filter Section */}
+            <form onSubmit={applyFilter} className="filter-form mb-4 d-flex align-items-center">
                 <input
                     type="text"
                     name="name"
+                    placeholder="Cari nama role..."
                     value={search.name}
                     onChange={handleSearchChange}
-                    className="form-control w-auto"
-                    placeholder="Cari nama role..."
+                    className="me-2"
                 />
 
-                <button type="submit" className="btn-custom btn-secondary">
+                <button type="submit" className="btn-custom btn-secondary me-2">
                     Filter
                 </button>
                 <button
@@ -136,77 +122,83 @@ export default function Roles({ roles, permissions, filters, title }) {
                 </button>
             </form>
 
-            {/* 📋 Tabel Roles */}
+            {/* 🔹 Table Section */}
             <div className="table-container">
-                <div className="table-header flex justify-between items-center mb-3">
+                <div className="table-header d-flex justify-content-between align-items-center">
                     <h4>Manajemen Roles</h4>
                     <button
-                        className="btn-custom btn-primary"
+                        className="btn btn-success btn-sm"
                         onClick={() => setShowAdd(true)}
                     >
                         Tambah Role
                     </button>
                 </div>
 
-                <table className="table-custom w-full text-left border-collapse">
-                    <thead>
-                        <tr>
-                            <th>No</th>
-                            <th>Nama Role</th>
-                            <th>Permissions</th>
-                            <th>Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {roles.data.length > 0 ? (
-                            roles.data.map((role, index) => (
-                                <tr key={role.id}>
-                                    <td>{roles.from + index}</td>
-                                    <td>{role.name}</td>
-                                    <td>
-                                        {role.permissions.length > 0
-                                            ? `${role.permissions.length} ${role.permissions.length > 1 ? "permissions" : "permission"}`
-                                            : "Tidak ada permission"}
-                                    </td>
-                                    <td>
-                                        <button
-                                            className="btn-custom btn-warning me-1"
-                                            onClick={() => openEdit(role)}
-                                        >
-                                            Edit
-                                        </button>
-                                        <button
-                                            className="btn-custom btn-secondary me-1"
-                                            onClick={() => {
-                                                setShowPermission(role);
-                                                setSelectedPerms(role.permissions.map((p) => p.name));
-                                            }}
-                                        >
-                                            Permissions
-                                        </button>
-                                        <button
-                                            className="btn-custom btn-danger"
-                                            onClick={() => handleDelete(role.id)}
-                                        >
-                                            Hapus
-                                        </button>
+                <div className="table-scroll">
+                    <table className="table-custom">
+                        <thead>
+                            <tr>
+                                <th className="text-center px-3">No.</th>
+                                <th className="text-center px-3">Nama Role</th>
+                                <th className="text-center px-3">Jumlah Permissions</th>
+                                <th className="text-center px-3">Aksi</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {roles.data.length > 0 ? (
+                                roles.data.map((item, index) => (
+                                    <tr key={item.id}>
+                                        <td className="text-center">{roles.from + index}</td>
+                                        <td className="text-center">{item.name}</td>
+                                        <td className="text-center">
+                                            {item.permissions.length > 0
+                                                ? `${item.permissions.length} permission${
+                                                      item.permissions.length > 1 ? "s" : ""
+                                                  }`
+                                                : "Tidak ada permission"}
+                                        </td>
+                                        <td className="text-center">
+                                            <div className="d-flex justify-content-center gap-2">
+                                                <button
+                                                    className="btn btn-warning btn-sm"
+                                                    onClick={() => openEdit(item)}
+                                                >
+                                                    Edit
+                                                </button>
+
+                                                <Link
+                                                    href={route("admin.roles.permissions.edit", item.id)}
+                                                    className="btn btn-secondary btn-sm"
+                                                >
+                                                    Permissions
+                                                </Link>
+
+                                                {/* <button
+                                                    className="btn btn-danger btn-sm"
+                                                    onClick={() => handleDelete(item.id)}
+                                                >
+                                                    Hapus
+                                                </button> */}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))
+                            ) : (
+                                <tr>
+                                    <td colSpan="4" className="text-center">
+                                        Tidak ada data
                                     </td>
                                 </tr>
-                            ))
-                        ) : (
-                            <tr>
-                                <td colSpan="4" className="text-center py-3">
-                                    Tidak ada data
-                                </td>
-                            </tr>
-                        )}
-                    </tbody>
-                </table>
+                            )}
+                        </tbody>
+                    </table>
+                </div>
 
-                {/* 🔸 Pagination */}
+                {/* 🔹 Pagination */}
                 {roles.links && (
-                    <div className="pagination-container mt-3">
-                        <ul className="pagination-custom flex gap-2">
+                    <div className="pagination-container">
+                        <ul className="pagination-custom">
                             {roles.links.map((link, index) => {
                                 let label = link.label;
                                 if (label.includes("Previous")) label = "&lt;";
@@ -215,11 +207,12 @@ export default function Roles({ roles, permissions, filters, title }) {
                                 return (
                                     <li
                                         key={index}
-                                        className={`page-item ${link.active ? "active" : ""} ${!link.url ? "disabled" : ""
-                                            }`}
+                                        className={`page-item ${
+                                            link.active ? "active" : ""
+                                        } ${!link.url ? "disabled" : ""}`}
                                     >
                                         <Link
-                                            href={link.url || "#"}
+                                            href={link.url || ""}
                                             dangerouslySetInnerHTML={{ __html: label }}
                                         />
                                     </li>
@@ -230,7 +223,7 @@ export default function Roles({ roles, permissions, filters, title }) {
                 )}
             </div>
 
-            {/* ➕ Modal Tambah */}
+            {/* 🔹 Modal Tambah/Edit/Permission */}
             {showAdd && (
                 <AddRoleModal
                     form={form}
@@ -240,7 +233,6 @@ export default function Roles({ roles, permissions, filters, title }) {
                 />
             )}
 
-            {/* ✏️ Modal Edit */}
             {showEdit && (
                 <EditRoleModal
                     form={form}
@@ -250,7 +242,6 @@ export default function Roles({ roles, permissions, filters, title }) {
                 />
             )}
 
-            {/* ⚙️ Modal Permissions */}
             {showPermission && (
                 <EditRolePermissionModal
                     role={showPermission}

@@ -13,16 +13,17 @@ return new class extends Migration
     {
         Schema::create('rt', function (Blueprint $table) {
             $table->id();
-            $table->char('no_kk', 16);
-            $table->char('nik', 16)->unique();
+            $table->char('no_kk', 16)->nullable(); 
+            $table->char('nik', 16)->unique()->nullable();
             $table->string('nomor_rt', 3);
-            $table->string('nama_ketua_rt');
-            $table->date('mulai_menjabat');
-            $table->date('akhir_jabatan');
-            $table->enum('status', ['aktif', 'nonaktif'])->default('aktif'); // 🔹 status RT
-            $table->unsignedBigInteger('id_rw'); // 🔹 wilayah RW administratif
+            $table->string('nama_anggota_rt')->nullable();
+            $table->date('mulai_menjabat')->nullable();
+            $table->date('akhir_jabatan')->nullable();
+            $table->enum('status', ['aktif', 'nonaktif'])->default('aktif')->nullable();
+            $table->unsignedBigInteger('id_rw')->nullable(); 
             $table->foreign('id_rw')->references('id')->on('rw')->onDelete('cascade');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

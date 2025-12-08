@@ -126,7 +126,7 @@ class PengumumanWargaController extends Controller
         $rukun_tetangga = $userRtId ? Rt::find($userRtId) : null;
         $title = 'Pengumuman';
 
-        return Inertia::render('Warga/Pengumuman', [
+        return Inertia::render('Pengumuman', [
             'pengumuman' => $pengumuman,
             'rukun_tetangga' => $rukun_tetangga,
             'title' => $title,
@@ -139,9 +139,6 @@ class PengumumanWargaController extends Controller
     }
 
     /**
-     * Helper method untuk mengkonversi nama hari dalam Bahasa Indonesia ke Bahasa Inggris.
-     * Metode ini diasumsikan ada di dalam controller yang sama.
-     *
      * @param string $indoDay
      * @return string|null
      */
@@ -161,6 +158,8 @@ class PengumumanWargaController extends Controller
 
     public function komen(Request $request, $id)
     {
+        /** @var User $user */
+        $user = Auth::user();
         $request->validate([
             'isi_komentar' => 'required|string|max:255'
         ]);
@@ -169,7 +168,8 @@ class PengumumanWargaController extends Controller
 
         $komentar = $pengaduan->komen()->create([
             'user_id' => Auth::id(),
-            'isi_komentar' => $request->isi_komentar
+            'isi_komentar' => $request->isi_komentar,
+            'role_snapshot' => session('active_role') ?? $user->getRoleNames()->first()
         ]);
 
         $komentar->load('user');

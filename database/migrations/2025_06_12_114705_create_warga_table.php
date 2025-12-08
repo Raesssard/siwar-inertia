@@ -19,6 +19,7 @@ return new class extends Migration
                 ->on('kartu_keluarga')
                 ->onUpdate('cascade')
                 ->onDelete('restrict');
+            $table->string('no_kk_lama')->nullable();
 
             $table->string('nama');
             $table->enum('jenis_kelamin', ['laki-laki', 'perempuan']);
@@ -55,6 +56,7 @@ return new class extends Migration
             $table->string('tujuan_pindah')->nullable();
 
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

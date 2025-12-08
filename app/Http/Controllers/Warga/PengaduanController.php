@@ -14,9 +14,6 @@ use Inertia\Inertia;
 
 class PengaduanController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index(Request $request)
     {
         /** @var User $user */
@@ -69,6 +66,7 @@ class PengaduanController extends Controller
         $total_pengaduan = Pengaduan::whereHas('warga.kartuKeluarga', function ($q) use ($user) {
             $q->where('id_rw', $user->id_rw);
         })->count();
+
         $total_pengaduan_filtered = $pengaduan->count();
 
         $list_bulan = [
@@ -98,7 +96,7 @@ class PengaduanController extends Controller
             ->distinct()
             ->pluck('level');
 
-        return Inertia::render('Warga/Pengaduan', [
+        return Inertia::render('Pengaduan', [
             'pengaduan' => $pengaduan,
             'title' => $title,
             'total_pengaduan' => $total_pengaduan,
@@ -109,17 +107,11 @@ class PengaduanController extends Controller
         ]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
-        //
+        
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
         $request->validate([
@@ -151,7 +143,6 @@ class PengaduanController extends Controller
                 'konfirmasi_rw' => $request->level === 'rt' ? 'belum' : 'menunggu',
             ]);
 
-            // load relasi biar React langsung dapat data lengkap
             $pengaduan->load(['warga', 'komentar.user', 'warga.kartuKeluarga.rukunTetangga', 'warga.kartuKeluarga.rw']);
 
             if ($request->wantsJson()) {
@@ -164,25 +155,16 @@ class PengaduanController extends Controller
         }
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(string $id)
     {
-        //
+
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(string $id)
     {
-        //
+
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, $id)
     {
         $nik_user = Auth::user()->warga->nik;
@@ -240,9 +222,6 @@ class PengaduanController extends Controller
             ->with('success', 'Pengaduan berhasil diperbarui.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Request $request, $id)
     {
         $nik_user = Auth::user()->warga->nik;
@@ -270,6 +249,8 @@ class PengaduanController extends Controller
 
     public function komen(Request $request, $id)
     {
+        /** @var User $user */
+        $user = Auth::user();
         $request->validate([
             'isi_komentar' => 'required|string|max:255'
         ]);
@@ -278,7 +259,8 @@ class PengaduanController extends Controller
 
         $komentar = $pengaduan->komentar()->create([
             'user_id' => Auth::id(),
-            'isi_komentar' => $request->isi_komentar
+            'isi_komentar' => $request->isi_komentar,
+            'role_snapshot' => session('active_role') ?? $user->getRoleNames()->first()
         ]);
 
         $komentar->load('user');

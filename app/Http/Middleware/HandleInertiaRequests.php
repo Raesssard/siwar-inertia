@@ -3,7 +3,10 @@
 namespace App\Http\Middleware;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Inertia\Middleware;
+use Spatie\Permission\Models\Role;
 
 class HandleInertiaRequests extends Middleware
 {
@@ -35,12 +38,50 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
+        $user = Auth::user();
+
+        if (!$user) {
+            return parent::share($request);
+        }
+
+        if (!session()->has('active_role')) {
+            Log::info('cookie laravel lagi nyoba ngasih session ke user dengan Nama ' . $user->nama);
+            if ($user->last_role && $user->hasRole($user->last_role)) {
+                session()->put('active_role', $user->last_role);
+            } else {
+                $firstRole = $user->getRoleNames()->first();
+                session()->put('active_role', $firstRole);
+            }
+        }
+
+        $validRoles = ['admin', 'rw', 'rt', 'warga'];
+        $currentRole = session('active_role');
+
+        $sideRoles = $user->roles()
+            ->whereNotIn('name', $validRoles)
+            ->pluck('name')
+            ->toArray();
+
+        $isWarga = $currentRole === 'warga';
+        $roleName = (!empty($sideRoles) && !$isWarga) ? $sideRoles[0] : $currentRole;
+
+        $role = Role::findByName($roleName);
+
+        $permissions = $role->permissions->pluck('name');
+
         return array_merge(parent::share($request), [
             'auth' => [
-                'user' => $request->user()?->load(['warga', 'rukunTetangga', 'rw']),
-                'roles' => $request->user()?->getRoleNames(),
-                'permissions' => $request->user()?->getAllPermissions()->pluck('name'),
-                'currentRole' => session('active_role'),
+                'user' => $user->load(['warga', 'rukunTetangga', 'rw']),
+                'rolesAccount' => $user
+                    ? $user->getRoleNames()->filter(fn($r) => in_array($r, $validRoles))->values()
+                    : [],
+                'roles' => $user->getRoleNames(),
+                'permissions' => $permissions,
+                'currentRole' => $currentRole,
+                'sideRoles' => $sideRoles,
+            ],
+            'cookie_prompt' => [
+                'need' => session('need_cookie_confirmation', false),
             ],
             'errors' => function () use ($request) {
                 return $request->session()->get('errors')

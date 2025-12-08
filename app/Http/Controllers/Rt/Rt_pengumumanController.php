@@ -4,21 +4,16 @@ namespace App\Http\Controllers\Rt;
 
 use App\Http\Controllers\Controller;
 use App\Models\Pengumuman;
-use App\Models\Rt;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Models\Rukun_tetangga;
-use Dompdf\Dompdf;
-use Dompdf\Options;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\View;
 use Inertia\Inertia;
 
 class Rt_pengumumanController extends Controller
 {
-    /**
-     * Tampilkan daftar pengumuman milik RT yang login (berdasarkan nomor RT).
-     */
     public function index(Request $request)
     {
         $search = $request->input('search');
@@ -53,8 +48,6 @@ class Rt_pengumumanController extends Controller
             });
         });
 
-        $total_pengumuman = Pengumuman::where('id_rw', $userRwId)->count();
-        $total_pengumuman_filtered = (clone $baseQuery)->count();
 
         $pengumuman = (clone $baseQuery)
             ->when($search, function ($query) use ($search) {
@@ -86,8 +79,8 @@ class Rt_pengumumanController extends Controller
                     }
                 });
             })
-            ->when($tahun, fn($q) => $q->whereYear('tanggal', $tahun))
-            ->when($bulan, fn($q) => $q->whereMonth('tanggal', $bulan))
+            ->when($tahun, fn($q) => $q->whereYear('created_at', $tahun))
+            ->when($bulan, fn($q) => $q->whereMonth('created_at', $bulan))
             ->when($kategori, fn($q) => $q->where('kategori', $kategori))
             ->when($level, function ($q) use ($request) {
                 if ($request->level === 'rt') {
@@ -96,11 +89,11 @@ class Rt_pengumumanController extends Controller
                     $q->whereNull('id_rt');
                 }
             })
-            ->orderByDesc('tanggal')
+            ->orderByDesc('created_at')
             ->get();
 
         $daftar_tahun = (clone $baseQuery)
-            ->selectRaw('YEAR(tanggal) as tahun')
+            ->selectRaw('YEAR(created_at) as tahun')
             ->distinct()
             ->orderByDesc('tahun')
             ->pluck('tahun');
@@ -125,12 +118,12 @@ class Rt_pengumumanController extends Controller
             'desember'
         ];
 
-        $rukun_tetangga = $userRtId ? Rt::find($userRtId) : null;
         $title = 'Pengumuman';
+        $total_pengumuman = Pengumuman::where('id_rw', $userRwId)->count();
+        $total_pengumuman_filtered = $pengumuman->count();
 
-        return Inertia::render('RT/Pengumuman', [
+        return Inertia::render('Pengumuman', [
             'pengumuman' => $pengumuman,
-            'rukun_tetangga' => $rukun_tetangga,
             'title' => $title,
             'daftar_tahun' => $daftar_tahun,
             'daftar_kategori' => $daftar_kategori,
@@ -146,7 +139,9 @@ class Rt_pengumumanController extends Controller
             'judul' => 'required',
             'isi' => 'required',
             'kategori' => 'required',
-            'dokumen' => 'nullable|file|mimes:jpg,jpeg,png,gif,mp4,mov,avi,mkv,doc,docx,pdf|max:20480',
+            'tanggal' => 'nullable|date',
+            'tempat' => 'nullable',
+            'dokumen' => 'nullable|file|mimes:doc,docx,xls,xlsx,pdf|max:20480',
         ]);
 
         $dokumenPath = null;
@@ -166,7 +161,8 @@ class Rt_pengumumanController extends Controller
             'judul' => $request->judul,
             'isi' => $request->isi,
             'kategori' => $request->kategori,
-            'tanggal' => now(),
+            'tanggal' => $request->tanggal ? Carbon::parse($request->tanggal)->format('Y-m-d H:i:s') : null,
+            'tempat' => $request->tempat ? $request->tempat : Auth::user()->warga->kartuKeluarga->alamat,
             'id_rt' => $id_rt_user,
             'id_rw' => $id_rw_user,
             'dokumen_path' => $dokumenPath,
@@ -213,7 +209,9 @@ class Rt_pengumumanController extends Controller
             'judul' => 'required|string|max:255',
             'kategori' => 'required|string|max:255',
             'isi' => 'required|string',
-            'dokumen' => 'nullable|file|mimes:jpg,jpeg,png,gif,mp4,mov,avi,mkv,doc,docx,pdf|max:20480',
+            'tanggal' => 'nullable|date',
+            'tempat' => 'nullable',
+            'dokumen' => 'nullable|file|mimes:doc,docx,xls,xlsx,pdf|max:20480',
             'hapus_dokumen_lama' => 'nullable|boolean',
         ]);
 
@@ -221,7 +219,8 @@ class Rt_pengumumanController extends Controller
             'judul' => $request->judul,
             'kategori' => $request->kategori,
             'isi' => $request->isi,
-            'tanggal' => now(),
+            'tanggal' => $request->tanggal,
+            'tempat' => $request->tempat,
         ];
 
         if ($request->hasFile('dokumen')) {
@@ -261,9 +260,6 @@ class Rt_pengumumanController extends Controller
             ->with('success', 'Pengumuman berhasil diperbarui.');
     }
 
-    /**
-     * Hapus pengumuman.
-     */
     public function destroy($id)
     {
 
@@ -302,27 +298,53 @@ class Rt_pengumumanController extends Controller
 
     public function exportPDF($id)
     {
-        $pengumuman = Pengumuman::findOrFail($id);
+        $data = Pengumuman::with(['rukunTetangga', 'rw.kartuKeluarga'])->findOrFail($id);
 
+        /** @var User $user */
+        $user = Auth::user();
+        $role = session('active_role') ?? $user->getRoleNames()->first();
+        $rt = $data->rukunTetangga;
+        $rw = $data->rw;
 
-        $html = View::make('rt.pengumuman.komponen.export_pengumuman', compact('pengumuman'))->render();
+        $rtNumber = $rt ? str_pad($rt->nomor_rt, 2, '0', STR_PAD_LEFT) : null;
+        $rwNumber = $rw ? str_pad($rw->nomor_rw, 2, '0', STR_PAD_LEFT) : null;
 
+        $bulanRomawi = [1 => "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII"];
+        $bulan = $bulanRomawi[now()->format('n')];
+        $tahun = now()->year;
 
-        $options = new Options();
-        $options->set('isHtml5ParserEnabled', true);
-        $options->set('isRemoteEnabled', true);
+        $urut = str_pad($data->id, 3, '0', STR_PAD_LEFT);
 
-        $dompdf = new Dompdf($options);
-        $dompdf->loadHtml($html);
-        $dompdf->setPaper('A4', 'portrait');
-        $dompdf->render();
+        $no_surat = $rt
+            ? "$urut/RT$rtNumber/$bulan/$tahun"
+            : "$urut/RW$rwNumber/$bulan/$tahun";
 
+        $hari   = Carbon::parse($data->tanggal)->translatedFormat('l');
+        $tanggal = Carbon::parse($data->tanggal)->translatedFormat('d F Y');
+        $waktu  = Carbon::parse($data->tanggal)->format('H:i');
+        $judul = $data->judul;
 
-        $filename = 'Pengumuman ' . $pengumuman->judul . '.pdf';
+        $kk = $data->rw->kartuKeluarga->where('no_kk', $role === 'rw' ? $rw->no_kk : $rt->no_kk)->first();
 
-        return response($dompdf->output(), 200)
-            ->header('Content-Type', 'application/pdf')
-            ->header('Content-Disposition', "attachment; filename=\"{$filename}\"");
+        $pdf = Pdf::loadView('rt.export-pengumuman', [
+            'rt' => $data->rukunTetangga->nomor_rt || null,
+            'rw' => $data->rw->nomor_rw,
+            'nama_desa' => 'Nama Desa',
+            'kelurahan' => $kk->kelurahan,
+            'kecamatan' => $kk->kecamatan,
+            'kabupaten' => $kk->kabupaten,
+            'nomor_surat' => $no_surat,
+            'hari' => $hari,
+            'tanggal' => $tanggal,
+            'waktu' => $waktu,
+            'tempat' => $data->tempat,
+            'isi_pengumuman' => $data->isi,
+            'tanggal_surat' => now()->format('d F Y'),
+            'nama_penanggung_jawab' => $user->nama,
+            'penanggung_jawab' => ucfirst($role),
+            'judul' => $judul,
+        ]);
+        return $pdf->download("Surat_Pengumuman_$judul.pdf");
     }
 
     protected function indoToEnglishDay(string $indoDay): ?string
@@ -341,6 +363,8 @@ class Rt_pengumumanController extends Controller
 
     public function komen(Request $request, $id)
     {
+        /** @var User $user */
+        $user = Auth::user();
         $request->validate([
             'isi_komentar' => 'required_without:file|string|nullable|max:255',
             'file' => 'required_without:isi_komentar|nullable|file|mimes:jpg,jpeg,png,gif,mp4,mov,avi,mkv,doc,docx,pdf|max:20480',
@@ -357,11 +381,18 @@ class Rt_pengumumanController extends Controller
             $filePath = $file->storeAs('file_pengumuman', $fileName, 'public');
         }
 
+        $validRoles = ['admin', 'rw', 'rt', 'warga'];
+        $sideRoles = $user->roles()
+            ->whereNotIn('name', $validRoles)
+            ->pluck('name')
+            ->first();
+
         $komentar = $pengaduan->komen()->create([
             'user_id' => Auth::id(),
             'isi_komentar' => $request->isi_komentar,
             'file_path' => $filePath,
             'file_name' => $fileName,
+            'role_snapshot' => $sideRoles ? $sideRoles : session('active_role') ?? $user->getRoleNames()->first()
         ]);
 
         $komentar->load('user');

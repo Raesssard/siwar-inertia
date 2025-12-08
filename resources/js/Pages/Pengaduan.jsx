@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useRef } from "react"
 import Layout from "@/Layouts/Layout"
-import { Head, Link, usePage, useForm } from "@inertiajs/react"
+import { Head, usePage, useForm } from "@inertiajs/react"
 import Masonry from "react-masonry-css"
-import FileDisplay from "../Component/FileDisplay"
-import { DetailPengaduan, TambahPengaduan } from "../Component/Modal"
-import { FilterPengaduan } from "../Component/Filter"
+import FileDisplay from "./Component/FileDisplay"
+import { DetailPengaduan, TambahPengaduan } from "./Component/Modal"
+import { FilterPengaduan } from "./Component/Filter"
+import Role from "./Component/Role"
 import { Inertia } from "@inertiajs/inertia"
 
 export function FormatWaktu({ createdAt }) {
@@ -12,6 +13,7 @@ export function FormatWaktu({ createdAt }) {
     const created = new Date(createdAt)
     const diffMs = now - created
     const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24))
+    const diffWeek = Math.floor(diffMs / (1000 * 60 * 60 * 24 * 7))
 
     if (diffDays < 1) {
         const diffHours = Math.floor(diffMs / (1000 * 60 * 60))
@@ -22,8 +24,12 @@ export function FormatWaktu({ createdAt }) {
         return "baru saja"
     }
 
-    if (diffDays < 30) {
+    if (diffDays < 8) {
         return `${diffDays} hari yang lalu`
+    }
+
+    if (diffDays < 30) {
+        return `${diffWeek} minggu yang lalu`
     }
 
     return (
@@ -37,23 +43,45 @@ export function FormatWaktu({ createdAt }) {
     )
 }
 
+function getWeek(date) {
+    const firstDayOfYear = new Date(date.getFullYear(), 0, 1)
+    const dayOfWeek = (firstDayOfYear.getDay() + 6) % 7;
+    const daysSinceYearStart = (date - firstDayOfYear) / 86400000;
+    return Math.ceil((daysSinceYearStart + dayOfWeek + 1) / 7);
+}
+
 export function splitWaktu({ createdAt }) {
     const now = new Date()
     const created = new Date(createdAt)
     const diffMs = now - created
     const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24))
+    const sameWeek =
+        getWeek(now) === getWeek(created) &&
+        now.getFullYear() === created.getFullYear()
+
+    const sameMonth =
+        now.getMonth() === created.getMonth() &&
+        now.getFullYear() === created.getFullYear()
+
+    const lastMonth =
+        now.getMonth() - created.getMonth() === 1 &&
+        now.getFullYear() === created.getFullYear()
 
     if (diffDays < 1) {
         return "Hari ini"
     } else if (diffDays < 2) {
         return "Kemarin"
-    } else if (diffDays < 7) {
+    } else if (sameWeek) {
         return "Minggu ini"
-    } else if (diffDays < 30) {
-        return "Minggu lalu"
-    } else {
+    } else if (!sameWeek && sameMonth) {
+        return "Bulan ini"
+    } else if (lastMonth) {
         return "Bulan lalu"
+    } else {
+        const namaBulan = created.toLocaleString("id-ID", { month: "long" })
+        return `${namaBulan} ${created.getFullYear()}`
     }
+
 }
 
 export default function Pengaduan() {
@@ -84,6 +112,32 @@ export default function Pengaduan() {
     const modalDetail = (item) => {
         setSelected(item)
         setShowModalDetail(true)
+
+        if (role === 'rw' && item.status === 'belum' && item.konfirmasi_rw === 'menunggu') {
+            Inertia.post(`/rw/pengaduan/${item.id}/baca`, {
+                onSuccess: () => {
+                    setPengaduanList(prev =>
+                        prev.map(p =>
+                            p.id === item.id ? { ...p, status: 'diproses' } : p
+                        )
+                    )
+                },
+                preserveScroll: true,
+                preserveState: true
+            })
+        } else if (role === 'rt' && item.status === 'belum' && item.konfirmasi_rw === 'sudah') {
+            Inertia.post(`/rt/pengaduan/${item.id}/baca`, {
+                onSuccess: () => {
+                    setPengaduanList(prev =>
+                        prev.map(p =>
+                            p.id === item.id ? { ...p, status: 'diproses' } : p
+                        )
+                    )
+                },
+                preserveScroll: true,
+                preserveState: true
+            })
+        }
     }
 
     const scrollToTop = () => {
@@ -101,6 +155,36 @@ export default function Pengaduan() {
         groups[kategori].push(item)
         return groups
     }, {})
+
+    const order = [
+        "Hari ini",
+        "Kemarin",
+        "Minggu ini",
+        "Bulan ini",
+        "Bulan lalu"
+    ]
+
+    const sortedGroup = Object.entries(groupByWaktu).sort(([a], [b]) => {
+        const indexA = order.indexOf(a)
+        const indexB = order.indexOf(b)
+        if (indexA !== -1 && indexB !== -1) return indexA - indexB
+
+        if (indexA !== -1) return -1
+        if (indexB !== -1) return 1
+
+        const [bulanA, tahunA] = a.split(" ")
+        const [bulanB, tahunB] = b.split(" ")
+        const monthOrder = [
+            "januari", "februari", "maret", "april", "mei", "juni",
+            "juli", "agustus", "september", "oktober", "november", "desember"
+        ]
+
+        const tA = parseInt(tahunA)
+        const tB = parseInt(tahunB)
+        if (tA !== tB) return tB - tA
+        return monthOrder.indexOf(bulanB.toLowerCase()) - monthOrder.indexOf(bulanA.toLowerCase())
+    })
+
 
     useEffect(() => {
         setTotal(total_pengaduan)
@@ -145,21 +229,6 @@ export default function Pengaduan() {
         display: "block",
     }
 
-    const statusLabel = (status, konfirmasi) => {
-        switch (status) {
-            case "belum":
-                return "Belum dibaca"
-            case "diproses":
-                if (konfirmasi === "sudah") return "Sudah dikonfirmasi"
-                if (konfirmasi === "menunggu") return "Menunggu konfirmasi RW"
-                return "Sedang diproses"
-            case "selesai":
-                return "Selesai"
-            default:
-                return "Status tidak diketahui"
-        }
-    }
-
     const filter = (e) => {
         e.preventDefault()
         get(`/${role}/pengaduan`, { preserveState: true, preserveScroll: true })
@@ -190,26 +259,23 @@ export default function Pengaduan() {
                 tambahShow={() => setShowModalTambah(true)}
                 role={role}
             />
-            <div className="d-flex justify-content-between align-items-center mb-3 mx-4 w-100">
-                <div className="d-flex align-items-center gap-1">
-                    <i className="fas fa-paper-plane me-2 text-primary"></i>
-                    <span className="fw-semibold text-dark">
-                        {totalFiltered ?? 0} Pengaduan
-                    </span>
-                </div>
-
-                <div className="text-muted">
-                    Menampilkan {totalFiltered} dari total {total} data
-                </div>
+            <div className="d-flex align-items-center ms-3 me-3 mb-3 mt-0 w-100">
+                <i className="fas fa-paper-plane me-2 text-primary"></i>
+                {totalFiltered} Pengaduan
             </div>
             <div className="col-12">
-                {Object.entries(groupByWaktu).map(([kategori, items]) => (
+                {pengaduanList.length ? sortedGroup.map(([kategori, items]) => (
                     <div key={kategori}>
-                        <div className="text-muted mb-3 mt-3 mx-4 w-100">
-                            {kategori}
+                        <div className="d-flex align-items-center w-100">
+                            <div className="text-muted mb-3 mt-3 ms-4 me-4">
+                                {kategori}
+                            </div>
+                            <div className="text-muted mr-4 ml-auto">
+                                Menampilkan {items.length} dari total {total} Pengumuman
+                            </div>
                         </div>
                         <div ref={cardBodyRef} className="card-body pengaduan">
-                            {items.length ? (
+                            {items.length && (
                                 <>
                                     <Masonry
                                         breakpointCols={breakpointColumnsObj}
@@ -220,7 +286,7 @@ export default function Pengaduan() {
                                             const labelMap = {
                                                 belum: "Belum dibaca",
                                                 diproses_menunggu: "Menunggu konfirmasi RW",
-                                                diproses_sudah: "Sudah dikonfirmasi",
+                                                diproses_sudah: "Sedang diproses",
                                                 diproses_default: "Sedang diproses",
                                                 selesai: "Selesai"
                                             }
@@ -233,37 +299,54 @@ export default function Pengaduan() {
                                                 selesai: "green"
                                             }
 
+                                            const colorClassMap = {
+                                                gray: "bg-gray-200 text-gray-800",
+                                                blue: "bg-blue-200 text-blue-800",
+                                                cyan: "bg-cyan-200 text-cyan-800",
+                                                yellow: "bg-yellow-200 text-yellow-800",
+                                                green: "bg-green-200 text-green-800",
+                                            }
+
                                             const key = `${item.status}${item.status === "diproses" ? "_" + (item.konfirmasi_rw || "default") : ""}`
                                             const color = colorMap[key] || "gray"
+                                            const colorClasses = colorClassMap[color] || "bg-gray-200 text-gray-800"
                                             const label = labelMap[key] || "Status tidak diketahui"
 
                                             return (
-                                                <div key={index} className="card-clickable d-flex justify-content-center align-items-center flex-column" onClick={() => modalDetail(item)}>
+                                                <div
+                                                    key={index}
+                                                    className="card-clickable d-flex justify-content-center align-items-center flex-column"
+                                                    onClick={() => modalDetail(item)}
+                                                >
                                                     <FileDisplay
                                                         filePath={`/storage/${item.file_path}`}
                                                         judul={item.file_name}
                                                         displayStyle={imgStyle} />
-                                                    <h2 className="font-semibold text-lg mb-2 text-left mx-3">{item.judul}</h2>
+                                                    <h2 className="font-semibold text-lg mb-2 text-left ms-3 me-3">{item.judul}</h2>
                                                     <div className="text-sm text-gray-500 mb-2 d-flex gap-3">
                                                         <span><i className="fas fa-user mr-1"></i>{item.warga.nama}</span>
                                                         <span><i className="fas fa-clock mr-1"></i><FormatWaktu createdAt={item.created_at} /></span>
                                                     </div>
-                                                    {item.nik_warga !== user.nik ? (
-                                                        <div className="text-sm text-gray-500 mb-2 d-flex gap-3">
-                                                            <span><i className="fas fa-users mr-1"></i>RT {item.warga?.kartu_keluarga?.rukun_tetangga?.rt}/RW {item.warga?.kartu_keluarga?.rw?.nomor_rw}</span>
-                                                        </div>
-                                                    ) : ""
-                                                    }
-                                                    <p className="isi-pengaduan text-gray-700 text-sm mb-3 mx-3 line-clamp-3">
+                                                    <Role role="warga">
+                                                        {item.nik_warga !== user.nik ? (
+                                                            <div className="text-sm text-gray-500 mb-2 d-flex gap-3">
+                                                                <span><i className="fas fa-users mr-1"></i>RT {item.warga?.kartu_keluarga?.rukun_tetangga?.rt}/RW {item.warga?.kartu_keluarga?.rw?.nomor_rw}</span>
+                                                            </div>
+                                                        ) : ""}
+                                                    </Role>
+
+                                                    <p className="isi-pengaduan text-gray-700 text-sm mb-3 ms-3 me-3 line-clamp-3">
                                                         {item.isi.length > 100 ? item.isi.slice(0, 100) + "..." : item.isi}
                                                     </p>
-                                                    {item.nik_warga === user.nik ?
-                                                        <span className={`px-2 py-1 rounded font-semibold bg-${color}-200 text-${color}-800`} style={{ fontSize: "0.85rem" }}>
-                                                            {label}
-                                                        </span>
-                                                        :
-                                                        ""
-                                                    }
+                                                    <Role role="warga">
+                                                        {item.nik_warga === user.nik ?
+                                                            <span className={`px-2 py-1 rounded font-semibold ${colorClasses}`} style={{ fontSize: "0.85rem" }}>
+                                                                {label}
+                                                            </span>
+                                                            :
+                                                            ""
+                                                        }
+                                                    </Role>
                                                 </div>
                                             )
                                         })}
@@ -277,12 +360,14 @@ export default function Pengaduan() {
                                         </button>
                                     )}
                                 </>
-                            ) : (
-                                <span className="d-block w-100 text-muted text-center">Tidak ada pengaduan</span>
                             )}
                         </div>
                     </div>
-                ))}
+                )) : (
+                    <div ref={cardBodyRef} className="card-body pengaduan">
+                        <span className="d-block w-100 text-muted text-center">Tidak ada pengaduan</span>
+                    </div>
+                )}
                 <DetailPengaduan
                     selectedData={selected}
                     detailShow={showModalDetail}

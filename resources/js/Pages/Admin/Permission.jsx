@@ -1,31 +1,29 @@
 import React, { useState } from "react";
 import Layout from "@/Layouts/Layout";
+import { Head, Link, router, usePage } from "@inertiajs/react";
 import { route } from "ziggy-js";
-import { Head, router, usePage } from "@inertiajs/react";
 import {
     AddPermissionModal,
     EditPermissionModal,
 } from "@/Pages/Component/Modal";
+import "../../../css/kk.css"; // biar tampilan seragam
 
 export default function Permission({ permissions, filters, title }) {
-    const { props } = usePage()
-    const role = props.auth?.currentRole
+    const { props } = usePage();
+    const role = props.auth?.currentRole || "Admin";
     const [showAdd, setShowAdd] = useState(false);
     const [showEdit, setShowEdit] = useState(null);
 
     const [form, setForm] = useState({ name: "" });
     const [search, setSearch] = useState({ keyword: filters?.keyword || "" });
 
-    // -------------------------------
-    // CRUD Handler
-    // -------------------------------
-    const handleChange = (e) => {
-        setForm({ ...form, [e.target.name]: e.target.value });
-    };
+    // 🔹 CRUD Handler
+    const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
     const handleAdd = (e) => {
         e.preventDefault();
         router.post(route("admin.permissions.store"), form, {
+            preserveScroll: true,
             onSuccess: () => {
                 setShowAdd(false);
                 setForm({ name: "" });
@@ -36,27 +34,27 @@ export default function Permission({ permissions, filters, title }) {
     const handleEdit = (e) => {
         e.preventDefault();
         router.put(route("admin.permissions.update", showEdit.id), form, {
+            preserveScroll: true,
             onSuccess: () => setShowEdit(null),
         });
     };
 
     const handleDelete = (id) => {
         if (confirm("Yakin ingin menghapus permission ini?")) {
-            router.delete(route("admin.permissions.destroy", id));
+            router.delete(route("admin.permissions.destroy", id), {
+                preserveScroll: true,
+            });
         }
     };
 
-    const openEdit = (permission) => {
-        setForm({ name: permission.name });
-        setShowEdit(permission);
+    const openEdit = (item) => {
+        setForm({ name: item.name });
+        setShowEdit(item);
     };
 
-    // -------------------------------
-    // Filter Handler
-    // -------------------------------
-    const handleSearchChange = (e) => {
+    // 🔹 Filter
+    const handleSearchChange = (e) =>
         setSearch({ ...search, [e.target.name]: e.target.value });
-    };
 
     const applyFilter = (e) => {
         e.preventDefault();
@@ -74,88 +72,95 @@ export default function Permission({ permissions, filters, title }) {
         });
     };
 
-    // -------------------------------
-    // Render
-    // -------------------------------
     return (
-        <Layout title="Data Permissions">
-            <Head title={`${title} - ${role.length <= 2
-                ? role.toUpperCase()
-                : role.charAt(0).toUpperCase() + role.slice(1)}`} />
-            {/* Filter */}
-            <form onSubmit={applyFilter} className="filter-form">
+        <Layout>
+            <Head
+                title={`${title} - ${
+                    role.length <= 2
+                        ? role.toUpperCase()
+                        : role.charAt(0).toUpperCase() + role.slice(1)
+                }`}
+            />
+
+            {/* 🔍 Filter Section */}
+            <form onSubmit={applyFilter} className="filter-form mb-4 d-flex align-items-center">
                 <input
                     type="text"
                     name="keyword"
                     placeholder="Cari permission..."
                     value={search.keyword}
                     onChange={handleSearchChange}
+                    className="me-2"
                 />
-                <button type="submit" className="btn-custom btn-secondary ms-2">
+                <button type="submit" className="btn-custom btn-secondary me-2">
                     Filter
                 </button>
                 <button
                     type="button"
                     onClick={resetFilter}
-                    className="btn-custom btn-light bg-gray-300 ms-2"
+                    className="btn-custom btn-light bg-gray-300"
                 >
                     Reset
                 </button>
             </form>
 
-            {/* Table */}
+            {/* 📋 Table Section */}
             <div className="table-container">
-                <div className="table-header">
-                    <h4>Data Permissions</h4>
+                <div className="table-header d-flex justify-content-between align-items-center">
+                    <h4>Manajemen Permissions</h4>
                     <button
-                        className="btn-custom btn-primary"
+                        className="btn btn-success btn-sm"
                         onClick={() => setShowAdd(true)}
                     >
                         Tambah Permission
                     </button>
                 </div>
 
-                <table className="table-custom">
-                    <thead>
-                        <tr>
-                            <th>No</th>
-                            <th>Nama Permission</th>
-                            <th>Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {permissions.data.length > 0 ? (
-                            permissions.data.map((item, index) => (
-                                <tr key={item.id}>
-                                    <td>{permissions.from + index}</td>
-                                    <td>{item.name}</td>
-                                    <td>
-                                        <button
-                                            className="btn-custom btn-warning me-1"
-                                            onClick={() => openEdit(item)}
-                                        >
-                                            Edit
-                                        </button>
-                                        <button
-                                            className="btn-custom btn-danger"
-                                            onClick={() => handleDelete(item.id)}
-                                        >
-                                            Hapus
-                                        </button>
+                <div className="table-scroll">
+                    <table className="table-custom">
+                        <thead>
+                            <tr>
+                                <th className="text-center px-3">No.</th>
+                                <th className="text-center px-3">Nama Permission</th>
+                                <th className="text-center px-3">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {permissions.data.length > 0 ? (
+                                permissions.data.map((item, index) => (
+                                    <tr key={item.id}>
+                                        <td className="text-center">{permissions.from + index}</td>
+                                        <td className="text-center">{item.name}</td>
+                                        <td className="text-center">
+                                            <div className="d-flex justify-content-center gap-2">
+                                                <button
+                                                    className="btn btn-warning btn-sm"
+                                                    onClick={() => openEdit(item)}
+                                                >
+                                                    Edit
+                                                </button>
+                                                <button
+                                                    className="btn btn-danger btn-sm"
+                                                    onClick={() => handleDelete(item.id)}
+                                                >
+                                                    Hapus
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))
+                            ) : (
+                                <tr>
+                                    <td colSpan="3" className="text-center">
+                                        Tidak ada data
                                     </td>
                                 </tr>
-                            ))
-                        ) : (
-                            <tr>
-                                <td colSpan="3" className="text-center">
-                                    Tidak ada data
-                                </td>
-                            </tr>
-                        )}
-                    </tbody>
-                </table>
+                            )}
+                        </tbody>
+                    </table>
+                </div>
 
-                {/* Pagination */}
+                {/* 🔸 Pagination */}
                 {permissions.links && (
                     <div className="pagination-container">
                         <ul className="pagination-custom">
@@ -170,7 +175,7 @@ export default function Permission({ permissions, filters, title }) {
                                             !link.url ? "disabled" : ""
                                         }`}
                                     >
-                                        <a
+                                        <Link
                                             href={link.url || "#"}
                                             dangerouslySetInnerHTML={{ __html: label }}
                                         />
@@ -182,7 +187,7 @@ export default function Permission({ permissions, filters, title }) {
                 )}
             </div>
 
-            {/* Modal Tambah */}
+            {/* 🪟 Modals */}
             {showAdd && (
                 <AddPermissionModal
                     form={form}
@@ -192,7 +197,6 @@ export default function Permission({ permissions, filters, title }) {
                 />
             )}
 
-            {/* Modal Edit */}
             {showEdit && (
                 <EditPermissionModal
                     form={form}
