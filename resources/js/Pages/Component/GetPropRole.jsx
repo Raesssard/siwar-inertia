@@ -305,7 +305,7 @@ export function getAdminCards({ ...rest }) {
                 {
                     href: "/rw/iuran",
                     color: "success",
-                    title: "Total Iuran Masuk Bulan Ini",
+                    title: "Total Iuran Bulan Ini",
                     value: formatRupiah(rest.total_iuran_bulan_ini),
                     icon: "circle-dollar-to-slot",
                     permission: "view.iuran",
@@ -662,7 +662,7 @@ export function getRwCards({ ...rest }) {
                 {
                     href: "/rw/iuran",
                     color: "success",
-                    title: "Total Iuran Masuk Bulan Ini",
+                    title: "Total Iuran Bulan Ini",
                     value: formatRupiah(rest.total_iuran_bulan_ini),
                     icon: "circle-dollar-to-slot",
                     permission: "view.iuran",

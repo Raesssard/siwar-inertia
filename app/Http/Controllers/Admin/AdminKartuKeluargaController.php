@@ -16,7 +16,7 @@ class AdminKartuKeluargaController extends Controller
 {
     public function index(Request $request)
     {
-        $title = 'Manajemen Kartu Keluarga (Admin)';
+        $title = 'Manajemen Kartu Keluarga';
         $search = $request->search;
 
         $total_kk = Kartu_keluarga::count();

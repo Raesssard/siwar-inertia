@@ -173,10 +173,10 @@ export function FilterPengumuman({ data, setData, daftar_tahun, list_bulan, daft
     )
 }
 
-export function FilterTransaksi({ transaksi, data, setData, daftar_tahun, daftar_bulan, filter, resetFilter, tambahShow, role }) {
+export function FilterTransaksi({ transaksi, data, setData, daftar_tahun, daftar_bulan, daftar_rw, daftar_rt, filter, resetFilter, tambahShow, role }) {
     return (
-        <form onSubmit={filter} className="filter-form form-filter d-flex px-0 g-2 pb-2 mb-2 w-100">
-            <div className="col-md-5 col-12 pr-2">
+        <form onSubmit={filter} className="filter-form form-filter d-flex px-0 gap-2 pb-2 mb-2 w-100">
+            <div className="col-md-5 col-12 pr-0">
                 <div className="input-group input-group-sm">
                     <input
                         type="text"
@@ -220,45 +220,77 @@ export function FilterTransaksi({ transaksi, data, setData, daftar_tahun, daftar
                         </option>
                     ))}
                 </select>
+                <Role role={['admin', 'rw']}>
+                    {/* <Role role={['admin']}>
+                        <select
+                            name="rw"
+                            value={data.rw}
+                            onChange={(e) => setData('rw', e.target.value)}
+                            className="form-select form-select-sm w-auto flex-fill my-2"
+                        >
+                            <option value="">Semua RW</option>
+                            {daftar_rw.map((noRw) => (
+                                <option key={noRw} value={noRw}>
+                                    RW {noRw}
+                                </option>
+                            ))}
+                        </select>
+                    </Role> */}
+                    <select
+                        name="rt"
+                        value={data.rt}
+                        onChange={(e) => setData('rt', e.target.value)}
+                        className="form-select form-select-sm w-auto flex-fill my-2"
+                    >
+                        <option value="">Semua RT</option>
+                        {daftar_rt.map((noRt) => (
+                            <option key={noRt} value={noRt}>
+                                RT {noRt}
+                            </option>
+                        ))}
+                    </select>
+                </Role>
                 <button type="submit" className="btn-input btn btn-sm btn-primary flex-fill p-0" title="Filter Transaksi" style={{ maxWidth: "3rem", minWidth: "3rem" }}>
                     <i className="fas fa-filter"></i>
                 </button>
                 <Link href={`/${role}/transaksi`} onClick={resetFilter} className="btn-input btn btn-secondary btn-sm flex-fill p-0 mx-0" title="Reset" style={{ maxWidth: "3rem", minWidth: "3rem" }}>
                     <i className="fas fa-undo"></i>
                 </Link>
+                <Role role={['rt', 'rw', 'bendahara', 'admin']}>
+                    <button
+                        className="btn btn-success my-auto"
+                        type="button"
+                        title={!transaksi?.length ? "Tidak ada Transaksi yang dapat diexport" : "Export Transaksi ke Excel"}
+                        style={{ borderRadius: "0.2rem" }}
+                        onClick={() => {
+                            // window.location.href = `/${role}/export/transaksi`
+
+                            axios({
+                                url: `/${role}/export/transaksi`,
+                                method: "GET",
+                                responseType: "blob"
+                            })
+                                .then((response) => {
+                                    const url = window.URL.createObjectURL(new Blob([response.data]))
+                                    const link = document.createElement("a")
+                                    link.href = url
+                                    link.setAttribute(
+                                        "download",
+                                        `laporan-transaksi.xlsx`
+                                    )
+                                    document.body.appendChild(link)
+                                    link.click()
+                                    link.remove()
+                                })
+                                .catch((err) => console.error(err))
+                        }}
+                        disabled={!transaksi?.length}
+                    >
+                        <i className="fas fa-file-excel"></i>
+                    </button>
+                </Role>
             </div>
             <Role role={['rt', 'rw', 'bendahara', 'admin']}>
-                <button
-                    className="btn btn-success my-auto mr-3"
-                    type="button"
-                    title={!transaksi?.length ? "Tidak ada Transaksi yang dapat diexport" : "Export Transaksi ke Excel"}
-                    style={{ borderRadius: "0.2rem" }}
-                    onClick={() => {
-                        // window.location.href = `/${role}/export/transaksi`
-
-                        axios({
-                            url: `/${role}/export/transaksi`,
-                            method: "GET",
-                            responseType: "blob"
-                        })
-                            .then((response) => {
-                                const url = window.URL.createObjectURL(new Blob([response.data]))
-                                const link = document.createElement("a")
-                                link.href = url
-                                link.setAttribute(
-                                    "download",
-                                    `laporan-transaksi.xlsx`
-                                )
-                                document.body.appendChild(link)
-                                link.click()
-                                link.remove()
-                            })
-                            .catch((err) => console.error(err))
-                    }}
-                    disabled={!transaksi?.length}
-                >
-                    <i className="fas fa-file-excel"></i>
-                </button>
                 <div className="text-end ml-auto mr-3">
                     <button type="button" onClick={() => tambahShow()} className="btn-input btn btn-sm btn-success">
                         <i className="fas fa-plus mr-2"></i>

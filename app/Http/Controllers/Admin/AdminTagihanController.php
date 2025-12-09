@@ -18,12 +18,13 @@ class AdminTagihanController extends Controller
 {
     public function index(Request $request)
     {
-        $title = 'Tagihan (Admin)';
+        $title = 'Tagihan';
 
         $search = $request->search;
         $no_kk_filter = $request->no_kk_filter;
+        $status = $request->status;
 
-        $kartuKeluargaForFilter = Kartu_keluarga::select('no_kk')
+        $kartuKeluargaForFilter = Kartu_keluarga::with(['rukunTetangga', 'rw'])
             ->distinct()
             ->orderBy('no_kk')
             ->get();
@@ -34,10 +35,8 @@ class AdminTagihanController extends Controller
             'kartuKeluarga.kepalaKeluarga',
             'kartuKeluarga.rw',
             'kartuKeluarga.rt',
-        ]);
-
-        $tagihanManual = (clone $baseQuery)
-            ->where('jenis', 'manual')
+        ])
+            ->orderBy('tgl_tagih', 'desc')
             ->when($search, function ($query) use ($search) {
                 $query->where(function ($q) use ($search) {
                     $q->where('nama', 'like', "%$search%")
@@ -45,20 +44,29 @@ class AdminTagihanController extends Controller
                         ->orWhere('no_kk', 'like', "%$search%");
                 });
             })
-            ->when($no_kk_filter, fn($q) => $q->where('no_kk', $no_kk_filter))
+            ->when($no_kk_filter, fn($q) => $q->where('no_kk', $no_kk_filter));
+
+        $filterStatus = function ($q) use ($status) {
+            if (!$status) return;
+
+            if ($status === 'sudah_lunas') {
+                $q->whereColumn('nominal_bayar', '>=', 'nominal');
+            } elseif ($status === 'belum_lunas') {
+                $q->whereColumn('nominal_bayar', '<', 'nominal');
+            } else {
+                $q->where('status_bayar', $status);
+            }
+        };
+
+        $tagihanManual = (clone $baseQuery)
+            ->where('jenis', 'manual')
+            ->where($filterStatus)
             ->orderBy('tgl_tagih', 'desc')
             ->paginate(10, ['*'], 'manual_page');
 
         $tagihanOtomatis = (clone $baseQuery)
             ->where('jenis', 'otomatis')
-            ->when($search, function ($query) use ($search) {
-                $query->where(function ($q) use ($search) {
-                    $q->where('nama', 'like', "%$search%")
-                        ->orWhere('nominal', 'like', "%$search%")
-                        ->orWhere('no_kk', 'like', "%$search%");
-                });
-            })
-            ->when($no_kk_filter, fn($q) => $q->where('no_kk', $no_kk_filter))
+            ->where($filterStatus)
             ->orderBy('tgl_tagih', 'desc')
             ->paginate(10, ['*'], 'otomatis_page');
 
@@ -119,13 +127,22 @@ class AdminTagihanController extends Controller
             $tagihanList->push($tagihan);
         }
 
+        $iuran->load(['iuran_golongan', 'iuran_golongan.golongan']);
+
+        $tagihanList->load([
+            'transaksi',
+            'iuran',
+            'kartuKeluarga.warga',
+            'kartuKeluarga.kepalaKeluarga',
+        ]);
+
         return response()->json([
             'success' => true,
             'message' => $request->no_kk === 'semua'
                 ? 'Tagihan berhasil dibuat untuk semua KK.'
                 : 'Tagihan berhasil dibuat.',
             'tagihan' => $request->no_kk === 'semua' ? $tagihanList : $tagihanList->first(),
-            'iuran' => $iuran->load(['iuran_golongan', 'iuran_golongan.golongan']),
+            'iuran' => $iuran,
         ], 201);
     }
 

@@ -33,18 +33,19 @@ class RwTransaksiController extends Controller
         $rt = $request->rt;
 
         $daftar_rt = Rt::where('id_rw', $idRw)
-            ->orderBy('nomor_rt')
-            ->pluck('nomor_rt') 
+            ->where('status', 'aktif')
+            ->pluck('nomor_rt')
             ->toArray();
 
         $query = Transaksi::whereHas('rukunTetangga.rw', function ($q) use ($nomorRwUser) {
-                $q->where('nomor_rw', $nomorRwUser);
-            })
+            $q->where('nomor_rw', $nomorRwUser);
+        })
             ->when($search, fn($q) => $q->where('nama_transaksi', 'like', "%{$search}%"))
             ->when($tahun, fn($q) => $q->whereYear('tanggal', $tahun))
             ->when($bulan, fn($q) => $q->whereMonth('tanggal', $bulan))
             ->when($rt, fn($q) => $q->whereHas('rukunTetangga', function ($qr) use ($rt, $idRw) {
-                $qr->where('nomor_rt', $rt)->where('id_rw', $idRw);
+                $qr->where('nomor_rt', $rt)
+                    ->where('id_rw', $idRw);
             }));
 
         $transaksi = $query->orderBy('tanggal', 'desc')
@@ -52,16 +53,26 @@ class RwTransaksiController extends Controller
             ->withQueryString();
 
         $daftar_tahun = Transaksi::whereHas('rukunTetangga.rw', function ($q) use ($nomorRwUser) {
-                $q->where('nomor_rw', $nomorRwUser);
-            })
+            $q->where('nomor_rw', $nomorRwUser);
+        })
             ->selectRaw('YEAR(tanggal) as tahun')
             ->distinct()
             ->orderBy('tahun', 'desc')
             ->pluck('tahun');
 
         $daftar_bulan = [
-            'januari','februari','maret','april','mei','juni',
-            'juli','agustus','september','oktober','november','desember'
+            'januari',
+            'februari',
+            'maret',
+            'april',
+            'mei',
+            'juni',
+            'juli',
+            'agustus',
+            'september',
+            'oktober',
+            'november',
+            'desember'
         ];
 
         $list_kk = Kartu_keluarga::with('rukunTetangga')

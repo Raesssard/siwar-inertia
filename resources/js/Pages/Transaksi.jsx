@@ -1,55 +1,54 @@
-import Layout from "@/Layouts/Layout";
-import { Head, Link, useForm, usePage } from "@inertiajs/react";
-import React, { useEffect, useState } from "react";
-import Swal from "sweetalert2";
-import axios from "axios";
-import { formatRupiah, formatTanggal } from "./Component/GetPropRole";
-import { FilterTransaksi } from "./Component/Filter";
+import Layout from "@/Layouts/Layout"
+import { Head, Link, useForm, usePage } from "@inertiajs/react"
+import React, { useEffect, useState } from "react"
+import Swal from "sweetalert2"
+import axios from "axios"
+import { formatRupiah, formatTanggal } from "./Component/GetPropRole"
+import { FilterTransaksi } from "./Component/Filter"
 import {
     EditTransaksi,
     TambahTransaksiPerKk,
-} from "./Component/Modal";
+} from "./Component/Modal"
 export default function Transaksi() {
     const {
         title,
         transaksi: transaksiServer,
         daftar_tahun,
         daftar_bulan,
+        daftar_rw,
         daftar_rt,
         list_kk,
         transaksiWarga,
         transaksiUmum,
-    } = usePage().props;
+    } = usePage().props
 
-    const role = usePage().props.auth?.currentRole;
-    const user = usePage().props.auth?.user;
+    const role = usePage().props.auth?.currentRole
+    const user = usePage().props.auth?.user
 
     // ===================== STATE ===================== //
-    const [transaksiList, setTransaksiList] = useState(
-        transaksiServer?.data ?? []
-    );
-
-    const [selected, setSelected] = useState(null);
-    const [showTambahPerKk, setShowTambahPerKk] = useState(false);
-    const [showEdit, setShowEdit] = useState(false);
+    const [transaksiList, setTransaksiList] = useState(transaksiServer?.data ?? [])
+    const [selected, setSelected] = useState(null)
+    const [showTambahPerKk, setShowTambahPerKk] = useState(false)
+    const [showEdit, setShowEdit] = useState(false)
 
     const { get, data, setData } = useForm({
         search: "",
         tahun: "",
         bulan: "",
         rt: "",
-    });
+        rw: "",
+    })
 
     // Reload data ketika dari server berubah
     useEffect(() => {
-        setTransaksiList(transaksiServer?.data ?? []);
-    }, [transaksiServer]);
+        setTransaksiList(transaksiServer?.data ?? [])
+    }, [transaksiServer])
 
     // ===================== FILTER ===================== //
     const filter = (e) => {
-        e.preventDefault();
-        get(`/${role}/transaksi`, { preserveScroll: true, preserveState: true });
-    };
+        e.preventDefault()
+        get(`/${role}/transaksi`, { preserveScroll: true, preserveState: true })
+    }
 
     const resetFilter = () => {
         setData({
@@ -57,14 +56,15 @@ export default function Transaksi() {
             tahun: "",
             bulan: "",
             rt: "",
-        });
-    };
+            rw: "",
+        })
+    }
 
     // ===================== MODAL ===================== //
     const modalEdit = (item) => {
-        setSelected(item);
-        setShowEdit(true);
-    };
+        setSelected(item)
+        setShowEdit(true)
+    }
 
     const handleDelete = (id) => {
         Swal.fire({
@@ -81,24 +81,24 @@ export default function Transaksi() {
                 axios
                     .delete(`/${role}/transaksi/${id}`)
                     .then(() => {
-                        Swal.fire("Berhasil!", "Transaksi dihapus.", "success");
+                        Swal.fire("Berhasil!", "Transaksi dihapus.", "success")
                         setTransaksiList((prev) =>
                             prev.filter((item) => item.id !== id)
-                        );
+                        )
                     })
                     .catch(() => {
-                        Swal.fire("Gagal!", "Tidak bisa menghapus data.", "error");
-                    });
+                        Swal.fire("Gagal!", "Tidak bisa menghapus data.", "error")
+                    })
             }
-        });
-    };
+        })
+    }
 
     // ===================== RENDER ===================== //
 
     const roleTitle =
         role.length <= 2
             ? role.toUpperCase()
-            : role.charAt(0).toUpperCase() + role.slice(1);
+            : role.charAt(0).toUpperCase() + role.slice(1)
 
     return (
         <Layout>
@@ -110,7 +110,8 @@ export default function Transaksi() {
                 setData={setData}
                 daftar_tahun={daftar_tahun}
                 daftar_bulan={daftar_bulan}
-                daftar_rt={daftar_rt ?? []}
+                daftar_rt={daftar_rt}
+                daftar_rw={daftar_rw}
                 tambahShow={() => setShowTambahPerKk(true)}
                 filter={filter}
                 resetFilter={resetFilter}
@@ -210,22 +211,26 @@ export default function Transaksi() {
                     <div className="pagination-container">
                         <ul className="pagination-custom">
                             {transaksiServer.links.map((link, index) => {
-                                let label = link.label;
-                                if (label.includes("Previous")) label = "&lt;";
-                                if (label.includes("Next")) label = "&gt;";
+                                let label = link.label
+                                if (label.includes("Previous")) label = "&lt;"
+                                if (label.includes("Next")) label = "&gt;"
 
                                 return (
                                     <li
                                         key={index}
-                                        className={`page-item ${link.active ? "active" : ""
-                                            } ${!link.url ? "disabled" : ""}`}
+                                        className={`page-item ${link.active ? "active" : ""} ${!link.url ? "disabled" : ""
+                                            }`}
+                                        style={{ cursor: !link.url ? "not-allowed" : "pointer" }}
                                     >
                                         <Link
                                             href={link.url || ""}
-                                            dangerouslySetInnerHTML={{ __html: label }}
+                                            dangerouslySetInnerHTML={{
+                                                __html: label,
+                                            }}
+                                            title={`Pergi ke halaman ${label === "&lt;" ? 'sebelumnya' : label === "&gt;" ? 'selanjutnya' : label}`}
                                         />
                                     </li>
-                                );
+                                )
                             })}
                         </ul>
                     </div>
@@ -255,5 +260,5 @@ export default function Transaksi() {
                 }
             />
         </Layout>
-    );
+    )
 }

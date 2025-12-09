@@ -48,7 +48,7 @@ class DashboardController extends Controller
             $total_iuran_bulan_ini = Tagihan::where('status_bayar', 'sudah_bayar')
                 ->whereMonth('updated_at', Carbon::now()->month)
                 ->whereYear('updated_at', Carbon::now()->year)
-                ->sum('nominal');
+                ->sum('nominal_bayar');
 
             $data = array_merge(
                 $data,
@@ -248,7 +248,7 @@ class DashboardController extends Controller
             $total_iuran_bulan_ini = Tagihan::where('status_bayar', 'sudah_bayar')
                 ->whereMonth('updated_at', Carbon::now()->month)
                 ->whereYear('updated_at', Carbon::now()->year)
-                ->sum('nominal');
+                ->sum('nominal_bayar');
 
             $title = 'Dashboard';
             $jumlah_warga_penduduk = Warga::where('status_warga', 'penduduk')->count();

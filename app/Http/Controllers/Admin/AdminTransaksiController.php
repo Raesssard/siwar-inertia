@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Kartu_keluarga;
 use App\Models\Transaksi;
 use App\Models\Rt;
+use App\Models\Rw;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -13,14 +14,20 @@ class AdminTransaksiController extends Controller
 {
     public function index(Request $request)
     {
-        $title = "Transaksi Admin";
+        $title = "Transaksi";
 
         $search = $request->search;
         $tahun = $request->tahun;
         $bulan = $request->bulan;
+        $rw = $request->rw;
         $rt = $request->rt;
 
+        $daftar_rw = Rw::orderBy('nomor_rw')
+            ->where('status', 'aktif')
+            ->pluck('nomor_rw')
+            ->toArray();
         $daftar_rt = Rt::orderBy('nomor_rt')
+            ->where('status', 'aktif')
             ->pluck('nomor_rt')
             ->toArray();
 
@@ -28,6 +35,9 @@ class AdminTransaksiController extends Controller
             ->when($search, fn($q) => $q->where('nama_transaksi', 'like', "%{$search}%"))
             ->when($tahun, fn($q) => $q->whereYear('tanggal', $tahun))
             ->when($bulan, fn($q) => $q->whereMonth('tanggal', $bulan))
+            ->when($rw, fn($q) => $q->whereHas('rukunTetangga.rw', function ($kueri) use ($rw) {
+                $kueri->where('nomor_rw', $rw);
+            }))
             ->when($rt, fn($q) => $q->whereHas('rukunTetangga', function ($qr) use ($rt) {
                 $qr->where('nomor_rt', $rt);
             }));
@@ -42,8 +52,18 @@ class AdminTransaksiController extends Controller
             ->pluck('tahun');
 
         $daftar_bulan = [
-            'januari','februari','maret','april','mei','juni',
-            'juli','agustus','september','oktober','november','desember'
+            'januari',
+            'februari',
+            'maret',
+            'april',
+            'mei',
+            'juni',
+            'juli',
+            'agustus',
+            'september',
+            'oktober',
+            'november',
+            'desember'
         ];
 
         $list_kk = Kartu_keluarga::with('rukunTetangga')
@@ -56,6 +76,7 @@ class AdminTransaksiController extends Controller
             'daftar_tahun' => $daftar_tahun,
             'daftar_bulan' => $daftar_bulan,
             'daftar_rt' => $daftar_rt,
+            'daftar_rw' => $daftar_rw,
             'list_kk' => $list_kk,
             'filters' => [
                 'search' => $search,
@@ -130,4 +151,3 @@ class AdminTransaksiController extends Controller
         ]);
     }
 }
-
