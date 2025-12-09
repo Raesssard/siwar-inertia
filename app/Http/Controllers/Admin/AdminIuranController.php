@@ -41,12 +41,26 @@ class AdminIuranController extends Controller
 
         $golongan_list = Kategori_golongan::with('iuranGolongan')->get();
 
-        $rt_list = Rt::select('id', 'nomor_rt', 'id_rw')
-            ->where('status', 'aktif')
+        
+
+        $allowedMainRoles = ['admin', 'rw', 'rt', 'warga'];
+
+        $rw_list = Rw::whereHas('users', function ($q) use ($allowedMainRoles) {
+                $q->whereHas('roles', fn($qrw) => $qrw->where('name', 'rw'))
+                ->whereDoesntHave('roles', fn($qx) =>
+                    $qx->whereNotIn('name', $allowedMainRoles)
+                );
+            })
+            ->select('id', 'nomor_rw', 'nama_anggota_rw')
             ->get();
 
-        $rw_list = Rw::select('id', 'nomor_rw')
-            ->where('status', 'aktif')
+        $rt_list = Rt::whereHas('user', function ($q) use ($allowedMainRoles) {
+                $q->whereHas('roles', fn($qrt) => $qrt->where('name', 'rt'))
+                ->whereDoesntHave('roles', fn($qx) =>
+                    $qx->whereNotIn('name', $allowedMainRoles)
+                );
+            })
+            ->select('id', 'id_rw', 'nomor_rt', 'nama_anggota_rt')
             ->get();
 
         $nik_list = Warga::select('nik')->get();
@@ -76,12 +90,12 @@ class AdminIuranController extends Controller
                 'tgl_tempo' => 'required|date',
                 'jenis' => 'required|in:manual,otomatis',
                 'nominal' => 'required_if:jenis,manual|nullable|numeric|min:0|max:99999999',
-                // 'id_rw' => 'required|exists:rw,id',
-                'id_rt' => 'nullable|exists:rt,id',
+                'id_rw' => 'required|exists:rw,id',
+                'id_rt' => 'required|exists:rt,id',
             ]);
 
             $iuran = Iuran::create([
-                'id_rw' => 1,
+                'id_rw' => $request->id_rw,
                 'id_rt' => $request->id_rt,
                 'nama' => $request->nama,
                 'tgl_tagih' => $request->tgl_tagih,

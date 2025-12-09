@@ -9,6 +9,7 @@ use App\Models\Kartu_keluarga;
 use App\Models\Kategori_golongan;
 use App\Models\Tagihan;
 use App\Models\Rt;
+use App\Models\Rw;
 use App\Models\Warga;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -28,7 +29,8 @@ class RwIuranController extends Controller
         }
 
         $nomorRwUser = $userRwData->nomor_rw;
-
+        $allowedMainRoles = ['admin', 'rw', 'rt', 'warga'];
+        
         $search = $request->input('search');
 
         $query = Iuran::with('iuran_golongan')
@@ -54,10 +56,14 @@ class RwIuranController extends Controller
             ->orderBy('tgl_tagih', 'desc')
             ->paginate(10);
 
-        $rt_list = Rt::whereHas('rw', function ($q) use ($nomorRwUser) {
-                $q->where('nomor_rw', $nomorRwUser);
+        $rt_list = Rt::whereHas('user', function ($q) use ($allowedMainRoles) {
+                $q->whereHas('roles', fn($qrt) => $qrt->where('name', 'rt'))
+                ->whereDoesntHave('roles', fn($qx) =>
+                    $qx->whereNotIn('name', $allowedMainRoles)
+                );
             })
-            ->get(['id', 'nomor_rt']);
+            ->select('id', 'id_rw', 'nomor_rt', 'nama_anggota_rt')
+            ->get();
 
         $nik_list = Warga::whereHas('kartuKeluarga.rw', function ($q) use ($nomorRwUser) {
                 $q->where('nomor_rw', $nomorRwUser);
@@ -72,11 +78,15 @@ class RwIuranController extends Controller
         ->orderBy('no_kk')
         ->get();
 
+        $rw_list = Rw::where('nomor_rw', $nomorRwUser)
+            ->get(['id', 'nomor_rw', 'nama_anggota_rw']);
+
         return Inertia::render('Iuran', [
             'iuranOtomatis' => $iuranOtomatis,
             'iuranManual' => $iuranManual,
             'golongan_list' => $golongan_list,
             'rt_list' => $rt_list,
+            'rw_list' => $rw_list,
             'nik_list' => $nik_list,
             'no_kk_list' => $no_kk_list,
             'title' => $title,

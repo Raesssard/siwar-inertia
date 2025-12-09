@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Pengumuman;
+use App\Models\Rt;
+use App\Models\Rw;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -24,6 +26,7 @@ class AdminPengumumanController extends Controller
         $bulan = $request->input('bulan');
         $kategori = $request->input('kategori');
         $level = $request->input('level'); 
+        $allowedMainRoles = ['admin', 'rw', 'rt', 'warga'];
 
         $baseQuery = Pengumuman::with([
             'rukunTetangga',
@@ -68,6 +71,24 @@ class AdminPengumumanController extends Controller
             'juli','agustus','september','oktober','november','desember'
         ];
 
+        $rwList = Rw::whereHas('users', function ($q) use ($allowedMainRoles) {
+                $q->whereHas('roles', fn($qrw) => $qrw->where('name', 'rw'))
+                ->whereDoesntHave('roles', fn($qx) =>
+                    $qx->whereNotIn('name', $allowedMainRoles)
+                );
+            })
+            ->select('id', 'nomor_rw', 'nama_anggota_rw')
+            ->get();
+
+        $rtList = Rt::whereHas('user', function ($q) use ($allowedMainRoles) {
+                $q->whereHas('roles', fn($qrt) => $qrt->where('name', 'rt'))
+                ->whereDoesntHave('roles', fn($qx) =>
+                    $qx->whereNotIn('name', $allowedMainRoles)
+                );
+            })
+            ->select('id', 'id_rw', 'nomor_rt', 'nama_anggota_rt')
+            ->get();
+
         return Inertia::render('Pengumuman', [
             'pengumuman' => $pengumuman,
             'title' => $title,
@@ -76,6 +97,8 @@ class AdminPengumumanController extends Controller
             'total_pengumuman' => $total_pengumuman,
             'total_pengumuman_filtered' => $pengumuman->count(),
             'list_bulan' => $list_bulan,
+            'rwList' => $rwList,
+            'rtList' => $rtList,
         ]);
     }
 
@@ -87,8 +110,8 @@ class AdminPengumumanController extends Controller
             'kategori' => 'required',
             'tanggal' => 'nullable|date',
             'tempat' => 'nullable',
-            // 'id_rw' => 'required|exists:rw,id',
-            // 'id_rt' => 'nullable|exists:rukun_tetangga,id',
+            'id_rw' => 'required|exists:rw,id',
+            'id_rt' => 'nullable|exists:rt,id',
             'dokumen' => 'nullable|file|mimes:doc,docx,xls,xlsx,pdf,jpg,jpeg,png,gif,mp4,mkv|max:20480',
         ]);
 
@@ -107,8 +130,8 @@ class AdminPengumumanController extends Controller
             'kategori' => $request->kategori,
             'tanggal' => Carbon::parse($request->tanggal)->format('Y-m-d H:i:s'),
             'tempat' => $request->tempat ?? '-',
-            'id_rw' => 1,
-            'id_rt' => null,
+            'id_rw' => $request->id_rw,
+            'id_rt' => $request->id_rt,
             'dokumen_path' => $path,
             'dokumen_name' => $name,
         ]);

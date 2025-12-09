@@ -22,14 +22,25 @@ class AdminTransaksiController extends Controller
         $rw = $request->rw;
         $rt = $request->rt;
 
-        $daftar_rw = Rw::orderBy('nomor_rw')
-            ->where('status', 'aktif')
-            ->pluck('nomor_rw')
-            ->toArray();
-        $daftar_rt = Rt::orderBy('nomor_rt')
-            ->where('status', 'aktif')
-            ->pluck('nomor_rt')
-            ->toArray();
+        $allowedMainRoles = ['admin', 'rw', 'rt', 'warga'];
+
+        $rw_list = Rw::whereHas('users', function ($q) use ($allowedMainRoles) {
+                $q->whereHas('roles', fn($qrw) => $qrw->where('name', 'rw'))
+                ->whereDoesntHave('roles', fn($qx) =>
+                    $qx->whereNotIn('name', $allowedMainRoles)
+                );
+            })
+            ->select('id', 'nomor_rw', 'nama_anggota_rw')
+            ->get();
+
+        $rt_list = Rt::whereHas('user', function ($q) use ($allowedMainRoles) {
+                $q->whereHas('roles', fn($qrt) => $qrt->where('name', 'rt'))
+                ->whereDoesntHave('roles', fn($qx) =>
+                    $qx->whereNotIn('name', $allowedMainRoles)
+                );
+            })
+            ->select('id', 'id_rw', 'nomor_rt', 'nama_anggota_rt')
+            ->get();
 
         $query = Transaksi::with(['rukunTetangga.rw'])
             ->when($search, fn($q) => $q->where('nama_transaksi', 'like', "%{$search}%"))
@@ -75,8 +86,8 @@ class AdminTransaksiController extends Controller
             'transaksi' => $transaksi,
             'daftar_tahun' => $daftar_tahun,
             'daftar_bulan' => $daftar_bulan,
-            'daftar_rt' => $daftar_rt,
-            'daftar_rw' => $daftar_rw,
+            'daftar_rt' => $rt_list,
+            'daftar_rw' => $rw_list,
             'list_kk' => $list_kk,
             'filters' => [
                 'search' => $search,
