@@ -13,6 +13,7 @@ export default function Iuran() {
         iuranManual: iuranManualFromServer,
         golongan_list,
         rt_list,
+        rw_list,
         nik_list,
         no_kk_list,
         title,
@@ -316,7 +317,8 @@ export default function Iuran() {
                 onAdded={handleAdded}
                 role={role}
                 golongan={golongan_list}
-                rt={rt_list} // ✅ sesuai dengan props di atas
+                rt_list={rt_list} // ✅ sesuai dengan props di atas
+                rw_list={rw_list}
                 nik={nik_list}
                 no_kk={no_kk_list}
             />

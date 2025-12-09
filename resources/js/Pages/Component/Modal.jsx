@@ -5533,7 +5533,7 @@ export function DetailWarga({ selectData, detailShow, onClose }) {
     )
 }
 
-export function TambahIuran({ tambahShow, onClose, onAdded, role, golongan, rt = [], nik, no_kk }) {
+export function TambahIuran({ tambahShow, onClose, onAdded, role, golongan, nik, no_kk, rw_list, rt_list }) {
     const [data, setData] = useState({
         id_rt: "",
         nama: "",
@@ -5550,6 +5550,7 @@ export function TambahIuran({ tambahShow, onClose, onAdded, role, golongan, rt =
     const [noKkWarga, setNoKkWarga] = useState([])
     const [perWarga, setPerWarga] = useState(false)
     const [perKk, setPerKk] = useState(false)
+    const [filteredRt, setFilteredRt] = useState([]);
 
     useEffect(() => {
         setGolonganList(golongan)
@@ -5687,8 +5688,59 @@ export function TambahIuran({ tambahShow, onClose, onAdded, role, golongan, rt =
                                             }}
                                         />
                                     </div> */}
+                                    <Role role={['admin']}>
+                                        <div className="mb-3">
+                                            <label className="form-label">RW</label>
+                                            <select
+                                                className="form-control"
+                                                value={data.id_rw || ""}
+                                                onChange={(e) => {
+                                                    const rwId = e.target.value;
+                                                    setData({ ...data, id_rw: rwId, id_rt: "" });
 
-                                    <div className="mb-3">
+                                                    const list = rt_list.filter(rt => rt.id_rw == rwId);
+                                                    setFilteredRt(list);
+                                                }}
+                                                required
+                                                style={{
+                                                border: '0',
+                                                borderBottom: '1px solid lightgray',
+                                                borderRadius: '0',
+                                            }}
+                                            >
+                                                <option value="">-- Pilih RW --</option>
+                                                {rw_list.map((rw) => (
+                                                    <option key={rw.id} value={rw.id}>
+                                                        RW {rw.nomor_rw} - {rw.nama_anggota_rw}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        </div>
+
+                                        <div className="mb-3">
+                                            <label className="form-label">RT</label>
+                                            <select
+                                                className="form-control"
+                                                value={data.id_rt || ""}
+                                                onChange={(e) => setData({ ...data, id_rt: e.target.value })}
+                                                disabled={filteredRt.length === 0}
+                                                style={{
+                                                border: '0',
+                                                borderBottom: '1px solid lightgray',
+                                                borderRadius: '0',
+                                            }}
+                                            >
+                                                <option value="">-- Pilih RT --</option>
+                                                {filteredRt.map(rt => (
+                                                    <option key={rt.id} value={rt.id}>
+                                                        RT {rt.nomor_rt} - {rt.nama_anggota_rt}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                    </Role>
+                                    <Role role ={['rw']}>
+                                        <div className="mb-3">
                                         <label className="form-label">Pilih RT</label>
                                         <select
                                             name="id_rt"
@@ -5703,10 +5755,10 @@ export function TambahIuran({ tambahShow, onClose, onAdded, role, golongan, rt =
                                             required
                                         >
                                             <option value="">-- Pilih RT --</option>
-                                            {rt.length > 0 ? (
-                                                rt.map((item) => (
+                                            {rt_list.length > 0 ? (
+                                                rt_list.map((item) => (
                                                     <option key={item.id} value={item.id}>
-                                                        RT {item.nomor_rt}
+                                                        RT {item.nomor_rt} - {item.nama_anggota_rt}
                                                     </option>
                                                 ))
                                             ) : (
@@ -5714,7 +5766,7 @@ export function TambahIuran({ tambahShow, onClose, onAdded, role, golongan, rt =
                                             )}
                                         </select>
                                     </div>
-
+                                    </Role>
                                     {/* {perWarga && (
                                         <div className="mb-3">
                                             <label className="form-label">NIK Warga</label>
