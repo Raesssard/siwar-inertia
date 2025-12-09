@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Kartu_keluarga;
 use App\Models\Transaksi;
 use App\Models\Rt;
+use App\Models\Rw;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -20,9 +21,25 @@ class AdminTransaksiController extends Controller
         $bulan = $request->bulan;
         $rt = $request->rt;
 
-        $daftar_rt = Rt::orderBy('nomor_rt')
-            ->pluck('nomor_rt')
-            ->toArray();
+        $allowedMainRoles = ['admin', 'rw', 'rt', 'warga'];
+
+        $rw_list = Rw::whereHas('users', function ($q) use ($allowedMainRoles) {
+                $q->whereHas('roles', fn($qrw) => $qrw->where('name', 'rw'))
+                ->whereDoesntHave('roles', fn($qx) =>
+                    $qx->whereNotIn('name', $allowedMainRoles)
+                );
+            })
+            ->select('id', 'nomor_rw', 'nama_anggota_rw')
+            ->get();
+
+        $rt_list = Rt::whereHas('user', function ($q) use ($allowedMainRoles) {
+                $q->whereHas('roles', fn($qrt) => $qrt->where('name', 'rt'))
+                ->whereDoesntHave('roles', fn($qx) =>
+                    $qx->whereNotIn('name', $allowedMainRoles)
+                );
+            })
+            ->select('id', 'id_rw', 'nomor_rt', 'nama_anggota_rt')
+            ->get();
 
         $query = Transaksi::with(['rukunTetangga.rw'])
             ->when($search, fn($q) => $q->where('nama_transaksi', 'like', "%{$search}%"))
@@ -55,7 +72,8 @@ class AdminTransaksiController extends Controller
             'transaksi' => $transaksi,
             'daftar_tahun' => $daftar_tahun,
             'daftar_bulan' => $daftar_bulan,
-            'daftar_rt' => $daftar_rt,
+            'daftar_rt' => $rt_list,
+            'daftar_rw' => $rw_list,
             'list_kk' => $list_kk,
             'filters' => [
                 'search' => $search,

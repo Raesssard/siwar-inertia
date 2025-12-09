@@ -16,6 +16,7 @@ export default function Transaksi() {
         daftar_tahun,
         daftar_bulan,
         daftar_rt,
+        daftar_rw,
         list_kk,
         transaksiWarga,
         transaksiUmum,
@@ -240,6 +241,7 @@ export default function Transaksi() {
                 onClose={() => setShowTambahPerKk(false)}
                 role={role}
                 daftarRT={daftar_rt}
+                daftarRW={daftar_rw}
                 onAdded={(baru) => setTransaksiList((prev) => [baru, ...prev])}
             />
 
