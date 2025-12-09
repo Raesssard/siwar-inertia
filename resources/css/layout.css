@@ -366,7 +366,7 @@ div.modal-komen {
 }
 
 p.isi-pengaduan,
-p.isi-pengumuman,
+div.isi-pengumuman,
 p.komen {
     word-wrap: break-word;
     overflow-wrap: break-word;
