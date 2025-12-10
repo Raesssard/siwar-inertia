@@ -22,7 +22,7 @@ class AdminIuranController extends Controller
         $search = $request->input('search');
 
         $query = Iuran::with(['iuran_golongan', 'rw', 'rt'])
-            ->where('level', 'rw') 
+            ->where('level', 'rw')
             ->orderBy('tgl_tagih', 'desc');
 
         if ($search) {
@@ -75,7 +75,7 @@ class AdminIuranController extends Controller
             'rw_list'       => $rw_list,
             'nik_list'      => $nik_list,
             'no_kk_list'    => $no_kk_list,
-            'title'         => "Iuran RW (Admin)",
+            'title'         => "Iuran",
         ]);
     }
 
@@ -156,7 +156,6 @@ class AdminIuranController extends Controller
                 'message' => 'Iuran RW berhasil dibuat.',
                 'iuran' => $iuran,
             ]);
-
         } catch (\Throwable $e) {
 
             Log::error('Gagal membuat iuran RW:', [
@@ -216,7 +215,6 @@ class AdminIuranController extends Controller
             Iuran::findOrFail($id)->delete();
 
             return response()->json(['success' => true, 'message' => 'Iuran manual RW dihapus.']);
-
         } catch (\Throwable $e) {
             Log::error('Gagal hapus iuran RW: ' . $e->getMessage());
             return response()->json(['success' => false, 'message' => 'Terjadi kesalahan.'], 500);

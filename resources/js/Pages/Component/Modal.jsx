@@ -208,8 +208,6 @@ export function AddRwModal({ dataWarga, form, handleChange, handleSelectChange, 
                         <h5 className="text-lg font-semibold">Tambah RW</h5>
                         <button type="button" onClick={onClose} className="text-gray-500 hover:text-gray-700">✕</button>
                     </div>
-                    {console.log(form.nik)}
-                    {console.log(form)}
                     <div className="space-y-3">
                         <div>
                             <label className="block text-sm font-medium">NIK</label>
@@ -5533,8 +5531,9 @@ export function DetailWarga({ selectData, detailShow, onClose }) {
     )
 }
 
-export function TambahIuran({ tambahShow, onClose, onAdded, role, golongan, nik, no_kk, rw_list, rt_list }) {
+export function TambahIuran({ tambahShow, onClose, onAdded, role, golongan, rw, rt, nik, no_kk }) {
     const [data, setData] = useState({
+        id_rw: "",
         id_rt: "",
         nama: "",
         tgl_tagih: "",
@@ -5546,6 +5545,7 @@ export function TambahIuran({ tambahShow, onClose, onAdded, role, golongan, nik,
     });
 
     const [golonganList, setGolonganList] = useState([])
+    const [rtList, setRtList] = useState([])
     const [nikWarga, setNikWarga] = useState([])
     const [noKkWarga, setNoKkWarga] = useState([])
     const [perWarga, setPerWarga] = useState(false)
@@ -5567,6 +5567,13 @@ export function TambahIuran({ tambahShow, onClose, onAdded, role, golongan, nik,
         setData({ ...data, [e.target.name]: e.target.value })
     }
 
+    const handleSelectChange = (name, selected) => {
+        setData({
+            ...data,
+            [name]: selected?.value || ""
+        });
+    };
+
     const handleNominalChange = (id, value) => {
         setData({ ...data, [`nominal_${id}`]: value })
     }
@@ -5577,6 +5584,7 @@ export function TambahIuran({ tambahShow, onClose, onAdded, role, golongan, nik,
 
     const handleChangeOption = () => {
         setData({
+            id_rw: "",
             id_rt: "",
             nama: "",
             tgl_tagih: "",
@@ -5595,6 +5603,7 @@ export function TambahIuran({ tambahShow, onClose, onAdded, role, golongan, nik,
             .then(res => {
                 if (onAdded) onAdded(res.data.iuran)
                 setData({
+                    id_rw: "",
                     id_rt: "",
                     nama: "",
                     tgl_tagih: "",
@@ -5619,6 +5628,28 @@ export function TambahIuran({ tambahShow, onClose, onAdded, role, golongan, nik,
         document.addEventListener("keydown", handleEsc)
         return () => document.removeEventListener("keydown", handleEsc)
     }, [onClose])
+
+    useEffect(() => {
+        let filteredRt;
+
+        if (data.id_rw) {
+            filteredRt = rt?.filter(
+                kk => kk.id_rw == data.id_rw
+            );
+        } else {
+            filteredRt = rt;
+        }
+
+        if (role !== 'rw' && !data.id_rw) {
+            setRtList([])
+        } else {
+            setRtList(filteredRt);
+        }
+
+        if (filteredRt?.length === 0) {
+            setData('id_rt', '');
+        }
+    }, [data.id_rw]);
 
     if (!tambahShow) return null
 
@@ -5688,61 +5719,74 @@ export function TambahIuran({ tambahShow, onClose, onAdded, role, golongan, nik,
                                             }}
                                         />
                                     </div> */}
-                                    <Role role={['admin']}>
-                                        <div className="mb-3">
-                                            <label className="form-label">RW</label>
-                                            <select
-                                                className="form-control"
-                                                value={data.id_rw || ""}
-                                                onChange={(e) => {
-                                                    const rwId = e.target.value;
-                                                    setData({ ...data, id_rw: rwId, id_rt: "" });
 
-                                                    const list = rt_list.filter(rt => rt.id_rw == rwId);
-                                                    setFilteredRt(list);
+                                    <Role role={'admin'}>
+                                        <div className="mb-3">
+                                            <label className="form-label">Pilih RW</label>
+                                            <Select
+                                                options={rw?.map((item) => ({
+                                                    value: item.id,
+                                                    label: `RW ${item.nomor_rw}`,
+                                                }))}
+                                                value={
+                                                    data.id_rw
+                                                        ? {
+                                                            value: data.id_rw,
+                                                            label: `RW ${rw?.find((x) => x.id == data.id_rw)?.nomor_rw}` || "",
+                                                        }
+                                                        : null
+                                                }
+                                                onChange={(selected) => handleSelectChange('id_rw', selected)}
+                                                placeholder="Pilih nomor RW..."
+                                                isSearchable={true}
+                                                className="react-select-container"
+                                                classNamePrefix="react-select"
+                                                noOptionsMessage={() => "Tidak ada RW yang aktif"}
+                                                styles={{
+                                                    control: (base) => ({
+                                                        ...base,
+                                                        border: 0,
+                                                        borderBottom: "1px solid lightgray",
+                                                        borderRadius: 0,
+                                                        boxShadow: "none",
+                                                    }),
                                                 }}
-                                                required
-                                                style={{
-                                                border: '0',
-                                                borderBottom: '1px solid lightgray',
-                                                borderRadius: '0',
-                                            }}
-                                            >
-                                                <option value="">-- Pilih RW --</option>
-                                                {rw_list.map((rw) => (
-                                                    <option key={rw.id} value={rw.id}>
-                                                        RW {rw.nomor_rw} - {rw.nama_anggota_rw}
-                                                    </option>
-                                                ))}
-                                            </select>
-                                        </div>
-
-                                        <div className="mb-3">
-                                            <label className="form-label">RT</label>
-                                            <select
-                                                className="form-control"
-                                                value={data.id_rt || ""}
-                                                onChange={(e) => setData({ ...data, id_rt: e.target.value })}
-                                                disabled={filteredRt.length === 0}
-                                                style={{
-                                                border: '0',
-                                                borderBottom: '1px solid lightgray',
-                                                borderRadius: '0',
-                                            }}
-                                            >
-                                                <option value="">-- Pilih RT --</option>
-                                                {filteredRt.map(rt => (
-                                                    <option key={rt.id} value={rt.id}>
-                                                        RT {rt.nomor_rt} - {rt.nama_anggota_rt}
-                                                    </option>
-                                                ))}
-                                            </select>
+                                            />
                                         </div>
                                     </Role>
-                                    <Role role ={['rw']}>
-                                        <div className="mb-3">
+
+                                    <div className="mb-3">
                                         <label className="form-label">Pilih RT</label>
-                                        <select
+                                        <Select
+                                            options={rtList?.map((item) => ({
+                                                value: item.id,
+                                                label: `RT ${item.nomor_rt}`,
+                                            }))}
+                                            value={
+                                                data.id_rt
+                                                    ? {
+                                                        value: data.id_rt,
+                                                        label: `RT ${rtList?.find((x) => x.id == data.id_rt)?.nomor_rt}` || "",
+                                                    }
+                                                    : null
+                                            }
+                                            onChange={(selected) => handleSelectChange('id_rt', selected)}
+                                            placeholder="Pilih nomor RT..."
+                                            isSearchable={true}
+                                            className="react-select-container"
+                                            classNamePrefix="react-select"
+                                            noOptionsMessage={() => data.id_rw ? "Tidak ada RT yang aktif" : "Harap pilih RW terlebihdahulu"}
+                                            styles={{
+                                                control: (base) => ({
+                                                    ...base,
+                                                    border: 0,
+                                                    borderBottom: "1px solid lightgray",
+                                                    borderRadius: 0,
+                                                    boxShadow: "none",
+                                                }),
+                                            }}
+                                        />
+                                        {/* <select
                                             name="id_rt"
                                             className="form-control"
                                             value={data.id_rt}
@@ -5764,7 +5808,7 @@ export function TambahIuran({ tambahShow, onClose, onAdded, role, golongan, nik,
                                             ) : (
                                                 <option value="">Tidak ada RT</option>
                                             )}
-                                        </select>
+                                        </select> */}
                                     </div>
                                     </Role>
                                     {/* {perWarga && (
@@ -6262,18 +6306,25 @@ export function TambahTagihan({ tambahShow, onClose, onUpdated, role, iuran, kk_
         nama: "",
         nominal: "",
         tgl_tagih: "",
-        no_kk: "semua",
+        no_kk: "",
     })
+
+    const [kkList, setKkList] = useState([])
 
     useEffect(() => {
         if (!iuran || iuran.length === 0) return
         const selected = iuran.find((item) => item.id == data.id_iuran)
         if (selected) {
+            const kkFinder = kk_list.filter(kk => kk.rw.id === selected.id)
+            console.log(kkFinder)
+            console.log(kkList)
+            setKkList(kkFinder)
             setData((prev) => ({
                 ...prev,
                 nama: selected.nama || "",
                 nominal: selected.nominal || "",
                 tgl_tagih: selected.tgl_tagih || "",
+                no_kk: "semua",
             }))
         }
     }, [data.id_iuran, iuran])
@@ -6297,7 +6348,7 @@ export function TambahTagihan({ tambahShow, onClose, onUpdated, role, iuran, kk_
                     nama: "",
                     nominal: "",
                     tgl_tagih: "",
-                    no_kk: "semua",
+                    no_kk: "",
                 })
                 onClose()
             })
@@ -6343,15 +6394,72 @@ export function TambahTagihan({ tambahShow, onClose, onUpdated, role, iuran, kk_
                                 <div className="p-3">
                                     <form onSubmit={handleSubmit} className="h-100">
                                         <div className="mb-3">
-                                            <label className="form-label">Nomor Kartu Keluarga</label>
+                                            <div className="mb-3">
+                                                <label className="form-label">Jenis Iuran</label>
+                                                <Select
+                                                    options={iuran?.map((item) => ({
+                                                        value: item.id,
+                                                        label: item.nama,
+                                                    }))}
+                                                    value={
+                                                        data.id_iuran
+                                                            ? {
+                                                                value: data.id_iuran,
+                                                                label: iuran?.find((x) => x.id == data.id_iuran)?.nama || "",
+                                                            }
+                                                            : null
+                                                    }
+                                                    onChange={(selected) => setData("id_iuran", selected?.value || "")}
+                                                    placeholder="Pilih jenis iuran..."
+                                                    isSearchable={true}
+                                                    className="react-select-container"
+                                                    classNamePrefix="react-select"
+                                                    noOptionsMessage={() => "Tidak ada Iuran"}
+                                                    styles={{
+                                                        control: (base) => ({
+                                                            ...base,
+                                                            border: 0,
+                                                            borderBottom: "1px solid lightgray",
+                                                            borderRadius: 0,
+                                                            boxShadow: "none",
+                                                        }),
+                                                    }}
+                                                />
+                                                {/* <select
+                                                name="id_iuran"
+                                                value={data.id_iuran}
+                                                className="form-control"
+                                                onChange={(e) => setData('id_iuran', e.target.value)}
+                                                required
+                                                title="Pilih Iuran"
+                                                style={{
+                                                    border: '0',
+                                                    borderBottom: '1px solid lightgray',
+                                                    borderRadius: '0',
+                                                }}
+                                            >
+                                                <option value="" disabled>-- Pilih Iuran --</option>
+                                                {iuran.length > 0 ?
+                                                    iuran.map((iuran) => (
+                                                        <option key={iuran.id} value={iuran.id}>{iuran.nama}</option>
+                                                    )) : (
+                                                        <option value="" title={role === 'rt' && "Tolong hubungi RW anda untuk ditindaklanjuti."} className="text-center" disabled>-- Tidak ada iuran yang tersedia --</option>
+                                                    )
+                                                }
+                                            </select> */}
+                                            </div>
+
+                                            <label className="form-label">Nomor Kartu Keluarga</label>{console.log(kkList?.length)}
                                             <Select
-                                                options={[
-                                                    { value: "semua", label: "Semua Kartu Keluarga" },
-                                                    ...kk_list.map((kk) => ({
-                                                        value: kk.no_kk,
-                                                        label: kk.no_kk,
-                                                    })),
-                                                ]}
+                                                options={
+                                                    kkList?.length ? [
+                                                        { value: "semua", label: "Semua Kartu Keluarga" },
+                                                        ...kkList.map((kk) => ({
+                                                            value: kk.no_kk,
+                                                            label: kk.no_kk,
+                                                        })),
+                                                    ] : []
+                                                }
                                                 value={
                                                     data.no_kk
                                                         ? { value: data.no_kk, label: data.no_kk === "semua" ? "Semua Kartu Keluarga" : data.no_kk }
@@ -6362,7 +6470,7 @@ export function TambahTagihan({ tambahShow, onClose, onUpdated, role, iuran, kk_
                                                 isSearchable={true}
                                                 className="react-select-container"
                                                 classNamePrefix="react-select"
-                                                noOptionsMessage={() => "Tidak ada Kartu Keluarga"}
+                                                noOptionsMessage={() => data.id_iuran ? "Tidak ada Kartu Keluarga" : "Harap Pilih Iuran Terlebih dahulu"}
                                                 styles={{
                                                     control: (base) => ({
                                                         ...base,
@@ -6396,60 +6504,7 @@ export function TambahTagihan({ tambahShow, onClose, onUpdated, role, iuran, kk_
                                             </select> */}
                                         </div>
 
-                                        <div className="mb-3">
-                                            <label className="form-label">Jenis Iuran</label>
-                                            <Select
-                                                options={iuran?.map((item) => ({
-                                                    value: item.id,
-                                                    label: item.nama,
-                                                }))}
-                                                value={
-                                                    data.id_iuran
-                                                        ? {
-                                                            value: data.id_iuran,
-                                                            label: iuran?.find((x) => x.id == data.id_iuran)?.nama || "",
-                                                        }
-                                                        : null
-                                                }
-                                                onChange={(selected) => setData("id_iuran", selected?.value || "")}
-                                                placeholder="Pilih jenis iuran..."
-                                                isSearchable={true}
-                                                className="react-select-container"
-                                                classNamePrefix="react-select"
-                                                noOptionsMessage={() => "Tidak ada Iuran"}
-                                                styles={{
-                                                    control: (base) => ({
-                                                        ...base,
-                                                        border: 0,
-                                                        borderBottom: "1px solid lightgray",
-                                                        borderRadius: 0,
-                                                        boxShadow: "none",
-                                                    }),
-                                                }}
-                                            />
-                                            {/* <select
-                                                name="id_iuran"
-                                                value={data.id_iuran}
-                                                className="form-control"
-                                                onChange={(e) => setData('id_iuran', e.target.value)}
-                                                required
-                                                title="Pilih Iuran"
-                                                style={{
-                                                    border: '0',
-                                                    borderBottom: '1px solid lightgray',
-                                                    borderRadius: '0',
-                                                }}
-                                            >
-                                                <option value="" disabled>-- Pilih Iuran --</option>
-                                                {iuran.length > 0 ?
-                                                    iuran.map((iuran) => (
-                                                        <option key={iuran.id} value={iuran.id}>{iuran.nama}</option>
-                                                    )) : (
-                                                        <option value="" title={role === 'rt' && "Tolong hubungi RW anda untuk ditindaklanjuti."} className="text-center" disabled>-- Tidak ada iuran yang tersedia --</option>
-                                                    )
-                                                }
-                                            </select> */}
-                                        </div>
+
 
                                         <div className="mb-3">
                                             <label className="form-label">Nominal</label>
@@ -6976,170 +7031,170 @@ export function DetailTagihan({ selectedData, detailShow, onClose }) {
     )
 }
 
-export function TambahTransaksi({ tambahShow, onClose, onAdded, role, daftarRT = [] }) {
-    const { data, setData } = useForm({
-        tanggal: "",
-        nama_transaksi: "",
-        jenis: "",
-        nominal: "",
-        keterangan: "",
-        rt: "",
-    });
+// export function TambahTransaksi({ tambahShow, onClose, onAdded, role, daftarRT = [] }) {
+//     const { data, setData } = useForm({
+//         tanggal: "",
+//         nama_transaksi: "",
+//         jenis: "",
+//         nominal: "",
+//         keterangan: "",
+//         rt: "",
+//     });
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
+//     const handleSubmit = (e) => {
+//         e.preventDefault();
 
-        const formData = new FormData();
-        formData.append('tanggal', data.tanggal);
-        formData.append('nama_transaksi', data.nama_transaksi);
-        formData.append('jenis', data.jenis);
-        formData.append('nominal', data.nominal);
-        formData.append('keterangan', data.keterangan);
-        formData.append('rt', data.rt);
+//         const formData = new FormData();
+//         formData.append('tanggal', data.tanggal);
+//         formData.append('nama_transaksi', data.nama_transaksi);
+//         formData.append('jenis', data.jenis);
+//         formData.append('nominal', data.nominal);
+//         formData.append('keterangan', data.keterangan);
+//         formData.append('rt', data.rt);
 
-        axios.post(`/${role}/transaksi`, formData)
-            .then(res => {
-                console.log('RESPON:', res.data);
+//         axios.post(`/${role}/transaksi`, formData)
+//             .then(res => {
+//                 console.log('RESPON:', res.data);
 
-                if (onAdded && res.data.transaksi) {
-                    onAdded(res.data.transaksi, res.data.jenis);
-                }
+//                 if (onAdded && res.data.transaksi) {
+//                     onAdded(res.data.transaksi, res.data.jenis);
+//                 }
 
-                setData({
-                    tanggal: "",
-                    nama_transaksi: "",
-                    jenis: "",
-                    nominal: "",
-                    keterangan: "",
-                    rt: "",
-                });
+//                 setData({
+//                     tanggal: "",
+//                     nama_transaksi: "",
+//                     jenis: "",
+//                     nominal: "",
+//                     keterangan: "",
+//                     rt: "",
+//                 });
 
-                onClose();
-            })
-            .catch(err => {
-                console.error(err.response?.data || err.message);
-            });
-    };
+//                 onClose();
+//             })
+//             .catch(err => {
+//                 console.error(err.response?.data || err.message);
+//             });
+//     };
 
-    useEffect(() => {
-        const handleEsc = (e) => {
-            if (e.key === "Escape") onClose();
-        };
-        document.addEventListener("keydown", handleEsc);
-        return () => document.removeEventListener("keydown", handleEsc);
-    }, [onClose]);
+//     useEffect(() => {
+//         const handleEsc = (e) => {
+//             if (e.key === "Escape") onClose();
+//         };
+//         document.addEventListener("keydown", handleEsc);
+//         return () => document.removeEventListener("keydown", handleEsc);
+//     }, [onClose]);
 
-    if (!tambahShow) return null;
+//     if (!tambahShow) return null;
 
-    return (
-        <div
-            className="modal fade show"
-            tabIndex="-1"
-            style={{
-                display: "block",
-                backgroundColor: "rgba(0,0,0,0.5)"
-            }}
-            onClick={onClose}
-        >
-            <div
-                className="modal-dialog modal-dialog-scrollable modal-dialog-centered"
-                onClick={(e) => e.stopPropagation()}
-            >
-                <div className="modal-content shadow-lg border-0">
-                    <div className="modal-body p-0 m-0">
-                        <div className="d-flex tambah-body flex-column" style={{ width: "100%", maxHeight: "80vh", overflowY: "auto" }}>
-                            <div className="p-3">
-                                <form onSubmit={handleSubmit} className="h-100">
-                                    <div className="mb-3">
-                                        <label className="form-label">Nama Transaksi</label>
-                                        <input
-                                            name="nama_transaksi"
-                                            type="text"
-                                            className="form-control"
-                                            onChange={(e) => setData('nama_transaksi', e.target.value)}
-                                            required
-                                        />
-                                    </div>
+//     return (
+//         <div
+//             className="modal fade show"
+//             tabIndex="-1"
+//             style={{
+//                 display: "block",
+//                 backgroundColor: "rgba(0,0,0,0.5)"
+//             }}
+//             onClick={onClose}
+//         >
+//             <div
+//                 className="modal-dialog modal-dialog-scrollable modal-dialog-centered"
+//                 onClick={(e) => e.stopPropagation()}
+//             >
+//                 <div className="modal-content shadow-lg border-0">
+//                     <div className="modal-body p-0 m-0">
+//                         <div className="d-flex tambah-body flex-column" style={{ width: "100%", maxHeight: "80vh", overflowY: "auto" }}>
+//                             <div className="p-3">
+//                                 <form onSubmit={handleSubmit} className="h-100">
+//                                     <div className="mb-3">
+//                                         <label className="form-label">Nama Transaksi</label>
+//                                         <input
+//                                             name="nama_transaksi"
+//                                             type="text"
+//                                             className="form-control"
+//                                             onChange={(e) => setData('nama_transaksi', e.target.value)}
+//                                             required
+//                                         />
+//                                     </div>
 
-                                    <div className="mb-3">
-                                        <label className="form-label">Tanggal Transaksi</label>
-                                        <input
-                                            name="tanggal"
-                                            type="date"
-                                            className="form-control"
-                                            onChange={(e) => setData('tanggal', e.target.value)}
-                                            required
-                                        />
-                                    </div>
+//                                     <div className="mb-3">
+//                                         <label className="form-label">Tanggal Transaksi</label>
+//                                         <input
+//                                             name="tanggal"
+//                                             type="date"
+//                                             className="form-control"
+//                                             onChange={(e) => setData('tanggal', e.target.value)}
+//                                             required
+//                                         />
+//                                     </div>
 
-                                    <div className="mb-3">
-                                        <label className="form-label">Jenis Transaksi</label>
-                                        <select
-                                            name="jenis"
-                                            className="form-select"
-                                            value={data.jenis}
-                                            onChange={(e) => setData('jenis', e.target.value)}
-                                            required
-                                        >
-                                            <option value="">-- Pilih Jenis --</option>
-                                            <option value="pemasukan">Pemasukan</option>
-                                            <option value="pengeluaran">Pengeluaran</option>
-                                        </select>
-                                    </div>
+//                                     <div className="mb-3">
+//                                         <label className="form-label">Jenis Transaksi</label>
+//                                         <select
+//                                             name="jenis"
+//                                             className="form-select"
+//                                             value={data.jenis}
+//                                             onChange={(e) => setData('jenis', e.target.value)}
+//                                             required
+//                                         >
+//                                             <option value="">-- Pilih Jenis --</option>
+//                                             <option value="pemasukan">Pemasukan</option>
+//                                             <option value="pengeluaran">Pengeluaran</option>
+//                                         </select>
+//                                     </div>
 
-                                    <div className="mb-3">
-                                        <label className="form-label">Nominal Transaksi</label>
-                                        <input
-                                            type="number"
-                                            name="nominal"
-                                            className="form-control"
-                                            onChange={(e) => setData('nominal', e.target.value)}
-                                            maxLength="8"
-                                            required
-                                        />
-                                    </div>
+//                                     <div className="mb-3">
+//                                         <label className="form-label">Nominal Transaksi</label>
+//                                         <input
+//                                             type="number"
+//                                             name="nominal"
+//                                             className="form-control"
+//                                             onChange={(e) => setData('nominal', e.target.value)}
+//                                             maxLength="8"
+//                                             required
+//                                         />
+//                                     </div>
 
-                                    <div className="mb-3">
-                                        <label className="form-label">RT</label>
-                                        <select
-                                            name="rt"
-                                            className="form-select"
-                                            value={data.rt}
-                                            onChange={(e) => setData('rt', e.target.value)}
-                                            required
-                                        >
-                                            <option value="">-- Pilih RT --</option>
-                                            {daftarRT.map((nomor, i) => (
-                                                <option key={i} value={nomor}>
-                                                    RT {nomor}
-                                                </option>
-                                            ))}
-                                        </select>
-                                    </div>
+//                                     <div className="mb-3">
+//                                         <label className="form-label">RT</label>
+//                                         <select
+//                                             name="rt"
+//                                             className="form-select"
+//                                             value={data.rt}
+//                                             onChange={(e) => setData('rt', e.target.value)}
+//                                             required
+//                                         >
+//                                             <option value="">-- Pilih RT --</option>
+//                                             {daftarRT.map((nomor, i) => (
+//                                                 <option key={i} value={nomor}>
+//                                                     RT {nomor}
+//                                                 </option>
+//                                             ))}
+//                                         </select>
+//                                     </div>
 
-                                    <div className="mb-3">
-                                        <label className="form-label">Keterangan</label>
-                                        <textarea
-                                            name="keterangan"
-                                            className="form-control"
-                                            rows="3"
-                                            onChange={(e) => setData("keterangan", e.target.value)}
-                                        ></textarea>
-                                    </div>
+//                                     <div className="mb-3">
+//                                         <label className="form-label">Keterangan</label>
+//                                         <textarea
+//                                             name="keterangan"
+//                                             className="form-control"
+//                                             rows="3"
+//                                             onChange={(e) => setData("keterangan", e.target.value)}
+//                                         ></textarea>
+//                                     </div>
 
-                                    <button type="submit" className="btn btn-primary ms-auto mt-auto">
-                                        <i className="fas fa-save me-2"></i>
-                                        Simpan
-                                    </button>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
-}
+//                                     <button type="submit" className="btn btn-primary ms-auto mt-auto">
+//                                         <i className="fas fa-save me-2"></i>
+//                                         Simpan
+//                                     </button>
+//                                 </form>
+//                             </div>
+//                         </div>
+//                     </div>
+//                 </div>
+//             </div>
+//         </div>
+//     );
+// }
 
 export function TambahTransaksiPerKk({ listKK = [], tambahShow, onClose, onAdded, role, daftarRT = [], daftarRW = [] }) {
     const { data, setData } = useForm({

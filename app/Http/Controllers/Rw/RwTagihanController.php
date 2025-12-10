@@ -35,7 +35,7 @@ class RwTagihanController extends Controller
         $kartuKeluargaForFilter = Kartu_keluarga::whereHas('rw', function ($q) use ($nomorRwUser) {
             $q->where('nomor_rw', $nomorRwUser);
         })
-            ->select('no_kk')
+            ->with(['rukunTetangga', 'rw'])
             ->distinct()
             ->orderBy('no_kk')
             ->get();
@@ -45,6 +45,7 @@ class RwTagihanController extends Controller
             'kartuKeluarga.warga',
             'kartuKeluarga.kepalaKeluarga',
         ])
+            ->orderBy('tgl_tagih', 'desc')
             ->whereHas('kartuKeluarga.rw', function ($q) use ($nomorRwUser) {
                 $q->where('nomor_rw', $nomorRwUser);
             })
@@ -81,7 +82,7 @@ class RwTagihanController extends Controller
             ->orderBy('tgl_tagih', 'desc')
             ->paginate(10, ['*'], 'otomatis_page');
 
-        $iuran_for_tagihan = Iuran::with(['iuran_golongan', 'iuran_golongan.golongan'])
+        $iuran_for_tagihan = Iuran::with(['iuran_golongan', 'iuran_golongan.golongan', 'rw'])
             ->whereHas('rw', function ($q) use ($nomorRwUser) {
                 $q->where('nomor_rw', $nomorRwUser);
             })

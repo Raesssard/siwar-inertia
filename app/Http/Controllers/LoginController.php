@@ -131,8 +131,6 @@ class LoginController extends Controller
         $user->last_role = $role;
         $user->save();
 
-        // session()->flash('need_cookie_confirmation', true);
-
         return response()->json(['success' => true]);
     }
 

@@ -29,8 +29,8 @@ class Rt_tagihanController extends Controller
         $status = $request->status;
         $no_kk_filter = $request->no_kk_filter;
 
-        $kartuKeluargaForFilter = Kartu_keluarga::where('id_rt', $idRt)
-            ->select('no_kk')
+        $kartuKeluargaForFilter = Kartu_keluarga::with(['rukunTetangga', 'rw'])
+            ->where('id_rt', $idRt)
             ->distinct()
             ->orderBy('no_kk')
             ->get();
@@ -40,6 +40,7 @@ class Rt_tagihanController extends Controller
             'kartuKeluarga.warga',
             'kartuKeluarga.kepalaKeluarga',
         ])
+            ->orderBy('tgl_tagih', 'desc')
             ->where(function ($query) use ($idRt, $idRw, $user) {
                 $query->whereHas('kartuKeluarga', function ($q) use ($idRt, $idRw, $user) {
                     if ($user->hasRole('rt')) {
@@ -85,7 +86,7 @@ class Rt_tagihanController extends Controller
             ->orderBy('tgl_tagih', 'desc')
             ->paginate(10, ['*'], 'otomatis_page');
 
-        $iuran_for_tagihan = Iuran::with(['iuran_golongan', 'iuran_golongan.golongan'])
+        $iuran_for_tagihan = Iuran::with(['iuran_golongan', 'iuran_golongan.golongan', 'rw'])
             ->whereHas('rw', function ($q) use ($idRw) {
                 $q->where('id_rw', $idRw);
             })

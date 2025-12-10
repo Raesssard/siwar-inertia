@@ -14,11 +14,12 @@ class AdminTransaksiController extends Controller
 {
     public function index(Request $request)
     {
-        $title = "Transaksi Admin";
+        $title = "Transaksi";
 
         $search = $request->search;
         $tahun = $request->tahun;
         $bulan = $request->bulan;
+        $rw = $request->rw;
         $rt = $request->rt;
 
         $allowedMainRoles = ['admin', 'rw', 'rt', 'warga'];
@@ -45,6 +46,9 @@ class AdminTransaksiController extends Controller
             ->when($search, fn($q) => $q->where('nama_transaksi', 'like', "%{$search}%"))
             ->when($tahun, fn($q) => $q->whereYear('tanggal', $tahun))
             ->when($bulan, fn($q) => $q->whereMonth('tanggal', $bulan))
+            ->when($rw, fn($q) => $q->whereHas('rukunTetangga.rw', function ($kueri) use ($rw) {
+                $kueri->where('nomor_rw', $rw);
+            }))
             ->when($rt, fn($q) => $q->whereHas('rukunTetangga', function ($qr) use ($rt) {
                 $qr->where('nomor_rt', $rt);
             }));
@@ -59,8 +63,18 @@ class AdminTransaksiController extends Controller
             ->pluck('tahun');
 
         $daftar_bulan = [
-            'januari','februari','maret','april','mei','juni',
-            'juli','agustus','september','oktober','november','desember'
+            'januari',
+            'februari',
+            'maret',
+            'april',
+            'mei',
+            'juni',
+            'juli',
+            'agustus',
+            'september',
+            'oktober',
+            'november',
+            'desember'
         ];
 
         $list_kk = Kartu_keluarga::with('rukunTetangga')
@@ -148,4 +162,3 @@ class AdminTransaksiController extends Controller
         ]);
     }
 }
-
