@@ -56,7 +56,7 @@ export default function FormKK({ kk = null, daftar_rt = [], kategori_iuran = [],
         "w-full p-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-200 transition text-gray-800";
 
     return (
-        <Layout title={isEdit ? "Edit Kartu Keluarga" : "Tambah Kartu Keluarga"}>
+        <Layout>
             <Head title={isEdit ? "Edit Kartu Keluarga" : "Tambah Kartu Keluarga"} />
 
             <div className="max-w-6xl mx-auto bg-white p-10 mt-8 rounded-2xl shadow-xl">

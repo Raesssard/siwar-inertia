@@ -94,7 +94,7 @@ export default function Roles({ roles, permissions, filters, title }) {
             <Head
                 title={`${title} - ${role.length <= 2
                     ? role.toUpperCase()
-                    : role.charAt(0).toUpperCase() + role.slice(1)
+                    : role.replace(/\b\w/g, (char) => char.toUpperCase())
                     }`}
             />
 
@@ -149,7 +149,10 @@ export default function Roles({ roles, permissions, filters, title }) {
                                 roles.data.map((item, index) => (
                                     <tr key={item.id}>
                                         <td className="text-center">{roles.from + index}</td>
-                                        <td className="text-center">{item.name}</td>
+                                        <td className="text-center">{item.name.length <= 2
+                                            ? item.name.toUpperCase()
+                                            : item.name.replace(/\b\w/g, (char) => char.toUpperCase())
+                                        }</td>
                                         <td className="text-center">
                                             {item.permissions.length > 0
                                                 ? `${item.permissions.length} permission${item.permissions.length > 1 ? "s" : ""
@@ -161,8 +164,9 @@ export default function Roles({ roles, permissions, filters, title }) {
                                                 <button
                                                     className="btn btn-warning btn-sm"
                                                     onClick={() => openEdit(item)}
+                                                    title="Edit Role"
                                                 >
-                                                    Edit
+                                                    <i className="fas fa-edit"></i>
                                                 </button>
 
                                                 <Link
@@ -170,8 +174,9 @@ export default function Roles({ roles, permissions, filters, title }) {
                                                     preserveState
                                                     href={route("admin.roles.permissions.edit", item.id)}
                                                     className="btn btn-secondary btn-sm"
+                                                    title="Permission Role"
                                                 >
-                                                    Permissions
+                                                    <i className="fa-solid fa-user-lock"></i>
                                                 </Link>
 
                                                 {/* <button

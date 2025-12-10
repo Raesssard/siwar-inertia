@@ -8,6 +8,8 @@ export default function AssignRolesPermission({ role, permissions, title }) {
         role.permissions.map((p) => p.name)
     );
     const [search, setSearch] = useState("");
+    const { props } = usePage()
+    const currentRole = props.auth?.currentRole ?? []
 
     // 🔄 Toggle permission
     const togglePermission = (perm) => {
@@ -63,7 +65,12 @@ export default function AssignRolesPermission({ role, permissions, title }) {
 
     return (
         <Layout>
-            <Head title={title} />
+            <Head
+                title={`${title} - ${currentRole.length <= 2
+                    ? currentRole.toUpperCase()
+                    : currentRole.replace(/\b\w/g, (char) => char.toUpperCase())
+                    }`}
+            />
 
             {/* 🧩 Header */}
             <div className="d-flex justify-content-between align-items-center mb-4">
@@ -99,8 +106,8 @@ export default function AssignRolesPermission({ role, permissions, title }) {
                                     >
                                         <label
                                             className={`d-flex align-items-center p-2 rounded border transition text-black ${selectedPerms.includes(perm.name)
-                                                    ? "bg-blue-500 bg-opacity-10 border-blue-950"
-                                                    : "bg-light border-light"
+                                                ? "bg-blue-500 bg-opacity-10 border-blue-950"
+                                                : "bg-light border-light"
                                                 }`}
                                             style={{ cursor: "pointer" }}
                                         >

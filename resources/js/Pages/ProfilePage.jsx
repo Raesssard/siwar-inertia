@@ -16,7 +16,8 @@ export default function ProfilePage({ user, rt, rw, kk }) {
     const [isPhotoDirty, setIsPhotoDirty] = useState(false)
     const [isSubmitting, setIsSubmitting] = useState(false)
     const bypassGuard = useRef(false)
-
+    const { props } = usePage()
+    const role = props.auth?.currentRole
     const safeAction = async (callback) => {
         bypassGuard.current = true
         try {
@@ -182,8 +183,13 @@ export default function ProfilePage({ user, rt, rw, kk }) {
     }
 
     return (
-        <Layout title="Profil Pengguna">
-            <Head title="Profil" />
+        <Layout>
+            <Head
+                title={`Profil - ${role.length <= 2
+                    ? role.toUpperCase()
+                    : role.replace(/\b\w/g, (char) => char.toUpperCase())
+                    }`}
+            />
 
             <div className="max-w-4xl mx-auto p-8 rounded-xl shadow">
                 <h2 className="mb-3">Profil Pengguna</h2>

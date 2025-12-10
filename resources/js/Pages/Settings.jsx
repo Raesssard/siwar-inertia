@@ -1,5 +1,5 @@
 import React from "react";
-import { useForm, usePage } from "@inertiajs/react";
+import { Head, useForm, usePage } from "@inertiajs/react";
 import Layout from "@/Layouts/Layout";
 
 export default function Settings() {
@@ -42,7 +42,13 @@ export default function Settings() {
     };
 
     return (
-        <Layout title="Pengaturan Akun & Sistem">
+        <Layout>
+            <Head
+                title={`Pengaturan - ${role.length <= 2
+                    ? role.toUpperCase()
+                    : role.replace(/\b\w/g, (char) => char.toUpperCase())
+                    }`}
+            />
             <div className="col-12 col-md-10 col-lg-8 mx-auto py-5">
                 <div className="bg-white shadow rounded-lg p-4">
                     <h3 className="mb-4 fw-bold text-center">

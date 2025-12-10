@@ -7208,7 +7208,6 @@ export function TambahTransaksiPerKk({ listKK = [], tambahShow, onClose, onAdded
         rw: "",
     })
     const [Kklist, setKkList] = useState(listKK || [])
-    const [filteredRt, setFilteredRt] = useState([]);
     const [rtList, setRtList] = useState([])
 
     const handleSelectChange = (name, selected) => {
@@ -7219,26 +7218,27 @@ export function TambahTransaksiPerKk({ listKK = [], tambahShow, onClose, onAdded
     };
 
     useEffect(() => {
-        let filteredRt;
+        let filteredRt
 
         if (data.rw) {
             filteredRt = daftarRT?.filter(
+                // ini filter pake nomor_rw🔥😮😱🦅
                 kk => kk.rw.nomor_rw == data.rw
-            );
+            )
         } else {
-            filteredRt = daftarRT;
+            filteredRt = daftarRT
         }
 
         if (role !== 'rw' && !data.rw) {
             setRtList([])
         } else {
-            setRtList(filteredRt);
+            setRtList(filteredRt)
         }
 
         if (filteredRt?.length === 0) {
-            setData('rt', '');
+            setData('rt', '')
         }
-    }, [data.rw]);
+    }, [data.rw])
 
     const handleSubmit = (e) => {
         e.preventDefault()
@@ -7278,26 +7278,26 @@ export function TambahTransaksiPerKk({ listKK = [], tambahShow, onClose, onAdded
     }
 
     useEffect(() => {
-        let filteredKK;
+        let filteredKK
 
         if (data.rt) {
             filteredKK = listKK?.filter(
                 kk => kk.rukun_tetangga?.nomor_rt == data.rt
-            );
+            )
         } else {
-            filteredKK = listKK;
+            filteredKK = listKK
         }
 
         if (role !== 'rt' && !data.rt) {
             setKkList([])
         } else {
-            setKkList(filteredKK);
+            setKkList(filteredKK)
         }
 
         if (filteredKK?.length === 0) {
-            setData('no_kk', '');
+            setData('no_kk', '')
         }
-    }, [data.rt]);
+    }, [data.rt])
 
     useEffect(() => {
         const handleEsc = (e) => {
