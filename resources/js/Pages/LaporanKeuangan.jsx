@@ -184,9 +184,12 @@ export default function LaporanKeuangan() {
 
     return (
         <Layout>
-            <Head title={`${title} - ${role.length <= 2
-                ? role.toUpperCase()
-                : role.charAt(0).toUpperCase() + role.slice(1)}`} />
+            <Head
+                title={`${title} - ${role.length <= 2
+                    ? role.toUpperCase()
+                    : role.replace(/\b\w/g, (char) => char.toUpperCase())
+                    }`}
+            />
             <FilterLaporanKeuangan
                 transaksi={transaksi}
                 exportExcel={handleExportLaporan}
@@ -281,6 +284,8 @@ export default function LaporanKeuangan() {
                                         style={{ cursor: !link.url ? "not-allowed" : "pointer" }}
                                     >
                                         <Link
+                                            preserveScroll
+                                            preserveState
                                             href={link.url || ""}
                                             dangerouslySetInnerHTML={{
                                                 __html: label,
@@ -352,6 +357,8 @@ export default function LaporanKeuangan() {
                                         style={{ cursor: !link.url ? "not-allowed" : "pointer" }}
                                     >
                                         <Link
+                                            preserveScroll
+                                            preserveState
                                             href={link.url || ""}
                                             dangerouslySetInnerHTML={{
                                                 __html: label,

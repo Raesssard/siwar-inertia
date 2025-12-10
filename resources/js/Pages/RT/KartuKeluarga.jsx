@@ -38,9 +38,12 @@ export default function KartuKeluarga() {
 
     return (
         <Layout>
-            <Head title={`${title} - ${role.length <= 2
-                ? role.toUpperCase()
-                : role.charAt(0).toUpperCase() + role.slice(1)}`} />
+            <Head
+                title={`${title} - ${role.length <= 2
+                    ? role.toUpperCase()
+                    : role.replace(/\b\w/g, (char) => char.toUpperCase())
+                    }`}
+            />
             <FilterKK
                 data={data}
                 setData={setData}
@@ -102,9 +105,9 @@ export default function KartuKeluarga() {
                     <div className="pagination-container">
                         <ul className="pagination-custom">
                             {kartu_keluarga.links.map((link, index) => {
-                                let label = link.label;
-                                if (label.includes("Previous")) label = "&lt;";
-                                if (label.includes("Next")) label = "&gt;";
+                                let label = link.label
+                                if (label.includes("Previous")) label = "&lt;"
+                                if (label.includes("Next")) label = "&gt;"
 
                                 return (
                                     <li
@@ -114,6 +117,8 @@ export default function KartuKeluarga() {
                                         style={{ cursor: !link.url ? "not-allowed" : "pointer" }}
                                     >
                                         <Link
+                                            preserveScroll
+                                            preserveState
                                             href={link.url || ""}
                                             dangerouslySetInnerHTML={{
                                                 __html: label,
@@ -121,7 +126,7 @@ export default function KartuKeluarga() {
                                             title={`Pergi ke halaman ${label === "&lt;" ? 'sebelumnya' : label === "&gt;" ? 'selanjutnya' : label}`}
                                         />
                                     </li>
-                                );
+                                )
                             })}
                         </ul>
                     </div>

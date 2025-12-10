@@ -131,6 +131,8 @@ export default function Topbar({ modalShow, hapusHistory }) {
                     <Link
                         className="nav-link dropdown-toggle w-100"
                         href="#"
+                        preserveScroll
+                        preserveState
                         id="userDropdown"
                         role="button"
                         data-bs-toggle="dropdown"

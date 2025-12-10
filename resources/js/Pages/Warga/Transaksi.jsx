@@ -35,9 +35,12 @@ export default function Transaksi() {
 
     return (
         <Layout>
-            <Head title={`${title} - ${role.length <= 2
-                ? role.toUpperCase()
-                : role.charAt(0).toUpperCase() + role.slice(1)}`} />
+            <Head
+                title={`${title} - ${role.length <= 2
+                    ? role.toUpperCase()
+                    : role.replace(/\b\w/g, (char) => char.toUpperCase())
+                    }`}
+            />
             <FilterTransaksi
                 data={data}
                 setData={setData}
@@ -117,6 +120,8 @@ export default function Transaksi() {
                                         style={{ cursor: !link.url ? "not-allowed" : "pointer" }}
                                     >
                                         <Link
+                                            preserveScroll
+                                            preserveState
                                             href={link.url || ""}
                                             dangerouslySetInnerHTML={{
                                                 __html: label,

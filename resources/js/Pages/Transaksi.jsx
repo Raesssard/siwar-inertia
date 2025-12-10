@@ -95,14 +95,14 @@ export default function Transaksi() {
 
     // ===================== RENDER ===================== //
 
-    const roleTitle =
-        role.length <= 2
-            ? role.toUpperCase()
-            : role.charAt(0).toUpperCase() + role.slice(1)
-
     return (
         <Layout>
-            <Head title={`${title} - ${roleTitle}`} />
+            <Head
+                title={`${title} - ${role.length <= 2
+                    ? role.toUpperCase()
+                    : role.replace(/\b\w/g, (char) => char.toUpperCase())
+                    }`}
+            />
 
             <FilterTransaksi
                 transaksi={transaksiList}
@@ -125,8 +125,8 @@ export default function Transaksi() {
                         {role === "admin"
                             ? "Semua Transaksi"
                             : role === "rw"
-                            ? `Transaksi RW ${user?.rw?.nomor_rw}`
-                            : `Transaksi RT ${user?.rt?.nomor_rt}`}
+                                ? `Transaksi RW ${user?.rw?.nomor_rw}`
+                                : `Transaksi RT ${user?.rt?.nomor_rt}`}
                     </h4>
                     <span></span>
                 </div>
@@ -223,6 +223,8 @@ export default function Transaksi() {
                                         style={{ cursor: !link.url ? "not-allowed" : "pointer" }}
                                     >
                                         <Link
+                                            preserveScroll
+                                            preserveState
                                             href={link.url || ""}
                                             dangerouslySetInnerHTML={{
                                                 __html: label,

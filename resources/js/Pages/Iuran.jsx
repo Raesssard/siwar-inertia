@@ -12,7 +12,6 @@ export default function Iuran() {
         iuranOtomatis: iuranOtomatisFromServer,
         iuranManual: iuranManualFromServer,
         golongan_list,
-        rw_list,
         rt_list,
         nik_list,
         no_kk_list,
@@ -148,9 +147,12 @@ export default function Iuran() {
 
     return (
         <Layout>
-            <Head title={`${title} - ${role.length <= 2
-                ? role.toUpperCase()
-                : role.charAt(0).toUpperCase() + role.slice(1)}`} />
+            <Head
+                title={`${title} - ${role.length <= 2
+                    ? role.toUpperCase()
+                    : role.replace(/\b\w/g, (char) => char.toUpperCase())
+                    }`}
+            />
             <FilterIuran
                 iuranManual={iuranListManual}
                 iuranOtomatis={iuranListOtomatis}
@@ -234,6 +236,8 @@ export default function Iuran() {
                                         style={{ cursor: !link.url ? "not-allowed" : "pointer" }}
                                     >
                                         <Link
+                                            preserveScroll
+                                            preserveState
                                             href={link.url || ""}
                                             dangerouslySetInnerHTML={{
                                                 __html: label,
@@ -297,6 +301,8 @@ export default function Iuran() {
                                         style={{ cursor: !link.url ? "not-allowed" : "pointer" }}
                                     >
                                         <Link
+                                            preserveScroll
+                                            preserveState
                                             href={link.url || ""}
                                             dangerouslySetInnerHTML={{
                                                 __html: label,

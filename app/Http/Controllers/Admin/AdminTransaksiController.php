@@ -8,6 +8,7 @@ use App\Models\Transaksi;
 use App\Models\Rt;
 use App\Models\Rw;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 
 class AdminTransaksiController extends Controller
@@ -25,20 +26,24 @@ class AdminTransaksiController extends Controller
         $allowedMainRoles = ['admin', 'rw', 'rt', 'warga'];
 
         $rw_list = Rw::whereHas('users', function ($q) use ($allowedMainRoles) {
-                $q->whereHas('roles', fn($qrw) => $qrw->where('name', 'rw'))
-                ->whereDoesntHave('roles', fn($qx) =>
+            $q->whereHas('roles', fn($qrw) => $qrw->where('name', 'rw'))
+                ->whereDoesntHave(
+                    'roles',
+                    fn($qx) =>
                     $qx->whereNotIn('name', $allowedMainRoles)
                 );
-            })
+        })
             ->select('id', 'nomor_rw', 'nama_anggota_rw')
             ->get();
 
-        $rt_list = Rt::whereHas('user', function ($q) use ($allowedMainRoles) {
-                $q->whereHas('roles', fn($qrt) => $qrt->where('name', 'rt'))
-                ->whereDoesntHave('roles', fn($qx) =>
+        $rt_list = Rt::with('rw')->whereHas('user', function ($q) use ($allowedMainRoles) {
+            $q->whereHas('roles', fn($qrt) => $qrt->where('name', 'rt'))
+                ->whereDoesntHave(
+                    'roles',
+                    fn($qx) =>
                     $qx->whereNotIn('name', $allowedMainRoles)
                 );
-            })
+        })
             ->select('id', 'id_rw', 'nomor_rt', 'nama_anggota_rt')
             ->get();
 
@@ -100,13 +105,15 @@ class AdminTransaksiController extends Controller
 
     public function store(Request $request)
     {
+        Log::info($request);
         $request->validate([
             'tanggal' => 'required|date',
             'nama_transaksi' => 'required|string|max:255',
             'jenis' => 'required|string|max:255',
             'nominal' => 'required|numeric|min:0',
             'keterangan' => 'nullable|string',
-            'rt' => 'required|numeric'
+            'rt' => 'required|numeric',
+            'rw' => 'required|numeric',
         ]);
 
         $isPerKk = $request->no_kk !== 'semua';
@@ -114,7 +121,7 @@ class AdminTransaksiController extends Controller
         $data = [
             'tagihan_id' => null,
             'no_kk' => $isPerKk ? $request->no_kk : null,
-            'rt' => $request->rt,
+            'rt' => "RT {$request->rt}" . ' - ' . "RW {$request->rw}",
             'tanggal' => $request->tanggal,
             'nama_transaksi' => $request->nama_transaksi,
             'jenis' => $request->jenis,

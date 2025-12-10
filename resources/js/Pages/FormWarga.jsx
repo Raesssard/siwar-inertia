@@ -100,7 +100,7 @@ export default function FormWarga({
     "w-full p-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition text-gray-800";
 
   return (
-    <Layout title={isEdit ? "Edit Data Warga" : "Tambah Warga"}>
+    <Layout>
       <Head title={isEdit ? "Edit Warga" : "Tambah Warga"} />
 
       <div className="max-w-6xl mx-auto bg-white p-10 mt-8 rounded-2xl shadow-xl">

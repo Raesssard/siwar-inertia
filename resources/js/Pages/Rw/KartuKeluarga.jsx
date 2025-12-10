@@ -59,11 +59,10 @@ export default function KartuKeluarga() {
     return (
         <Layout>
             <Head
-                title={`${title} - ${
-                    role.length <= 2
-                        ? role.toUpperCase()
-                        : role.charAt(0).toUpperCase() + role.slice(1)
-                }`}
+                title={`${title} - ${role.length <= 2
+                    ? role.toUpperCase()
+                    : role.replace(/\b\w/g, (char) => char.toUpperCase())
+                    }`}
             />
 
             <FilterKK
@@ -77,12 +76,14 @@ export default function KartuKeluarga() {
             <div className="table-container">
                 <div className="table-header d-flex justify-content-between align-items-center">
                     <h4>Data Kartu Keluarga</h4>
-                        <Link
-                            href={`/${role}/kartu_keluarga/create`}
-                            className="btn btn-success btn-sm"
-                        >
-                            <i className="bi bi-plus-circle"></i> Tambah KK
-                        </Link>
+                    <Link
+                        preserveScroll
+                        preserveState
+                        href={`/${role}/kartu_keluarga/create`}
+                        className="btn btn-success btn-sm"
+                    >
+                        <i className="bi bi-plus-circle"></i> Tambah KK
+                    </Link>
                 </div>
 
                 <div className="table-scroll">
@@ -106,9 +107,9 @@ export default function KartuKeluarga() {
                                         <td className="text-center">{index + 1}</td>
                                         <td className="text-center">{item.no_kk ?? "-"}</td>
                                         <td className="text-center">
-                                        {(item.warga ?? [])
-                                            .find((w) => w.status_hubungan_dalam_keluarga?.toLowerCase() === "kepala keluarga")
-                                            ?.nama ?? "-"}
+                                            {(item.warga ?? [])
+                                                .find((w) => w.status_hubungan_dalam_keluarga?.toLowerCase() === "kepala keluarga")
+                                                ?.nama ?? "-"}
                                         </td>
                                         <td className="text-center">{item.alamat ?? "-"}</td>
                                         <td className="text-center">
@@ -120,7 +121,7 @@ export default function KartuKeluarga() {
                                         <td className="text-center">
                                             {item.kategori_golongan?.jenis
                                                 ? item.kategori_golongan.jenis.charAt(0).toUpperCase() +
-                                                  item.kategori_golongan.jenis.slice(1)
+                                                item.kategori_golongan.jenis.slice(1)
                                                 : "-"}
                                         </td>
                                         <td className="text-center">
@@ -131,12 +132,14 @@ export default function KartuKeluarga() {
                                             >
                                                 <i className="fas fa-info"></i>
                                             </button>
-                                                <Link
-                                                    href={`/${role}/kartu_keluarga/${item.id}/edit`}
-                                                    className="btn btn-warning btn-sm me-1"
-                                                >
-                                                    <i className="fas fa-edit"></i>
-                                                </Link>
+                                            <Link
+                                                preserveScroll
+                                                preserveState
+                                                href={`/${role}/kartu_keluarga/${item.id}/edit`}
+                                                className="btn btn-warning btn-sm me-1"
+                                            >
+                                                <i className="fas fa-edit"></i>
+                                            </Link>
                                             <button
                                                 className="btn btn-danger btn-sm"
                                                 title="Hapus KK"
@@ -170,16 +173,18 @@ export default function KartuKeluarga() {
                                 return (
                                     <li
                                         key={index}
-                                        className={`page-item ${
-                                            link.active ? "active" : ""
-                                        } ${!link.url ? "disabled" : ""}`}
-                                        style={{
-                                            cursor: !link.url ? "not-allowed" : "pointer",
-                                        }}
+                                        className={`page-item ${link.active ? "active" : ""} ${!link.url ? "disabled" : ""
+                                            }`}
+                                        style={{ cursor: !link.url ? "not-allowed" : "pointer" }}
                                     >
                                         <Link
+                                            preserveScroll
+                                            preserveState
                                             href={link.url || ""}
-                                            dangerouslySetInnerHTML={{ __html: label }}
+                                            dangerouslySetInnerHTML={{
+                                                __html: label,
+                                            }}
+                                            title={`Pergi ke halaman ${label === "&lt;" ? 'sebelumnya' : label === "&gt;" ? 'selanjutnya' : label}`}
                                         />
                                     </li>
                                 )

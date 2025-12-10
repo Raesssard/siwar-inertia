@@ -8,6 +8,8 @@ export default function AssignRolesPermission({ role, permissions, title }) {
         role.permissions.map((p) => p.name)
     );
     const [search, setSearch] = useState("");
+    const { props } = usePage()
+    const currentRole = props.auth?.currentRole ?? []
 
     // 🔄 Toggle permission
     const togglePermission = (perm) => {
@@ -63,7 +65,12 @@ export default function AssignRolesPermission({ role, permissions, title }) {
 
     return (
         <Layout>
-            <Head title={title} />
+            <Head
+                title={`${title} - ${currentRole.length <= 2
+                    ? currentRole.toUpperCase()
+                    : currentRole.replace(/\b\w/g, (char) => char.toUpperCase())
+                    }`}
+            />
 
             {/* 🧩 Header */}
             <div className="d-flex justify-content-between align-items-center mb-4">
@@ -98,11 +105,10 @@ export default function AssignRolesPermission({ role, permissions, title }) {
                                         className="col-12 col-sm-6 col-md-4 col-lg-3"
                                     >
                                         <label
-                                            className={`d-flex align-items-center p-2 rounded border transition text-black ${
-                                                selectedPerms.includes(perm.name)
-                                                    ? "bg-blue-500 bg-opacity-10 border-blue-950"
-                                                    : "bg-light border-light"
-                                            }`}
+                                            className={`d-flex align-items-center p-2 rounded border transition text-black ${selectedPerms.includes(perm.name)
+                                                ? "bg-blue-500 bg-opacity-10 border-blue-950"
+                                                : "bg-light border-light"
+                                                }`}
                                             style={{ cursor: "pointer" }}
                                         >
                                             <input
@@ -137,6 +143,8 @@ export default function AssignRolesPermission({ role, permissions, title }) {
                     <i className="fas fa-save me-1"></i> Simpan Perubahan
                 </button>
                 <Link
+                    preserveScroll
+                    preserveState
                     href={route("admin.roles.index")}
                     className="btn btn-outline-secondary px-4"
                 >

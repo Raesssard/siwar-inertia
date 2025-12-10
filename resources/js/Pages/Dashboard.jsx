@@ -33,7 +33,7 @@ export default function Dashboard() {
       <Head
         title={`${title} - ${role.length <= 2
           ? role.toUpperCase()
-          : role.charAt(0).toUpperCase() + role.slice(1)
+          : role.replace(/\b\w/g, (char) => char.toUpperCase())
           }`}
       />
 

@@ -81,9 +81,12 @@ export default function Tagihan() {
 
     return (
         <Layout>
-            <Head title={`${title} - ${role.length <= 2
-                ? role.toUpperCase()
-                : role.charAt(0).toUpperCase() + role.slice(1)}`} />
+            <Head
+                title={`${title} - ${role.length <= 2
+                    ? role.toUpperCase()
+                    : role.replace(/\b\w/g, (char) => char.toUpperCase())
+                    }`}
+            />
             <FilterTagihan
                 tagihanManual={tagihanManualList}
                 tagihanOtomatis={tagihanOtomatisList}
@@ -169,7 +172,7 @@ export default function Tagihan() {
                     <div className="pagination-container">
                         <ul className="pagination-custom">
                             {tagihanManualFromServer.links.map((link, index) => {
-                                let label = link.label;
+                                let label = link.label
                                 if (label.includes("Previous")) label = "&lt;"
                                 if (label.includes("Next")) label = "&gt;"
 
@@ -181,6 +184,8 @@ export default function Tagihan() {
                                         style={{ cursor: !link.url ? "not-allowed" : "pointer" }}
                                     >
                                         <Link
+                                            preserveScroll
+                                            preserveState
                                             href={link.url || ""}
                                             dangerouslySetInnerHTML={{
                                                 __html: label,
@@ -188,7 +193,7 @@ export default function Tagihan() {
                                             title={`Pergi ke halaman ${label === "&lt;" ? 'sebelumnya' : label === "&gt;" ? 'selanjutnya' : label}`}
                                         />
                                     </li>
-                                );
+                                )
                             })}
                         </ul>
                     </div>
@@ -268,7 +273,7 @@ export default function Tagihan() {
                     <div className="pagination-container">
                         <ul className="pagination-custom">
                             {tagihanOtomatisFromServer.links.map((link, index) => {
-                                let label = link.label;
+                                let label = link.label
                                 if (label.includes("Previous")) label = "&lt;"
                                 if (label.includes("Next")) label = "&gt;"
 
@@ -280,6 +285,8 @@ export default function Tagihan() {
                                         style={{ cursor: !link.url ? "not-allowed" : "pointer" }}
                                     >
                                         <Link
+                                            preserveScroll
+                                            preserveState
                                             href={link.url || ""}
                                             dangerouslySetInnerHTML={{
                                                 __html: label,
@@ -287,7 +294,7 @@ export default function Tagihan() {
                                             title={`Pergi ke halaman ${label === "&lt;" ? 'sebelumnya' : label === "&gt;" ? 'selanjutnya' : label}`}
                                         />
                                     </li>
-                                );
+                                )
                             })}
                         </ul>
                     </div>

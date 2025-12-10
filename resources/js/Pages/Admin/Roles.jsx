@@ -92,11 +92,10 @@ export default function Roles({ roles, permissions, filters, title }) {
     return (
         <Layout>
             <Head
-                title={`${title} - ${
-                    role.length <= 2
-                        ? role.toUpperCase()
-                        : role.charAt(0).toUpperCase() + role.slice(1)
-                }`}
+                title={`${title} - ${role.length <= 2
+                    ? role.toUpperCase()
+                    : role.replace(/\b\w/g, (char) => char.toUpperCase())
+                    }`}
             />
 
             {/* 🔹 Filter Section */}
@@ -150,12 +149,14 @@ export default function Roles({ roles, permissions, filters, title }) {
                                 roles.data.map((item, index) => (
                                     <tr key={item.id}>
                                         <td className="text-center">{roles.from + index}</td>
-                                        <td className="text-center">{item.name}</td>
+                                        <td className="text-center">{item.name.length <= 2
+                                            ? item.name.toUpperCase()
+                                            : item.name.replace(/\b\w/g, (char) => char.toUpperCase())
+                                        }</td>
                                         <td className="text-center">
                                             {item.permissions.length > 0
-                                                ? `${item.permissions.length} permission${
-                                                      item.permissions.length > 1 ? "s" : ""
-                                                  }`
+                                                ? `${item.permissions.length} permission${item.permissions.length > 1 ? "s" : ""
+                                                }`
                                                 : "Tidak ada permission"}
                                         </td>
                                         <td className="text-center">
@@ -163,15 +164,19 @@ export default function Roles({ roles, permissions, filters, title }) {
                                                 <button
                                                     className="btn btn-warning btn-sm"
                                                     onClick={() => openEdit(item)}
+                                                    title="Edit Role"
                                                 >
-                                                    Edit
+                                                    <i className="fas fa-edit"></i>
                                                 </button>
 
                                                 <Link
+                                                    preserveScroll
+                                                    preserveState
                                                     href={route("admin.roles.permissions.edit", item.id)}
                                                     className="btn btn-secondary btn-sm"
+                                                    title="Permission Role"
                                                 >
-                                                    Permissions
+                                                    <i className="fa-solid fa-user-lock"></i>
                                                 </Link>
 
                                                 {/* <button
@@ -200,23 +205,28 @@ export default function Roles({ roles, permissions, filters, title }) {
                     <div className="pagination-container">
                         <ul className="pagination-custom">
                             {roles.links.map((link, index) => {
-                                let label = link.label;
-                                if (label.includes("Previous")) label = "&lt;";
-                                if (label.includes("Next")) label = "&gt;";
+                                let label = link.label
+                                if (label.includes("Previous")) label = "&lt;"
+                                if (label.includes("Next")) label = "&gt;"
 
                                 return (
                                     <li
                                         key={index}
-                                        className={`page-item ${
-                                            link.active ? "active" : ""
-                                        } ${!link.url ? "disabled" : ""}`}
+                                        className={`page-item ${link.active ? "active" : ""} ${!link.url ? "disabled" : ""
+                                            }`}
+                                        style={{ cursor: !link.url ? "not-allowed" : "pointer" }}
                                     >
                                         <Link
+                                            preserveScroll
+                                            preserveState
                                             href={link.url || ""}
-                                            dangerouslySetInnerHTML={{ __html: label }}
+                                            dangerouslySetInnerHTML={{
+                                                __html: label,
+                                            }}
+                                            title={`Pergi ke halaman ${label === "&lt;" ? 'sebelumnya' : label === "&gt;" ? 'selanjutnya' : label}`}
                                         />
                                     </li>
-                                );
+                                )
                             })}
                         </ul>
                     </div>

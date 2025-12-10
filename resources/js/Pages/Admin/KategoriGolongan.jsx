@@ -73,11 +73,10 @@ export default function KategoriGolongan({ kategori, filters, title }) {
     return (
         <Layout>
             <Head
-                title={`${title} - ${
-                    role.length <= 2
-                        ? role.toUpperCase()
-                        : role.charAt(0).toUpperCase() + role.slice(1)
-                }`}
+                title={`${title} - ${role.length <= 2
+                    ? role.toUpperCase()
+                    : role.replace(/\b\w/g, (char) => char.toUpperCase())
+                    }`}
             />
 
             {/* 🔍 Filter */}
@@ -128,20 +127,24 @@ export default function KategoriGolongan({ kategori, filters, title }) {
                                 kategori.data.map((item, index) => (
                                     <tr key={item.id}>
                                         <td className="text-center">{kategori.from + index}</td>
-                                        <td className="text-center">{item.jenis}</td>
+                                        <td className="text-center">
+                                            {item.jenis === "umkm"
+                                                ? item.jenis.toUpperCase()
+                                                : item.jenis.charAt(0).toUpperCase() + item.jenis.slice(1)}
+                                        </td>
                                         <td className="text-center">
                                             <div className="d-flex justify-content-center gap-2">
                                                 <button
                                                     className="btn btn-warning btn-sm"
                                                     onClick={() => openEdit(item)}
                                                 >
-                                                    Edit
+                                                    <i className="fas fa-edit"></i>
                                                 </button>
                                                 <button
                                                     className="btn btn-danger btn-sm"
                                                     onClick={() => handleDelete(item.id)}
                                                 >
-                                                    Hapus
+                                                    <i className="fas fa-trash"></i>
                                                 </button>
                                             </div>
                                         </td>
@@ -163,22 +166,28 @@ export default function KategoriGolongan({ kategori, filters, title }) {
                     <div className="pagination-container">
                         <ul className="pagination-custom">
                             {kategori.links.map((link, index) => {
-                                let label = link.label;
-                                if (label.includes("Previous")) label = "&lt;";
-                                if (label.includes("Next")) label = "&gt;";
+                                let label = link.label
+                                if (label.includes("Previous")) label = "&lt;"
+                                if (label.includes("Next")) label = "&gt;"
+
                                 return (
                                     <li
                                         key={index}
-                                        className={`page-item ${link.active ? "active" : ""} ${
-                                            !link.url ? "disabled" : ""
-                                        }`}
+                                        className={`page-item ${link.active ? "active" : ""} ${!link.url ? "disabled" : ""
+                                            }`}
+                                        style={{ cursor: !link.url ? "not-allowed" : "pointer" }}
                                     >
                                         <Link
-                                            href={link.url || "#"}
-                                            dangerouslySetInnerHTML={{ __html: label }}
+                                            preserveScroll
+                                            preserveState
+                                            href={link.url || ""}
+                                            dangerouslySetInnerHTML={{
+                                                __html: label,
+                                            }}
+                                            title={`Pergi ke halaman ${label === "&lt;" ? 'sebelumnya' : label === "&gt;" ? 'selanjutnya' : label}`}
                                         />
                                     </li>
-                                );
+                                )
                             })}
                         </ul>
                     </div>
