@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react"
 import { Link, usePage } from "@inertiajs/react"
 
-export function SidebarLink({ href, icon, text, children, isOpen, onToggle, isToggleOrMobile }) {
+export function SidebarLink({ href, icon, text, children, isOpen, onToggle, isToggleOrMobile, onKlik }) {
     const { url } = usePage()
 
     const isActive = (url, pattern, exact = false) => {
@@ -39,7 +39,7 @@ export function SidebarLink({ href, icon, text, children, isOpen, onToggle, isTo
                     <ul className={`list-unstyled ${isToggleOrMobile ? '' : 'ps-3'} ${open ? "open" : ""}`}>
                         {children.map((child, idx) => (
                             <li key={idx} className={`nav-item m-0 ${isActive(url, child.href) ? "active" : ""}`}>
-                                <Link className="nav-link" href={child.href}>
+                                <Link preserveScroll preserveState className="nav-link" onClick={onKlik} href={child.href}>
                                     <i className={`fas fa-${child.icon} me-2`}></i>
                                     <span style={{ fontSize: sizeFont }}>{child.text}</span>
                                 </Link>
@@ -48,7 +48,7 @@ export function SidebarLink({ href, icon, text, children, isOpen, onToggle, isTo
                     </ul>
                 </>
             ) : (
-                <Link className="nav-link " href={href}>
+                <Link preserveScroll preserveState className="nav-link" onClick={onKlik} href={href}>
                     <i className={`fas ${href === "/dashboard" ? "fa-fw" : ""} fa-${icon}`}></i>
                     <span>{text}</span>
                 </Link>

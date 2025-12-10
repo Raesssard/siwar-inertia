@@ -17,7 +17,6 @@ export default function Transaksi() {
         daftar_bulan,
         daftar_rw,
         daftar_rt,
-        daftar_rw,
         list_kk,
         transaksiWarga,
         transaksiUmum,
@@ -126,8 +125,8 @@ export default function Transaksi() {
                         {role === "admin"
                             ? "Semua Transaksi"
                             : role === "rw"
-                            ? `Transaksi RW ${user?.rw?.nomor_rw}`
-                            : `Transaksi RT ${user?.rt?.nomor_rt}`}
+                                ? `Transaksi RW ${user?.rw?.nomor_rw}`
+                                : `Transaksi RT ${user?.rt?.nomor_rt}`}
                     </h4>
                     <span></span>
                 </div>
@@ -224,6 +223,8 @@ export default function Transaksi() {
                                         style={{ cursor: !link.url ? "not-allowed" : "pointer" }}
                                     >
                                         <Link
+                                            preserveScroll
+                                            preserveState
                                             href={link.url || ""}
                                             dangerouslySetInnerHTML={{
                                                 __html: label,

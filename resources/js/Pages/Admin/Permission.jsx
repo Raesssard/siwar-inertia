@@ -75,11 +75,10 @@ export default function Permission({ permissions, filters, title }) {
     return (
         <Layout>
             <Head
-                title={`${title} - ${
-                    role.length <= 2
+                title={`${title} - ${role.length <= 2
                         ? role.toUpperCase()
                         : role.charAt(0).toUpperCase() + role.slice(1)
-                }`}
+                    }`}
             />
 
             {/* 🔍 Filter Section */}
@@ -165,22 +164,28 @@ export default function Permission({ permissions, filters, title }) {
                     <div className="pagination-container">
                         <ul className="pagination-custom">
                             {permissions.links.map((link, index) => {
-                                let label = link.label;
-                                if (label.includes("Previous")) label = "&lt;";
-                                if (label.includes("Next")) label = "&gt;";
+                                let label = link.label
+                                if (label.includes("Previous")) label = "&lt;"
+                                if (label.includes("Next")) label = "&gt;"
+
                                 return (
                                     <li
                                         key={index}
-                                        className={`page-item ${link.active ? "active" : ""} ${
-                                            !link.url ? "disabled" : ""
-                                        }`}
+                                        className={`page-item ${link.active ? "active" : ""} ${!link.url ? "disabled" : ""
+                                            }`}
+                                        style={{ cursor: !link.url ? "not-allowed" : "pointer" }}
                                     >
                                         <Link
-                                            href={link.url || "#"}
-                                            dangerouslySetInnerHTML={{ __html: label }}
+                                            preserveScroll
+                                            preserveState
+                                            href={link.url || ""}
+                                            dangerouslySetInnerHTML={{
+                                                __html: label,
+                                            }}
+                                            title={`Pergi ke halaman ${label === "&lt;" ? 'sebelumnya' : label === "&gt;" ? 'selanjutnya' : label}`}
                                         />
                                     </li>
-                                );
+                                )
                             })}
                         </ul>
                     </div>

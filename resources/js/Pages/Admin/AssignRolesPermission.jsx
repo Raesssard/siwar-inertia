@@ -98,11 +98,10 @@ export default function AssignRolesPermission({ role, permissions, title }) {
                                         className="col-12 col-sm-6 col-md-4 col-lg-3"
                                     >
                                         <label
-                                            className={`d-flex align-items-center p-2 rounded border transition text-black ${
-                                                selectedPerms.includes(perm.name)
+                                            className={`d-flex align-items-center p-2 rounded border transition text-black ${selectedPerms.includes(perm.name)
                                                     ? "bg-blue-500 bg-opacity-10 border-blue-950"
                                                     : "bg-light border-light"
-                                            }`}
+                                                }`}
                                             style={{ cursor: "pointer" }}
                                         >
                                             <input
@@ -137,6 +136,8 @@ export default function AssignRolesPermission({ role, permissions, title }) {
                     <i className="fas fa-save me-1"></i> Simpan Perubahan
                 </button>
                 <Link
+                    preserveScroll
+                    preserveState
                     href={route("admin.roles.index")}
                     className="btn btn-outline-secondary px-4"
                 >

@@ -3929,7 +3929,7 @@ export function DetailPengumuman({ kategori, selectedData, detailShow, onClose, 
                                                         <div className="p-3 text-center text-white">
                                                             <i className="bi bi-file-earmark-text fs-1"></i>
                                                             <p className="mb-1">Dokumen Terlampir: {selectedData.dokumen_name}</p>
-                                                            <Link href={`/storage/${selectedData.dokumen_path}`} target="_blank" className="btn btn-primary btn-sm">
+                                                            <Link preserveScroll preserveState preserveUrl href={`/storage/${selectedData.dokumen_path}`} target="_blank" className="btn btn-primary btn-sm">
                                                                 <i className="bi bi-download"></i> Unduh
                                                             </Link>
                                                         </div>
@@ -5810,7 +5810,7 @@ export function TambahIuran({ tambahShow, onClose, onAdded, role, golongan, rw, 
                                             )}
                                         </select> */}
                                     </div>
-                                    </Role>
+
                                     {/* {perWarga && (
                                         <div className="mb-3">
                                             <label className="form-label">NIK Warga</label>
@@ -7205,9 +7205,40 @@ export function TambahTransaksiPerKk({ listKK = [], tambahShow, onClose, onAdded
         jenis: "pemasukan",
         no_kk: "",
         rt: "",
+        rw: "",
     })
     const [Kklist, setKkList] = useState(listKK || [])
     const [filteredRt, setFilteredRt] = useState([]);
+    const [rtList, setRtList] = useState([])
+
+    const handleSelectChange = (name, selected) => {
+        setData({
+            ...data,
+            [name]: selected?.value || ""
+        });
+    };
+
+    useEffect(() => {
+        let filteredRt;
+
+        if (data.rw) {
+            filteredRt = daftarRT?.filter(
+                kk => kk.rw.nomor_rw == data.rw
+            );
+        } else {
+            filteredRt = daftarRT;
+        }
+
+        if (role !== 'rw' && !data.rw) {
+            setRtList([])
+        } else {
+            setRtList(filteredRt);
+        }
+
+        if (filteredRt?.length === 0) {
+            setData('rt', '');
+        }
+    }, [data.rw]);
 
     const handleSubmit = (e) => {
         e.preventDefault()
@@ -7220,6 +7251,7 @@ export function TambahTransaksiPerKk({ listKK = [], tambahShow, onClose, onAdded
         formData.append('jenis', data.jenis)
         formData.append('no_kk', data.no_kk)
         formData.append('rt', data.rt)
+        formData.append('rw', data.rw)
 
         axios.post(`/${role}/transaksi`, formData)
             .then(res => {
@@ -7236,6 +7268,7 @@ export function TambahTransaksiPerKk({ listKK = [], tambahShow, onClose, onAdded
                     jenis: "pemasukan",
                     no_kk: "",
                     rt: "",
+                    rw: "",
                 })
                 onClose()
             })
@@ -7264,7 +7297,7 @@ export function TambahTransaksiPerKk({ listKK = [], tambahShow, onClose, onAdded
         if (filteredKK?.length === 0) {
             setData('no_kk', '');
         }
-    }, [data.rt, listKK]);
+    }, [data.rt]);
 
     useEffect(() => {
         const handleEsc = (e) => {
@@ -7302,85 +7335,70 @@ export function TambahTransaksiPerKk({ listKK = [], tambahShow, onClose, onAdded
                                         <Role role={['admin']}>
                                             <div className="mb-3">
                                                 <label className="form-label">RW</label>
-                                                <select
-                                                    className="form-control"
-                                                    value={data.id_rw || ""}
-                                                    onChange={(e) => {
-                                                        const rwId = e.target.value;
-                                                        setData({ ...data, id_rw: rwId, id_rt: "", rt: "", no_kk: "" });
-
-                                                        const list = daftarRT.filter(rt => rt.id_rw == rwId);
-                                                        setFilteredRt(list);
+                                                <Select
+                                                    options={daftarRW?.map((item) => ({
+                                                        value: item.nomor_rw,
+                                                        label: `RW ${item.nomor_rw}`,
+                                                    }))}
+                                                    value={
+                                                        data.rw
+                                                            ? {
+                                                                value: data.rw,
+                                                                label: `RW ${daftarRW?.find((x) => x.nomor_rw == data.rw)?.nomor_rw}` || "",
+                                                            }
+                                                            : null
+                                                    }
+                                                    onChange={(selected) => handleSelectChange('rw', selected)}
+                                                    placeholder="Pilih nomor RW..."
+                                                    isSearchable={true}
+                                                    className="react-select-container"
+                                                    classNamePrefix="react-select"
+                                                    noOptionsMessage={() => "Tidak ada RW yang aktif"}
+                                                    styles={{
+                                                        control: (base) => ({
+                                                            ...base,
+                                                            border: 0,
+                                                            borderBottom: "1px solid lightgray",
+                                                            borderRadius: 0,
+                                                            boxShadow: "none",
+                                                        }),
                                                     }}
-                                                    required
-                                                    style={{
-                                                    border: '0',
-                                                    borderBottom: '1px solid lightgray',
-                                                    borderRadius: '0',
-                                                }}
-                                                >
-                                                    <option value="">-- Pilih RW --</option>
-                                                    {daftarRW.map((rw) => (
-                                                        <option key={rw.id} value={rw.id}>
-                                                            RW {rw.nomor_rw} - {rw.nama_anggota_rw}
-                                                        </option>
-                                                    ))}
-                                                </select>
-                                            </div>
-
-                                            <div className="mb-3">
-                                                <label className="form-label">RT</label>
-                                                <select
-                                                    className="form-control"
-                                                    value={data.rt || ""}
-                                                    onChange={(e) => {
-                                                        const rtId = e.target.value;
-                                                        const rtSelected = filteredRt.find(r => r.id == rtId);
-
-                                                        setData({
-                                                            ...data,
-                                                            id_rt: rtId,               // untuk backend
-                                                            rt: rtSelected?.nomor_rt || ""  // untuk filter KK
-                                                        });
-                                                    }}
-                                                    disabled={filteredRt.length === 0}
-                                                    style={{
-                                                    border: '0',
-                                                    borderBottom: '1px solid lightgray',
-                                                    borderRadius: '0',
-                                                }}
-                                                >
-                                                    <option value="">-- Pilih RT --</option>
-                                                    {filteredRt.map(rt => (
-                                                        <option key={rt.id} value={rt.id}>
-                                                            RT {rt.nomor_rt} - {rt.nama_anggota_rt}
-                                                        </option>
-                                                    ))}
-                                                </select>
+                                                />
                                             </div>
                                         </Role>
-                                        <Role role={['rw', 'bendahara']}>
+
+                                        <Role role={['rw', 'bendahara', 'admin']}>
                                             <div className="mb-3">
                                                 <label className="form-label">RT</label>
-                                                <select
-                                                    name="rt"
-                                                    className="form-control"
-                                                    value={data.rt}
-                                                    onChange={(e) => setData('rt', e.target.value)}
-                                                    required
-                                                    style={{
-                                                        border: '0',
-                                                        borderBottom: '1px solid lightgray',
-                                                        borderRadius: '0',
+                                                <Select
+                                                    options={rtList?.map((item) => ({
+                                                        value: item.nomor_rt,
+                                                        label: `RT ${item.nomor_rt}`,
+                                                    }))}
+                                                    value={
+                                                        data.rt
+                                                            ? {
+                                                                value: data.rt,
+                                                                label: `RT ${rtList?.find((x) => x.nomor_rt == data.rt)?.nomor_rt}` || "",
+                                                            }
+                                                            : null
+                                                    }
+                                                    onChange={(selected) => handleSelectChange('rt', selected)}
+                                                    placeholder="Pilih nomor RT..."
+                                                    isSearchable={true}
+                                                    className="react-select-container"
+                                                    classNamePrefix="react-select"
+                                                    noOptionsMessage={() => data.rw ? "Tidak ada RT yang aktif" : "Harap pilih RW terlebihdahulu"}
+                                                    styles={{
+                                                        control: (base) => ({
+                                                            ...base,
+                                                            border: 0,
+                                                            borderBottom: "1px solid lightgray",
+                                                            borderRadius: 0,
+                                                            boxShadow: "none",
+                                                        }),
                                                     }}
-                                                >
-                                                    <option value="" disabled>-- Pilih RT --</option>
-                                                    {daftarRT?.map((nomor, i) => (
-                                                        <option key={i} value={nomor}>
-                                                            RT {nomor}
-                                                        </option>
-                                                    ))}
-                                                </select>
+                                                />
                                             </div>
                                         </Role>
 

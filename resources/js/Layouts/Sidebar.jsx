@@ -145,7 +145,7 @@ export default function Sidebar({ toggleKeParent, localStorageHistory }) {
                 className={`navbar-nav bg-gradient-primary sidebar sidebar-dark accordion d-none d-md-block ${toggle}`}
                 id="accordionSidebar"
             >
-                <Link className="sidebar-brand" href="/dashboard">
+                <Link preserveScroll preserveState className="sidebar-brand" href="/dashboard">
                     <div className="sidebar-brand-icon">
                         <img
                             src={logo}

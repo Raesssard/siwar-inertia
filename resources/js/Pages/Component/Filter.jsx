@@ -165,7 +165,7 @@ export function FilterPengumuman({ data, setData, daftar_tahun, list_bulan, daft
                 <button type="submit" className="btn-input btn btn-sm btn-primary flex-fill p-0" title="Filter Pengumuman" style={{ width: '3rem' }}>
                     <i className="fas fa-filter"></i>
                 </button>
-                <Link href={`/${role}/pengumuman`} onClick={resetFilter} className="btn-input btn btn-secondary btn-sm flex-fill p-0" title="Reset" style={{ width: '3rem' }}>
+                <Link preserveScroll href={`/${role}/pengumuman`} onClick={resetFilter} className="btn-input btn btn-secondary btn-sm flex-fill p-0" title="Reset" style={{ width: '3rem' }}>
                     <i className="fas fa-undo"></i>
                 </Link>
             </div>
@@ -244,8 +244,8 @@ export function FilterTransaksi({ transaksi, data, setData, daftar_tahun, daftar
                     >
                         <option value="">Semua RT</option>
                         {daftar_rt.map((noRt) => (
-                            <option key={noRt} value={noRt}>
-                                RT {noRt}
+                            <option key={noRt.nomor_rt} value={noRt.nomor_rt}>
+                                RT {noRt.nomor_rt}
                             </option>
                         ))}
                     </select>
@@ -253,7 +253,7 @@ export function FilterTransaksi({ transaksi, data, setData, daftar_tahun, daftar
                 <button type="submit" className="btn-input btn btn-sm btn-primary flex-fill p-0" title="Filter Transaksi" style={{ maxWidth: "3rem", minWidth: "3rem" }}>
                     <i className="fas fa-filter"></i>
                 </button>
-                <Link href={`/${role}/transaksi`} onClick={resetFilter} className="btn-input btn btn-secondary btn-sm flex-fill p-0 mx-0" title="Reset" style={{ maxWidth: "3rem", minWidth: "3rem" }}>
+                <Link preserveScroll href={`/${role}/transaksi`} onClick={resetFilter} className="btn-input btn btn-secondary btn-sm flex-fill p-0 mx-0" title="Reset" style={{ maxWidth: "3rem", minWidth: "3rem" }}>
                     <i className="fas fa-undo"></i>
                 </Link>
                 <Role role={['rt', 'rw', 'bendahara', 'admin']}>
@@ -352,7 +352,7 @@ export function FilterTagihan({ tagihanManual, tagihanOtomatis, data, setData, f
                         <i className="fas fa-filter"></i>
                     </button>
                 </Role>
-                <Link href={`/${role}/tagihan`} onClick={resetFilter} className="btn-input btn btn-secondary btn-sm flex-fill p-0 mx-0" title="Reset" style={{ maxWidth: "3rem", minWidth: "3rem" }}>
+                <Link preserveScroll href={`/${role}/tagihan`} onClick={resetFilter} className="btn-input btn btn-secondary btn-sm flex-fill p-0 mx-0" title="Reset" style={{ maxWidth: "3rem", minWidth: "3rem" }}>
                     <i className="fas fa-undo"></i>
                 </Link>
             </div>
@@ -433,7 +433,7 @@ export function FilterWarga({ data, setData, filter, resetFilter, role, total_wa
                 <button type="submit" className="btn-input btn btn-sm btn-primary flex-fill p-0 mx-0" title="Filter Warga" style={{ maxWidth: "3rem", minWidth: "3rem" }}>
                     <i className="fas fa-filter"></i>
                 </button>
-                <Link href={`/${role}/warga`} onClick={resetFilter} className="btn-input btn btn-secondary btn-sm flex-fill p-0 mx-0" title="Reset" style={{ maxWidth: "3rem", minWidth: "3rem" }}>
+                <Link preserveScroll href={`/${role}/warga`} onClick={resetFilter} className="btn-input btn btn-secondary btn-sm flex-fill p-0 mx-0" title="Reset" style={{ maxWidth: "3rem", minWidth: "3rem" }}>
                     <i className="fas fa-undo"></i>
                 </Link>
                 <Role role={['rt', 'rw', 'sekretaris', 'admin']}>
@@ -474,6 +474,7 @@ export function FilterKK({ data, setData, filter, resetFilter, role, totalKK }) 
 
             <div className="d-flex flex-wrap gap-2">
                 <Link
+                    preserveScroll
                     href={`/${role}/kartu_keluarga`}
                     onClick={resetFilter}
                     className="btn-input btn btn-secondary btn-sm flex-fill p-0 mx-0"
@@ -524,7 +525,7 @@ export function FilterIuran({ iuranManual, iuranOtomatis, data, setData, filter,
                 </div>
             </div>
 
-            <Link href={`/${role}/iuran`} onClick={resetFilter} className="btn-input btn btn-secondary btn-sm flex-fill p-0 mx-0" title="Reset" style={{ maxWidth: "3rem" }}>
+            <Link preserveScroll href={`/${role}/iuran`} onClick={resetFilter} className="btn-input btn btn-secondary btn-sm flex-fill p-0 mx-0" title="Reset" style={{ maxWidth: "3rem" }}>
                 <i className="fas fa-undo"></i>
             </Link>
 
@@ -652,7 +653,7 @@ export function FilterLaporanKeuangan({ transaksi, exportExcel, exportPdf, handl
                 <button type="submit" className="btn-input btn btn-sm btn-primary flex-fill p-0" title="Filter Laporan" style={{ maxWidth: "3rem", minWidth: "3rem" }}>
                     <i className="fas fa-filter"></i>
                 </button>
-                <Link href={'/laporan-keuangan'} onClick={resetFilter} className="btn-input btn btn-secondary btn-sm flex-fill p-0 mx-0" title="Reset" style={{ maxWidth: "3rem", minWidth: "3rem" }}>
+                <Link preserveScroll href={'/laporan-keuangan'} onClick={resetFilter} className="btn-input btn btn-secondary btn-sm flex-fill p-0 mx-0" title="Reset" style={{ maxWidth: "3rem", minWidth: "3rem" }}>
                     <i className="fas fa-undo"></i>
                 </Link>
                 <div style={{
@@ -811,7 +812,7 @@ export function FilterLaporanPengaduan({ pengaduan, exportExcel, exportPdf, data
                     <i className="fas fa-filter"></i>
                 </button>
 
-                <Link href={'/laporan-pengaduan'} onClick={resetFilter} className="btn-input btn btn-secondary btn-sm flex-fill p-0 mx-0" title="Reset" style={{ maxWidth: "3rem", minWidth: "3rem" }}>
+                <Link preserveScroll href={'/laporan-pengaduan'} onClick={resetFilter} className="btn-input btn btn-secondary btn-sm flex-fill p-0 mx-0" title="Reset" style={{ maxWidth: "3rem", minWidth: "3rem" }}>
                     <i className="fas fa-undo"></i>
                 </Link>
 
