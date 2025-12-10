@@ -13,7 +13,6 @@ export default function Iuran() {
         iuranManual: iuranManualFromServer,
         golongan_list,
         rt_list,
-        rw_list,
         nik_list,
         no_kk_list,
         title,
