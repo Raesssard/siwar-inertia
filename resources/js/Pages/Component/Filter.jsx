@@ -243,9 +243,9 @@ export function FilterTransaksi({ transaksi, data, setData, daftar_tahun, daftar
                         className="form-select form-select-sm w-auto flex-fill my-2"
                     >
                         <option value="">Semua RT</option>
-                        {daftar_rt.map((noRt) => (
-                            <option key={noRt} value={noRt}>
-                                RT {noRt}
+                        {daftar_rt.map((rt) => (
+                            <option key={rt.id} value={rt.nomor_rt}>
+                                RT {rt.nomor_rt}
                             </option>
                         ))}
                     </select>

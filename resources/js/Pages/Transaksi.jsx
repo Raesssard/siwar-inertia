@@ -17,7 +17,6 @@ export default function Transaksi() {
         daftar_bulan,
         daftar_rw,
         daftar_rt,
-        daftar_rw,
         list_kk,
         transaksiWarga,
         transaksiUmum,

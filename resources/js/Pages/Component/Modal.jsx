@@ -5810,7 +5810,6 @@ export function TambahIuran({ tambahShow, onClose, onAdded, role, golongan, rw, 
                                             )}
                                         </select> */}
                                     </div>
-                                    </Role>
                                     {/* {perWarga && (
                                         <div className="mb-3">
                                             <label className="form-label">NIK Warga</label>
@@ -7208,6 +7207,14 @@ export function TambahTransaksiPerKk({ listKK = [], tambahShow, onClose, onAdded
     })
     const [Kklist, setKkList] = useState(listKK || [])
     const [filteredRt, setFilteredRt] = useState([]);
+    const [daftarRt, setRtList] = useState([])
+
+    const handleSelectChange = (name, selected) => {
+        setData({
+            ...data,
+            [name]: selected?.value || ""
+        });
+    };
 
     const handleSubmit = (e) => {
         e.preventDefault()
@@ -7377,7 +7384,7 @@ export function TambahTransaksiPerKk({ listKK = [], tambahShow, onClose, onAdded
                                                     <option value="" disabled>-- Pilih RT --</option>
                                                     {daftarRT?.map((nomor, i) => (
                                                         <option key={i} value={nomor}>
-                                                            RT {nomor}
+                                                            RT {nomor} 
                                                         </option>
                                                     ))}
                                                 </select>

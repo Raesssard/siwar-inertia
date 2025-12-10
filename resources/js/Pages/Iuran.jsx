@@ -14,7 +14,6 @@ export default function Iuran() {
         golongan_list,
         rw_list,
         rt_list,
-        rw_list,
         nik_list,
         no_kk_list,
         title,
