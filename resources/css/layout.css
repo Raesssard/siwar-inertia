@@ -239,6 +239,7 @@ div.card-body.pengumuman::-webkit-scrollbar,
 div.komen-section::-webkit-scrollbar,
 div.tambah-body::-webkit-scrollbar,
 div.item-nav::-webkit-scrollbar,
+div.modal-body::-webkit-scrollbar,
 div.table-responsive::-webkit-scrollbar {
     display: none;
 }
