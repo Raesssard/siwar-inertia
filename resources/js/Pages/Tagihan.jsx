@@ -139,9 +139,9 @@ export default function Tagihan() {
                                             ) : (
                                                 <span className="badge bg-warning text-white">Belum Bayar</span>
                                             )}
-                                            {item.status_bayar === 'sudah_bayar' && (item.nominal_bayar >= item.nominal) ? (
+                                            {item.status_bayar === 'sudah_bayar' && (parseFloat(item.nominal_bayar) >= parseFloat(item.nominal)) ? (
                                                 <span className="badge bg-primary text-white">Sudah Lunas</span>
-                                            ) : item.status_bayar === 'sudah_bayar' && (item.nominal_bayar < item.nominal) && (
+                                            ) : item.status_bayar === 'sudah_bayar' && (parseFloat(item.nominal_bayar) < parseFloat(item.nominal)) && (
                                                 <span className="badge bg-danger text-white">Belum Lunas</span>
                                             )}
                                         </td>

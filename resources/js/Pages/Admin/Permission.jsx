@@ -136,13 +136,13 @@ export default function Permission({ permissions, filters, title }) {
                                                     className="btn btn-warning btn-sm"
                                                     onClick={() => openEdit(item)}
                                                 >
-                                                    Edit
+                                                    <i className="fas fa-edit"></i>
                                                 </button>
                                                 <button
                                                     className="btn btn-danger btn-sm"
                                                     onClick={() => handleDelete(item.id)}
                                                 >
-                                                    Hapus
+                                                    <i className="fas fa-trash"></i>
                                                 </button>
                                             </div>
                                         </td>

@@ -130,10 +130,10 @@ export default function ProfilePage({ user, rt, rw, kk }) {
                         onSuccess: () => {
                             setPreviewUrl(null)
                             setData("foto_profil", null)
-
                             setFotoBase(null)
-
                             setIsPhotoDirty(false)
+
+                            document.getElementById("foto-profil").value = ""
                         }
                     })
                 })
@@ -412,7 +412,7 @@ export default function ProfilePage({ user, rt, rw, kk }) {
                             type="submit"
                             disabled={(processing || !isPhotoDirty)}
                             className="bg-green-600 text-white px-5 py-2 rounded w-100"
-                            style={(processing || !isPhotoDirty) && { opacity: '0.5' }}
+                            style={(processing || !isPhotoDirty) ? { opacity: '0.5' } : {}}
                         >
                             Simpan Perubahan
                         </button>

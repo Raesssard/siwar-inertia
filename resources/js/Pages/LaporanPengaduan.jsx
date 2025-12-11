@@ -3,6 +3,7 @@ import { Head, Link, useForm, usePage } from "@inertiajs/react"
 import React, { useEffect, useState } from "react"
 import { formatTanggal } from "./Component/GetPropRole"
 import { FilterLaporanPengaduan } from "./Component/Filter";
+import Role from "./Component/Role";
 
 export default function InformasiPengaduan() {
     const {
@@ -161,6 +162,9 @@ export default function InformasiPengaduan() {
                                 <th className="px-3 text-center" scope="col">NIK</th>
                                 <th className="px-3 text-center" scope="col">Nama Pelapor</th>
                                 <th className="px-3 text-center" scope="col">Aduan</th>
+                                <Role role={['admin', 'rw']}>
+                                    <th className="px-3 text-center" scope="col">Tujuan</th>
+                                </Role>
                                 <th className="px-3 text-center" scope="col">Status</th>
                             </tr>
                         </thead>
@@ -173,6 +177,9 @@ export default function InformasiPengaduan() {
                                         <td className="text-center">{item.nik_warga ?? '-'}</td>
                                         <td className="text-center">{item.warga.nama ?? '-'}</td>
                                         <td className="text-center">{item.judul ?? '-'}</td>
+                                        <Role role={['admin', 'rw']}>
+                                            <td className="text-center">{item.level.toUpperCase() ?? '-'}</td>
+                                        </Role>
                                         <td className="text-center">
                                             {item.status === 'selesai' ? (
                                                 <span className="badge bg-success text-white">Selesai</span>

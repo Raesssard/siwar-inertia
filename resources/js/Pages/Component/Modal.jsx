@@ -1354,7 +1354,7 @@ export function DetailPengaduan({ selectedData, detailShow, onClose, onUpdated, 
                                                 : { maxWidth: "100%" }}
                                     >
                                         <div className="p-3 border-bottom caption-section" style={{ width: '100%' }}>
-                                            {(!isMobile || !selectedData?.file_path) && (
+                                            {(isMobile && !selectedData?.file_path) && (
                                                 <div className="d-flex justify-content-end w-100">
                                                     <button
                                                         type="button"
@@ -2485,7 +2485,7 @@ export function TambahPengaduan({ tambahShow, onClose, onAdded }) {
                                         : { maxWidth: "100%" }}
                                 >
                                     <div className="p-3" style={{ height: "100%", width: '100%' }}>
-                                        {(!isMobile || !previewUrl) && (<div className="d-flex justify-content-end w-100">
+                                        {(isMobile && !previewUrl) && (<div className="d-flex justify-content-end w-100">
                                             <button
                                                 type="button"
                                                 onClick={() => onClose()}
@@ -3952,7 +3952,7 @@ export function DetailPengumuman({ kategori, selectedData, detailShow, onClose, 
                                                 ? { maxWidth: "50%" }
                                                 : { maxWidth: "100%" }}>
                                         <div className="p-3 border-bottom caption-section">
-                                            {(!isMobile || !selectedData?.dokumen_path) && (
+                                            {(isMobile && !selectedData?.dokumen_path) && (
                                                 <div className="d-flex justify-content-end w-100">
                                                     <button
                                                         type="button"
@@ -5154,7 +5154,7 @@ export function TambahPengumuman({ kategori, tambahShow, onClose, onAdded, role,
                                         : { maxWidth: "100%" }}
                                 >
                                     <div className="p-3" style={{ height: "100%", width: '100%' }}>
-                                        {(!isMobile || !previewUrl) && (<div className="d-flex justify-content-end w-100">
+                                        {(isMobile && !previewUrl) && (<div className="d-flex justify-content-end w-100">
                                             <button
                                                 type="button"
                                                 onClick={() => onClose()}
@@ -5163,178 +5163,180 @@ export function TambahPengumuman({ kategori, tambahShow, onClose, onAdded, role,
                                                 ✕
                                             </button>
                                         </div>)}
-                                        <form onSubmit={handleSubmit}>
-                                            <Role role={['admin']}>
-                                                {/* PILIH RW */}
-                                                <div className="mb-3">
-                                                    <label className="form-label">RW</label>
-                                                    <small>-Wajib dipilih</small>
-                                                    <select
-                                                        className="form-control"
-                                                        value={data.id_rw || ""}
-                                                        onChange={(e) => {
-                                                            const rwId = e.target.value;
-                                                            setData("id_rw", rwId);
+                                        <div className="flex-grow-1 overflow-auto komen-section" style={{ maxHeight: '100%' }}>
+                                            <form onSubmit={handleSubmit}>
+                                                <Role role={['admin']}>
+                                                    {/* PILIH RW */}
+                                                    <div className="mb-3">
+                                                        <label className="form-label">RW</label>
+                                                        <small>-Wajib dipilih</small>
+                                                        <select
+                                                            className="form-control"
+                                                            value={data.id_rw || ""}
+                                                            onChange={(e) => {
+                                                                const rwId = e.target.value;
+                                                                setData("id_rw", rwId);
 
-                                                            // Reset RT agar tidak salah pilih
-                                                            setData("id_rt", "");
+                                                                // Reset RT agar tidak salah pilih
+                                                                setData("id_rt", "");
 
-                                                            // Filter RT berdasar RW
-                                                            const list = rtList.filter(rt => rt.id_rw == rwId);
-                                                            setFilteredRt(list);
+                                                                // Filter RT berdasar RW
+                                                                const list = rtList.filter(rt => rt.id_rw == rwId);
+                                                                setFilteredRt(list);
+                                                            }}
+                                                            required
+                                                            style={{
+                                                                border: "0",
+                                                                borderBottom: "1px solid lightgray",
+                                                                borderRadius: "0",
+                                                            }}
+                                                        >
+                                                            <option value="" disabled>-- Pilih RW --</option>
+                                                            {rwList?.map((rw) => (
+                                                                <option key={rw.id} value={rw.id}>
+                                                                    RW {rw.nomor_rw} - {rw.nama_anggota_rw}
+                                                                </option>
+                                                            ))}
+                                                        </select>
+                                                    </div>
+
+                                                    {/* PILIH RT */}
+                                                    <div className="mb-3">
+                                                        <label className="form-label">RT</label>
+                                                        <small>-Opsional (jika untuk pengumuman rw, kosongkan)</small>
+                                                        <select
+                                                            className="form-control"
+                                                            value={data.id_rt || ""}
+                                                            onChange={(e) => setData("id_rt", e.target.value)}
+                                                            disabled={filteredRt.length === 0}
+                                                            style={{
+                                                                border: "0",
+                                                                borderBottom: "1px solid lightgray",
+                                                                borderRadius: "0",
+                                                            }}
+                                                        >
+                                                            <option value="" disabled>-- Pilih RT --</option>
+                                                            {filteredRt.map((rt) => (
+                                                                <option key={rt.id} value={rt.id}>
+                                                                    RT {rt.nomor_rt} - {rt.nama_anggota_rt}
+                                                                </option>
+                                                            ))}
+                                                        </select>
+                                                    </div>
+                                                </Role>
+                                                <div className="mb-2">
+                                                    <label className="form-label">Judul</label>
+                                                    <input
+                                                        name="judul"
+                                                        type="text"
+                                                        className="tambah-judul form-control"
+                                                        value={data.judul}
+                                                        onChange={(e) => setData("judul", e.target.value)}
+                                                        required
+                                                    />
+                                                </div>
+
+                                                <div className="mb-2">
+                                                    <label className="form-label">Kategori</label>
+                                                    <CreatableSelect
+                                                        placeholder="Pilih atau buat kategori baru..."
+                                                        value={data.kategori ? { value: data.kategori, label: data.kategori } : null}
+                                                        onChange={(selected) => setData("kategori", selected ? selected.value : "")}
+                                                        options={kategori.map((kat) => ({
+                                                            value: kat,
+                                                            label: kat,
+                                                        }))}
+                                                        className="react-select-container"
+                                                        classNamePrefix="react-select"
+                                                        noOptionsMessage={() => "Ketik untuk membuat kategori baru"}
+                                                        styles={{
+                                                            control: (base) => ({
+                                                                ...base,
+                                                                border: 0,
+                                                                borderBottom: "1px solid lightgray",
+                                                                borderRadius: 0,
+                                                                boxShadow: "none",
+                                                            }),
                                                         }}
                                                         required
-                                                        style={{
-                                                            border: "0",
-                                                            borderBottom: "1px solid lightgray",
-                                                            borderRadius: "0",
-                                                        }}
-                                                    >
-                                                        <option value="" disabled>-- Pilih RW --</option>
-                                                        {rwList.map((rw) => (
-                                                            <option key={rw.id} value={rw.id}>
-                                                                RW {rw.nomor_rw} - {rw.nama_anggota_rw}
-                                                            </option>
-                                                        ))}
-                                                    </select>
+                                                    />
                                                 </div>
 
-                                                {/* PILIH RT */}
-                                                <div className="mb-3">
-                                                    <label className="form-label">RT</label>
-                                                    <small>-Opsional (jika untuk pengumuman rw, kosongkan)</small>
-                                                    <select
-                                                        className="form-control"
-                                                        value={data.id_rt || ""}
-                                                        onChange={(e) => setData("id_rt", e.target.value)}
-                                                        disabled={filteredRt.length === 0}
-                                                        style={{
-                                                            border: "0",
-                                                            borderBottom: "1px solid lightgray",
-                                                            borderRadius: "0",
-                                                        }}
-                                                    >
-                                                        <option value="" disabled>-- Pilih RT --</option>
-                                                        {filteredRt.map((rt) => (
-                                                            <option key={rt.id} value={rt.id}>
-                                                                RT {rt.nomor_rt} - {rt.nama_anggota_rt}
-                                                            </option>
-                                                        ))}
-                                                    </select>
+                                                <div className="mb-2">
+                                                    <label className="form-label">Tanggal Pelaksanaan</label>
+                                                    <input
+                                                        name="tanggal"
+                                                        type="datetime-local"
+                                                        className="tambah-kategori form-control"
+                                                        value={data.tanggal}
+                                                        onChange={(tanggal) => setData('tanggal', tanggal.target.value)}
+                                                    />
+                                                    <small className="mt-1 text-muted">Opsional</small>
                                                 </div>
-                                            </Role>
-                                            <div className="mb-2">
-                                                <label className="form-label">Judul</label>
-                                                <input
-                                                    name="judul"
-                                                    type="text"
-                                                    className="tambah-judul form-control"
-                                                    value={data.judul}
-                                                    onChange={(e) => setData("judul", e.target.value)}
-                                                    required
-                                                />
-                                            </div>
 
-                                            <div className="mb-2">
-                                                <label className="form-label">Kategori</label>
-                                                <CreatableSelect
-                                                    placeholder="Pilih atau buat kategori baru..."
-                                                    value={data.kategori ? { value: data.kategori, label: data.kategori } : null}
-                                                    onChange={(selected) => setData("kategori", selected ? selected.value : "")}
-                                                    options={kategori.map((kat) => ({
-                                                        value: kat,
-                                                        label: kat,
-                                                    }))}
-                                                    className="react-select-container"
-                                                    classNamePrefix="react-select"
-                                                    noOptionsMessage={() => "Ketik untuk membuat kategori baru"}
-                                                    styles={{
-                                                        control: (base) => ({
-                                                            ...base,
-                                                            border: 0,
-                                                            borderBottom: "1px solid lightgray",
-                                                            borderRadius: 0,
-                                                            boxShadow: "none",
-                                                        }),
-                                                    }}
-                                                    required
-                                                />
-                                            </div>
+                                                <div className="mb-2">
+                                                    <label className="form-label">Tempat Pelaksanaan</label>
+                                                    <input
+                                                        name="tempat"
+                                                        type="text"
+                                                        className="tambah-kategori form-control"
+                                                        value={data.tempat}
+                                                        onChange={(e) => setData("tempat", e.target.value)}
+                                                    />
+                                                </div>
 
-                                            <div className="mb-2">
-                                                <label className="form-label">Tanggal Pelaksanaan</label>
-                                                <input
-                                                    name="tanggal"
-                                                    type="datetime-local"
-                                                    className="tambah-kategori form-control"
-                                                    value={data.tanggal}
-                                                    onChange={(tanggal) => setData('tanggal', tanggal.target.value)}
-                                                />
-                                                <small className="mt-1 text-muted">Opsional</small>
-                                            </div>
+                                                <div className="mb-2">
+                                                    <label className="form-label">Isi</label>
+                                                    <textarea
+                                                        ref={isiRef}
+                                                        name="isi"
+                                                        className="edit-isi form-control"
+                                                        rows="4"
+                                                        value={data.isi}
+                                                        onChange={(e) => setData("isi", e.target.value)}
+                                                        required
+                                                    ></textarea>
+                                                </div>
 
-                                            <div className="mb-2">
-                                                <label className="form-label">Tempat Pelaksanaan</label>
-                                                <input
-                                                    name="tempat"
-                                                    type="text"
-                                                    className="tambah-kategori form-control"
-                                                    value={data.tempat}
-                                                    onChange={(e) => setData("tempat", e.target.value)}
-                                                />
-                                            </div>
-
-                                            <div className="mb-2">
-                                                <label className="form-label">Isi</label>
-                                                <textarea
-                                                    ref={isiRef}
-                                                    name="isi"
-                                                    className="edit-isi form-control"
-                                                    rows="4"
-                                                    value={data.isi}
-                                                    onChange={(e) => setData("isi", e.target.value)}
-                                                    required
-                                                ></textarea>
-                                            </div>
-
-                                            <div className="mb-2">
-                                                <input
-                                                    ref={fileInputRef}
-                                                    type="file"
-                                                    id="fileInput"
-                                                    name="dokumen"
-                                                    className="d-none"
-                                                    onChange={handleFileChange}
-                                                    accept=".doc,.docx,.xls,.xlsx,.pdf"
-                                                />
-                                                <small className="text-muted d-block mt-2">
-                                                    Opsional (Dokumen, Max 2MB: .doc, .docx, .pdf)
-                                                </small>
-                                                <button
-                                                    type="button"
-                                                    className="edit-file btn btn-outline-primary m-0"
-                                                    title="Upload File"
-                                                    onClick={() => document.getElementById('fileInput').click()}
-                                                >
-                                                    <i className="fas fa-upload me-2"></i>
-                                                    <small>
-                                                        Upload File
+                                                <div className="mb-2">
+                                                    <input
+                                                        ref={fileInputRef}
+                                                        type="file"
+                                                        id="fileInput"
+                                                        name="dokumen"
+                                                        className="d-none"
+                                                        onChange={handleFileChange}
+                                                        accept=".doc,.docx,.xls,.xlsx,.pdf"
+                                                    />
+                                                    <small className="text-muted d-block mt-2">
+                                                        Opsional (Dokumen, Max 2MB: .doc, .docx, .pdf)
                                                     </small>
-                                                </button>
-                                                {data.dokumen && (
-                                                    <small className="text-success d-block mt-2" style={{ wordBreak: 'break-all' }}>
-                                                        File dipilih: {data.dokumen.name}
-                                                    </small>
-                                                )}
-                                            </div>
+                                                    <button
+                                                        type="button"
+                                                        className="edit-file btn btn-outline-primary m-0"
+                                                        title="Upload File"
+                                                        onClick={() => document.getElementById('fileInput').click()}
+                                                    >
+                                                        <i className="fas fa-upload me-2"></i>
+                                                        <small>
+                                                            Upload File
+                                                        </small>
+                                                    </button>
+                                                    {data.dokumen && (
+                                                        <small className="text-success d-block mt-2" style={{ wordBreak: 'break-all' }}>
+                                                            File dipilih: {data.dokumen.name}
+                                                        </small>
+                                                    )}
+                                                </div>
 
-                                            <div className="d-flex justify-content-end" style={{ marginTop: "auto" }}>
-                                                <button type="submit" className="btn btn-primary my-auto">
-                                                    <i className="fas fa-save me-2"></i>
-                                                    Simpan
-                                                </button>
-                                            </div>
-                                        </form>
+                                                <div className="d-flex justify-content-end" style={{ marginTop: "auto" }}>
+                                                    <button type="submit" className="btn btn-primary my-auto">
+                                                        <i className="fas fa-save me-2"></i>
+                                                        Simpan
+                                                    </button>
+                                                </div>
+                                            </form>
+                                        </div>
                                         {preview.show && (
                                             <div
                                                 className="preview-overlay"
@@ -5939,8 +5941,8 @@ export function TambahIuran({ tambahShow, onClose, onAdded, role, golongan, rw, 
                                                 className="form-control"
                                                 onChange={handleChange}
                                                 onInput={(e) => {
-                                                    if (e.target.value.length > 8) {
-                                                        e.target.value = e.target.value.slice(0, 8)
+                                                    if (e.target.value.length > 13) {
+                                                        e.target.value = e.target.value.slice(0, 13)
                                                     }
                                                 }}
                                                 required
@@ -5973,8 +5975,8 @@ export function TambahIuran({ tambahShow, onClose, onAdded, role, golongan, rw, 
                                                                 type="number"
                                                                 className="tambah-judul form-control"
                                                                 onInput={(e) => {
-                                                                    if (e.target.value.length > 8 || e.target.value.length < 0) {
-                                                                        e.target.value = e.target.value.slice(0, 8)
+                                                                    if (e.target.value.length > 13 || e.target.value.length < 0) {
+                                                                        e.target.value = e.target.value.slice(0, 13)
                                                                     }
                                                                 }}
                                                                 onChange={(e) => handleNominalChange(g.id, e.target.value)}
@@ -6129,8 +6131,8 @@ export function EditIuranOtomatis({ editShow, onClose, onUpdated, role, golongan
                                                 className="tambah-judul form-control"
                                                 onChange={(e) => setData("nominal", e.target.value)}
                                                 onInput={(e) => {
-                                                    if (e.target.value.length > 8) {
-                                                        e.target.value = e.target.value.slice(0, 8);
+                                                    if (e.target.value.length > 13) {
+                                                        e.target.value = e.target.value.slice(0, 13);
                                                     }
                                                 }}
                                                 required
@@ -6277,8 +6279,8 @@ export function EditIuranManual({ editShow, onClose, onUpdated, role, iuran }) {
                                                 className="tambah-judul form-control"
                                                 onChange={(e) => setData("nominal", e.target.value)}
                                                 onInput={(e) => {
-                                                    if (e.target.value.length > 8) {
-                                                        e.target.value = e.target.value.slice(0, 8);
+                                                    if (e.target.value.length > 13) {
+                                                        e.target.value = e.target.value.slice(0, 13);
                                                     }
                                                 }}
                                                 required
@@ -6515,8 +6517,8 @@ export function TambahTagihan({ tambahShow, onClose, onUpdated, role, iuran, kk_
                                                 className="form-control"
                                                 onChange={(e) => setData('nominal', e.target.value)}
                                                 onInput={(e) => {
-                                                    if (e.target.value.length > 8) {
-                                                        e.target.value = e.target.value.slice(0, 8)
+                                                    if (e.target.value.length > 13) {
+                                                        e.target.value = e.target.value.slice(0, 13)
                                                     }
                                                 }}
                                                 required
@@ -6773,8 +6775,8 @@ export function EditTagihan({ editShow, onClose, onUpdated, role, selectedData }
                                                 value={selectedData.nominal}
                                                 className="form-control"
                                                 onInput={(e) => {
-                                                    if (e.target.value.length > 8) {
-                                                        e.target.value = e.target.value.slice(0, 8)
+                                                    if (e.target.value.length > 13) {
+                                                        e.target.value = e.target.value.slice(0, 13)
                                                     }
                                                 }}
                                                 disabled
@@ -6795,8 +6797,8 @@ export function EditTagihan({ editShow, onClose, onUpdated, role, selectedData }
                                                 className="form-control"
                                                 onChange={(e) => setData('nominal_bayar', e.target.value)}
                                                 onInput={(e) => {
-                                                    if (e.target.value.length > 8) {
-                                                        e.target.value = e.target.value.slice(0, 8)
+                                                    if (e.target.value.length > 13) {
+                                                        e.target.value = e.target.value.slice(0, 13)
                                                     }
                                                 }}
                                                 required={data.status_bayar === "sudah_bayar"}
@@ -7505,8 +7507,8 @@ export function TambahTransaksiPerKk({ listKK = [], tambahShow, onClose, onAdded
                                                 className="tambah-judul form-control"
                                                 onChange={(nominal) => setData('nominal', nominal.target.value)}
                                                 onInput={(e) => {
-                                                    if (e.target.value.length > 8) {
-                                                        e.target.value = e.target.value.slice(0, 8);
+                                                    if (e.target.value.length > 13) {
+                                                        e.target.value = e.target.value.slice(0, 13);
                                                     }
                                                 }}
                                             />
@@ -7728,8 +7730,8 @@ export function EditTransaksi({ editShow, onClose, onUpdated, role, selectedData
                                                 className="tambah-judul form-control"
                                                 onChange={(nominal) => setData('nominal', nominal.target.value)}
                                                 onInput={(e) => {
-                                                    if (e.target.value.length > 8) {
-                                                        e.target.value = e.target.value.slice(0, 8);
+                                                    if (e.target.value.length > 13) {
+                                                        e.target.value = e.target.value.slice(0, 13);
                                                     }
                                                 }}
                                             />
