@@ -1249,3 +1249,52 @@ export function useIsMobile() {
 
     return mobile;
 }
+
+export function iconPermission() {
+    return [
+        {
+            name: "assign",
+            icon: "clipboard-list"
+        },
+        {
+            name: "comment",
+            icon: "comments"
+        },
+        {
+            name: "confirm",
+            icon: "circle-check"
+        },
+        {
+            name: "create",
+            icon: "circle-plus"
+        },
+        {
+            name: "dashboard",
+            icon: "tachometer-alt"
+        },
+        {
+            name: "delete",
+            icon: "trash"
+        },
+        {
+            name: "edit",
+            icon: "pen-to-square"
+        },
+        {
+            name: "export",
+            icon: "file-export"
+        },
+        {
+            name: "respond",
+            icon: "reply"
+        },
+        {
+            name: "toggle",
+            icon: "toggle-on"
+        },
+        {
+            name: "view",
+            icon: "eye"
+        },
+    ]
+}

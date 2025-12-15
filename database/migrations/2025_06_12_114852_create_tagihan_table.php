@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('tagihan', function (Blueprint $table) {
             $table->id();
             $table->string('nama');
-            $table->decimal('nominal', 10, 2);
+            $table->decimal('nominal', 15, 2);
             $table->date('tgl_tagih');
             $table->date('tgl_tempo');
             $table->enum('jenis', ['otomatis', 'manual'])->default('manual');
@@ -24,7 +24,7 @@ return new class extends Migration
 
             $table->enum('status_bayar', ['sudah_bayar', 'belum_bayar'])->default('belum_bayar');
             $table->dateTime('tgl_bayar')->nullable(); // dari dateTime diubah jadi date, biar bisa diambil sama si input date 👍👍👍
-            $table->decimal('nominal_bayar', 10, 2)->default(0);
+            $table->decimal('nominal_bayar', 15, 2)->default(0);
             $table->foreignId('id_iuran')->constrained('iuran')->onDelete('cascade');
             $table->enum('kategori_pembayaran', ['transfer', 'tunai'])->nullable();
             $table->string('bukti_transfer')->nullable();

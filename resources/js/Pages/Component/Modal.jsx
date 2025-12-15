@@ -88,7 +88,7 @@ export function ModalSidebar({ modalIsOpen, modalShow, localStorageHistory }) {
                                     ×
                                 </button>
                             </div>
-                            <div className="modal-body p-0 m-0 d-block" style={{ overflowY: "hidden" }}>
+                            <div className="modal-body p-0 m-0 d-block">
                                 <ul className="navbar-nav sidebar sidebar-dark accordion">
                                     <hr className="sidebar-divider my-0" />
                                     {statLinks.map((link, index) => (
