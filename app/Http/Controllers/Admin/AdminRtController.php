@@ -10,6 +10,7 @@ use App\Models\Warga;
 use App\Models\Setting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
@@ -20,7 +21,14 @@ class AdminRtController extends Controller
     public function index(Request $request)
     {
         $title = 'Rukun Tetangga';
-        $query = Rt::with('rw');
+        $query = Rt::with([
+            'user' => function ($q) {
+                $q->whereHas('roles', function ($q) {
+                    $q->where('name', 'rt');
+                });
+            },
+            'user.roles',
+        ]);
 
         if ($request->filled('keyword')) {
             $query->where(function ($q) use ($request) {
@@ -118,22 +126,16 @@ class AdminRtController extends Controller
             return back()->withErrors($validator)->withInput();
         }
 
+        $jabatan = $request->jabatan ?: 'ketua'; // default ketua
+
         $maxRT = Setting::where('key', 'max_rt_per_rw')->value('value') ?? 0;
 
-        $currentRTCount = Rt::where('id_rw', $request->id_rw)->count();
+        $currentRTCount = Rt::orderBy('nomor_rt', 'desc')->value('nomor_rt');
 
-        if ($maxRT > 0 && $currentRTCount >= $maxRT) {
+        if ($maxRT > 0 && $currentRTCount >= $maxRT && $jabatan === 'ketua') {
             return back()
                 ->with('error', "RW ini sudah memiliki jumlah RT maksimal ({$maxRT}). Tidak dapat menambah RT baru.")
                 ->withInput();
-        }
-
-        $jabatan = $request->jabatan ?: 'ketua'; // default ketua
-
-        if ($jabatan === 'ketua') {
-            $roleToCheck = null; // karena ketua = tanpa role tambahan
-        } else {
-            $roleToCheck = $jabatan;
         }
 
         if ($jabatan) {
@@ -164,36 +166,61 @@ class AdminRtController extends Controller
             }
         }
 
-        $rt = Rt::create([
-            'nik' => $request->nik,
-            'no_kk' => $request->filled('nik')
-                ? optional(Warga::where('nik', $request->nik)->first())->no_kk
-                : null,
-            'nomor_rt' => $request->nomor_rt,
-            'nama_anggota_rt' => $request->nama_anggota_rt,
-            'mulai_menjabat' => $request->mulai_menjabat,
-            'akhir_jabatan' => $request->akhir_jabatan,
-            'id_rw' => $request->id_rw,
-            'status' => $request->status ?? 'nonaktif',
-        ]);
+        if ($jabatan === 'ketua') {
+            $rt = Rt::create([
+                'nik' => $request->nik,
+                'no_kk' => $request->filled('nik')
+                    ? optional(Warga::where('nik', $request->nik)->first())->no_kk
+                    : null,
+                'nomor_rt' => $request->nomor_rt,
+                'nama_anggota_rt' => $request->nama_anggota_rt,
+                'mulai_menjabat' => $request->mulai_menjabat,
+                'akhir_jabatan' => $request->akhir_jabatan,
+                'id_rw' => $request->id_rw,
+                'status' => $request->status ?? 'nonaktif',
+            ]);
+        }
 
         if ($request->filled('nik') && $request->filled('nama_anggota_rt')) {
 
-            $user = User::create([
-                'nik' => $request->nik,
-                'nama' => $request->nama_anggota_rt,
-                'password' => Hash::make('password'),
-                'id_rt' => $rt->id,
-                'id_rw' => $request->id_rw,
-            ]);
+            $user = User::updateOrCreate(
+                ['nik' => $request->nik],
+                [
+                    'nama' => $request->nama_anggota_rt,
+                    'password' => Hash::make('password'),
+                    'id_rt' => $rt->id ?? $rtAktif->id,
+                    'id_rw' => $request->id_rw,
+                ]
+            );
 
-            $roles = ['rt'];
+            $existingRoles = $user->roles->pluck('name')->toArray();
 
-            if ($jabatan !== 'ketua' && Role::where('name', $jabatan)->exists()) {
-                $roles[] = $jabatan;
+            $hasWarga = in_array('warga', $existingRoles);
+
+            $coreRoles = ['admin', 'rw', 'rt', 'warga'];
+
+            $finalRoles = ['rt'];
+
+            if ($request->filled('jabatan') && $request->jabatan !== 'ketua') {
+                $jabatanBaru = $request->jabatan;
+
+                if (Role::where('name', $jabatanBaru)->exists()) {
+
+                    $finalRoles = array_filter(
+                        $finalRoles,
+                        fn($role) =>
+                        in_array($role, $coreRoles)
+                    );
+
+                    $finalRoles[] = $jabatanBaru;
+                }
             }
 
-            $user->syncRoles($roles);
+            if ($hasWarga) {
+                $finalRoles[] = 'warga';
+            }
+
+            $user->syncRoles(array_unique($finalRoles));
         }
 
         return redirect()->route('admin.rt.index')
@@ -228,12 +255,6 @@ class AdminRtController extends Controller
         }
 
         $jabatan = $request->jabatan ?: 'ketua';
-
-        if ($jabatan === 'ketua') {
-            $roleToCheck = null;
-        } else {
-            $roleToCheck = $jabatan;
-        }
 
         $rtAktif = Rt::where('id_rw', $request->id_rw)
             ->where('nomor_rt', $request->nomor_rt)

@@ -31,7 +31,15 @@ class RwRukunTetanggaController extends Controller
 
         $query = Rt::whereHas('rw', function ($q) use ($nomorRwUser) {
             $q->where('nomor_rw', $nomorRwUser);
-        });
+        })
+            ->orWhereHas('user.roles', function ($q) {
+                $q->where('name', 'rt');
+            })
+            ->with(['user' => function ($q) {
+                $q->whereHas('roles', function ($q) {
+                    $q->where('name', 'rt');
+                });
+            }, 'user.roles']);
 
         if ($request->filled('keyword')) {
             $query->where(function ($q) use ($request) {
@@ -44,7 +52,8 @@ class RwRukunTetanggaController extends Controller
             $query->where('nomor_rt', $request->nomor_rt);
         }
 
-        $rukun_tetangga = $query->orderBy('nomor_rt')
+        $rukun_tetangga = $query
+            ->orderBy('nomor_rt')
             ->paginate(10)
             ->withQueryString();
 
@@ -62,12 +71,17 @@ class RwRukunTetanggaController extends Controller
 
         $roles = collect(['ketua'])->merge($roles)->values();
 
+        $warga = Warga::whereDoesntHave('user.roles', function ($q) {
+            $q->where('name', 'rw');
+        })->get();
+
         return Inertia::render('Rw/Rt', [
             'rukun_tetangga' => $rukun_tetangga,
             'filters' => $request->only(['keyword', 'nomor_rt']),
             'rukun_tetangga_filter' => $rukun_tetangga_filter,
             'roles' => $roles,
             'title' => $title,
+            'warga' => $warga,
         ]);
     }
 
