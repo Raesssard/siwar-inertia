@@ -100,11 +100,20 @@ class RwRukunTetanggaController extends Controller
 
         $maxRT = Setting::where('key', 'max_rt_per_rw')->value('value') ?? 0;
 
-        $currentRTCount = Rt::where('id_rw', $request->id_rw)->count();
+        $currentKetuaRTCount = Rt::where('id_rw', $request->id_rw)
+            ->where('status', 'aktif')
+            ->whereDoesntHave('user.roles', function ($q) {
+                $q->whereNotIn('name', ['rt', 'warga']);
+            })
+            ->distinct('nomor_rt')
+            ->count('nomor_rt');
 
-        if ($maxRT > 0 && $currentRTCount >= $maxRT) {
+        if ($maxRT > 0 && $currentKetuaRTCount >= $maxRT) {
             return back()
-                ->with('error', "RW ini sudah memiliki jumlah RT maksimal ({$maxRT}). Tidak dapat menambah RT baru.")
+                ->with(
+                    'error',
+                    "RW ini sudah memiliki {$maxRT} RT aktif (ketua RT). Tidak dapat menambah RT baru."
+                )
                 ->withInput();
         }
 

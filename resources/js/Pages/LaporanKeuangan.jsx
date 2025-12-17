@@ -223,7 +223,7 @@ export default function LaporanKeuangan() {
                             <tr>
                                 <th className="px-3 text-center" scope="col" style={{ borderLeft: '1px solid lightGray' }}>No.</th>
                                 <th className="px-3 text-center" scope="col">Tanggal</th>
-                                <th className="px-3 text-center" scope="col">Keterangan</th>
+                                <th className="px-3 text-center" scope="col">Transaksi</th>
                                 {/* <th className="px-3 text-center" scope="col">Jenis</th> */}
                                 <th className="px-3 text-center" style={batasNominal} scope="col">Pemasukan</th>
                                 <th className="px-3 text-center" style={batasNominal} scope="col">Pengeluaran</th>
@@ -237,7 +237,7 @@ export default function LaporanKeuangan() {
                                         <tr key={item.id}>
                                             <td className="text-center" style={{ borderLeft: '1px solid lightGray' }}>{index + 1}</td>
                                             <td className="text-center">{formatTanggal(item.tanggal)}</td>
-                                            <td className="text-center">{item.nama_transaksi ?? '-'}</td>
+                                            <td className="text-start">{item.nama_transaksi ?? '-'}</td>
                                             {/* <td className="text-center">
                                                 {item.jenis === 'pemasukan' ? (
                                                     <span className="badge bg-success text-white">Pemasukan</span>

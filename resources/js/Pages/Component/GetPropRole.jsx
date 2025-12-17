@@ -416,6 +416,12 @@ export function getAdminLinks() {
                     permission: "view.kartu_keluarga",
                 },
                 {
+                    href: "/history-warga",
+                    text: "History Warga",
+                    icon: "user",
+                    permission: "view.warga",
+                },
+                {
                     href: "/admin/rw",
                     text: "Data RW",
                     icon: "house-user",
@@ -749,6 +755,12 @@ export function getRwLinks() {
                     icon: "id-card",
                     permission: "view.kartu_keluarga",
                 },
+                {
+                    href: "/history-warga",
+                    text: "History Warga",
+                    icon: "user",
+                    permission: "view.warga",
+                },
             ],
             permissions: [
                 "view.rt",
@@ -995,6 +1007,12 @@ export function getRtLinks() {
                     text: "Data Kartu Keluarga",
                     icon: "id-card",
                     permission: "view.kartu_keluarga",
+                },
+                {
+                    href: "/history-warga",
+                    text: "History Warga",
+                    icon: "user",
+                    permission: "view.warga",
                 },
             ],
             permissions: [

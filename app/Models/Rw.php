@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -21,6 +22,20 @@ class Rw extends Model
         'mulai_menjabat',
         'akhir_jabatan',
     ];
+
+    public function getMulaiMenjabatAttribute($value)
+    {
+        return $value
+            ? Carbon::parse($value)->format('d/m/y')
+            : null;
+    }
+
+    public function getAkhirJabatanAttribute($value)
+    {
+        return $value
+            ? Carbon::parse($value)->format('d/m/y')
+            : null;
+    }
 
     public function warga()
     {
