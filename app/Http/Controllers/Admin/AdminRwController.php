@@ -124,7 +124,7 @@ class AdminRwController extends Controller
 
             $warga = Warga::where('nik', $request->nik)->first();
 
-            $user = User::create([
+            $user = User::updateOrCreate([
                 'nik'      => $request->nik,
                 'nama'     => $request->nama_anggota_rw,
                 'password' => Hash::make('password'),

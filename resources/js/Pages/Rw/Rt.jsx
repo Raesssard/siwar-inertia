@@ -5,7 +5,15 @@ import { route } from "ziggy-js";
 import { AddRtModal, EditRtModal } from "@/Pages/Component/Modal";
 import "../../../css/kk.css"; // biar tabel dan tombolnya sama gaya
 
-export default function Rt({ rukun_tetangga, filters, rukun_tetangga_filter, title, roles }) {
+export default function Rt() {
+    const {
+        rukun_tetangga,
+        filters,
+        rukun_tetangga_filter,
+        title,
+        warga,
+        roles
+    } = usePage().props
     const { props } = usePage();
     const role = props.auth?.currentRole || "rw";
 
@@ -160,6 +168,7 @@ export default function Rt({ rukun_tetangga, filters, rukun_tetangga_filter, tit
                                 <th className="text-center px-3">NIK</th>
                                 <th className="text-center px-3">Nomor RT</th>
                                 <th className="text-center px-3">Nama Anggota RT</th>
+                                <th className="text-center px-3">Jabatan</th>
                                 <th className="text-center px-3">Mulai Menjabat</th>
                                 <th className="text-center px-3">Akhir Jabatan</th>
                                 <th className="text-center px-3">Status</th>
@@ -169,34 +178,42 @@ export default function Rt({ rukun_tetangga, filters, rukun_tetangga_filter, tit
 
                         <tbody>
                             {rukun_tetangga.data.length > 0 ? (
-                                rukun_tetangga.data.map((item, index) => (
-                                    <tr key={item.id}>
-                                        <td className="text-center">
-                                            {rukun_tetangga.from + index}
-                                        </td>
-                                        <td className="text-center">{item.nik || "-"}</td>
-                                        <td className="text-center">{item.nomor_rt || "-"}</td>
-                                        <td className="text-center">
-                                            {item.nama_anggota_rt || "-"}
-                                        </td>
-                                        <td className="text-center">{item.mulai_menjabat || "-"}</td>
-                                        <td className="text-center">{item.akhir_jabatan || "-"}</td>
-                                        <td className="text-center align-middle">
-                                            <span
-                                                className={`inline-block px-2 py-1 rounded text-sm font-medium ${item.status === "aktif"
-                                                    ? "bg-green-100 text-green-700"
-                                                    : "bg-red-100 text-red-700"
-                                                    }`}
-                                                onClick={() => handleToggleStatus(item.id)}
-                                                style={{ cursor: 'pointer', width: '4.25rem' }}
-                                                title="Ganti status RT"
-                                            >
-                                                {item.status || "-"}
-                                            </span>
-                                        </td>
-                                        <td className="text-center">
-                                            <div className="d-flex justify-content-center gap-2">
-                                                {/* <button
+                                rukun_tetangga.data.map((item, index) => {
+                                    const roleUtama = ['admin', 'rw', 'rt', 'warga']
+                                    const roleKetua = item.user[0]?.roles.length
+                                    const sideRole = item.user[0]?.roles.filter(
+                                        role => !roleUtama.includes(role.name)
+                                    ) || []
+
+                                    return (
+                                        <tr key={item.id}>
+                                            <td className="text-center">
+                                                {rukun_tetangga.from + index}
+                                            </td>
+                                            <td className="text-center">{item.nik || "-"}</td>
+                                            <td className="text-center">{item.nomor_rt || "-"}</td>
+                                            <td className="text-center">
+                                                {item.nama_anggota_rt || "-"}
+                                            </td>
+                                            <td className="text-center">{sideRole[0]?.name ? sideRole[0]?.name.replace(/\b\w/g, (char) => char.toUpperCase()) : roleKetua ? "Ketua" : "-"}</td>
+                                            <td className="text-center">{item.mulai_menjabat || "-"}</td>
+                                            <td className="text-center">{item.akhir_jabatan || "-"}</td>
+                                            <td className="text-center align-middle">
+                                                <span
+                                                    className={`inline-block px-2 py-1 rounded text-sm font-medium ${item.status === "aktif"
+                                                        ? "bg-green-100 text-green-700"
+                                                        : "bg-red-100 text-red-700"
+                                                        }`}
+                                                    onClick={() => handleToggleStatus(item.id)}
+                                                    style={{ cursor: 'pointer', width: '4.25rem' }}
+                                                    title="Ganti status RT"
+                                                >
+                                                    {item.status || "-"}
+                                                </span>
+                                            </td>
+                                            <td className="text-center">
+                                                <div className="d-flex justify-content-center gap-2">
+                                                    {/* <button
                                                     className={`btn btn-sm ${item.status === "aktif"
                                                         ? "btn-secondary"
                                                         : "btn-success"
@@ -208,25 +225,26 @@ export default function Rt({ rukun_tetangga, filters, rukun_tetangga_filter, tit
                                                         : "Aktifkan"}
                                                 </button> */}
 
-                                                <button
-                                                    className="btn btn-warning btn-sm my-auto"
-                                                    onClick={() => openEdit(item)}
-                                                    title="Edit RT"
-                                                >
-                                                    <i className="fas fa-edit"></i>
-                                                </button>
+                                                    <button
+                                                        className="btn btn-warning btn-sm my-auto"
+                                                        onClick={() => openEdit(item)}
+                                                        title="Edit RT"
+                                                    >
+                                                        <i className="fas fa-edit"></i>
+                                                    </button>
 
-                                                <button
-                                                    className="btn btn-danger btn-sm my-auto"
-                                                    onClick={() => handleDelete(item.id)}
-                                                    title="Hapus RT"
-                                                >
-                                                    <i className="fas fa-trash"></i>
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ))
+                                                    <button
+                                                        className="btn btn-danger btn-sm my-auto"
+                                                        onClick={() => handleDelete(item.id)}
+                                                        title="Hapus RT"
+                                                    >
+                                                        <i className="fas fa-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    )
+                                })
                             ) : (
                                 <tr>
                                     <td colSpan="8" className="text-center">
@@ -274,6 +292,7 @@ export default function Rt({ rukun_tetangga, filters, rukun_tetangga_filter, tit
             {/* ➕ Modal Tambah & ✏️ Edit */}
             {showAdd && (
                 <AddRtModal
+                    dataWarga={warga}
                     form={form}
                     handleChange={handleChange}
                     handleAdd={handleAdd}
@@ -285,6 +304,7 @@ export default function Rt({ rukun_tetangga, filters, rukun_tetangga_filter, tit
 
             {showEdit && (
                 <EditRtModal
+                    dataWarga={warga}
                     form={form}
                     handleChange={handleChange}
                     handleEdit={handleEdit}

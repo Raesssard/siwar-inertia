@@ -70,9 +70,9 @@ class Rt extends Model
         return $this->belongsTo(Rw::class, 'id_rw');
     }
 
-    public function user(): HasOne
+    public function user(): HasMany
     {
-        return $this->hasOne(User::class, 'id_rt', 'id');
+        return $this->hasMany(User::class, 'id_rt', 'id');
     }
 
     public function getStatusLabelAttribute(): string
