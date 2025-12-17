@@ -37,7 +37,18 @@ export default function Rt() {
     })
 
     // --- Form Handlers ---
-    const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value })
+    const handleChange = (e) =>
+        setForm({
+            ...form,
+            [e.target.name]: e.target.value
+        })
+
+    const handleSelectChange = (name, selected) => {
+        setForm({
+            ...form,
+            [name]: selected?.value || ""
+        });
+    };
 
     const handleAdd = (e) => {
         e.preventDefault()
@@ -288,6 +299,7 @@ export default function Rt() {
                     dataWarga={warga}
                     form={form}
                     handleChange={handleChange}
+                    handleSelectChange={handleSelectChange}
                     handleAdd={handleAdd}
                     onClose={() => setShowAdd(false)}
                     rwList={rwList}
@@ -298,8 +310,10 @@ export default function Rt() {
 
             {showEdit && (
                 <EditRtModal
+                    dataWarga={warga}
                     form={form}
                     handleChange={handleChange}
+                    handleSelectChange={handleSelectChange}
                     handleEdit={handleEdit}
                     onClose={() => setShowEdit(null)}
                     rwList={rwList}

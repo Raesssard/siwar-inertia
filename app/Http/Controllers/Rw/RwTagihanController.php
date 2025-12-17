@@ -19,7 +19,7 @@ class RwTagihanController extends Controller
 {
     public function index(Request $request)
     {
-        $title = 'Tagihan RW';
+        $title = 'Tagihan';
 
         $userRwData = Auth::user()->rw;
         if (!$userRwData) {

@@ -129,7 +129,7 @@ class AdminRwController extends Controller
                 'nama'     => $request->nama_anggota_rw,
                 'password' => Hash::make('password'),
                 'id_rw'    => $rw->id,
-                'id_rt'    => $warga?->kartuKeluarga?->id_rt 
+                'id_rt'    => $warga?->kartuKeluarga?->id_rt
             ]);
 
             $roles = ['rw'];
@@ -175,7 +175,7 @@ class AdminRwController extends Controller
             return back()->withErrors($validator)->withInput();
         }
 
-        $targetRole = $request->jabatan ?: 'ketua'; 
+        $targetRole = $request->jabatan ?: 'ketua';
 
         $rwLain = Rw::where('nomor_rw', $request->nomor_rw)
             ->where('id', '!=', $rw->id)
@@ -234,32 +234,34 @@ class AdminRwController extends Controller
                 ]);
             }
 
-        $existingRoles = $user->roles->pluck('name')->toArray();
+            $existingRoles = $user->roles->pluck('name')->toArray();
 
-        $hasWarga = in_array('warga', $existingRoles);
+            $hasWarga = in_array('warga', $existingRoles);
 
-        $coreRoles = ['admin', 'rw', 'rt', 'warga'];
+            $coreRoles = ['admin', 'rw', 'rt', 'warga'];
 
-        $finalRoles = ['rt'];
+            $finalRoles = ['rw'];
 
-        if ($request->filled('jabatan') && $request->jabatan !== 'ketua') {
-            $jabatanBaru = $request->jabatan;
+            if ($request->filled('jabatan') && $request->jabatan !== 'ketua') {
+                $jabatanBaru = $request->jabatan;
 
-            if (Role::where('name', $jabatanBaru)->exists()) {
+                if (Role::where('name', $jabatanBaru)->exists()) {
 
-                $finalRoles = array_filter($finalRoles, function ($role) use ($coreRoles) {
-                    return !in_array($role, $coreRoles);
-                });
+                    $finalRoles = array_filter(
+                        $finalRoles,
+                        fn($role) =>
+                        in_array($role, $coreRoles)
+                    );
 
-                $finalRoles[] = $jabatanBaru;
+                    $finalRoles[] = $jabatanBaru;
+                }
             }
-        }
 
-        if ($hasWarga) {
-            $finalRoles[] = 'warga';
-        }
+            if ($hasWarga) {
+                $finalRoles[] = 'warga';
+            }
 
-        $user->syncRoles(array_unique($finalRoles));
+            $user->syncRoles(array_unique($finalRoles));
         } else {
             if ($user) $user->delete();
         }
@@ -291,7 +293,7 @@ class AdminRwController extends Controller
 
         $ignoredRoles = ['rw', 'warga'];
 
-        $user = $rw->user()->first();
+        $user = $rw->users()->first();
 
         $jabatanUser = $user?->roles()
             ->whereNotIn('name', $ignoredRoles)

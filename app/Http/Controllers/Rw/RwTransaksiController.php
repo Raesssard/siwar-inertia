@@ -15,7 +15,7 @@ class RwTransaksiController extends Controller
 {
     public function index(Request $request)
     {
-        $title = "Transaksi RW";
+        $title = "Transaksi";
 
         $user = $request->user();
         $userRwData = $user?->rw;
@@ -32,10 +32,18 @@ class RwTransaksiController extends Controller
         $bulan = $request->bulan;
         $rt = $request->rt;
 
-        $daftar_rt = Rt::where('id_rw', $idRw)
-            ->where('status', 'aktif')
-            ->pluck('nomor_rt')
-            ->toArray();
+        $allowedMainRoles = ['admin', 'rw', 'rt', 'warga'];
+
+        $daftar_rt = Rt::with('rw')->whereHas('user', function ($q) use ($allowedMainRoles) {
+            $q->whereHas('roles', fn($qrt) => $qrt->where('name', 'rt'))
+                ->whereDoesntHave(
+                    'roles',
+                    fn($qx) =>
+                    $qx->whereNotIn('name', $allowedMainRoles)
+                );
+        })
+            ->select('id', 'id_rw', 'nomor_rt', 'nama_anggota_rt')
+            ->get();
 
         $query = Transaksi::whereHas('rukunTetangga.rw', function ($q) use ($nomorRwUser) {
             $q->where('nomor_rw', $nomorRwUser);

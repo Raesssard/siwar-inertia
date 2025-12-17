@@ -2,7 +2,7 @@ import React, { useState, useMemo } from "react";
 import Layout from "@/Layouts/Layout";
 import { Head, router, Link, usePage } from "@inertiajs/react";
 import { route } from "ziggy-js";
-import { iconPermission } from "../Component/GetPropRole";
+import { iconPermission, useIsMobile } from "../Component/GetPropRole";
 
 export default function AssignRolesPermission({ role, permissions, title }) {
     const [selectedPerms, setSelectedPerms] = useState(
@@ -155,7 +155,7 @@ export default function AssignRolesPermission({ role, permissions, title }) {
             </div>
 
             {/* 🔘 Tombol Aksi */}
-            <div className="d-flex w-100 justify-content-end gap-2 mt-4 me-4">
+            <div className={`d-flex w-100 gap-2 ${useIsMobile() ? "justify-content-center mt-2 mx-2" : "justify-content-end mt-4 me-4"}`}>
                 <button className="btn btn-primary px-4" onClick={handleSave}>
                     <i className="fas fa-save me-1"></i> Simpan Perubahan
                 </button>

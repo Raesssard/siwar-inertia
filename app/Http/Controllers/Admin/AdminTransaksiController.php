@@ -113,7 +113,6 @@ class AdminTransaksiController extends Controller
             'nominal' => 'required|numeric|min:0',
             'keterangan' => 'nullable|string',
             'rt' => 'required|numeric',
-            'rw' => 'required|numeric',
         ]);
 
         $isPerKk = $request->no_kk !== 'semua';
@@ -121,7 +120,7 @@ class AdminTransaksiController extends Controller
         $data = [
             'tagihan_id' => null,
             'no_kk' => $isPerKk ? $request->no_kk : null,
-            'rt' => "RT {$request->rt}" . ' - ' . "RW {$request->rw}",
+            'rt' => $request->rt,
             'tanggal' => $request->tanggal,
             'nama_transaksi' => $request->nama_transaksi,
             'jenis' => $request->jenis,

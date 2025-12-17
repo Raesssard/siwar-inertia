@@ -126,7 +126,7 @@ export default function Transaksi() {
                             ? "Semua Transaksi"
                             : role === "rw"
                                 ? `Transaksi RW ${user?.rw?.nomor_rw}`
-                                : `Transaksi RT ${user?.rt?.nomor_rt}`}
+                                : `Transaksi RT ${user?.rukun_tetangga?.nomor_rt}`}
                     </h4>
                     <span></span>
                 </div>

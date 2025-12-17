@@ -44,7 +44,7 @@ class RwIuranController extends Controller
         }
 
         $golongan_list = Kategori_golongan::with('iuranGolongan')->get();
-        $title = 'Iuran RW';
+        $title = 'Iuran';
 
         $iuranOtomatis = (clone $query)
             ->where('jenis', 'otomatis')

@@ -49,6 +49,8 @@ export function ModalSidebar({ modalIsOpen, modalShow, localStorageHistory }) {
 
     const { props } = usePage()
     const role = props.auth?.currentRole
+    const sideRoles = props.auth?.sideRoles || []
+    const permissions = props.auth?.permissions || []
 
     let statLinks = []
 
@@ -68,6 +70,69 @@ export function ModalSidebar({ modalIsOpen, modalShow, localStorageHistory }) {
         default:
             statLinks = []
     }
+
+    const mainRoles = ["admin", "rw", "rt", "warga"]
+    const activeRole = sideRoles.length > 0 ? sideRoles[0] : role
+
+    const filteredLinks = statLinks.flatMap(link => {
+
+        // 1) DASHBOARD selalu muncul
+        if (link.href === "/dashboard") {
+            return [{
+                text: link.text,
+                href: link.href,
+                icon: link.icon
+            }]
+        }
+
+        const parentAllowed =
+            !link.permission || permissions.includes(link.permission)
+
+        const childrenAllowed = link.children
+            ? link.children.filter(child =>
+                !child.permission || permissions.includes(child.permission)
+            )
+            : []
+
+        // 2) ROLE UTAMA → masih ada ortu, anaknya masih kecil
+        if (mainRoles.includes(activeRole)) {
+            if (parentAllowed || childrenAllowed.length > 0) {
+                if (childrenAllowed.length > 0) {
+                    return [{
+                        ...link,
+                        children: childrenAllowed
+                    }]
+                }
+
+                const { children, ...rest } = link
+                return [rest]
+            }
+            return []
+        }
+
+        // 3) ROLE SAMPINGAN → anak mandiri, ortu gak numpang kalau gak dibutuhin 🥀🥀
+        if (!mainRoles.includes(activeRole)) {
+
+            // Kalau ada anak allowed → tampil anak aja
+            if (childrenAllowed.length > 0) {
+                return childrenAllowed.map(child => {
+                    const { children, ...rest } = child
+                    return rest
+                })
+            }
+
+            // kalau parent punya permission khusus → tampil
+            if (link.permission && permissions.includes(link.permission)) {
+                const { children, ...rest } = link
+                return [rest]
+            }
+
+            // kalau sampai sini → buang parent karena dia cuma frame kosong 💀
+            return []
+        }
+
+        return []
+    })
 
     return (
         <>
@@ -91,7 +156,7 @@ export function ModalSidebar({ modalIsOpen, modalShow, localStorageHistory }) {
                             <div className="modal-body p-0 m-0 d-block">
                                 <ul className="navbar-nav sidebar sidebar-dark accordion">
                                     <hr className="sidebar-divider my-0" />
-                                    {statLinks.map((link, index) => (
+                                    {filteredLinks.map((link, index) => (
                                         <SidebarLink
                                             key={index}
                                             {...link}
@@ -201,385 +266,630 @@ export function ModalSidebar({ modalIsOpen, modalShow, localStorageHistory }) {
 
 export function AddRwModal({ dataWarga, form, handleChange, handleSelectChange, handleAdd, onClose, roles = [] }) {
     return (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 fade-in">
-            <div className="bg-white rounded-2xl shadow-lg w-full max-w-md animate-scaleIn">
-                <form onSubmit={handleAdd} className="p-6 space-y-4">
-                    <div className="flex justify-between items-center border-b pb-2">
-                        <h5 className="text-lg font-semibold">Tambah RW</h5>
+        <div
+            className="modal fade show"
+            tabIndex="-1"
+            style={{
+                display: "block",
+                backgroundColor: "rgba(0,0,0,0.5)"
+            }}
+            onClick={() => {
+                onClose()
+            }}
+        >
+            <div
+                className="modal-dialog modal-dialog-scrollable modal-dialog-centered"
+                style={useIsMobile() ? { maxHeight: '80vh' } : {}}
+                onClick={(e) => e.stopPropagation()}
+            >
+                <div
+                    className="modal-content shadow-lg border-0"
+                    style={useIsMobile() ? { maxHeight: '80vh' } : {}}
+                >
+                    <div className="modal-header border-bottom mb-0" style={{ position: "sticky", zIndex: '10' }}>
+                        <h5 className="text-lg">Tambah RW</h5>
                         <button type="button" onClick={onClose} className="text-gray-500 hover:text-gray-700">✕</button>
                     </div>
-                    <div className="space-y-3">
-                        <div>
-                            <label className="block text-sm font-medium">NIK</label>
-                            <Select
-                                name="nik"
-                                options={dataWarga?.map((item) => ({
-                                    value: item.nik,
-                                    label: item.nik,
-                                }))}
-                                value={
-                                    form.nik
-                                        ? {
-                                            value: form.nik,
-                                            label: dataWarga?.find((x) => x.nik == form.nik)?.nik || "",
-                                        }
-                                        : null
-                                }
-                                onChange={(val) => handleSelectChange("nik", val)}
-                                placeholder="Pilih/Ketik NIK Warga..."
-                                isSearchable={true}
-                                className="react-select-container"
-                                classNamePrefix="react-select"
-                                noOptionsMessage={() => "Tidak ada NIK"}
-                                styles={{
-                                    control: (base) => ({
-                                        ...base,
-                                        height: '2.6rem',
-                                        borderColor: 'lightgray',
-                                    }),
-                                }}
-                            />
-                            {/* <input type="text" name="nik" value={form.nik || ""} onChange={handleChange} className="w-full border rounded-md p-2" /> */}
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium">Nomor RW</label>
-                            <input type="text" name="nomor_rw" value={form.nomor_rw || ""} onChange={handleChange} className="w-full border rounded-md p-2" />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium">Nama Anggota RW</label>
-                            <input type="text" name="nama_anggota_rw" value={form.nama_anggota_rw || ""} onChange={handleChange} className="w-full border rounded-md p-2" />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium">Mulai Menjabat</label>
-                            <input type="date" name="mulai_menjabat" value={form.mulai_menjabat || ""} onChange={handleChange} className="w-full border rounded-md p-2" />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium">Akhir Jabatan</label>
-                            <input type="date" name="akhir_jabatan" value={form.akhir_jabatan || ""} onChange={handleChange} className="w-full border rounded-md p-2" />
-                        </div>
+                    <div className="modal-body p-0 m-0">
+                        <div className="d-flex tambah-body flex-column" style={{ width: "100%", maxHeight: "80vh", overflowY: "auto" }}>
+                            <div className="p-3">
+                                <form onSubmit={handleAdd} id="tambahRw">
+                                    <div className="space-y-3">
+                                        <div>
+                                            <label className="block text-sm font-medium">NIK</label>
+                                            <Select
+                                                name="nik"
+                                                options={dataWarga?.map((item) => ({
+                                                    value: item.nik,
+                                                    label: item.nik,
+                                                }))}
+                                                value={
+                                                    form.nik
+                                                        ? {
+                                                            value: form.nik,
+                                                            label: dataWarga?.find((x) => x.nik == form.nik)?.nik || "",
+                                                        }
+                                                        : null
+                                                }
+                                                onChange={(val) => handleSelectChange("nik", val)}
+                                                placeholder="Pilih/Ketik NIK Warga..."
+                                                isSearchable={true}
+                                                className="react-select-container"
+                                                classNamePrefix="react-select"
+                                                noOptionsMessage={() => "Tidak ada NIK"}
+                                                styles={{
+                                                    control: (base) => ({
+                                                        ...base,
+                                                        height: '2.6rem',
+                                                        borderColor: 'lightgray',
+                                                    }),
+                                                }}
+                                            />
+                                            {/* <input type="text" name="nik" value={form.nik || ""} onChange={handleChange} className="w-full border rounded-md p-2" /> */}
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium">Nomor RW</label>
+                                            <input type="text" name="nomor_rw" value={form.nomor_rw || ""} onChange={handleChange} className="w-full border rounded-md p-2" />
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium">Nama Anggota RW</label>
+                                            <input type="text" name="nama_anggota_rw" value={form.nama_anggota_rw || ""} onChange={handleChange} className="w-full border rounded-md p-2" />
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium">Mulai Menjabat</label>
+                                            <input type="date" name="mulai_menjabat" value={form.mulai_menjabat || ""} onChange={handleChange} className="w-full border rounded-md p-2" />
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium">Akhir Jabatan</label>
+                                            <input type="date" name="akhir_jabatan" value={form.akhir_jabatan || ""} onChange={handleChange} className="w-full border rounded-md p-2" />
+                                        </div>
 
-                        {/* 🔹 Tambahan Jabatan */}
-                        <div>
-                            <label className="block text-sm font-medium">Jabatan</label>
-                            <select
-                                name="jabatan"
-                                value={form.jabatan || ""}
-                                onChange={handleChange}
-                                className="w-full border rounded-md p-2"
-                            >
-                                <option value="">Pilih Jabatan</option>
-                                {roles.map((role) => (
-                                    <option key={role} value={role}>
-                                        {role === "ketua"
-                                            ? "Ketua RW"
-                                            : role.charAt(0).toUpperCase() + role.slice(1)}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
+                                        {/* 🔹 Tambahan Jabatan */}
+                                        <div>
+                                            <label className="block text-sm font-medium">Jabatan</label>
+                                            <select
+                                                name="jabatan"
+                                                value={form.jabatan || ""}
+                                                onChange={handleChange}
+                                                className="w-full border rounded-md p-2"
+                                            >
+                                                <option value="">Pilih Jabatan</option>
+                                                {roles.map((role) => (
+                                                    <option key={role} value={role}>
+                                                        {role === "ketua"
+                                                            ? "Ketua RW"
+                                                            : role.charAt(0).toUpperCase() + role.slice(1)}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        </div>
 
-                        {/* 🔹 Tambahan Status */}
-                        <div>
-                            <label className="block text-sm font-medium">Status</label>
-                            <select name="status" value={form.status || ""} onChange={handleChange} className="w-full border rounded-md p-2">
-                                <option value="">Pilih Status</option>
-                                <option value="aktif">Aktif</option>
-                                <option value="nonaktif">Nonaktif</option>
-                            </select>
+                                        {/* 🔹 Tambahan Status */}
+                                        <div>
+                                            <label className="block text-sm font-medium">Status</label>
+                                            <select name="status" value={form.status || ""} onChange={handleChange} className="w-full border rounded-md p-2">
+                                                <option value="">Pilih Status</option>
+                                                <option value="aktif">Aktif</option>
+                                                <option value="nonaktif">Nonaktif</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                </form>
+                            </div>
                         </div>
                     </div>
-
-                    <div className="flex justify-end gap-3 pt-4 border-t">
+                    <div className="modal-footer border-top mt-0" style={{ position: "sticky", zIndex: '10' }}>
+                        {/* <div className="flex justify-end gap-3 pt-4 border-t"> */}
                         <button type="button" onClick={onClose} className="px-4 py-2 bg-gray-200 rounded-md hover:bg-gray-300">Batal</button>
-                        <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Simpan</button>
+                        <button type="submit" form="tambahRw" className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Simpan</button>
+                        {/* </div> */}
                     </div>
-                </form>
+                </div>
             </div>
         </div>
     )
 }
 
-export function EditRwModal({ dataWarga, form, handleChange, handleEdit, onClose, roles = [] }) {
+export function EditRwModal({ dataWarga, form, handleChange, handleSelectChange, handleEdit, onClose, roles = [] }) {
     return (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 fade-in">
-            <div className="bg-white rounded-2xl shadow-lg w-full max-w-md animate-scaleIn">
-                <form onSubmit={handleEdit} className="p-6 space-y-4">
-                    <div className="flex justify-between items-center border-b pb-2">
+        <div
+            className="modal fade show"
+            tabIndex="-1"
+            style={{
+                display: "block",
+                backgroundColor: "rgba(0,0,0,0.5)"
+            }}
+            onClick={() => {
+                onClose()
+            }}
+        >
+            <div
+                className="modal-dialog modal-dialog-scrollable modal-dialog-centered"
+                style={useIsMobile() ? { maxHeight: '80vh' } : {}}
+                onClick={(e) => e.stopPropagation()}
+            >
+                <div
+                    className="modal-content shadow-lg border-0"
+                    style={useIsMobile() ? { maxHeight: '80vh' } : {}}
+                >
+                    <div className="modal-header border-bottom mb-0" style={{ position: "sticky", zIndex: '10' }}>
                         <h5 className="text-lg font-semibold">Edit RW</h5>
                         <button type="button" onClick={onClose} className="text-gray-500 hover:text-gray-700">✕</button>
                     </div>
+                    <div className="modal-body p-0 m-0">
+                        <div className="d-flex tambah-body flex-column" style={{ width: "100%", maxHeight: "80vh", overflowY: "auto" }}>
+                            <div className="p-3">
+                                <form onSubmit={handleEdit} id="editRw">
+                                    <div className="space-y-3">
+                                        <div>
+                                            <label className="block text-sm font-medium">NIK</label>
+                                            <Select
+                                                name="nik"
+                                                options={dataWarga?.map((item) => ({
+                                                    value: item.nik,
+                                                    label: item.nik,
+                                                }))}
+                                                value={
+                                                    form.nik
+                                                        ? {
+                                                            value: form.nik,
+                                                            label: dataWarga?.find((x) => x.nik == form.nik)?.nik || "",
+                                                        }
+                                                        : null
+                                                }
+                                                onChange={(val) => handleSelectChange("nik", val)}
+                                                placeholder="Pilih/Ketik NIK Warga..."
+                                                isSearchable={true}
+                                                className="react-select-container"
+                                                classNamePrefix="react-select"
+                                                noOptionsMessage={() => "Tidak ada NIK"}
+                                                styles={{
+                                                    control: (base) => ({
+                                                        ...base,
+                                                        height: '2.6rem',
+                                                        borderColor: 'lightgray',
+                                                    }),
+                                                }}
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium">Nomor RW</label>
+                                            <input type="text" name="nomor_rw" value={form.nomor_rw || ""} onChange={handleChange} className="w-full border rounded-md p-2" />
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium">Nama Anggota RW</label>
+                                            <input type="text" name="nama_anggota_rw" value={form.nama_anggota_rw || ""} onChange={handleChange} className="w-full border rounded-md p-2" />
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium">Mulai Menjabat</label>
+                                            <input type="date" name="mulai_menjabat" value={form.mulai_menjabat || ""} onChange={handleChange} className="w-full border rounded-md p-2" />
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium">Akhir Jabatan</label>
+                                            <input type="date" name="akhir_jabatan" value={form.akhir_jabatan || ""} onChange={handleChange} className="w-full border rounded-md p-2" />
+                                        </div>
 
-                    <div className="space-y-3">
-                        <div>
-                            <label className="block text-sm font-medium">NIK</label>
-                            <input type="text" name="nik" value={form.nik || ""} onChange={handleChange} className="w-full border rounded-md p-2" />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium">Nomor RW</label>
-                            <input type="text" name="nomor_rw" value={form.nomor_rw || ""} onChange={handleChange} className="w-full border rounded-md p-2" />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium">Nama Anggota RW</label>
-                            <input type="text" name="nama_anggota_rw" value={form.nama_anggota_rw || ""} onChange={handleChange} className="w-full border rounded-md p-2" />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium">Mulai Menjabat</label>
-                            <input type="date" name="mulai_menjabat" value={form.mulai_menjabat || ""} onChange={handleChange} className="w-full border rounded-md p-2" />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium">Akhir Jabatan</label>
-                            <input type="date" name="akhir_jabatan" value={form.akhir_jabatan || ""} onChange={handleChange} className="w-full border rounded-md p-2" />
-                        </div>
-
-                        {/* 🔹 Tambahan Jabatan */}
-                        <div>
-                            <label className="block text-sm font-medium">Jabatan</label>
-                            <select
-                                name="jabatan"
-                                value={form.jabatan || ""}
-                                onChange={handleChange}
-                                className="w-full border rounded-md p-2"
-                            >
-                                <option value="">Pilih Jabatan</option>
-                                {roles.map((role) => (
-                                    <option key={role} value={role}>
-                                        {role === "ketua"
-                                            ? "Ketua RW"
-                                            : role.charAt(0).toUpperCase() + role.slice(1)}
-                                    </option>
-                                ))}
-                            </select>
+                                        {/* 🔹 Tambahan Jabatan */}
+                                        <div>
+                                            <label className="block text-sm font-medium">Jabatan</label>
+                                            <select
+                                                name="jabatan"
+                                                value={form.jabatan || ""}
+                                                onChange={handleChange}
+                                                className="w-full border rounded-md p-2"
+                                            >
+                                                <option value="">Pilih Jabatan</option>
+                                                {roles.map((role) => (
+                                                    <option key={role} value={role}>
+                                                        {role === "ketua"
+                                                            ? "Ketua RW"
+                                                            : role.charAt(0).toUpperCase() + role.slice(1)}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
                         </div>
                     </div>
-
-                    <div className="flex justify-end gap-3 pt-4 border-t">
+                    <div className="modal-footer border-top mt-0" style={{ position: "sticky", zIndex: '10' }}>
+                        {/* <div className="flex justify-end gap-3 pt-4 border-t"> */}
                         <button type="button" onClick={onClose} className="px-4 py-2 bg-gray-200 rounded-md hover:bg-gray-300">Batal</button>
-                        <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Update</button>
+                        <button type="submit" form="editRw" className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Simpan</button>
+                        {/* </div> */}
                     </div>
-                </form>
+                </div>
             </div>
         </div>
     )
 }
 
-export function AddRtModal({ form, handleChange, handleAdd, onClose, rwList = [], isRw = false, roles = [] }) {
+export function AddRtModal({ dataWarga, form, handleChange, handleSelectChange, handleAdd, onClose, rwList = [], isRw = false, roles = [] }) {
     return (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 fade-in">
-            <div className="bg-white rounded-2xl shadow-lg w-full max-w-md animate-scaleIn">
-                <form onSubmit={handleAdd} className="p-6 space-y-4">
-                    <div className="flex justify-between items-center border-b pb-2">
-                        <h5 className="text-lg font-semibold">Tambah RT</h5>
+        <div
+            className="modal fade show"
+            tabIndex="-1"
+            style={{
+                display: "block",
+                backgroundColor: "rgba(0,0,0,0.5)"
+            }}
+            onClick={() => {
+                onClose()
+            }}
+        >
+            <div
+                className="modal-dialog modal-dialog-scrollable modal-dialog-centered"
+                style={useIsMobile() ? { maxHeight: '80vh' } : {}}
+                onClick={(e) => e.stopPropagation()}
+            >
+                <div
+                    className="modal-content shadow-lg border-0"
+                    style={useIsMobile() ? { maxHeight: '80vh' } : {}}
+                >
+                    <div className="modal-header border-bottom mb-0" style={{ position: "sticky", zIndex: '10' }}>
+                        <h5 className="text-lg">Tambah RT</h5>
                         <button type="button" onClick={onClose} className="text-gray-500 hover:text-gray-700">✕</button>
                     </div>
+                    <div className="modal-body p-0 m-0">
+                        <div className="d-flex tambah-body flex-column" style={{ width: "100%", maxHeight: "80vh", overflowY: "auto" }}>
+                            <div className="p-3">
+                                <form onSubmit={handleAdd} id="tambahRt">
+                                    <div className="space-y-3">
+                                        {/* kan ada komponen Role kocag 🤣🤣🦅🤣 */}
+                                        <Role role={'admin'}>
+                                            <div>
+                                                <Select
+                                                    name="id_rw"
+                                                    options={rwList?.map((item) => ({
+                                                        value: item.id,
+                                                        label: `RW ${item.nomor_rw} - ${item.nama_anggota_rw}`,
+                                                    }))}
+                                                    value={
+                                                        form.id_rw
+                                                            ? {
+                                                                value: form.id_rw,
+                                                                label: `RW ${rwList?.find((x) => x.id == form.id_rw)?.nomor_rw} - ${rwList?.find((x) => x.id == form.id_rw)?.nama_anggota_rw}`
+                                                                    || "",
+                                                            }
+                                                            : null
+                                                    }
+                                                    onChange={(val) => handleSelectChange("id_rw", val)}
+                                                    placeholder="Pilih/Ketik Rukun Warga..."
+                                                    isSearchable={true}
+                                                    className="react-select-container"
+                                                    classNamePrefix="react-select"
+                                                    noOptionsMessage={() => "Tidak ada RW yang aktif"}
+                                                    styles={{
+                                                        control: (base) => ({
+                                                            ...base,
+                                                            height: '2.6rem',
+                                                            borderColor: 'lightgray',
+                                                        }),
+                                                    }}
+                                                />
+                                            </div>
+                                        </Role>
 
-                    <div className="space-y-3">
-                        {/* 🔹 NIK */}
-                        <div>
-                            <label className="block text-sm font-medium">NIK</label>
-                            <input
-                                type="text"
-                                name="nik"
-                                value={form.nik || ""}
-                                onChange={handleChange}
-                                className="w-full border rounded-md p-2"
-                            />
-                        </div>
+                                        {/* 🔹 NIK */}
+                                        <div>
+                                            <label className="block text-sm font-medium">NIK</label>
+                                            <Select
+                                                name="nik"
+                                                options={dataWarga?.map((item) => ({
+                                                    value: item.nik,
+                                                    label: item.nik,
+                                                }))}
+                                                value={
+                                                    form.nik
+                                                        ? {
+                                                            value: form.nik,
+                                                            label: dataWarga?.find((x) => x.nik == form.nik)?.nik || "",
+                                                        }
+                                                        : null
+                                                }
+                                                onChange={(val) => handleSelectChange("nik", val)}
+                                                placeholder="Pilih/Ketik NIK Warga..."
+                                                isSearchable={true}
+                                                className="react-select-container"
+                                                classNamePrefix="react-select"
+                                                noOptionsMessage={() => "Tidak ada NIK"}
+                                                styles={{
+                                                    control: (base) => ({
+                                                        ...base,
+                                                        height: '2.6rem',
+                                                        borderColor: 'lightgray',
+                                                    }),
+                                                }}
+                                            />
+                                        </div>
 
-                        {/* 🔹 Nomor RT */}
-                        <div>
-                            <label className="block text-sm font-medium">Nomor RT</label>
-                            <input
-                                type="text"
-                                name="nomor_rt"
-                                value={form.nomor_rt || ""}
-                                onChange={handleChange}
-                                className="w-full border rounded-md p-2"
-                            />
-                        </div>
+                                        {/* 🔹 Nomor RT */}
+                                        <div>
+                                            <label className="block text-sm font-medium">Nomor RT</label>
+                                            <input
+                                                type="text"
+                                                name="nomor_rt"
+                                                value={form.nomor_rt || ""}
+                                                onChange={handleChange}
+                                                className="w-full border rounded-md p-2"
+                                            />
+                                        </div>
 
-                        {/* 🔹 Nama Anggota RT */}
-                        <div>
-                            <label className="block text-sm font-medium">Nama Anggota RT</label>
-                            <input
-                                type="text"
-                                name="nama_anggota_rt"
-                                value={form.nama_anggota_rt || ""}
-                                onChange={handleChange}
-                                className="w-full border rounded-md p-2"
-                            />
-                        </div>
+                                        {/* 🔹 Nama Anggota RT */}
+                                        <div>
+                                            <label className="block text-sm font-medium">Nama Anggota RT</label>
+                                            <input
+                                                type="text"
+                                                name="nama_anggota_rt"
+                                                value={form.nama_anggota_rt || ""}
+                                                onChange={handleChange}
+                                                className="w-full border rounded-md p-2"
+                                            />
+                                        </div>
 
-                        {/* 🔹 Jabatan */}
-                        <div>
-                            <label className="block text-sm font-medium">Jabatan</label>
-                            <select
-                                name="jabatan"
-                                value={form.jabatan || ""}
-                                onChange={handleChange}
-                                className="w-full border rounded-md p-2"
-                            >
-                                <option value="">Pilih Jabatan</option>
-                                {roles.map((role) => (
-                                    <option key={role} value={role}>
-                                        {role === "ketua"
-                                            ? "Ketua RT"
-                                            : role.charAt(0).toUpperCase() + role.slice(1)}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
+                                        {/* 🔹 Jabatan */}
+                                        <div>
+                                            <label className="block text-sm font-medium">Jabatan</label>
+                                            <select
+                                                name="jabatan"
+                                                value={form.jabatan || ""}
+                                                onChange={handleChange}
+                                                className="w-full border rounded-md p-2"
+                                            >
+                                                <option value="">Pilih Jabatan</option>
+                                                {roles.map((role) => (
+                                                    <option key={role} value={role}>
+                                                        {role === "ketua"
+                                                            ? "Ketua RT"
+                                                            : role.charAt(0).toUpperCase() + role.slice(1)}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        </div>
 
-                        {/* 🔹 Tanggal Menjabat */}
-                        <div>
-                            <label className="block text-sm font-medium">Mulai Menjabat</label>
-                            <input
-                                type="date"
-                                name="mulai_menjabat"
-                                value={form.mulai_menjabat || ""}
-                                onChange={handleChange}
-                                className="w-full border rounded-md p-2"
-                            />
-                        </div>
+                                        {/* 🔹 Tanggal Menjabat */}
+                                        <div>
+                                            <label className="block text-sm font-medium">Mulai Menjabat</label>
+                                            <input
+                                                type="date"
+                                                name="mulai_menjabat"
+                                                value={form.mulai_menjabat || ""}
+                                                onChange={handleChange}
+                                                className="w-full border rounded-md p-2"
+                                            />
+                                        </div>
 
-                        <div>
-                            <label className="block text-sm font-medium">Akhir Jabatan</label>
-                            <input
-                                type="date"
-                                name="akhir_jabatan"
-                                value={form.akhir_jabatan || ""}
-                                onChange={handleChange}
-                                className="w-full border rounded-md p-2"
-                            />
-                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium">Akhir Jabatan</label>
+                                            <input
+                                                type="date"
+                                                name="akhir_jabatan"
+                                                value={form.akhir_jabatan || ""}
+                                                onChange={handleChange}
+                                                className="w-full border rounded-md p-2"
+                                            />
+                                        </div>
 
-                        {/* 🔹 Pilih RW (hanya untuk admin) */}
-                        {!isRw && (
-                            <div>
-                                <label className="block text-sm font-medium">Pilih RW</label>
-                                <select
-                                    name="id_rw"
-                                    value={form.id_rw || ""}
-                                    onChange={handleChange}
-                                    className="w-full border rounded-md p-2"
-                                >
-                                    <option value="">-- Pilih RW --</option>
-                                    {rwList.map((rw) => (
-                                        <option key={rw.id} value={rw.id}>
-                                            RW {rw.nomor_rw} - {rw.nama_anggota_rw}
-                                        </option>
-                                    ))}
-                                </select>
+                                        {/* 🔹 Pilih RW (hanya untuk admin) */}
+                                        {/* {!isRw && (
+                                            <div>
+                                                <label className="block text-sm font-medium">Pilih RW</label>
+                                                <select
+                                                    name="id_rw"
+                                                    value={form.id_rw || ""}
+                                                    onChange={handleChange}
+                                                    className="w-full border rounded-md p-2"
+                                                >
+                                                    <option value="">-- Pilih RW --</option>
+                                                    {rwList.map((rw) => (
+                                                        <option key={rw.id} value={rw.id}>
+                                                            RW {rw.nomor_rw} - {rw.nama_anggota_rw}
+                                                        </option>
+                                                    ))}
+                                                </select>
+                                            </div>
+                                        )} */}
+
+                                        {/* 🔹 Status (tetap muncul untuk semua) */}
+                                        <div>
+                                            <label className="block text-sm font-medium">Status</label>
+                                            <select
+                                                name="status"
+                                                value={form.status || "aktif"}
+                                                onChange={handleChange}
+                                                className="w-full border rounded-md p-2"
+                                            >
+                                                <option value="aktif">Aktif</option>
+                                                <option value="nonaktif">Nonaktif</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </form>
                             </div>
-                        )}
-
-                        {/* 🔹 Status (tetap muncul untuk semua) */}
-                        <div>
-                            <label className="block text-sm font-medium">Status</label>
-                            <select
-                                name="status"
-                                value={form.status || "aktif"}
-                                onChange={handleChange}
-                                className="w-full border rounded-md p-2"
-                            >
-                                <option value="aktif">Aktif</option>
-                                <option value="nonaktif">Nonaktif</option>
-                            </select>
                         </div>
                     </div>
-
-                    {/* 🔹 Tombol Aksi */}
-                    <div className="flex justify-end gap-3 pt-4 border-t">
+                    <div className="modal-footer border-top mt-0" style={{ position: "sticky", zIndex: '10' }}>
                         <button type="button" onClick={onClose} className="px-4 py-2 bg-gray-200 rounded-md hover:bg-gray-300">
                             Batal
                         </button>
-                        <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+                        <button type="submit" form="tambahRt" className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
                             Simpan
                         </button>
                     </div>
-                </form>
+                </div>
             </div>
         </div>
     );
 }
 
-export function EditRtModal({ form, handleChange, handleEdit, onClose, rwList = [], isRw = false, roles = [] }) {
+export function EditRtModal({ dataWarga, form, handleChange, handleEdit, onClose, rwList = [], isRw = false, roles = [] }) {
     return (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 fade-in">
-            <div className="bg-white rounded-2xl shadow-lg w-full max-w-md animate-scaleIn">
-                <form onSubmit={handleEdit} className="p-6 space-y-4">
-                    <div className="flex justify-between items-center border-b pb-2">
+        <div
+            className="modal fade show"
+            tabIndex="-1"
+            style={{
+                display: "block",
+                backgroundColor: "rgba(0,0,0,0.5)"
+            }}
+            onClick={() => {
+                onClose()
+            }}
+        >
+            <div
+                className="modal-dialog modal-dialog-scrollable modal-dialog-centered"
+                style={useIsMobile() ? { maxHeight: '80vh' } : {}}
+                onClick={(e) => e.stopPropagation()}
+            >
+                <div
+                    className="modal-content shadow-lg border-0"
+                    style={useIsMobile() ? { maxHeight: '80vh' } : {}}
+                >
+                    <div className="modal-header border-bottom mb-0" style={{ position: "sticky", zIndex: '10' }}>
                         <h5 className="text-lg font-semibold">Edit RT</h5>
                         <button type="button" onClick={onClose} className="text-gray-500 hover:text-gray-700">✕</button>
                     </div>
+                    <div className="modal-body p-0 m-0">
+                        <div className="d-flex tambah-body flex-column" style={{ width: "100%", maxHeight: "80vh", overflowY: "auto" }}>
+                            <div className="p-3">
+                                <form onSubmit={handleEdit} id="editRt">
+                                    <div className="space-y-3">
+                                        <Role role={'admin'}>
+                                            <div>
+                                                <Select
+                                                    name="id_rw"
+                                                    options={rwList?.map((item) => ({
+                                                        value: item.id,
+                                                        label: `RW ${item.nomor_rw} - ${item.nama_anggota_rw}`,
+                                                    }))}
+                                                    value={
+                                                        form.id_rw
+                                                            ? {
+                                                                value: form.id_rw,
+                                                                label: `RW ${rwList?.find((x) => x.id == form.id_rw)?.nomor_rw} - ${rwList?.find((x) => x.id == form.id_rw)?.nama_anggota_rw}`
+                                                                    || "",
+                                                            }
+                                                            : null
+                                                    }
+                                                    onChange={(val) => handleSelectChange("id_rw", val)}
+                                                    placeholder="Pilih/Ketik Rukun Warga..."
+                                                    isSearchable={true}
+                                                    className="react-select-container"
+                                                    classNamePrefix="react-select"
+                                                    noOptionsMessage={() => "Tidak ada RW yang aktif"}
+                                                    styles={{
+                                                        control: (base) => ({
+                                                            ...base,
+                                                            height: '2.6rem',
+                                                            borderColor: 'lightgray',
+                                                        }),
+                                                    }}
+                                                />
+                                            </div>
+                                        </Role>
 
-                    <div className="space-y-3">
-                        <div>
-                            <label className="block text-sm font-medium">NIK</label>
-                            <input type="text" name="nik" value={form.nik || ""} onChange={handleChange} className="w-full border rounded-md p-2" />
-                        </div>
+                                        {/* 🔹 NIK */}
+                                        <div>
+                                            <label className="block text-sm font-medium">NIK</label>
+                                            <Select
+                                                name="nik"
+                                                options={dataWarga?.map((item) => ({
+                                                    value: item.nik,
+                                                    label: item.nik,
+                                                }))}
+                                                value={
+                                                    form.nik
+                                                        ? {
+                                                            value: form.nik,
+                                                            label: dataWarga?.find((x) => x.nik == form.nik)?.nik || "",
+                                                        }
+                                                        : null
+                                                }
+                                                onChange={(val) => handleSelectChange("nik", val)}
+                                                placeholder="Pilih/Ketik NIK Warga..."
+                                                isSearchable={true}
+                                                className="react-select-container"
+                                                classNamePrefix="react-select"
+                                                noOptionsMessage={() => "Tidak ada NIK"}
+                                                styles={{
+                                                    control: (base) => ({
+                                                        ...base,
+                                                        height: '2.6rem',
+                                                        borderColor: 'lightgray',
+                                                    }),
+                                                }}
+                                            />
+                                        </div>
 
-                        <div>
-                            <label className="block text-sm font-medium">Nomor RT</label>
-                            <input type="text" name="nomor_rt" value={form.nomor_rt || ""} onChange={handleChange} className="w-full border rounded-md p-2" />
-                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium">Nomor RT</label>
+                                            <input type="text" name="nomor_rt" value={form.nomor_rt || ""} onChange={handleChange} className="w-full border rounded-md p-2" />
+                                        </div>
 
-                        <div>
-                            <label className="block text-sm font-medium">Nama Anggota RT</label>
-                            <input type="text" name="nama_anggota_rt" value={form.nama_anggota_rt || ""} onChange={handleChange} className="w-full border rounded-md p-2" />
-                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium">Nama Anggota RT</label>
+                                            <input type="text" name="nama_anggota_rt" value={form.nama_anggota_rt || ""} onChange={handleChange} className="w-full border rounded-md p-2" />
+                                        </div>
 
-                        {/* 🔹 Jabatan */}
-                        <div>
-                            <label className="block text-sm font-medium">Jabatan</label>
-                            <select
-                                name="jabatan"
-                                value={form.jabatan || ""}
-                                onChange={handleChange}
-                                className="w-full border rounded-md p-2"
-                            >
-                                <option value="">Pilih Jabatan</option>
-                                {roles.map((role) => (
-                                    <option key={role} value={role}>
-                                        {role === "ketua"
-                                            ? "Ketua RT"
-                                            : role.charAt(0).toUpperCase() + role.slice(1)}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
+                                        {/* 🔹 Jabatan */}
+                                        <div>
+                                            <label className="block text-sm font-medium">Jabatan</label>
+                                            <select
+                                                name="jabatan"
+                                                value={form.jabatan || ""}
+                                                onChange={handleChange}
+                                                className="w-full border rounded-md p-2"
+                                            >
+                                                <option value="">Pilih Jabatan</option>
+                                                {roles.map((role) => (
+                                                    <option key={role} value={role}>
+                                                        {role === "ketua"
+                                                            ? "Ketua RT"
+                                                            : role.charAt(0).toUpperCase() + role.slice(1)}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        </div>
 
-                        <div>
-                            <label className="block text-sm font-medium">Mulai Menjabat</label>
-                            <input type="date" name="mulai_menjabat" value={form.mulai_menjabat || ""} onChange={handleChange} className="w-full border rounded-md p-2" />
-                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium">Mulai Menjabat</label>
+                                            <input type="date" name="mulai_menjabat" value={form.mulai_menjabat || ""} onChange={handleChange} className="w-full border rounded-md p-2" />
+                                        </div>
 
-                        <div>
-                            <label className="block text-sm font-medium">Akhir Jabatan</label>
-                            <input type="date" name="akhir_jabatan" value={form.akhir_jabatan || ""} onChange={handleChange} className="w-full border rounded-md p-2" />
-                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium">Akhir Jabatan</label>
+                                            <input type="date" name="akhir_jabatan" value={form.akhir_jabatan || ""} onChange={handleChange} className="w-full border rounded-md p-2" />
+                                        </div>
 
-                        {/* 🔹 Pilih RW (hanya untuk admin) */}
-                        {!isRw && (
-                            <div>
-                                <label className="block text-sm font-medium">Pilih RW</label>
-                                <select name="id_rw" value={form.id_rw || ""} onChange={handleChange} className="w-full border rounded-md p-2">
-                                    <option value="">-- Pilih RW --</option>
-                                    {rwList.map((rw) => (
-                                        <option key={rw.id} value={rw.id}>
-                                            RW {rw.nomor_rw} - {rw.nama_anggota_rw}
-                                        </option>
-                                    ))}
-                                </select>
+                                        {/* 🔹 Pilih RW (hanya untuk admin) */}
+                                        {/* {!isRw && (
+                                            <div>
+                                                <label className="block text-sm font-medium">Pilih RW</label>
+                                                <select name="id_rw" value={form.id_rw || ""} onChange={handleChange} className="w-full border rounded-md p-2">
+                                                    <option value="">-- Pilih RW --</option>
+                                                    {rwList.map((rw) => (
+                                                        <option key={rw.id} value={rw.id}>
+                                                            RW {rw.nomor_rw} - {rw.nama_anggota_rw}
+                                                        </option>
+                                                    ))}
+                                                </select>
+                                            </div>
+                                        )} */}
+                                    </div>
+                                </form>
                             </div>
-                        )}
+                        </div>
                     </div>
-
-                    {/* 🔹 Tombol Aksi */}
-                    <div className="flex justify-end gap-3 pt-4 border-t">
-                        <button type="button" onClick={onClose} className="px-4 py-2 bg-gray-200 rounded-md hover:bg-gray-300">Batal</button>
-                        <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Update</button>
+                    <div className="modal-footer border-top mt-0" style={{ position: "sticky", zIndex: '10' }}>
+                        <button type="button" onClick={onClose} className="px-4 py-2 bg-gray-200 rounded-md hover:bg-gray-300">
+                            Batal
+                        </button>
+                        <button type="submit" form="editRt" className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+                            Simpan
+                        </button>
                     </div>
-                </form>
+                </div>
             </div>
         </div>
     );
@@ -589,7 +899,10 @@ export function AddKategoriGolonganModal({ form, handleChange, handleAdd, onClos
     return (
         <div
             className="modal fade show"
-            style={{ display: "block", backgroundColor: "rgba(0,0,0,0.5)" }}
+            style={{
+                display: "block",
+                backgroundColor: "rgba(0,0,0,0.5)",
+            }}
         >
             <div className="modal-dialog modal-dialog-centered">
                 <div className="modal-content modal-custom">
@@ -7253,7 +7566,6 @@ export function TambahTransaksiPerKk({ listKK = [], tambahShow, onClose, onAdded
         formData.append('jenis', data.jenis)
         formData.append('no_kk', data.no_kk)
         formData.append('rt', data.rt)
-        formData.append('rw', data.rw)
 
         axios.post(`/${role}/transaksi`, formData)
             .then(res => {

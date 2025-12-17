@@ -274,7 +274,7 @@ class AdminRtController extends Controller
             'status' => $request->status ?? 'nonaktif',
         ]);
 
-        $user = User::where('id_rt', $rt->id)->first();
+        $user = User::where('id_rt', $rt->id)->where('nik', $request->nik)->first();
 
         if ($request->filled('nik') && $request->filled('nama_anggota_rt')) {
 
@@ -305,32 +305,34 @@ class AdminRtController extends Controller
                 ]);
             }
 
-        $existingRoles = $user->roles->pluck('name')->toArray();
+            $existingRoles = $user->roles->pluck('name')->toArray();
 
-        $hasWarga = in_array('warga', $existingRoles);
+            $hasWarga = in_array('warga', $existingRoles);
 
-        $coreRoles = ['admin', 'rw', 'rt', 'warga'];
+            $coreRoles = ['admin', 'rw', 'rt', 'warga'];
 
-        $finalRoles = ['rt'];
+            $finalRoles = ['rt'];
 
-        if ($request->filled('jabatan') && $request->jabatan !== 'ketua') {
-            $jabatanBaru = $request->jabatan;
+            if ($request->filled('jabatan') && $request->jabatan !== 'ketua') {
+                $jabatanBaru = $request->jabatan;
 
-            if (Role::where('name', $jabatanBaru)->exists()) {
+                if (Role::where('name', $jabatanBaru)->exists()) {
 
-                $finalRoles = array_filter($finalRoles, function ($role) use ($coreRoles) {
-                    return !in_array($role, $coreRoles);
-                });
+                    $finalRoles = array_filter(
+                        $finalRoles,
+                        fn($role) =>
+                        in_array($role, $coreRoles)
+                    );
 
-                $finalRoles[] = $jabatanBaru;
+                    $finalRoles[] = $jabatanBaru;
+                }
             }
-        }
 
-        if ($hasWarga) {
-            $finalRoles[] = 'warga';
-        }
+            if ($hasWarga) {
+                $finalRoles[] = 'warga';
+            }
 
-        $user->syncRoles(array_unique($finalRoles));
+            $user->syncRoles(array_unique($finalRoles));
         } else {
 
             if ($user) $user->delete();
