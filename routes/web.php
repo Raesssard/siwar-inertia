@@ -9,6 +9,7 @@ use App\Http\Controllers\{
     Laporan,
     SettingsController,
     ExportController,
+    HistoryWargaController,
 };
 use App\Http\Controllers\Warga\{
     LihatKKController,
@@ -79,6 +80,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/export/laporan-keuangan-pdf/{bulan}/{tahun}', [ExportController::class, 'exportLaporanKeuanganPdf'])->name('laporan-keuangan-pdf.export');
     Route::get('/export/laporan-pengaduan', [ExportController::class, 'exportLaporanPengaduan'])->name('laporan-pengaduan.export');
     Route::get('/export/laporan-pengaduan-pdf', [ExportController::class, 'exportLaporanPengaduanPdf'])->name('laporan-keuangan-pdf.export');
+    Route::get('/history-warga', [HistoryWargaController::class, 'index'])->name('history-warga.index');
 
     /*
     |--------------------------------------------------------------------------

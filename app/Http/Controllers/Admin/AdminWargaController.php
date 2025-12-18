@@ -121,12 +121,19 @@ class AdminWargaController extends Controller
         }
 
         $warga = Warga::create($validated);
+        // Hitung umur berdasarkan tanggal lahir
+        $usiaHari = Carbon::parse($warga->tanggal_lahir)->diffInDays(now());
+
+        // Tentukan keterangan history
+        $keterangan = $usiaHari < 365
+            ? 'Bayi baru lahir'
+            : 'Warga baru ditambahkan';
 
         HistoryWarga::create([
             'warga_nik' => $warga->nik,
             'nama' => $warga->nama,
             'jenis' => 'masuk',
-            'keterangan' => 'Warga baru ditambahkan',
+            'keterangan' => $keterangan,
             'tanggal' => now()->toDateString(),
         ]);
 
