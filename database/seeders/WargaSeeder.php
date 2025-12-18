@@ -115,8 +115,8 @@ class WargaSeeder extends Seeder
             'status_hubungan_dalam_keluarga' => 'kepala keluarga',
             'golongan_darah' => 'O',
             'kewarganegaraan' => 'WNI',
-            'nama_ayah' => 'Slamet Riyadi',
-            'nama_ibu' => 'Dewi Sartika',
+            // 'nama_ayah' => 'Slamet Riyadi',
+            // 'nama_ibu' => 'Dewi Sartika',
             'status_warga' => 'penduduk',
         ]);
 
@@ -135,8 +135,8 @@ class WargaSeeder extends Seeder
             'status_hubungan_dalam_keluarga' => 'kepala keluarga',
             'golongan_darah' => 'A',
             'kewarganegaraan' => 'WNI',
-            'nama_ayah' => 'Budi Hartono',
-            'nama_ibu' => 'Siti Kurniawan',
+            // 'nama_ayah' => 'Budi Hartono',
+            // 'nama_ibu' => 'Siti Kurniawan',
             'status_warga' => 'penduduk',
         ]);
 

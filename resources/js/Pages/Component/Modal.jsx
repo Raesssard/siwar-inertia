@@ -3453,18 +3453,18 @@ export function DetailKK({ selectedData, detailShow, onClose, role, userData }) 
                                             <th rowSpan="2">Status Perkawinan</th>
                                             <th rowSpan="2">Status Hubungan Dalam Keluarga</th>
                                             <th rowSpan="2">Kewarganegaraan</th>
-                                            <th colSpan="2">Dokumen Imigrasi</th>
-                                            <th colSpan="2">Nama Orang Tua</th>
+                                            {/* <th colSpan="2">Dokumen Imigrasi</th>
+                                            <th colSpan="2">Nama Orang Tua</th> */}
                                             <th rowSpan="2">Status Warga</th>
                                             <th rowSpan="2">Detail</th>
                                         </tr>
                                         <tr>
                                             <th>Tempat Lahir</th>
                                             <th>Tanggal Lahir</th>
-                                            <th>No. Paspor</th>
+                                            {/* <th>No. Paspor</th>
                                             <th>No. KITAS/KITAP</th>
                                             <th>Nama Ayah</th>
-                                            <th>Nama Ibu</th>
+                                            <th>Nama Ibu</th> */}
                                         </tr>
                                     </thead>
                                     <tbody className="small">
@@ -3534,15 +3534,15 @@ export function DetailKK({ selectedData, detailShow, onClose, role, userData }) 
                                                         <td className="text-center">
                                                             {data.kewarganegaraan ?? "WNI"}
                                                         </td>
-                                                        <td className="text-center">
+                                                        {/* <td className="text-center">
                                                             {data.no_paspor ?? "-"}
                                                         </td>
                                                         <td className="text-center">
                                                             {`${data.no_kitas ?? "-"} / ${data.no_kitap ?? "-"
                                                                 }`}
-                                                        </td>
-                                                        <td className="text-center">{data.nama_ayah ?? '-'}</td>
-                                                        <td className="text-center">{data.nama_ibu ?? '-'}</td>
+                                                        </td> */}
+                                                        {/* <td className="text-center">{data.nama_ayah ?? '-'}</td>
+                                                        <td className="text-center">{data.nama_ibu ?? '-'}</td> */}
                                                         <td className="text-center">{data.status_warga.charAt(0).toUpperCase() + data.status_warga.slice(1) ?? '-'}</td>
                                                         <td className="text-center space-x-1">
                                                             {/* Detail */}
@@ -5802,19 +5802,19 @@ export function DetailWarga({ selectData, detailShow, onClose }) {
                                     <p><strong>Status Hubungan <br /> dalam Keluarga</strong> : {selectData.status_hubungan_dalam_keluarga.charAt(0).toUpperCase() + selectData.status_hubungan_dalam_keluarga.slice(1) ?? '-'}</p>
                                     <p><strong>Golongan Darah</strong> : {selectData.golongan_darah ?? '-'}</p>
                                     <p><strong>Kewarganegaraan</strong> : {selectData.kewarganegaraan ?? '-'}</p>
-                                    <p><strong>No Paspor</strong> : {selectData.no_paspor ?? '-'}</p>
+                                    {/* <p><strong>No Paspor</strong> : {selectData.no_paspor ?? '-'}</p>
                                     <p><strong>Tanggal Terbit Paspor</strong> : {formatTanggal(selectData.tgl_terbit_paspor) ?? '-'}</p>
-                                    <p><strong>Tanggal Akhir Paspor</strong> : {formatTanggal(selectData.tgl_berakhir_paspor) ?? '-'}</p>
+                                    <p><strong>Tanggal Akhir Paspor</strong> : {formatTanggal(selectData.tgl_berakhir_paspor) ?? '-'}</p> */}
                                 </div>
                                 <div className="kk-info-item">
-                                    <p><strong>No Paspor</strong> : {selectData.no_kitas ?? '-'}</p>
+                                    {/* <p><strong>No Paspor</strong> : {selectData.no_kitas ?? '-'}</p>
                                     <p><strong>Tanggal Terbit Paspor</strong> : {formatTanggal(selectData.tgl_terbit_kitas) ?? '-'}</p>
                                     <p><strong>Tanggal Akhir Paspor</strong> : {formatTanggal(selectData.tgl_berakhir_kitas) ?? '-'}</p>
                                     <p><strong>No Paspor</strong> : {selectData.no_kitap ?? '-'}</p>
                                     <p><strong>Tanggal Terbit Paspor</strong> : {formatTanggal(selectData.tgl_terbit_kitap) ?? '-'}</p>
                                     <p><strong>Tanggal Akhir Paspor</strong> : {formatTanggal(selectData.tgl_berakhir_kitap) ?? '-'}</p>
                                     <p><strong>Nama Ayah</strong> : {selectData.nama_ayah ?? '-'}</p>
-                                    <p><strong>Nama Ibu</strong> : {selectData.nama_ibu ?? '-'}</p>
+                                    <p><strong>Nama Ibu</strong> : {selectData.nama_ibu ?? '-'}</p> */}
                                     <p><strong>Alamat Asal</strong> : {selectData.alamat_asal ?? '-'}</p>
                                     <p><strong>Alamat Domisili</strong> : {selectData.alamat_domisili ?? '-'}</p>
                                     <p><strong>Tanggal Mulai Tinggal</strong> : {formatTanggal(selectData.tanggal_mulai_tinggal) ?? '-'}</p>

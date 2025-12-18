@@ -298,16 +298,7 @@ export default function FormWarga({
                   <option value="penduduk">Penduduk</option>
                   <option value="pendatang">Pendatang</option>
                 </select>
-              </div>
-            </div>
-          </section>
-
-          {/* =================== DATA KELUARGA =================== */}
-          <section>
-            <h3 className="text-lg font-semibold text-gray-700 mb-5 border-l-4 border-blue-500 pl-3">
-              Data Keluarga
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              </div>          
               <div>
                 <label className="font-medium text-gray-700">Hubungan Dalam Keluarga</label>
                 <select
@@ -324,7 +315,15 @@ export default function FormWarga({
                   <option value="anak">Anak</option>
                 </select>
               </div>
+            </div>
+          </section>
 
+          {/* <section>
+            <h3 className="text-lg font-semibold text-gray-700 mb-5 border-l-4 border-blue-500 pl-3">
+              Data Keluarga
+            </h3>
+
+            
               <div>
                 <label className="font-medium text-gray-700">Nama Ayah</label>
                 <input
@@ -344,11 +343,10 @@ export default function FormWarga({
                   className={inputBase}
                 />
               </div>
-            </div>
-          </section>
 
-          {/* =================== DOKUMEN WNA =================== */}
-          <section>
+          </section> */}
+
+          {/* <section>
             <h3 className="text-lg font-semibold text-gray-700 mb-5 border-l-4 border-blue-500 pl-3">
               Dokumen (Paspor / KITAS / KITAP) *Opsional
             </h3>
@@ -375,9 +373,8 @@ export default function FormWarga({
                 </div>
               ))}
             </div>
-          </section>
+          </section> */}
 
-          {/* =================== DOMISILI (PENDATANG) =================== */}
           {data.status_warga === "pendatang" && (
             <section>
               <h3 className="text-lg font-semibold text-gray-700 mb-5 border-l-4 border-blue-500 pl-3">
@@ -389,7 +386,8 @@ export default function FormWarga({
                   <textarea
                     value={data.alamat_asal}
                     onChange={(e) => setData("alamat_asal", e.target.value)}
-                    className={`${inputBase} min-h-[100px]`}
+                    className={`${inputBase} min-h-[100px]`}r
+                    required
                   />
                 </div>
                 <div>
@@ -398,6 +396,7 @@ export default function FormWarga({
                     value={data.alamat_domisili}
                     onChange={(e) => setData("alamat_domisili", e.target.value)}
                     className={`${inputBase} min-h-[100px]`}
+                    required
                   />
                 </div>
                 <div>
@@ -407,6 +406,7 @@ export default function FormWarga({
                     value={data.tanggal_mulai_tinggal}
                     onChange={(e) => setData("tanggal_mulai_tinggal", e.target.value)}
                     className={inputBase}
+                    required
                   />
                 </div>
                 <div>
@@ -416,6 +416,7 @@ export default function FormWarga({
                     value={data.tujuan_pindah}
                     onChange={(e) => setData("tujuan_pindah", e.target.value)}
                     className={inputBase}
+                    required
                   />
                 </div>
               </div>
