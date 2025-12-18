@@ -172,7 +172,7 @@ export default function Rw() {
             {/* 🔹 Table Section */}
             <div className="table-container">
                 <div className="table-header d-flex justify-content-between align-items-center">
-                    <h4>Data RW</h4>
+                    <h4>Pengurus RW</h4>
                     <button
                         className="btn btn-success btn-sm"
                         onClick={() => setShowAdd(true)}
@@ -187,12 +187,12 @@ export default function Rw() {
                             <tr>
                                 <th className="text-center px-3">No.</th>
                                 <th className="text-center px-3">NIK</th>
-                                <th className="text-center px-3">NOMOR RW</th>
-                                <th className="text-center px-3">NAMA ANGGOTA RW</th>
-                                <th className="text-center px-3">MULAI MENJABAT</th>
-                                <th className="text-center px-3">AKHIR JABATAN</th>
-                                <th className="text-center px-3">STATUS</th>
-                                <th className="text-center px-3">AKSI</th>
+                                <th className="text-center px-3">Nomor RW</th>
+                                <th className="text-center px-3">Nama</th>
+                                <th className="text-center px-3">Mulai Menjabat</th>
+                                <th className="text-center px-3">Akhir Jabatan</th>
+                                <th className="text-center px-3">Status</th>
+                                <th className="text-center px-3">Aksi</th>
                             </tr>
                         </thead>
 

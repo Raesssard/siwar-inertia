@@ -165,8 +165,8 @@ export default function Rt() {
                         <thead>
                             <tr>
                                 <th className="text-center px-3">No.</th>
-                                <th className="text-center px-3">NIK</th>
                                 <th className="text-center px-3">Nomor RT</th>
+                                <th className="text-center px-3">NIK</th>
                                 <th className="text-center px-3">Nama Anggota RT</th>
                                 <th className="text-center px-3">Jabatan</th>
                                 <th className="text-center px-3">Mulai Menjabat</th>
@@ -178,71 +178,74 @@ export default function Rt() {
 
                         <tbody>
                             {rukun_tetangga.data.length > 0 ? (
-                                rukun_tetangga.data.map((item, index) => {
+                                rukun_tetangga.data.flatMap((item, index) => {
                                     const roleUtama = ['admin', 'rw', 'rt', 'warga']
-                                    const roleKetua = item.user[0]?.roles.length
-                                    const sideRole = item.user[0]?.roles.filter(
-                                        role => !roleUtama.includes(role.name)
-                                    ) || []
+
+                                    const ketua = item.user.find(u =>
+                                        u.roles.some(r => roleUtama.includes(r.name))
+                                    )
+
+                                    const anggotaSide = item.user
+                                        .map(u => {
+                                            const side = u.roles.find(r => !roleUtama.includes(r.name))
+                                            return side ? { ...u, sideRole: side.name } : null
+                                        })
+                                        .filter(Boolean)
 
                                     return (
-                                        <tr key={item.id}>
-                                            <td className="text-center">
-                                                {rukun_tetangga.from + index}
-                                            </td>
-                                            <td className="text-center">{item.nik || "-"}</td>
-                                            <td className="text-center">{item.nomor_rt || "-"}</td>
-                                            <td className="text-center">
-                                                {item.nama_anggota_rt || "-"}
-                                            </td>
-                                            <td className="text-center">{sideRole[0]?.name ? sideRole[0]?.name.replace(/\b\w/g, (char) => char.toUpperCase()) : roleKetua ? "Ketua" : "-"}</td>
-                                            <td className="text-center">{item.mulai_menjabat || "-"}</td>
-                                            <td className="text-center">{item.akhir_jabatan || "-"}</td>
-                                            <td className="text-center align-middle">
-                                                <span
-                                                    className={`inline-block px-2 py-1 rounded text-sm font-medium ${item.status === "aktif"
-                                                        ? "bg-green-100 text-green-700"
-                                                        : "bg-red-100 text-red-700"
-                                                        }`}
-                                                    onClick={() => handleToggleStatus(item.id)}
-                                                    style={{ cursor: 'pointer', width: '4.25rem' }}
-                                                    title="Ganti status RT"
-                                                >
-                                                    {item.status || "-"}
-                                                </span>
-                                            </td>
-                                            <td className="text-center">
-                                                <div className="d-flex justify-content-center gap-2">
-                                                    {/* <button
-                                                    className={`btn btn-sm ${item.status === "aktif"
-                                                        ? "btn-secondary"
-                                                        : "btn-success"
-                                                        }`}
-                                                    onClick={() => handleToggleStatus(item.id)}
-                                                >
-                                                    {item.status === "aktif"
-                                                        ? "Nonaktifkan"
-                                                        : "Aktifkan"}
-                                                </button> */}
-
-                                                    <button
-                                                        className="btn btn-warning btn-sm my-auto"
-                                                        onClick={() => openEdit(item)}
-                                                        title="Edit RT"
+                                        <>
+                                            <tr key={item.id}>
+                                                <td rowSpan={anggotaSide.length + 1} className="text-center">
+                                                    {rukun_tetangga.from + index}
+                                                </td>
+                                                <td className="text-center" rowSpan={anggotaSide.length + 1}>{item.nomor_rt}</td>
+                                                <td className="text-center">{ketua?.nik || "-"}</td>
+                                                <td className="text-center">{ketua ? ketua.nama : "-"}</td>
+                                                <td className="text-center">Ketua</td>
+                                                <td className="text-center" rowSpan={anggotaSide.length + 1}>{item?.mulai_menjabat || "-"}</td>
+                                                <td className="text-center" rowSpan={anggotaSide.length + 1}>{item?.akhir_jabatan || "-"}</td>
+                                                <td className="text-center align-middle" rowSpan={anggotaSide.length + 1}>
+                                                    <span
+                                                        className={`inline-block px-2 py-1 rounded text-sm font-medium ${item.status === "aktif"
+                                                            ? "bg-green-100 text-green-700"
+                                                            : "bg-red-100 text-red-700"
+                                                            }`}
+                                                        onClick={() => handleToggleStatus(item.id)}
+                                                        style={{ cursor: 'pointer', width: '4.25rem' }}
+                                                        title="Ganti status RT"
                                                     >
-                                                        <i className="fas fa-edit"></i>
-                                                    </button>
+                                                        {item.status || "-"}
+                                                    </span>
+                                                </td>
+                                                <td className="text-center" rowSpan={anggotaSide.length + 1}>
+                                                    <div className="d-flex justify-content-center gap-2">
+                                                        <button
+                                                            className="btn btn-warning btn-sm"
+                                                            onClick={() => openEdit(item)}
+                                                        >
+                                                            <i className="fas fa-edit"></i>
+                                                        </button>
 
-                                                    <button
-                                                        className="btn btn-danger btn-sm my-auto"
-                                                        onClick={() => handleDelete(item.id)}
-                                                        title="Hapus RT"
-                                                    >
-                                                        <i className="fas fa-trash"></i>
-                                                    </button>
-                                                </div>
-                                            </td>
-                                        </tr>
+                                                        <button
+                                                            className="btn btn-danger btn-sm"
+                                                            onClick={() => handleDelete(item.id)}
+                                                        >
+                                                            <i className="fas fa-trash"></i>
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+
+                                            {anggotaSide.map((u) => (
+                                                <tr key={u.id}>
+                                                    <td className="text-center">{u.nik}</td>
+                                                    <td className="text-center">{u.nama}</td>
+                                                    <td className="text-center">
+                                                        {u.sideRole.replace(/\b\w/g, c => c.toUpperCase())}
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </>
                                     )
                                 })
                             ) : (

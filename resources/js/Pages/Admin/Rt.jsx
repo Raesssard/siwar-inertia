@@ -1,5 +1,5 @@
 // resources/js/Pages/Admin/Rt.jsx
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import Layout from "@/Layouts/Layout"
 import { route } from "ziggy-js"
 import { Head, Link, router, usePage } from "@inertiajs/react"
@@ -49,6 +49,19 @@ export default function Rt() {
             [name]: selected?.value || ""
         });
     };
+    useEffect(() => {
+        if (form.nik) {
+            const namaWarga = form.nik ? warga.find(n => n.nik === form.nik).nama : ""
+            const noRt = form.nik ? warga.find(n => n.nik === form.nik).kartu_keluarga.rukun_tetangga.nomor_rt : ""
+            console.log(warga)
+
+            setForm({
+                ...form,
+                nomor_rt: noRt,
+                nama_anggota_rt: namaWarga,
+            })
+        }
+    }, [form.nik])
 
     const handleAdd = (e) => {
         e.preventDefault()
@@ -166,7 +179,7 @@ export default function Rt() {
             {/* 🔹 Table Section */}
             <div className="table-container">
                 <div className="table-header d-flex justify-content-between align-items-center">
-                    <h4>Data RT</h4>
+                    <h4>Pengurus RT</h4>
                     <button
                         className="btn btn-success btn-sm"
                         onClick={() => setShowAdd(true)}
@@ -180,9 +193,9 @@ export default function Rt() {
                         <thead>
                             <tr>
                                 <th className="text-center px-3">No.</th>
-                                <th className="text-center px-3">NIK</th>
                                 <th className="text-center px-3">Nomor RT</th>
-                                <th className="text-center px-3">Nama Anggota RT</th>
+                                <th className="text-center px-3">NIK</th>
+                                <th className="text-center px-3">Nama</th>
                                 <th className="text-center px-3">Jabatan</th>
                                 <th className="text-center px-3">Mulai Menjabat</th>
                                 <th className="text-center px-3">Akhir Jabatan</th>
@@ -213,8 +226,8 @@ export default function Rt() {
                                                 <td rowSpan={anggotaSide.length + 1} className="text-center">
                                                     {rukun_tetangga.from + index}
                                                 </td>
+                                                <td className="text-center" rowSpan={anggotaSide.length + 1}>{item.nomor_rt}</td>
                                                 <td className="text-center">{ketua?.nik || "-"}</td>
-                                                <td className="text-center">{item.nomor_rt}</td>
                                                 <td className="text-center">{ketua ? ketua.nama : "-"}</td>
                                                 <td className="text-center">Ketua</td>
                                                 <td className="text-center" rowSpan={anggotaSide.length + 1}>{item?.mulai_menjabat || "-"}</td>
@@ -252,9 +265,8 @@ export default function Rt() {
                                             </tr>
 
                                             {anggotaSide.map((u) => (
-                                                <tr key={u.id}>{console.log(u)}
+                                                <tr key={u.id}>
                                                     <td className="text-center">{u.nik}</td>
-                                                    <td className="text-center">{item.nomor_rt}</td>
                                                     <td className="text-center">{u.nama}</td>
                                                     <td className="text-center">
                                                         {u.sideRole.replace(/\b\w/g, c => c.toUpperCase())}

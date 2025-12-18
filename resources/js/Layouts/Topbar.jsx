@@ -11,7 +11,8 @@ import { useIsMobile, judul } from "../Pages/Component/GetPropRole"
 export default function Topbar({ modalShow, hapusHistory }) {
     const { props } = usePage()
     const user = props.auth?.user
-    const currentRole = props.auth?.currentRole
+    const currentRole = props.auth?.currentRole || []
+    const sideRole = props.auth?.sideRole || []
     const roles = props.auth?.rolesAccount || []
     // const [showPasswordModal, setShowPasswordModal] = useState(false)
     const [gantiAkun, setGantiAkun] = useState(false)
@@ -140,7 +141,10 @@ export default function Topbar({ modalShow, hapusHistory }) {
                         aria-expanded="false"
                     >
                         <span className={`${mobile ? 'ms-auto' : ''} me-3 text-gray-600 small user-name-display`} style={{ maxWidth: '100%' }}>
-                            {user?.nama || "User"}
+                            {`${user?.nama || "User"} - ${sideRole.length > 0
+                                ? sideRole.length <= 2 ? sideRole.toUpperCase() : sideRole.replace(/\b\w/g, (c) => c.toUpperCase())
+                                : currentRole.length <= 2 ? currentRole.toUpperCase() : currentRole.replace(/\b\w/g, (c) => c.toUpperCase())
+                                }`}
                         </span>
                     </Link>
 

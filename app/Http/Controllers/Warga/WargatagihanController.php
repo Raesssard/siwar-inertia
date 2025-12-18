@@ -8,6 +8,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
 class WargatagihanController extends Controller
@@ -59,6 +60,30 @@ class WargatagihanController extends Controller
             'title' => $title,
             'tagihanSudahDibayar' => $tagihanSudahDibayar,
             'tagihanBelumDibayar' => $tagihanBelumDibayar
+        ]);
+    }
+
+    public function uploadBukti(Request $request, $id)
+    {
+        $tagihan = Tagihan::findOrFail($id);
+
+        $buktiPath = $tagihan->bukti_transfer;
+
+        if ($request->hasFile('bukti_transfer')) {
+            if ($buktiPath && Storage::exists('public/' . $buktiPath)) {
+                Storage::delete('public/' . $buktiPath);
+            }
+            $buktiPath = $request->file('bukti_transfer')->store('bukti_transfer', 'public');
+        }
+
+        $tagihan->update([
+            'bukti_transfer' => $buktiPath,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Berhasil mengupload foto bukti.',
+            'tagihan' => $tagihan,
         ]);
     }
 }

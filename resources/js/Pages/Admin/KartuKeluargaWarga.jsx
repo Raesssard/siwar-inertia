@@ -76,7 +76,7 @@ export default function KartuKeluarga() {
 
             <div className="table-container">
                 <div className="table-header d-flex justify-content-between align-items-center">
-                    <h4>Data Kartu Keluarga</h4>
+                    <h4>Warga</h4>
 
                     {/* 🔘 Tombol Tambah KK */}
                     <Link

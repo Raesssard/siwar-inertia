@@ -42,12 +42,12 @@ export default function FormKK({ kk = null, daftar_rt = [], kategori_iuran = [],
         if (isEdit) {
             put(route(`${baseRoute}.update`, kk.id), {
                 preserveScroll: true,
-                onSuccess: () => router.visit(route(`${baseRoute}.index`)),
+                // onSuccess: () => router.visit(route(`${baseRoute}.index`)),
             });
         } else {
             post(route(`${baseRoute}.store`), {
                 preserveScroll: true,
-                onSuccess: () => router.visit(route(`${baseRoute}.index`)),
+                // onSuccess: () => router.visit(route(`${baseRoute}.index`)),
             });
         }
     };

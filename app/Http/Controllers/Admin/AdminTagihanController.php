@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Iuran;
 use App\Models\Tagihan;
 use App\Models\Kartu_keluarga;
+use App\Models\Rt;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
@@ -92,13 +93,19 @@ class AdminTagihanController extends Controller
             'tgl_tagih' => 'nullable|date',
             'no_kk' => 'nullable',
         ]);
-
+        $idRw = $request->id_rw;
         $iuran = Iuran::findOrFail($request->id_iuran);
-
+        $rt = Rt::whereHas('rw', function ($r) use ($idRw) {
+            $r->where('id', $idRw);
+        });
         $kkQuery = Kartu_keluarga::where('id_rw', $iuran->id_rw);
 
         if ($request->no_kk && $request->no_kk !== 'semua') {
             $kkQuery->where('no_kk', $request->no_kk);
+        } elseif ($request->no_kk === 'rt') {
+            $kkQuery->whereHas('rukunTetangga', function ($kk) use ($rt) {
+                $kk->where('id', $rt);
+            });
         }
 
         $kkList = $kkQuery->get();

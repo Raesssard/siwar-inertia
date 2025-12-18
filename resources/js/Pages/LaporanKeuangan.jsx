@@ -263,7 +263,7 @@ export default function LaporanKeuangan() {
                                 <td colSpan="3" className="text-start" style={{ fontWeight: '500' }}>Total Keuangan Bulan {keteranganBulan}</td>
                                 <td className="text-end" style={batasNominal}>{totalPemasukan ? formatRupiah(totalPemasukan) : ' '}</td>
                                 <td className="text-end" style={batasNominal}>{totalPengeluaran ? formatRupiah(totalPengeluaran) : ' '}</td>
-                                <td className="text-end" style={batasNominal}>{totalKeuangan ? formatRupiah(totalKeuangan) : ' '}</td>
+                                <td className="text-end" style={batasNominal}>{totalKeuangan < 0 ? `( ${formatRupiah(totalKeuangan).replace('-', ' ')} )` : formatRupiah(totalKeuangan)}</td>
                             </tr>
                         </tfoot>
                     </table>

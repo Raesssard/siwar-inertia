@@ -3457,9 +3457,6 @@ export function DetailKK({ selectedData, detailShow, onClose, role, userData }) 
                                             <th colSpan="2">Nama Orang Tua</th>
                                             <th rowSpan="2">Status Warga</th>
                                             <th rowSpan="2">Detail</th>
-                                            <Role role="rw">
-                                                <th rowSpan="2">Aksi</th>
-                                            </Role>
                                         </tr>
                                         <tr>
                                             <th>Tempat Lahir</th>
@@ -4367,7 +4364,7 @@ export function DetailPengumuman({ kategori, selectedData, detailShow, onClose, 
                                                 )
                                             }
                                         </div>
-                                        <div className="flex-grow-1 overflow-auto p-3 komen-section" ref={komenRef}>
+                                        {/* <div className="flex-grow-1 overflow-auto p-3 komen-section" ref={komenRef}>
                                             {komentar.length > 0 ? (
                                                 komentar.map((komen, i) => (
                                                     <div key={i} className="mb-3">
@@ -4696,7 +4693,7 @@ export function DetailPengumuman({ kategori, selectedData, detailShow, onClose, 
                                                     <i className="far fa-paper-plane"></i>
                                                 </button>
                                             </div>
-                                        </div>
+                                        </div> */}
                                     </div>
                                 </div>
                             )}
@@ -7233,7 +7230,14 @@ export function EditTagihan({ editShow, onClose, onUpdated, role, selectedData }
 }
 
 export function DetailTagihan({ selectedData, detailShow, onClose }) {
-    if (!detailShow || !selectedData) return null
+    const { data, setData } = useForm({
+        bukti_transfer: null,
+    })
+
+    const [previewBuktiTransfer, setPreviewBuktiTransfer] = useState(null)
+    const [buktiLama, setBuktiLama] = useState(null)
+    const fileInputRef = useRef(null)
+
 
     useEffect(() => {
         const handleEsc = (e) => {
@@ -7244,12 +7248,79 @@ export function DetailTagihan({ selectedData, detailShow, onClose }) {
         return () => document.removeEventListener("keydown", handleEsc)
     }, [onClose])
 
+    const handleSubmit = (e) => {
+        e.preventDefault()
+
+        const formData = new FormData()
+        Object.entries(data).forEach(([key, value]) => {
+            if (key === "bukti_transfer" && value instanceof File) {
+                formData.append(key, value)
+            } else {
+                formData.append(key, value ?? "")
+            }
+        })
+
+        axios.post(`/warga/tagihan/upload_foto/${selectedData.id}`, formData, {
+            headers: {
+                "Content-Type": "multipart/form-data",
+            },
+        })
+            .then((res) => {
+                console.log(res.data.message)
+                setData({
+                    bukti_transfer: null,
+                })
+            })
+            .catch((err) => {
+                console.error(err.response?.data || err)
+                alert("Gagal update tagihan! Lihat console untuk detail.")
+            })
+    }
+
+    const handleClear = () => {
+        setData("bukti_transfer", null)
+        setBuktiLama(null)
+        setPreviewBuktiTransfer(null)
+        if (fileInputRef.current) fileInputRef.current.value = ""
+    }
+
+    useEffect(() => {
+        if (selectedData) {
+            setData({
+                bukti_transfer: selectedData.bukti_transfer || null,
+            });
+            setBuktiLama(selectedData.bukti_transfer || null)
+        }
+    }, [selectedData, setData, detailShow]);
+
+    const handleFileChange = (e) => {
+        const selectedFile = e.target.files[0]
+
+        if (!selectedFile) {
+            setPreviewBuktiTransfer(null)
+            setData("bukti_transfer", null)
+            return
+        }
+
+        setData("bukti_transfer", selectedFile || null)
+
+        const fileName = selectedFile.name.toLowerCase()
+
+        if (fileName.endsWith(".jpg") || fileName.endsWith(".jpeg") || fileName.endsWith(".png") || fileName.endsWith(".gif")) {
+            const reader = new FileReader()
+            reader.onload = (ev) => setPreviewBuktiTransfer({ type: "image", src: ev.target.result })
+            reader.readAsDataURL(selectedFile)
+        }
+    }
+
     const getFileUrl = (src) => {
         if (!src) return ""
         if (src.startsWith("data:")) return src
         if (src.startsWith("blob:")) return src
         return `/storage/${src}`
     }
+
+    if (!detailShow || !selectedData) return null
 
     return (
         <>
@@ -7278,14 +7349,7 @@ export function DetailTagihan({ selectedData, detailShow, onClose }) {
                                     <div className="kk-info-item">
                                         <p><strong>Tagihan</strong>: {selectedData.nama}</p>
                                         <p><strong>Nominal</strong>: {formatRupiah(selectedData.nominal)}</p>
-                                        <p><strong>Tanggal Tagih</strong>: {formatTanggal(selectedData.tgl_tagih)}</p>
                                         <p><strong>Tanggal Tempo</strong>: {formatTanggal(selectedData.tgl_tempo)}</p>
-                                        <p><strong>Jenis Tagihan</strong>: {selectedData.jenis === 'manual' ? (
-                                            <span className="badge bg-primary d-flex align-items-center justify-content-center text-white ms-1">Manual</span>
-                                        ) : (
-                                            <span className="badge bg-secondary d-flex align-items-center justify-content-center text-white ms-1">Otomatis</span>
-                                        )}
-                                        </p>
                                     </div>
                                     <div className="kk-info-item">
                                         <p><strong>Status</strong>: {selectedData.status_bayar === 'sudah_bayar' ? (
@@ -7302,34 +7366,94 @@ export function DetailTagihan({ selectedData, detailShow, onClose }) {
                                     </div>
 
                                     <div className="mb-3 mt-3">
-                                        {(selectedData.bukti_transfer && selectedData.status_bayar === 'sudah_bayar') && (
-                                            <>
-                                                <p><strong>Bukti Transfer: </strong></p>
-                                                <div
-                                                    className="flex-fill border-end bg-black d-flex align-items-center justify-content-center mb-3"
+                                        {(previewBuktiTransfer || buktiLama) && (
+                                            <div
+                                                className="flex-fill border-end bg-black d-flex align-items-center justify-content-center mb-3"
+                                                style={{
+                                                    width: "200px",
+                                                    height: "200px",
+                                                    overflow: "hidden",
+                                                    borderRadius: "10px",
+                                                    position: "relative",
+                                                }}>
+                                                <button
+                                                    type="button"
+                                                    onClick={(e) => {
+                                                        e.stopPropagation()
+                                                        handleClear()
+                                                    }}
                                                     style={{
-                                                        width: "200px",
-                                                        height: "200px",
-                                                        overflow: "hidden",
-                                                        borderRadius: "10px",
-                                                        position: "relative",
-                                                    }}>
-                                                    <div id="preview" style={{ width: "100%", height: "100%" }}>
-                                                        {(selectedData.bukti_transfer && /\.(jpg|jpeg|png|gif)$/i.test(selectedData.bukti_transfer)) && (
-                                                            <img
-                                                                src={getFileUrl(selectedData.bukti_transfer)}
-                                                                alt="Preview"
-                                                                style={{
-                                                                    maxWidth: "100%",
-                                                                    maxHeight: "100%",
-                                                                    objectFit: "contain"
-                                                                }}
-                                                            />
-                                                        )}
-                                                    </div>
+                                                        position: "absolute",
+                                                        top: "5px",
+                                                        right: "5px",
+                                                        zIndex: 10,
+                                                        background: "rgba(0, 0, 0, 0.5)",
+                                                        color: "white",
+                                                        border: "none",
+                                                        borderRadius: "50%",
+                                                        width: "25px",
+                                                        height: "25px",
+                                                        cursor: "pointer",
+                                                        fontWeight: "bold",
+                                                        lineHeight: "1",
+                                                    }}
+                                                    title="Hapus file"
+                                                >
+                                                    ✕
+                                                </button>
+                                                <div id="preview" style={{ width: "100%", height: "100%" }}>
+                                                    {((previewBuktiTransfer && previewBuktiTransfer.type === "image") || (buktiLama && /\.(jpg|jpeg|png|gif)$/i.test(buktiLama))) && (
+                                                        <img
+                                                            src={
+                                                                (previewBuktiTransfer && previewBuktiTransfer.type === "image")
+                                                                    ? getFileUrl(previewBuktiTransfer.src)
+                                                                    : (buktiLama && /\.(jpg|jpeg|png|gif)$/i.test(buktiLama))
+                                                                    && getFileUrl(buktiLama)
+                                                            }
+                                                            alt="Preview"
+                                                            style={{
+                                                                maxWidth: "100%",
+                                                                maxHeight: "100%",
+                                                                objectFit: "contain"
+                                                            }}
+                                                        />
+                                                    )}
                                                 </div>
-                                            </>
+                                            </div>
                                         )}
+                                        <input
+                                            ref={fileInputRef}
+                                            type="file"
+                                            id="fileInput"
+                                            name="bukti_transfer"
+                                            className="d-none"
+                                            onChange={handleFileChange}
+                                            accept="image/*"
+                                            onClick={(e) => { e.target.value = null }}
+                                        />
+                                        <button
+                                            type="button"
+                                            className="edit-file btn btn-outline-primary m-0"
+                                            title="Pilih File"
+                                            onClick={() => fileInputRef.current?.click()}
+                                        >
+                                            <i className="fas fa-folder me-2"></i>
+                                            <small>
+                                                Pilih Bukti Transfer
+                                            </small>
+                                        </button>
+                                        <button
+                                            type="button"
+                                            className="edit-file btn btn-outline-primary m-0"
+                                            title="Upload File"
+                                            onClick={handleSubmit}
+                                            disabled={!previewBuktiTransfer}
+                                        >
+                                            <i className="fas fa-upload me-2"></i>
+                                            <small>
+                                                Upload Bukti Transfer
+                                            </small>
+                                        </button>
                                     </div>
 
                                     <button onClick={() => onClose()} className="btn btn-success ms-auto mt-auto">

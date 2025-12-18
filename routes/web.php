@@ -301,6 +301,9 @@ Route::middleware(['auth'])->group(function () {
             Route::get('tagihan', [WargatagihanController::class, 'index'])
                 ->middleware(CheckPermission::class . ':view.tagihan')
                 ->name('tagihan');
+            Route::post('/tagihan/upload_foto/{id}', [WargatagihanController::class, 'uploadBukti'])
+                ->middleware(CheckPermission::class . ':view.tagihan')
+                ->name('tagihan.upload_foto');
 
 
             // 💳 Transaksi

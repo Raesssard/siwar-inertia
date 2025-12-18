@@ -65,7 +65,7 @@ export default function Layout({ children }) {
             setFlashMessage(message)
 
             // Hilangkan otomatis setelah 3 detik
-            const timer = setTimeout(() => setFlashMessage(null), 3000)
+            const timer = setTimeout(() => setFlashMessage(null), 10000)
             return () => clearTimeout(timer)
         }
     }, [flash])

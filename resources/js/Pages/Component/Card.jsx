@@ -12,7 +12,7 @@ export function StatCard({ href, color, title, value, icon }) {
                             {/* Text */}
                             <div className="col mr-2" style={{ zIndex: 20 }}>
                                 <div
-                                    className={`text-xs font-weight-bold text-${color} text-uppercase ${value ? "mb-1" : ""} text-align-start`}
+                                    className={`text-md font-weight-bold text-${color} text-uppercase ${value ? "mb-1" : ""} text-start`}
                                 >
                                     {title}
                                 </div>

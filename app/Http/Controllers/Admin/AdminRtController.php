@@ -84,7 +84,7 @@ class AdminRtController extends Controller
 
         $roles = collect(['ketua'])->merge($roles)->values();
 
-        $warga = Warga::whereDoesntHave('user.roles', function ($q) {
+        $warga = Warga::with('kartuKeluarga.rukunTetangga')->whereDoesntHave('user.roles', function ($q) {
             $q->where('name', 'rw');
         })->get();
 

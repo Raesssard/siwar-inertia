@@ -37,7 +37,8 @@
     /* biar ga mepet */
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
     overflow-x: hidden;
-    overflow-y: hidden;
+    min-height: fit-content;
+    /* overflow-y: hidden; */
 }
 
 .table-header {
@@ -84,7 +85,7 @@
 }
 
 .table-scroll {
-    max-height: 13.75rem;
+    height: auto;
     overflow-y: auto;
     overflow-x: auto;
     width: 100%;
