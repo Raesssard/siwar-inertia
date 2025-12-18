@@ -10,6 +10,19 @@ export function formatRupiah(angka, withDecimals = false) {
         maximumFractionDigits: withDecimals ? 2 : 0,
     }).replace('-', ' ')} )`;
 }
+    export function AutoDotNumeric(value) {
+        if (!value) return "";
+
+        // hapus semua selain angka
+        const number = value.toString().replace(/\D/g, "");
+
+        // format ribuan Indonesia
+        return new Intl.NumberFormat("id-ID").format(number);
+    };
+
+    export function unformatRupiah(value) {
+        return value.replace(/\./g, "");
+    };
 
 export function formatTanggal(tanggal) {
     if (!tanggal) return "-"

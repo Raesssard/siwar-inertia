@@ -3,7 +3,7 @@ import { Link, useForm, usePage, router } from "@inertiajs/react"
 import logo from '../../../../public/img/logo.png'
 import { FormatWaktu } from "../Pengaduan"
 import { SidebarLink } from "./SidebarLink"
-import { formatTanggal, getAdminLinks, getRtLinks, getWargaLinks, getRwLinks, formatRupiah, useIsMobile } from "./GetPropRole"
+import { formatTanggal, getAdminLinks, getRtLinks, getWargaLinks, getRwLinks, formatRupiah, useIsMobile, AutoDotNumeric, unformatRupiah } from "./GetPropRole"
 import Role from "./Role"
 import { route } from "ziggy-js"
 import { motion } from "framer-motion"
@@ -6248,13 +6248,19 @@ export function TambahIuran({ tambahShow, onClose, onAdded, role, golongan, rw, 
                                         <div className="mb-3">
                                             <label className="form-label">Nominal Iuran</label>
                                             <input
-                                                type="number"
+                                                type="text"
                                                 name="nominal"
                                                 className="form-control"
-                                                onChange={handleChange}
+                                                value={AutoDotNumeric(data.nominal)}
+                                                onChange={(e) => {
+                                                    const raw = unformatRupiah(e.target.value)
+                                                    setData({ ...data, nominal: raw })
+                                                }}
                                                 onInput={(e) => {
-                                                    if (e.target.value.length > 13) {
-                                                        e.target.value = e.target.value.slice(0, 13)
+                                                    if (e.target.value.replace(/\D/g, "").length > 13) {
+                                                        e.target.value = AutoDotNumeric(
+                                                            e.target.value.replace(/\D/g, "").slice(0, 13)
+                                                        )
                                                     }
                                                 }}
                                                 required
@@ -6284,14 +6290,20 @@ export function TambahIuran({ tambahShow, onClose, onAdded, role, golongan, rw, 
                                                                     ? g.jenis.toUpperCase()
                                                                     : g.jenis.charAt(0).toUpperCase() + g.jenis.slice(1)}</label>
                                                             <input
-                                                                type="number"
+                                                                type="text"
                                                                 className="tambah-judul form-control"
+                                                                value={AutoDotNumeric(data[`nominal_${g.id}`] || "")}
+                                                                onChange={(e) => {
+                                                                    const raw = unformatRupiah(e.target.value)
+                                                                    handleNominalChange(g.id, raw)
+                                                                }}
                                                                 onInput={(e) => {
-                                                                    if (e.target.value.length > 13 || e.target.value.length < 0) {
-                                                                        e.target.value = e.target.value.slice(0, 13)
+                                                                    if (e.target.value.replace(/\D/g, "").length > 13) {
+                                                                        e.target.value = AutoDotNumeric(
+                                                                            e.target.value.replace(/\D/g, "").slice(0, 13)
+                                                                        )
                                                                     }
                                                                 }}
-                                                                onChange={(e) => handleNominalChange(g.id, e.target.value)}
                                                                 required
                                                             />
                                                         </div>
@@ -6437,13 +6449,18 @@ export function EditIuranOtomatis({ editShow, onClose, onUpdated, role, golongan
                                         <div className="mb-3">
                                             <label className="form-label">Nominal Iuran</label>
                                             <input
-                                                type="number"
+                                                type="text"
                                                 name="nominal"
-                                                value={data.nominal}
-                                                className="tambah-judul form-control"
-                                                onChange={(e) => setData("nominal", e.target.value)}
+                                                value={AutoDotNumeric(data.nominal)}
+                                                className="form-control"
+                                                onChange={(e) =>
+                                                    setData({
+                                                        ...data,
+                                                        nominal: unformatRupiah(e.target.value),
+                                                    })
+                                                }
                                                 onInput={(e) => {
-                                                    if (e.target.value.length > 13) {
+                                                    if (e.target.value.replace(/\D/g, "").length > 13) {
                                                         e.target.value = e.target.value.slice(0, 13);
                                                     }
                                                 }}
@@ -6585,11 +6602,16 @@ export function EditIuranManual({ editShow, onClose, onUpdated, role, iuran }) {
                                         <div className="mb-3">
                                             <label className="form-label">Nominal Iuran</label>
                                             <input
-                                                type="number"
+                                                type="text"
                                                 name="nominal"
-                                                value={data.nominal}
+                                                value={AutoDotNumeric(data.nominal)}
                                                 className="tambah-judul form-control"
-                                                onChange={(e) => setData("nominal", e.target.value)}
+                                                onChange={(e) =>
+                                                    setData({
+                                                        ...data,
+                                                        nominal: unformatRupiah(e.target.value),
+                                                    })
+                                                }
                                                 onInput={(e) => {
                                                     if (e.target.value.length > 13) {
                                                         e.target.value = e.target.value.slice(0, 13);
@@ -6823,17 +6845,23 @@ export function TambahTagihan({ tambahShow, onClose, onUpdated, role, iuran, kk_
                                         <div className="mb-3">
                                             <label className="form-label">Nominal</label>
                                             <input
-                                                type="number"
+                                                type="text"
                                                 name="nominal"
-                                                value={data.nominal}
+                                                value={AutoDotNumeric(data.nominal)}
                                                 className="form-control"
-                                                onChange={(e) => setData('nominal', e.target.value)}
+                                                onChange={(e) => {
+                                                    const raw = unformatRupiah(e.target.value)
+                                                    setData('nominal', raw)
+                                                }}
                                                 onInput={(e) => {
-                                                    if (e.target.value.length > 13) {
-                                                        e.target.value = e.target.value.slice(0, 13)
+                                                    if (e.target.value.replace(/\D/g, "").length > 13) {
+                                                        e.target.value = AutoDotNumeric(
+                                                            e.target.value.replace(/\D/g, "").slice(0, 13)
+                                                        )
                                                     }
                                                 }}
                                                 required
+                                                readOnly
                                                 style={{
                                                     border: '0',
                                                     borderBottom: '1px solid lightgray',
@@ -7082,9 +7110,9 @@ export function EditTagihan({ editShow, onClose, onUpdated, role, selectedData }
                                         <div className="mb-3">
                                             <label className="form-label">Nominal</label>
                                             <input
-                                                type="number"
+                                                type="text"
                                                 name="nominal"
-                                                value={selectedData.nominal}
+                                                value={AutoDotNumeric(selectedData.nominal)}
                                                 className="form-control"
                                                 onInput={(e) => {
                                                     if (e.target.value.length > 13) {
@@ -7103,11 +7131,13 @@ export function EditTagihan({ editShow, onClose, onUpdated, role, selectedData }
                                         <div className="mb-3">
                                             <label className="form-label">Nominal Bayar</label>
                                             <input
-                                                type="number"
+                                                type="text"
                                                 name="nominal_bayar"
-                                                value={data.nominal_bayar}
+                                                value={AutoDotNumeric(data.nominal_bayar)}
                                                 className="form-control"
-                                                onChange={(e) => setData('nominal_bayar', e.target.value)}
+                                                onChange={(e) => {
+                                                    setData('nominal_bayar', unformatRupiah(e.target.value))
+                                                }}
                                                 onInput={(e) => {
                                                     if (e.target.value.length > 13) {
                                                         e.target.value = e.target.value.slice(0, 13)
@@ -7943,7 +7973,13 @@ export function TambahTransaksiPerKk({ listKK = [], tambahShow, onClose, onAdded
                                                 type="text"
                                                 name="nominal"
                                                 className="tambah-judul form-control"
-                                                onChange={(nominal) => setData('nominal', nominal.target.value)}
+                                                value={AutoDotNumeric(data.nominal)}
+                                                onChange={(e) => {
+                                                    const rawValue = unformatRupiah(e.target.value);
+                                                    setData("nominal", rawValue);
+                                                }}
+                                                inputMode="numeric"
+                                                placeholder="Contoh: 1.000.000"
                                                 onInput={(e) => {
                                                     if (e.target.value.length > 13) {
                                                         e.target.value = e.target.value.slice(0, 13);
@@ -8070,7 +8106,7 @@ export function EditTransaksi({ editShow, onClose, onUpdated, role, selectedData
             setData({
                 tanggal: selectedData.tanggal || "",
                 nama_transaksi: selectedData.nama_transaksi || "",
-                nominal: selectedData.nominal || "",
+                nominal: AutoDotNumeric(selectedData.nominal) || "",
                 keterangan: selectedData.keterangan || "",
             });
         }
@@ -8083,7 +8119,7 @@ export function EditTransaksi({ editShow, onClose, onUpdated, role, selectedData
         formData.append('_method', 'PUT')
         formData.append('tanggal', data.tanggal)
         formData.append('nama_transaksi', data.nama_transaksi)
-        formData.append('nominal', data.nominal)
+        formData.append('nominal', unformatRupiah(data.nominal))
         formData.append('keterangan', data.keterangan)
 
         axios.post(`/${role}/transaksi/${selectedData.id}`, formData)
@@ -8166,9 +8202,12 @@ export function EditTransaksi({ editShow, onClose, onUpdated, role, selectedData
                                                 name="nominal"
                                                 value={data.nominal}
                                                 className="tambah-judul form-control"
-                                                onChange={(nominal) => setData('nominal', nominal.target.value)}
+                                                onChange={(e) => {
+                                                    const raw = e.target.value;
+                                                    setData("nominal", AutoDotNumeric(raw));
+                                                }}
                                                 onInput={(e) => {
-                                                    if (e.target.value.length > 13) {
+                                                    if (e.target.value.replace(/\D/g, "").length > 13) {
                                                         e.target.value = e.target.value.slice(0, 13);
                                                     }
                                                 }}
