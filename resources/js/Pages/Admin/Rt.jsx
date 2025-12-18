@@ -53,7 +53,6 @@ export default function Rt() {
         if (form.nik) {
             const namaWarga = form.nik ? warga.find(n => n.nik === form.nik).nama : ""
             const noRt = form.nik ? warga.find(n => n.nik === form.nik).kartu_keluarga.rukun_tetangga.nomor_rt : ""
-            console.log(warga)
 
             setForm({
                 ...form,
@@ -209,30 +208,48 @@ export default function Rt() {
                                 rukun_tetangga.data.flatMap((item, index) => {
                                     const roleUtama = ['admin', 'rw', 'rt', 'warga']
 
-                                    const ketua = item.user.find(u =>
-                                        u.roles.some(r => roleUtama.includes(r.name))
-                                    )
+                                    const jabatanPerUser = item.user.map(u => {
+                                        // cari role non-utama
+                                        const sideRole = u.roles.find(r => !roleUtama.includes(r.name))
 
-                                    const anggotaSide = item.user
-                                        .map(u => {
-                                            const side = u.roles.find(r => !roleUtama.includes(r.name))
-                                            return side ? { ...u, sideRole: side.name } : null
-                                        })
-                                        .filter(Boolean)
+                                        // kalau ada jabatan asli (bendahara, sekretaris, dll)
+                                        if (sideRole) {
+                                            return {
+                                                nik: u.nik,
+                                                jabatan: sideRole.name.replace(/\b\w/g, (char => char.toUpperCase()))
+                                            }
+                                        }
 
+                                        // kalau dia ketua (nik sama + role rt)
+                                        if (
+                                            u.nik === item.nik &&
+                                            u.roles.some(r => r.name === 'rt')
+                                        ) {
+                                            return {
+                                                nik: u.nik,
+                                                jabatan: 'Ketua'
+                                            }
+                                        }
+
+                                        // selain itu abaikan
+                                        return null
+                                    }).filter(Boolean)
+
+                                    const jabatanRt = jabatanPerUser.find(j => j.nik === item.nik)
+                                    console.log(jabatanRt)
                                     return (
                                         <>
                                             <tr key={item.id}>
-                                                <td rowSpan={anggotaSide.length + 1} className="text-center">
-                                                    {rukun_tetangga.from + index}
+                                                <td className="text-center">
+                                                    {index + 1}
                                                 </td>
-                                                <td className="text-center" rowSpan={anggotaSide.length + 1}>{item.nomor_rt}</td>
-                                                <td className="text-center">{ketua?.nik || "-"}</td>
-                                                <td className="text-center">{ketua ? ketua.nama : "-"}</td>
-                                                <td className="text-center">Ketua</td>
-                                                <td className="text-center" rowSpan={anggotaSide.length + 1}>{item?.mulai_menjabat || "-"}</td>
-                                                <td className="text-center" rowSpan={anggotaSide.length + 1}>{item?.akhir_jabatan || "-"}</td>
-                                                <td className="text-center align-middle" rowSpan={anggotaSide.length + 1}>
+                                                <td className="text-center">{item.nomor_rt}</td>
+                                                <td className="text-center">{item?.nik || "-"}</td>
+                                                <td className="text-center">{item.nama_anggota_rt || "-"}</td>
+                                                <td className="text-center">{jabatanRt?.jabatan || "-"}</td>
+                                                <td className="text-center">{item?.mulai_menjabat || "-"}</td>
+                                                <td className="text-center">{item?.akhir_jabatan || "-"}</td>
+                                                <td className="text-center align-middle">
                                                     <span
                                                         className={`inline-block px-2 py-1 rounded text-sm font-medium ${item.status === "aktif"
                                                             ? "bg-green-100 text-green-700"
@@ -245,7 +262,7 @@ export default function Rt() {
                                                         {item.status || "-"}
                                                     </span>
                                                 </td>
-                                                <td className="text-center" rowSpan={anggotaSide.length + 1}>
+                                                <td className="text-center">
                                                     <div className="d-flex justify-content-center gap-2">
                                                         <button
                                                             className="btn btn-warning btn-sm"
@@ -263,7 +280,7 @@ export default function Rt() {
                                                     </div>
                                                 </td>
                                             </tr>
-
+                                            {/* 
                                             {anggotaSide.map((u) => (
                                                 <tr key={u.id}>
                                                     <td className="text-center">{u.nik}</td>
@@ -272,7 +289,7 @@ export default function Rt() {
                                                         {u.sideRole.replace(/\b\w/g, c => c.toUpperCase())}
                                                     </td>
                                                 </tr>
-                                            ))}
+                                            ))} */}
                                         </>
                                     )
                                 })

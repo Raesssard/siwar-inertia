@@ -32,14 +32,10 @@ class RwRukunTetanggaController extends Controller
         $query = Rt::whereHas('rw', function ($q) use ($nomorRwUser) {
             $q->where('nomor_rw', $nomorRwUser);
         })
-            ->orWhereHas('user.roles', function ($q) {
-                $q->where('name', 'rt');
-            })
-            ->with(['user' => function ($q) {
-                $q->whereHas('roles', function ($q) {
-                    $q->where('name', 'rt');
-                });
-            }, 'user.roles']);
+            ->with([
+                'user.roles',
+                'user.rukunTetangga',
+            ]);
 
         if ($request->filled('keyword')) {
             $query->where(function ($q) use ($request) {
@@ -158,20 +154,18 @@ class RwRukunTetanggaController extends Controller
             }
         }
 
-        if ($jabatan === 'ketua') {
-            $rt = Rt::create([
-                'nik' => $request->nik,
-                'no_kk' => $request->filled('nik')
-                    ? optional(Warga::where('nik', $request->nik)->first())->no_kk
-                    : null,
-                'nomor_rt' => $request->nomor_rt,
-                'nama_anggota_rt' => $request->nama_anggota_rt,
-                'mulai_menjabat' => $request->mulai_menjabat,
-                'akhir_jabatan' => $request->akhir_jabatan,
-                'id_rw' => $id_rw,
-                'status' => $request->status ?? 'nonaktif',
-            ]);
-        }
+        $rt = Rt::create([
+            'nik' => $request->nik,
+            'no_kk' => $request->filled('nik')
+                ? optional(Warga::where('nik', $request->nik)->first())->no_kk
+                : null,
+            'nomor_rt' => $request->nomor_rt,
+            'nama_anggota_rt' => $request->nama_anggota_rt,
+            'mulai_menjabat' => $request->mulai_menjabat,
+            'akhir_jabatan' => $request->akhir_jabatan,
+            'id_rw' => $id_rw,
+            'status' => $request->status ?? 'nonaktif',
+        ]);
 
         if ($request->filled('nik') && $request->filled('nama_anggota_rt')) {
             $user = User::updateOrCreate(

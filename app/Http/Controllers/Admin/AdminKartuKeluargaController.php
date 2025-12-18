@@ -123,7 +123,7 @@ class AdminKartuKeluargaController extends Controller
 
             Kartu_keluarga::create($validated);
 
-            return redirect('admin.kartu_keluarga.index')->with('success', 'Kartu Keluarga berhasil ditambahkan!');
+            return back()->with('success', 'Kartu Keluarga berhasil ditambahkan!');
         } catch (\Exception $e) {
             Log::error('Admin gagal menambahkan KK: ' . $e->getMessage());
             return back()->with('error', 'Gagal menambahkan data KK.');

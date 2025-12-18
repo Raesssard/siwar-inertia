@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { useForm, router, Head } from "@inertiajs/react";
+import { useForm, router, Head, usePage } from "@inertiajs/react";
 import { route } from "ziggy-js";
 import Layout from "@/Layouts/Layout";
 
@@ -42,12 +42,24 @@ export default function FormKK({ kk = null, daftar_rt = [], kategori_iuran = [],
         if (isEdit) {
             put(route(`${baseRoute}.update`, kk.id), {
                 preserveScroll: true,
-                // onSuccess: () => router.visit(route(`${baseRoute}.index`)),
+                onSuccess: (res) => {
+                    if (res.props.flash.success) {
+                        router.visit(route(`${baseRoute}.index`))
+                    } else {
+                        return
+                    }
+                },
             });
         } else {
             post(route(`${baseRoute}.store`), {
                 preserveScroll: true,
-                // onSuccess: () => router.visit(route(`${baseRoute}.index`)),
+                onSuccess: (res) => {
+                    if (res.props.flash.success) {
+                        router.visit(route(`${baseRoute}.index`))
+                    } else {
+                        return
+                    }
+                },
             });
         }
     };
@@ -79,6 +91,7 @@ export default function FormKK({ kk = null, daftar_rt = [], kategori_iuran = [],
                                     value={data.no_kk}
                                     onChange={(e) => setData("no_kk", e.target.value)}
                                     className={inputBase}
+                                    maxLength={'16'}
                                 />
                                 {errors.no_kk && <p className="text-red-500 text-sm">{errors.no_kk}</p>}
                             </div>
@@ -90,6 +103,7 @@ export default function FormKK({ kk = null, daftar_rt = [], kategori_iuran = [],
                                     value={data.no_registrasi}
                                     onChange={(e) => setData("no_registrasi", e.target.value)}
                                     className={inputBase}
+                                    maxLength={'16'}
                                 />
                                 {errors.no_registrasi && (
                                     <p className="text-red-500 text-sm">{errors.no_registrasi}</p>
