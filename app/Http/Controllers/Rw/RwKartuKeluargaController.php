@@ -113,7 +113,7 @@ class RwKartuKeluargaController extends Controller
 
     public function store(Request $request)
     {
-        try {
+
             $userRw = Auth::user()->rw;
             if (!$userRw) {
                 return back()->with('error', 'Data RW Anda tidak ditemukan.');
@@ -135,6 +135,10 @@ class RwKartuKeluargaController extends Controller
                 'kabupaten_kota_penerbit' => 'nullable|string|max:255',
                 'nama_kepala_dukcapil' => 'nullable|string|max:255',
                 'nip_kepala_dukcapil' => 'nullable|string|max:255',
+            ],
+            [
+                'no_kk.unique' => 'No. KK sudah terdaftar.',
+                'no_kk.digits' => 'No. KK harus terdiri dari 16 digit.',
             ]);
 
             $validated['id_rw'] = $userRw->id;
@@ -142,10 +146,7 @@ class RwKartuKeluargaController extends Controller
             Kartu_keluarga::create($validated);
 
             return back()->with('success', 'Kartu Keluarga berhasil ditambahkan!');
-        } catch (\Exception $e) {
-            Log::error('Gagal menambahkan KK: ' . $e->getMessage());
-            return back()->with('error', 'Gagal menambahkan data KK.');
-        }
+
     }
 
     public function edit($id)
@@ -186,7 +187,7 @@ class RwKartuKeluargaController extends Controller
 
     public function update(Request $request, $id)
     {
-        try {
+
             $kk = Kartu_keluarga::findOrFail($id);
 
             $validated = $request->validate([
@@ -205,14 +206,15 @@ class RwKartuKeluargaController extends Controller
                 'kabupaten_kota_penerbit' => 'nullable|string|max:255',
                 'nama_kepala_dukcapil' => 'nullable|string|max:255',
                 'nip_kepala_dukcapil' => 'nullable|string|max:255',
+            ],
+            [
+                'no_kk.unique' => 'No. KK sudah terdaftar.',
+                'no_kk.digits' => 'No. KK harus terdiri dari 16 digit.',
             ]);
 
             $kk->update($validated);
             return back()->with('success', 'Kartu Keluarga berhasil diperbarui!');
-        } catch (\Exception $e) {
-            Log::error('Gagal update KK: ' . $e->getMessage());
-            return back()->with('error', 'Gagal memperbarui data KK.');
-        }
+
     }
 
     public function destroy($id)

@@ -104,6 +104,11 @@ class AdminWargaController extends Controller
             'alamat_domisili' => 'nullable|string',
             'tanggal_mulai_tinggal' => 'nullable|date',
             'tujuan_pindah' => 'nullable|string',
+        ],
+        [
+            'nik.unique' => 'NIK tidak boleh sama / sudah terdaftar.',
+            'nik.digits' => 'NIK harus terdiri dari 16 digit.',
+            'nik.required' => 'NIK wajib diisi.',
         ]);
 
         if ($validated['status_hubungan_dalam_keluarga'] === 'kepala keluarga') {
@@ -156,8 +161,7 @@ class AdminWargaController extends Controller
             }
         }
 
-        return redirect()->route('admin.kartu_keluarga.index')
-            ->with('success', 'Warga berhasil ditambahkan.');
+            return redirect('admin.kartu_keluarga.index')->with('success', 'Warga berhasil ditambahkan.');
     }
 
     public function edit($id)
@@ -176,6 +180,7 @@ class AdminWargaController extends Controller
 
     public function update(Request $request, $id)
     {
+
         $warga = Warga::findOrFail($id);
         $kk_lama = $warga->no_kk; 
 
@@ -211,6 +216,11 @@ class AdminWargaController extends Controller
             'alamat_domisili' => 'nullable|string',
             'tanggal_mulai_tinggal' => 'nullable|date',
             'tujuan_pindah' => 'nullable|string',
+        ],
+        [
+            'nik.unique' => 'NIK tidak boleh sama / sudah terdaftar.',
+            'nik.digits' => 'NIK harus terdiri dari 16 digit.',
+            'nik.required' => 'NIK wajib diisi.',
         ]);
 
 
@@ -283,8 +293,7 @@ class AdminWargaController extends Controller
         }
 
 
-        return redirect()->route('admin.kartu_keluarga.index')
-            ->with('success', 'Data warga berhasil diperbarui.');
+            return redirect('admin.kartu_keluarga.index')->with('success', 'Data warga berhasil diperbarui.');
     }
 
     public function destroy(Request $request, $id)
