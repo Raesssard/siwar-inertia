@@ -79,6 +79,8 @@ export default function FormKK({ kk = null, daftar_rt = [], kategori_iuran = [],
                                     value={data.no_kk}
                                     onChange={(e) => setData("no_kk", e.target.value)}
                                     className={inputBase}
+                                    required
+                                    maxLength={16}
                                 />
                                 {errors.no_kk && <p className="text-red-500 text-sm">{errors.no_kk}</p>}
                             </div>
@@ -90,6 +92,7 @@ export default function FormKK({ kk = null, daftar_rt = [], kategori_iuran = [],
                                     value={data.no_registrasi}
                                     onChange={(e) => setData("no_registrasi", e.target.value)}
                                     className={inputBase}
+                                    required
                                 />
                                 {errors.no_registrasi && (
                                     <p className="text-red-500 text-sm">{errors.no_registrasi}</p>
@@ -111,6 +114,7 @@ export default function FormKK({ kk = null, daftar_rt = [], kategori_iuran = [],
                                     value={data.id_rt}
                                     onChange={(e) => setData("id_rt", e.target.value)}
                                     className={inputBase}
+                                    required
                                 >
                                     <option value="">-- Pilih RT --</option>
                                     {daftar_rt.map((rt) => (
@@ -128,6 +132,7 @@ export default function FormKK({ kk = null, daftar_rt = [], kategori_iuran = [],
                                     value={data.kategori_iuran}
                                     onChange={(e) => setData("kategori_iuran", e.target.value)}
                                     className={inputBase}
+                                    required
                                 >
                                     <option value="">-- Pilih Kategori --</option>
 
@@ -157,6 +162,7 @@ export default function FormKK({ kk = null, daftar_rt = [], kategori_iuran = [],
                             value={data.alamat}
                             onChange={(e) => setData("alamat", e.target.value)}
                             className={`${inputBase} min-h-[100px]`}
+                            required
                         />
                         {errors.alamat && <p className="text-red-500 text-sm">{errors.alamat}</p>}
 

@@ -189,6 +189,7 @@ export default function Rw() {
                                 <th className="text-center px-3">NIK</th>
                                 <th className="text-center px-3">Nomor RW</th>
                                 <th className="text-center px-3">Nama</th>
+                                <th className="text-center px-3">Jabatan</th>
                                 <th className="text-center px-3">Mulai Menjabat</th>
                                 <th className="text-center px-3">Akhir Jabatan</th>
                                 <th className="text-center px-3">Status</th>
@@ -206,6 +207,7 @@ export default function Rw() {
                                         <td className="text-center">
                                             {item.nama_anggota_rw || "-"}
                                         </td>
+                                        <td className="text-center">Ketua</td>
                                         <td className="text-center">{item.mulai_menjabat || "-"}</td>
                                         <td className="text-center">{item.akhir_jabatan || "-"}</td>
                                         <td className="text-center align-middle">

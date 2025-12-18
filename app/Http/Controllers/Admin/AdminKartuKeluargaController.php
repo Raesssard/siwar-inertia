@@ -94,7 +94,6 @@ class AdminKartuKeluargaController extends Controller
 
     public function store(Request $request)
     {
-        try {
             $validated = $request->validate([
                 'no_kk' => 'required|digits:16|unique:kartu_keluarga,no_kk',
                 'no_registrasi' => 'required|string|max:255',
@@ -112,6 +111,10 @@ class AdminKartuKeluargaController extends Controller
                 'kabupaten_kota_penerbit' => 'nullable|string|max:255',
                 'nama_kepala_dukcapil' => 'nullable|string|max:255',
                 'nip_kepala_dukcapil' => 'nullable|string|max:255',
+            ],
+            [
+                'no_kk.unique' => 'No. KK sudah terdaftar.',
+                'no_kk.digits' => 'No. KK harus terdiri dari 16 digit.',
             ]);
 
             Log::info('Admin Data KK diterima:', $request->all());
@@ -124,10 +127,6 @@ class AdminKartuKeluargaController extends Controller
             Kartu_keluarga::create($validated);
 
             return redirect('admin.kartu_keluarga.index')->with('success', 'Kartu Keluarga berhasil ditambahkan!');
-        } catch (\Exception $e) {
-            Log::error('Admin gagal menambahkan KK: ' . $e->getMessage());
-            return back()->with('error', 'Gagal menambahkan data KK.');
-        }
     }
 
     public function edit($id)
@@ -164,7 +163,6 @@ class AdminKartuKeluargaController extends Controller
 
     public function update(Request $request, $id)
     {
-        try {
             $kk = Kartu_keluarga::findOrFail($id);
 
             $validated = $request->validate([
@@ -183,6 +181,10 @@ class AdminKartuKeluargaController extends Controller
                 'kabupaten_kota_penerbit' => 'nullable|string|max:255',
                 'nama_kepala_dukcapil' => 'nullable|string|max:255',
                 'nip_kepala_dukcapil' => 'nullable|string|max:255',
+            ],
+            [
+                'no_kk.unique' => 'No. KK sudah terdaftar.',
+                'no_kk.digits' => 'No. KK harus terdiri dari 16 digit.',
             ]);
 
             if ($request->filled('id_rt')) {
@@ -194,11 +196,7 @@ class AdminKartuKeluargaController extends Controller
 
             $kk->update($validated);
 
-            return back()->with('success', 'Kartu Keluarga berhasil diperbarui!');
-        } catch (\Exception $e) {
-            Log::error('Admin gagal update KK: ' . $e->getMessage());
-            return back()->with('error', 'Gagal memperbarui data KK.');
-        }
+            return redirect('admin.kartu_keluarga.index')->with('success', 'Kartu Keluarga berhasil diperbarui!');
     }
 
     public function destroy($id)
@@ -211,7 +209,7 @@ class AdminKartuKeluargaController extends Controller
             }
 
             $kk->delete();
-            return back()->with('success', 'Kartu Keluarga berhasil dihapus!');
+            return redirect('admin.kartu_keluarga.index')->with('success', 'Kartu Keluarga berhasil dihapus!');
         } catch (\Exception $e) {
             Log::error('Admin gagal hapus KK: ' . $e->getMessage());
             return back()->with('error', 'Gagal menghapus data KK.');
@@ -254,9 +252,9 @@ class AdminKartuKeluargaController extends Controller
         if ($kartuKeluarga->foto_kk) {
             Storage::disk('public')->delete($kartuKeluarga->foto_kk);
             $kartuKeluarga->update(['foto_kk' => null]);
-            return back()->with('success', 'Dokumen berhasil dihapus!');
+            return response()->json(['success', 'Dokumen berhasil dihapus!'], 200);
         }
 
-        return back()->with('error', 'Tidak ada dokumen untuk dihapus.');
+        return response()->json(['error' => 'Tidak ada dokumen untuk dihapus.'], 404);
     }
 }

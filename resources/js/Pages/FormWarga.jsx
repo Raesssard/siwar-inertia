@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { useForm, router, Head } from "@inertiajs/react";
 import { route } from "ziggy-js";
 import Layout from "@/Layouts/Layout";
+import { i } from "framer-motion/client";
 
 export default function FormWarga({
   warga = null,
@@ -83,17 +84,25 @@ export default function FormWarga({
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    const action = isEdit
-      ? put(route(`${baseRoute}.update`, warga.id), {
-          onSuccess: () => {
+    if (isEdit) {
+      put(route(`${baseRoute}.update`, warga.id), {
+        preserveScroll: true,
+        onSuccess: (res) => {
+          if (res.props.flash.success) {
             router.visit(route(`${kkRoute}.index`));
-          },
-        })
-      : post(route(`${baseRoute}.store`), {
-          onSuccess: () => {
+          }
+        },
+      });
+    } else {
+      post(route(`${baseRoute}.store`), {
+        preserveScroll: true,
+        onSuccess: (res) => {
+          if (res.props.flash.success) {
             router.visit(route(`${kkRoute}.index`));
-          },
-        });
+          }
+        },
+      });
+    }
   };
 
   const inputBase =
@@ -123,6 +132,8 @@ export default function FormWarga({
                   value={data.no_kk}
                   onChange={(e) => setData("no_kk", e.target.value)}
                   className={inputBase}
+                  required
+                  maxLength={16}
                 />
                 {errors.no_kk && (
                   <p className="text-red-500 text-sm">{errors.no_kk}</p>
@@ -137,6 +148,7 @@ export default function FormWarga({
                   maxLength={16}
                   onChange={(e) => setData("nik", e.target.value)}
                   className={inputBase}
+                  required
                 />
                 {errors.nik && (
                   <p className="text-red-500 text-sm">{errors.nik}</p>
@@ -145,9 +157,9 @@ export default function FormWarga({
 
               {/* Nama, tempat lahir, dll */}
               {[
-                { name: "nama", label: "Nama Lengkap", type: "text" },
+                { name: "nama", label: "Nama Lengkap", type: "text", required: true },
                 { name: "tempat_lahir", label: "Tempat Lahir", type: "text" },
-                { name: "tanggal_lahir", label: "Tanggal Lahir", type: "date" },
+                { name: "tanggal_lahir", label: "Tanggal Lahir", type: "date", required: true },
                 { name: "pendidikan", label: "Pendidikan", type: "text" },
               ].map((f) => (
                 <div key={f.name}>
@@ -174,14 +186,12 @@ export default function FormWarga({
                   required
                 >
                   <option value="">-- Pilih Agama --</option>
-                  <option value="Tak Beragama">Tak Beragama</option>
                   <option value="Islam">Islam</option>
                   <option value="Buddha">Buddha</option>
                   <option value="Hindu">Hindu</option>
                   <option value="Kong Hu Cu">Kong Hu Cu</option>
                   <option value="Kristen Katholik">Kristen Katholik</option>
                   <option value="Kristen Protestan">Kristen Protestan</option>
-                  <option value="Atheis">Atheis</option>
                 </select>
 
                 {errors.agama && (
@@ -194,6 +204,7 @@ export default function FormWarga({
                   value={data.pekerjaan}
                   onChange={(e) => setData("pekerjaan", e.target.value)}
                   className={inputBase}
+                  required
                 >
                   <option value="">Pilih pekerjaan</option>
                   <option value="pelajar/mahasiswa">Pelajar / Mahasiswa</option>
@@ -221,6 +232,7 @@ export default function FormWarga({
                   value={data.jenis_kelamin}
                   onChange={(e) => setData("jenis_kelamin", e.target.value)}
                   className={inputBase}
+                  required
                 >
                   <option value="">Pilih jenis kelamin</option>
                   <option value="laki-laki">Laki-laki</option>
@@ -267,6 +279,7 @@ export default function FormWarga({
                   value={data.kewarganegaraan}
                   onChange={(e) => setData("kewarganegaraan", e.target.value)}
                   className={inputBase}
+                  required
                 >
                   <option value="WNI">WNI</option>
                   <option value="WNA">WNA</option>
@@ -280,6 +293,7 @@ export default function FormWarga({
                   value={data.status_warga}
                   onChange={(e) => setData("status_warga", e.target.value)}
                   className={inputBase}
+                  required
                 >
                   <option value="penduduk">Penduduk</option>
                   <option value="pendatang">Pendatang</option>
@@ -302,6 +316,7 @@ export default function FormWarga({
                     setData("status_hubungan_dalam_keluarga", e.target.value)
                   }
                   className={inputBase}
+                  required
                 >
                   <option value="">Pilih hubungan</option>
                   <option value="kepala keluarga">Kepala keluarga</option>
@@ -316,7 +331,7 @@ export default function FormWarga({
                   type="text"
                   value={data.nama_ayah}
                   onChange={(e) => setData("nama_ayah", e.target.value)}
-                  className={inputBase}
+                  className={inputBase}     
                 />
               </div>
 

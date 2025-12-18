@@ -117,7 +117,13 @@ class RwWargaController extends Controller
             'alamat_domisili' => 'nullable|string',
             'tanggal_mulai_tinggal' => 'nullable|date',
             'tujuan_pindah' => 'nullable|string',
-        ]);
+        ],
+        [
+            'nik.unique' => 'NIK tidak boleh sama / sudah terdaftar.',
+            'nik.digits' => 'NIK harus terdiri dari 16 digit.',
+            'nik.required' => 'NIK wajib diisi.',
+        ]
+        );
 
         if ($validated['status_hubungan_dalam_keluarga'] === 'kepala keluarga') {
 
@@ -233,7 +239,13 @@ class RwWargaController extends Controller
             'alamat_domisili' => 'nullable|string',
             'tanggal_mulai_tinggal' => 'nullable|date',
             'tujuan_pindah' => 'nullable|string',
-        ]);
+        ],
+        [
+            'nik.unique' => 'NIK tidak boleh sama / sudah terdaftar.',
+            'nik.digits' => 'NIK harus terdiri dari 16 digit.',
+            'nik.required' => 'NIK wajib diisi.',
+        ]
+        );
 
         $kk_baru = $validated['no_kk'];
         $status_baru = $validated['status_hubungan_dalam_keluarga'];
