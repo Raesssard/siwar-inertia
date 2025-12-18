@@ -2397,6 +2397,7 @@ export function EditPengaduan({ toggle, onUpdated, onDeleted, pengaduan }) {
                                 name="file"
                                 className="d-none"
                                 onChange={handleFileChange}
+                                accept="image/*"
                             />
                             <button
                                 type="button"
@@ -2859,6 +2860,7 @@ export function TambahPengaduan({ tambahShow, onClose, onAdded }) {
                                                     name="file"
                                                     className="d-none"
                                                     onChange={handleFileChange}
+                                                    accept="image/*"
                                                 />
                                                 <button
                                                     type="button"
