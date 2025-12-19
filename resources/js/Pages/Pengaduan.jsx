@@ -332,8 +332,8 @@ export default function Pengaduan() {
                                                     </div>
                                                     <Role role="warga">
                                                         {item.nik_warga !== user.nik ? (
-                                                            <div className="text-sm text-gray-500 mb-2 d-flex gap-3">
-                                                                <span><i className="fas fa-users mr-1"></i>RT {item.warga?.kartu_keluarga?.rukun_tetangga?.rt}/RW {item.warga?.kartu_keluarga?.rw?.nomor_rw}</span>
+                                                            <div className="text-sm text-gray-500 mb-2 d-flex gap-3">{console.log(item)}
+                                                                <span><i className="fas fa-users mr-1"></i>RT {item.warga?.kartu_keluarga?.rukun_tetangga?.nomor_rt}/RW {item.warga?.kartu_keluarga?.rw?.nomor_rw}</span>
                                                             </div>
                                                         ) : ""}
                                                     </Role>

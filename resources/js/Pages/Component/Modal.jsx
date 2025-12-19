@@ -3248,7 +3248,7 @@ export function TambahEditKK({ show, onClose, dataKK = null, kategoriIuran, daft
     );
 }
 
-export function DetailKK({ selectedData, detailShow, onClose, role, userData }) {
+export function DetailKK({ selectedData, detailShow, onClose, role, userData, onUpload, hapusFoto }) {
     if (!detailShow || !selectedData) return null
 
     const [selectedFile, setSelectedFile] = useState(null)
@@ -3309,11 +3309,11 @@ export function DetailKK({ selectedData, detailShow, onClose, role, userData }) 
         formData.append("kk_file", selectedFile)
         formData.append("_method", "PUT")
 
-        axios
-            .post(`/rt/kartu_keluarga/${selectedData?.no_kk}/upload-foto`, formData)
+        axios.post(`/${role}/kartu_keluarga/${selectedData?.no_kk}/upload-foto`, formData)
             .then((res) => {
-                console.log("Upload sukses:", res.data)
-                alert("Dokumen berhasil diunggah!")
+                const foto = res.data.kartuKeluarga
+                if (onUpload) onUpload(foto)
+                Swal.fire("Sukses", "Dokumen berhasil diunggah!", "success")
             })
             .catch((err) => {
                 console.error("Upload gagal:", err.response?.data || err)
@@ -3323,17 +3323,28 @@ export function DetailKK({ selectedData, detailShow, onClose, role, userData }) 
     }
 
     const handleDelete = () => {
-        if (!window.confirm("Yakin hapus dokumen ini?")) return
-
-        axios
-            .delete(`/${role}/kartu_keluarga/${selectedData?.no_kk}/delete-foto`)
-            .then(() => {
-                alert("Dokumen berhasil dihapus!")
-            })
-            .catch((err) => {
-                console.error(err)
-                alert("Gagal menghapus dokumen!")
-            })
+        Swal.fire({
+            title: "Yakin hapus dokumen ini?",
+            text: "Dokumen akan dihapus, harap pilih dokumen KK yang baru.",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#d33",
+            cancelButtonColor: "#3085d6",
+            confirmButtonText: "Ya, hapus",
+            cancelButtonText: "Batal",
+        }).then((result) => {
+            if (result.isConfirmed) {
+                axios.delete(`/${role}/kartu_keluarga/${selectedData?.no_kk}/delete-foto`)
+                    .then((res) => {
+                        if (hapusFoto) hapusFoto(res.data.kartuKeluarga)
+                        Swal.fire('Sukses', 'Dokumen berhasil dihapus', 'success')
+                    })
+                    .catch((err) => {
+                        console.error(err)
+                        alert("Gagal menghapus dokumen!")
+                    })
+            }
+        })
     }
 
     const mobile = useIsMobile();

@@ -1,13 +1,13 @@
 import Layout from "@/Layouts/Layout"
 import { Head, Link, useForm, usePage } from "@inertiajs/react"
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import { FilterKK } from "../Component/Filter"
 import { DetailKK } from "../Component/Modal"
 import '../../../css/kk.css'
 
 export default function KartuKeluarga() {
     const {
-        kartu_keluarga,
+        kartu_keluarga: kartuKeluargaFromServer,
         total_kartu_keluarga,
         title,
     } = usePage().props
@@ -17,6 +17,7 @@ export default function KartuKeluarga() {
     const { get, data, setData } = useForm({
         search: '',
     })
+    const [kartuKeluarga, setKartuKeluarga] = useState(kartuKeluargaFromServer.data ?? [])
     const [showModal, setShowModal] = useState(false)
     const [selected, setSelected] = useState(null)
 
@@ -24,6 +25,10 @@ export default function KartuKeluarga() {
         setSelected(item)
         setShowModal(true)
     }
+
+    useEffect(() => {
+        setKartuKeluarga(kartuKeluargaFromServer.data ?? [])
+    }, [kartuKeluargaFromServer])
 
     const filter = (e) => {
         e.preventDefault()
@@ -72,8 +77,8 @@ export default function KartuKeluarga() {
                             </tr>
                         </thead>
                         <tbody>
-                            {kartu_keluarga.data.length > 0 ? (
-                                kartu_keluarga.data.map((item, index) => (
+                            {kartuKeluarga.length > 0 ? (
+                                kartuKeluarga.map((item, index) => (
                                     <tr key={item.id}>
                                         <td className="text-center">{index + 1}</td>
                                         <td className="text-center">{item.no_kk ?? '-'}</td>
@@ -101,10 +106,10 @@ export default function KartuKeluarga() {
                         </tbody>
                     </table>
                 </div>
-                {kartu_keluarga.links && (
+                {kartuKeluargaFromServer.links && (
                     <div className="pagination-container">
                         <ul className="pagination-custom">
-                            {kartu_keluarga.links.map((link, index) => {
+                            {kartuKeluargaFromServer.links.map((link, index) => {
                                 let label = link.label
                                 if (label.includes("Previous")) label = "&lt;"
                                 if (label.includes("Next")) label = "&gt;"
@@ -134,6 +139,18 @@ export default function KartuKeluarga() {
                 <DetailKK
                     selectedData={selected}
                     detailShow={showModal}
+                    onUpload={(foto) => setKartuKeluarga(prev =>
+                        prev.map(item =>
+                            item.id === foto.id ? foto : item
+                        ))}
+                    hapusFoto={(foto) =>
+                        setKartuKeluarga(prev =>
+                            prev.map(item =>
+                                item.id === foto.id
+                                    ? { ...item, foto_kk: null }
+                                    : item
+                            )
+                        )}
                     onClose={() => setShowModal(false)}
                     role={role}
                     userData={user}

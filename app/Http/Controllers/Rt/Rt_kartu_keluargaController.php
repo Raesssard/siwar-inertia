@@ -86,7 +86,15 @@ class Rt_kartu_keluargaController extends Controller
 
             return response()->json([
                 'message' => 'Dokumen Kartu Keluarga berhasil diunggah!',
-                'path' => asset('storage/' . $path)
+                'path' => asset('storage/' . $path),
+                'kartuKeluarga' => $kartuKeluarga->load([
+                    'warga.kartuKeluarga.rukunTetangga',
+                    'rukunTetangga',
+                    'rw',
+                    'warga.kartuKeluarga.rw',
+                    'kategoriGolongan',
+                    'kepalaKeluarga'
+                ])
             ]);
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::error('Upload KK error: ' . $e->getMessage());
@@ -96,14 +104,30 @@ class Rt_kartu_keluargaController extends Controller
 
     public function deleteFoto($no_kk)
     {
-        $kartuKeluarga = Kartu_keluarga::where('no_kk', $no_kk)->firstOrFail();
+        try {
+            $kartuKeluarga = Kartu_keluarga::where('no_kk', $no_kk)->firstOrFail();
 
-        if ($kartuKeluarga->foto_kk) {
-            Storage::disk('public')->delete($kartuKeluarga->foto_kk);
-            $kartuKeluarga->foto_kk = null;
-            $kartuKeluarga->save();
-            return redirect()->back()->with('success', 'Dokumen Kartu Keluarga berhasil dihapus！');
+            if ($kartuKeluarga->foto_kk) {
+                Storage::disk('public')->delete($kartuKeluarga->foto_kk);
+                $kartuKeluarga->foto_kk = null;
+                $kartuKeluarga->save();
+                return response()->json([
+                    'message' => 'Dokumen Kartu Keluarga berhasil dihapus!',
+                    'kartuKeluarga' => $kartuKeluarga->load([
+                        'warga.kartuKeluarga.rukunTetangga',
+                        'rukunTetangga',
+                        'rw',
+                        'warga.kartuKeluarga.rw',
+                        'kategoriGolongan',
+                        'kepalaKeluarga'
+                    ])
+                ]);
+            }
+
+            return redirect()->back()->with('error', 'Tidak ada dokumen untuk dihapus.');
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Upload KK error: ' . $e->getMessage());
+            return response()->json(['error' => 'Upload gagal', 'detail' => $e->getMessage()], 500);
         }
-        return redirect()->back()->with('error', 'Tidak ada dokumen untuk dihapus.');
     }
 }
