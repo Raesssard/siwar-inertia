@@ -81,6 +81,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/export/laporan-pengaduan', [ExportController::class, 'exportLaporanPengaduan'])->name('laporan-pengaduan.export');
     Route::get('/export/laporan-pengaduan-pdf', [ExportController::class, 'exportLaporanPengaduanPdf'])->name('laporan-keuangan-pdf.export');
     Route::get('/history-warga', [HistoryWargaController::class, 'index'])->name('history-warga.index');
+    Route::get('/export/kartu_keluarga', [ExportController::class, 'exportDataKK'])
+        ->middleware(CheckPermission::class . ':view.kartu_keluarga')
+        ->name('kartu_keluarga.export');
 
     /*
     |--------------------------------------------------------------------------
@@ -516,10 +519,6 @@ Route::middleware(['auth'])->group(function () {
             Route::get('kartu_keluarga/{rt_kartu_keluarga}/upload-form', [Rt_kartu_keluargaController::class, 'uploadForm'])
                 ->middleware(CheckPermission::class . ':view.kartu_keluarga')
                 ->name('kartu_keluarga.upload_form');
-
-            Route::get('/export/kartu_keluarga', [ExportController::class, 'exportDataKK'])
-                // ->middleware(CheckPermission::class . ':export.kartu_keluarga')
-                ->name('kartu_keluarga.export');
 
             // 📢 Pengumuman
             Route::resource('pengumuman', Rt_pengumumanController::class)

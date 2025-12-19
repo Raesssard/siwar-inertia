@@ -769,7 +769,28 @@ export function FilterKK({ data, setData, filter, resetFilter, role, totalKK }) 
                             maxWidth: "3rem",
                             minWidth: "3rem"
                         }}
-                        onClick={() => window.location.href = `/${role}/export/kartu_keluarga`}
+                        onClick={() => {
+                            // window.location.href = `/${role}/export/kartu_keluarga`
+
+                            axios({
+                                url: `/export/kartu_keluarga`,
+                                method: "GET",
+                                responseType: "blob"
+                            })
+                                .then((response) => {
+                                    const url = window.URL.createObjectURL(new Blob([response.data]))
+                                    const link = document.createElement("a")
+                                    link.href = url
+                                    link.setAttribute(
+                                        "download",
+                                        `laporan-kartu-keluarga.xlsx`
+                                    )
+                                    document.body.appendChild(link)
+                                    link.click()
+                                    link.remove() // bersih2
+                                })
+                                .catch((err) => console.error(err))
+                        }}
                         disabled={totalKK < 1}
                     >
                         <i className="fas fa-file-excel"></i>

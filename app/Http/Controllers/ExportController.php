@@ -24,7 +24,9 @@ class ExportController extends Controller
 {
     public function exportIuran()
     {
-        $id_rt = Auth::user()->id_rt;
+        $id_rw = Auth::user()->id_rw ?? null;
+        $id_rt = Auth::user()->id_rt ?? null;
+        $role = session('active_role');
 
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
@@ -35,9 +37,19 @@ class ExportController extends Controller
         }
 
         $row = 3;
+        if ($role === "admin") {
+        $iurans = Iuran::where('jenis', 'manual')
+            ->orderBy('tgl_tagih', 'desc')
+            ->get();
+        } elseif ($role === "rw") {
+        $iurans = Iuran::where('id_rw', $id_rw)->where('jenis', 'manual')
+            ->orderBy('tgl_tagih', 'desc')
+            ->get();
+        } else {
         $iurans = Iuran::where('id_rt', $id_rt)->where('jenis', 'manual')
             ->orderBy('tgl_tagih', 'desc')
             ->get();
+        }
         $no_urut = 1;
 
         if ($iurans->isNotEmpty()) {
@@ -72,9 +84,19 @@ class ExportController extends Controller
         }
 
         $row_otomatis = 3;
+        if ($role === "admin") {
+        $iuran_otomatis = Iuran::where('jenis', 'otomatis')
+            ->orderBy('tgl_tagih', 'desc')
+            ->get();
+        } elseif ($role === "rw") {
+        $iuran_otomatis = Iuran::where('id_rw', $id_rw)->where('jenis', 'otomatis')
+            ->orderBy('tgl_tagih', 'desc')
+            ->get();
+        } else {
         $iuran_otomatis = Iuran::where('id_rt', $id_rt)->where('jenis', 'otomatis')
             ->orderBy('tgl_tagih', 'desc')
             ->get();
+        }
         $starCol = Kategori_golongan::all();
         $no = 1;
 
@@ -96,7 +118,7 @@ class ExportController extends Controller
                 $sheet->setCellValue("I{$row_otomatis}", $no);
                 $sheet->setCellValue("J{$row_otomatis}", $iuran->nama);
 
-                $colIndex = 11; 
+                $colIndex = 11;
                 foreach ($starCol as $golongan) {
                     $col = Coordinate::stringFromColumnIndex($colIndex);
                     $nominal = $iuran->iuran_golongan->firstWhere('id_golongan', $golongan->id)->nominal ?? 0;
@@ -241,7 +263,7 @@ class ExportController extends Controller
 
     public function exportTransaksi()
     {
-        $id_rt = Auth::user()->id_rt;
+        $id_rt = Auth::user()->id_rt ?? null;
 
         $rowStart = 3;
         $spreadsheet = new Spreadsheet();
@@ -341,7 +363,9 @@ class ExportController extends Controller
 
     public function exportDataWarga()
     {
-        $id_rt = Auth::user()->id_rt;
+        $id_rw = Auth::user()->id_rw ?? null;
+        $id_rt = Auth::user()->id_rt ?? null;
+        $role = session('active_role');
 
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
@@ -362,9 +386,17 @@ class ExportController extends Controller
         }
 
         $row = 4;
+        if ($role === "admin") {
+        $dataWarga = Warga::all();
+        } elseif ($role === "rw") {
+        $dataWarga = Warga::whereHas('kartuKeluarga', function ($warga) use ($id_rw) {
+            $warga->where('id_rw', $id_rw);
+        })->get();
+        } else {
         $dataWarga = Warga::whereHas('kartuKeluarga', function ($warga) use ($id_rt) {
             $warga->where('id_rt', $id_rt);
         })->get();
+        }
         $no_urut = 1;
 
         if ($dataWarga->isNotEmpty()) {
@@ -462,7 +494,9 @@ class ExportController extends Controller
 
     public function exportDataKK()
     {
-        $id_rt = Auth::user()->id_rt;
+        $id_rw = Auth::user()->id_rw ?? null;
+        $id_rt = Auth::user()->id_rt ?? null;
+        $role = session('active_role');
 
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
@@ -483,7 +517,13 @@ class ExportController extends Controller
         }
 
         $row = 3;
-        $dataKK = Kartu_keluarga::where('id_rt', $id_rt)->get();
+        if ($role === "admin") {
+            $dataKK = Kartu_keluarga::all();
+        } elseif ($role === "rw") {
+            $dataKK = Kartu_keluarga::where('id_rw', $id_rw)->get();
+        } else {
+            $dataKK = Kartu_keluarga::where('id_rt', $id_rt)->get();
+        }
         $no_urut = 1;
 
         if ($dataKK->isNotEmpty()) {
@@ -880,8 +920,8 @@ class ExportController extends Controller
 
         Log::info('nama bulan yg didapet', [$namaBulan]);
 
-$nomor_rt = null;
-$nomor_rw = null;
+        $nomor_rt = null;
+        $nomor_rw = null;
 
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
@@ -1058,8 +1098,8 @@ $nomor_rw = null;
 
         Log::info('nama bulan yg didapet', [$namaBulan]);
 
-$nomor_rt = null;
-$nomor_rw = null;
+        $nomor_rt = null;
+        $nomor_rw = null;
 
         if ($currentRole === 'admin') {
             $pengaduan = Pengaduan::with(['warga'])

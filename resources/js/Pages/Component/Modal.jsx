@@ -1686,10 +1686,10 @@ export function DetailPengaduan({ selectedData, detailShow, onClose, onUpdated, 
                                                         <i className="far fa-edit"></i>
                                                     </button>
                                                 </div>
-                                            ) : (role.includes('rt') || role.includes('rw')) ? (
+                                            ) : (role.includes('rt') || role.includes('rw') || role.includes('admin')) ? (
                                                 <div className="d-flex justify-between">
                                                     <h5 className="fw-bold mb-1 mt-2">{selectedData.judul}</h5>
-                                                    <Role role={selectedData.level === 'rt' ? ["rt", "rw", "sekretaris"] : ["rw", "sekretaris"]}>
+                                                    <Role role={selectedData.level === 'rt' ? ["rt", "rw", "sekretaris", "admin"] : ["rw", "sekretaris", "admin"]}>
                                                         {/* {(selectedData.konfirmasi_rw === 'sudah') && ( */}
                                                         <input type="checkbox"
                                                             name="selesai"
