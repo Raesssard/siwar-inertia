@@ -32,10 +32,6 @@ class RwPengaduanController extends Controller
             ->whereHas('warga.kartuKeluarga.rw', function ($q) use ($nomorRwUser) {
                 $q->where('nomor_rw', $nomorRwUser);
             })
-            ->where(function ($q) {
-                $q->where('konfirmasi_rw', 'menunggu')
-                    ->orWhere('konfirmasi_rw', 'sudah');
-            })
             ->with([
                 'warga',
                 'komentar.user',

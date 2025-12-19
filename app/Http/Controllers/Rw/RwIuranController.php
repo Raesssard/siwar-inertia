@@ -191,28 +191,49 @@ class RwIuranController extends Controller
         }
     }
 
-    public function update(Request $request, string $id)
+    public function update(Request $request, string $id, $jenis)
     {
-        $iuranGol = IuranGolongan::findOrFail($id);
+        try {
+            if ($jenis === 'otomatis') {
+                $iuranGol = IuranGolongan::findOrFail($id);
 
-        $request->validate([
-            'nominal' => 'required|numeric|min:0|max:99999999',
-            'periode' => 'required|numeric|min:0|max:12',
-        ]);
+                $request->validate([
+                    'nominal' => 'required|numeric|min:0|max:99999999',
+                    'periode' => 'required|numeric|min:0|max:12',
+                ]);
 
-        $iuranGol->update([
-            'nominal' => $request->nominal,
-            'periode' => $request->periode,
-        ]);
+                $iuranGol->update([
+                    'nominal' => $request->nominal,
+                    'periode' => $request->periode,
+                ]);
 
-        $iuran = Iuran::findOrFail($iuranGol->id_iuran);
-        $iuran->load(['iuran_golongan', 'iuran_golongan.golongan']);
+                $iuran = Iuran::findOrFail($iuranGol->id_iuran);
+            } elseif ($jenis === 'manual') {
+                $iuran = Iuran::findOrFail($id);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Iuran RW berhasil diperbarui.',
-            'iuran' => $iuran,
-        ]);
+                $request->validate([
+                    'nominal' => 'required|numeric|min:0|max:99999999',
+                ]);
+
+                $iuran->update([
+                    'nominal' => $request->nominal,
+                ]);
+            }
+
+            $iuran->load(['iuran_golongan', 'iuran_golongan.golongan']);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Iuran berhasil diedit.',
+                'iuran' => $iuran
+            ]);
+        } catch (\Exception $e) {
+            Log::error("Gagal update iuran: " . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan: ' . $e->getMessage(),
+            ], 500);
+        }
     }
 
     public function destroy(string $id, $jenis)

@@ -2084,7 +2084,7 @@ export function EditPengaduan({ toggle, onUpdated, onDeleted, pengaduan }) {
     const { data, setData } = useForm({
         judul: pengaduan.judul || "",
         isi: pengaduan.isi || "",
-        level: pengaduan.level || "",
+        level: pengaduan.level || "rt",
         file: null,
     }, { forceFormData: true })
     const [preview, setPreview] = useState({
@@ -2142,7 +2142,17 @@ export function EditPengaduan({ toggle, onUpdated, onDeleted, pengaduan }) {
             if (e.key === "Escape") toggle()
         }
         document.addEventListener("keydown", handleEsc)
+        if (pengaduan) {
+            setData({
+                judul: pengaduan.judul || "",
+                isi: pengaduan.isi || "",
+                level: pengaduan.level || "rt",
+                file: null,
+            })
+        }
+
         return () => document.removeEventListener("keydown", handleEsc)
+
     }, [toggle])
 
     const handleFileChange = (e) => {
@@ -2176,7 +2186,7 @@ export function EditPengaduan({ toggle, onUpdated, onDeleted, pengaduan }) {
         const formData = new FormData()
         formData.append('judul', data.judul)
         formData.append('isi', data.isi)
-        formData.append('level', data.level)
+        formData.append('level', "rt")
         if (data.file) formData.append('file', data.file)
         formData.append('_method', 'PUT')
 
@@ -2372,7 +2382,7 @@ export function EditPengaduan({ toggle, onUpdated, onDeleted, pengaduan }) {
                             ></textarea>
                         </div>
 
-                        <div className="mb-2">
+                        {/* <div className="mb-2">
                             <label className="form-label">Tujuan Pengaduan: </label>
                             <select
                                 name="level"
@@ -2388,7 +2398,7 @@ export function EditPengaduan({ toggle, onUpdated, onDeleted, pengaduan }) {
                                 <option value="rt">RT</option>
                                 <option value="rw">RW</option>
                             </select>
-                        </div>
+                        </div> */}
 
                         <div className="mb-2">
                             <input
@@ -2556,7 +2566,7 @@ export function TambahPengaduan({ tambahShow, onClose, onAdded }) {
     const { data, setData, put, processing, errors } = useForm({
         judul: "",
         isi: "",
-        level: "",
+        level: "rt",
         file: null,
     }, { forceFormData: true })
 
@@ -2609,7 +2619,7 @@ export function TambahPengaduan({ tambahShow, onClose, onAdded }) {
         const formData = new FormData()
         formData.append('judul', data.judul)
         formData.append('isi', data.isi)
-        formData.append('level', data.level)
+        formData.append('level', "rt")
         if (data.file) formData.append('file', data.file)
 
         axios.post('/warga/pengaduan', formData)
@@ -2620,7 +2630,7 @@ export function TambahPengaduan({ tambahShow, onClose, onAdded }) {
                 setData({
                     judul: "",
                     isi: "",
-                    level: "",
+                    level: "rt",
                     file: null,
                 })
                 setPreviewUrl(null)
@@ -2833,7 +2843,7 @@ export function TambahPengaduan({ tambahShow, onClose, onAdded }) {
                                                 ></textarea>
                                             </div>
 
-                                            <div className="mb-2">
+                                            {/* <div className="mb-2">
                                                 <label className="form-label">Tujuan Pengaduan: </label>
                                                 <select
                                                     name="level"
@@ -2850,7 +2860,7 @@ export function TambahPengaduan({ tambahShow, onClose, onAdded }) {
                                                     <option value="rt">RT</option>
                                                     <option value="rw">RW</option>
                                                 </select>
-                                            </div>
+                                            </div> */}
 
                                             <div className="mb-2">
                                                 <input
@@ -4263,7 +4273,7 @@ export function DetailPengumuman({ kategori, selectedData, detailShow, onClose, 
                                             : selectedData?.dokumen_path
                                                 ? { maxWidth: "50%" }
                                                 : { maxWidth: "100%" }}>
-                                        <div className="p-3 border-bottom caption-section">
+                                        <div className="p-3">
                                             {(isMobile && !selectedData?.dokumen_path) && (
                                                 <div className="d-flex justify-content-end w-100">
                                                     <button
@@ -6630,8 +6640,7 @@ export function TambahTagihan({ tambahShow, onClose, onUpdated, role, iuran, kk_
         const selected = iuran.find((item) => item.id == data.id_iuran)
         if (selected) {
             const kkFinder = kk_list.filter(kk => kk.rw.id === selected.id)
-            console.log(kkFinder)
-            console.log(kkList)
+
             setKkList(kkFinder)
             setData((prev) => ({
                 ...prev,
@@ -6763,7 +6772,7 @@ export function TambahTagihan({ tambahShow, onClose, onUpdated, role, iuran, kk_
                                             </select> */}
                                             </div>
 
-                                            <label className="form-label">Nomor Kartu Keluarga</label>{console.log(kkList?.length)}
+                                            <label className="form-label">Nomor Kartu Keluarga</label>
                                             <Select
                                                 options={
                                                     kkList?.length ? [

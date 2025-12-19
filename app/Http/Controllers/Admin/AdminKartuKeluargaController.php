@@ -126,7 +126,7 @@ class AdminKartuKeluargaController extends Controller
 
             Kartu_keluarga::create($validated);
 
-            return redirect('admin.kartu_keluarga.index')->with('success', 'Kartu Keluarga berhasil ditambahkan!');
+            return back()->with('success', 'Kartu Keluarga berhasil ditambahkan!');
     }
 
     public function edit($id)
@@ -196,7 +196,7 @@ class AdminKartuKeluargaController extends Controller
 
             $kk->update($validated);
 
-            return redirect('admin.kartu_keluarga.index')->with('success', 'Kartu Keluarga berhasil diperbarui!');
+            return back()->with('success', 'Kartu Keluarga berhasil diperbarui!');
     }
 
     public function destroy($id)

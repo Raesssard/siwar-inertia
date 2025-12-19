@@ -220,7 +220,10 @@ Route::middleware(['auth'])->group(function () {
                 ->name('transaksi.export');
 
             Route::resource('iuran', AdminIuranController::class)
-                ->except(['destroy'])
+                ->except(['destroy', 'update'])
+                ->middleware(CheckPermission::class . ':view.iuran');
+
+            Route::put('iuran/{id}/{jenis}', [AdminIuranController::class, 'update'])
                 ->middleware(CheckPermission::class . ':view.iuran');
 
             Route::delete('iuran/{id}/{jenis}', [AdminIuranController::class, 'destroy'])
@@ -400,7 +403,10 @@ Route::middleware(['auth'])->group(function () {
 
             // 💰 Iuran
             Route::resource('iuran', RwIuranController::class)
-                ->except(['destroy'])
+                ->except(['destroy', 'update'])
+                ->middleware(CheckPermission::class . ':view.iuran');
+
+            Route::put('iuran/{id}/{jenis}', [RwIuranController::class, 'update'])
                 ->middleware(CheckPermission::class . ':view.iuran');
 
             Route::delete('iuran/{id}/{jenis}', [RwIuranController::class, 'destroy'])
