@@ -136,13 +136,13 @@ export default function LaporanKeuangan() {
                 const url = window.URL.createObjectURL(new Blob([response.data]))
                 const link = document.createElement("a")
                 link.href = url
-                link.setAttribute(
-                    "download",
-                    `laporan-keuangan-${role === 'rt'
-                        ? `rt${user.rukun_tetangga.nomor_rt}-rw${user.rw.nomor_rw}`
-                        : `rw${user.rw.nomor_rw}`
-                    }-${nama_bulan}-${data.tahun}.xlsx`
-                )
+                const fileName =
+                    role === 'admin'
+                        ? 'laporan-keuangan-semua-rw'
+                        : role === 'rt'
+                            ? `laporan-keuangan-rt${user?.rukun_tetangga?.nomor_rt}-rw${user?.rw?.nomor_rw}`
+                            : `laporan-keuangan-rw${user?.rw?.nomor_rw}`;
+                link.setAttribute("download", `${fileName}.xlsx`);
                 document.body.appendChild(link)
                 link.click()
                 link.remove() // bersih2
@@ -168,13 +168,13 @@ export default function LaporanKeuangan() {
                 const url = window.URL.createObjectURL(new Blob([response.data]))
                 const link = document.createElement("a")
                 link.href = url
-                link.setAttribute(
-                    "download",
-                    `laporan-keuangan-${role === 'rt'
-                        ? `rt${user.rukun_tetangga.nomor_rt}-rw${user.rw.nomor_rw}`
-                        : `rw${user.rw.nomor_rw}`
-                    }-${nama_bulan}-${data.tahun}.pdf`
-                )
+                const fileName =
+                    role === 'admin'
+                        ? 'laporan-keuangan-semua-rw'
+                        : role === 'rt'
+                            ? `laporan-keuangan-rt${user?.rukun_tetangga?.nomor_rt}-rw${user?.rw?.nomor_rw}`
+                            : `laporan-keuangan-rw${user?.rw?.nomor_rw}`;
+                link.setAttribute("download", `${fileName}.pdf`);
                 document.body.appendChild(link)
                 link.click()
                 link.remove() // bersih2
