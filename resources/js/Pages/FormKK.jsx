@@ -105,11 +105,11 @@ export default function FormKK({ kk = null, daftar_rt = [], kategori_iuran = [],
                                     onChange={(e) => setData("no_registrasi", e.target.value)}
                                     className={inputBase}
                                     required
-                                    maxLength={'16'}
+                                    maxLength={16}
                                 />
-                                {errors.no_registrasi && (
+                                {errors.no_registrasi && 
                                     <p className="text-red-500 text-sm">{errors.no_registrasi}</p>
-                                )}
+                                }
                             </div>
                         </div>
                     </section>

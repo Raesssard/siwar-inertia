@@ -96,7 +96,7 @@ class AdminKartuKeluargaController extends Controller
     {
             $validated = $request->validate([
                 'no_kk' => 'required|digits:16|unique:kartu_keluarga,no_kk',
-                'no_registrasi' => 'required|string|max:255',
+                'no_registrasi' => 'required|string|max:255|unique:kartu_keluarga,no_registrasi',
                 'alamat' => 'required|string',
                 'id_rt' => 'nullable|exists:rt,id',
                 'id_rw' => 'nullable|exists:rw,id',
@@ -115,6 +115,8 @@ class AdminKartuKeluargaController extends Controller
             [
                 'no_kk.unique' => 'No. KK sudah terdaftar.',
                 'no_kk.digits' => 'No. KK harus terdiri dari 16 digit.',
+                'no_registrasi.required' => 'No. Registrasi wajib diisi.',
+                'no_registrasi.unique' => 'No. Registrasi sudah terdaftar.',
             ]);
 
             Log::info('Admin Data KK diterima:', $request->all());
@@ -167,7 +169,7 @@ class AdminKartuKeluargaController extends Controller
 
             $validated = $request->validate([
                 'no_kk' => 'required|digits:16|unique:kartu_keluarga,no_kk,' . $kk->id,
-                'no_registrasi' => 'required|string|max:255',
+                'no_registrasi' => 'required|string|max:255|unique:kartu_keluarga,no_registrasi,' . $kk->id,
                 'alamat' => 'required|string',
                 'id_rt' => 'nullable|exists:rt,id',
                 'kelurahan' => 'required|string|max:255',
@@ -185,6 +187,8 @@ class AdminKartuKeluargaController extends Controller
             [
                 'no_kk.unique' => 'No. KK sudah terdaftar.',
                 'no_kk.digits' => 'No. KK harus terdiri dari 16 digit.',
+                'no_registrasi.required' => 'No. Registrasi wajib diisi.',
+                'no_registrasi.unique' => 'No. Registrasi sudah terdaftar.',
             ]);
 
             if ($request->filled('id_rt')) {
