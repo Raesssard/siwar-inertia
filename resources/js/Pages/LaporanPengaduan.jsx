@@ -68,13 +68,15 @@ export default function InformasiPengaduan() {
                 const url = window.URL.createObjectURL(new Blob([response.data]))
                 const link = document.createElement("a")
                 link.href = url
-                link.setAttribute(
-                    "download",
-                    `laporan-pengaduan-${role === 'rt'
-                        ? `rt${user.rukun_tetangga.nomor_rt}-rw${user.rw.nomor_rw}`
-                        : `rw${user.rw.nomor_rw}`
-                    }.xlsx`
-                )
+                const fileName =
+                    role === 'admin'
+                        ? 'laporan-pengaduan-semua-rw'
+                        : role === 'rt'
+                            ? `laporan-pengaduan-rt${user?.rukun_tetangga?.nomor_rt}-rw${user?.rw?.nomor_rw}`
+                            : `laporan-pengaduan-rw${user?.rw?.nomor_rw}`;
+
+                link.setAttribute("download", `${fileName}.xlsx`);
+
                 document.body.appendChild(link)
                 link.click()
                 link.remove() // bersih2
@@ -107,13 +109,15 @@ export default function InformasiPengaduan() {
                 const url = window.URL.createObjectURL(new Blob([response.data]))
                 const link = document.createElement("a")
                 link.href = url
-                link.setAttribute(
-                    "download",
-                    `laporan-pengaduan-${role === 'rt'
-                        ? `rt${user.rukun_tetangga.nomor_rt}-rw${user.rw.nomor_rw}`
-                        : `rw${user.rw.nomor_rw}`
-                    }.pdf`
-                )
+                const fileName =
+                    role === 'admin'
+                        ? 'laporan-pengaduan-semua-rw'
+                        : role === 'rt'
+                            ? `laporan-pengaduan-rt${user?.rukun_tetangga?.nomor_rt}-rw${user?.rw?.nomor_rw}`
+                            : `laporan-pengaduan-rw${user?.rw?.nomor_rw}`;
+
+                link.setAttribute("download", `${fileName}.pdf`);
+
                 document.body.appendChild(link)
                 link.click()
                 link.remove() // bersih2

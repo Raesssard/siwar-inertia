@@ -599,6 +599,13 @@ class ExportController extends Controller
         $no = 1;
         $row = 4;
 
+        if ($currentRole === 'admin') {
+            $transaksi = Transaksi::query()
+                ->when($tahun, fn($q) => $q->whereYear('tanggal', $tahun))
+                ->when($bulan, fn($q) => $q->whereMonth('tanggal', $bulan))
+                ->orderBy('tanggal', 'desc');
+        }
+
         if ($currentRole === 'rw') {
             $transaksi = Transaksi::where(function ($query) use ($idRw) {
                 $query->where(function ($q) use ($idRw) {
@@ -653,7 +660,13 @@ class ExportController extends Controller
 
         $allTransaksi = (clone $transaksi)->get();
 
-        $sheet->setCellValue('B1', "Laporan Pemasukan dan Pengeluaran " . ($currentRole === 'rt' ? "RT {$nomor_rt}/RW {$nomor_rw}" : "RW {$nomor_rw}"));
+        $judul = match ($currentRole) {
+            'admin' => 'Laporan Pemasukan dan Pengeluaran (Semua RW)',
+            'rt'    => "Laporan Pemasukan dan Pengeluaran RT {$nomor_rt}/RW {$nomor_rw}",
+            'rw'    => "Laporan Pemasukan dan Pengeluaran RW {$nomor_rw}",
+        };
+
+        $sheet->setCellValue('B1', $judul);
         $sheet->mergeCells('B1:F1');
         $sheet->setCellValue('B2', "Periode {$namaBulan} {$tahun}");
         $sheet->mergeCells('B2:F2');
@@ -709,7 +722,11 @@ class ExportController extends Controller
         $formatBulan = strtolower($namaBulan);
 
         $writer = new Xlsx($spreadsheet);
-        $filename = "laporan_keuangan_" . ($currentRole === 'rt' ? "rt{$nomor_rt}/rw{$nomor_rw}" : "rw{$nomor_rw}") . "_{$formatBulan}_{$tahun}.xlsx";
+        $filename = match ($currentRole) {
+            'admin' => "laporan-keuangan-semua-rw-{$formatBulan}-{$tahun}.xlsx",
+            'rt'    => "laporan-keuangan-rt{$nomor_rt}-rw{$nomor_rw}-{$formatBulan}-{$tahun}.xlsx",
+            'rw'    => "laporan-keuangan-rw{$nomor_rw}-{$formatBulan}-{$tahun}.xlsx",
+        };
 
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         header("Content-Disposition: attachment; filename=\"$filename\"");
@@ -745,6 +762,13 @@ class ExportController extends Controller
 
         $nomor_rt = Auth::user()->rukunTetangga->nomor_rt ?? null;
         $nomor_rw = Auth::user()->rw->nomor_rw ?? null;
+
+        if ($currentRole === 'admin') {
+            $transaksi = Transaksi::query()
+                ->when($tahun, fn($q) => $q->whereYear('tanggal', $tahun))
+                ->when($bulan, fn($q) => $q->whereMonth('tanggal', $bulan))
+                ->orderBy('tanggal', 'desc');
+        }
 
         if ($currentRole === 'rw') {
             $transaksi = Transaksi::where(function ($query) use ($idRw) {
@@ -856,8 +880,8 @@ class ExportController extends Controller
 
         Log::info('nama bulan yg didapet', [$namaBulan]);
 
-        $nomor_rt = Auth::user()->rukunTetangga->nomor_rt ?? null;
-        $nomor_rw = Auth::user()->rw->nomor_rw ?? null;
+$nomor_rt = null;
+$nomor_rw = null;
 
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
@@ -878,7 +902,18 @@ class ExportController extends Controller
         $no = 1;
         $row = 4;
 
+        if ($currentRole === 'admin') {
+            $pengaduan = Pengaduan::with(['warga'])
+                ->when($search, fn($q) => $q->where('judul', 'like', "%$search%"))
+                ->when($tahun, fn($q) => $q->whereYear('created_at', $tahun))
+                ->when($bulan, fn($q) => $q->whereMonth('created_at', $bulan))
+                ->when($kategori, fn($q) => $q->where('level', $kategori))
+                ->when($status, fn($q) => $q->where('status', $status))
+                ->orderBy('created_at', 'desc');
+        }
+
         if ($currentRole === 'rw') {
+            $nomor_rw = Auth::user()->rw->nomor_rw;
             $pengaduan = Pengaduan::with(['warga'])->where(function ($query) use ($idRw) {
                 $query->where(function ($q) use ($idRw) {
                     $q->where('level', 'rw')
@@ -900,6 +935,8 @@ class ExportController extends Controller
         }
 
         if ($currentRole === 'rt') {
+            $nomor_rt = Auth::user()->rukunTetangga->nomor_rt;
+            $nomor_rw = Auth::user()->rukunTetangga->rw->nomor_rw;
             $pengaduan = Pengaduan::with(['warga'])->where(function ($query) use ($idRt) {
                 $query->where(function ($q) use ($idRt) {
                     $q->where('level', 'rt')
@@ -917,7 +954,14 @@ class ExportController extends Controller
 
         $allPengaduan = (clone $pengaduan)->get();
 
-        $sheet->setCellValue('B1', "Laporan Pengaduan " . ($currentRole === 'rt' ? "RT {$nomor_rt}/RW {$nomor_rw}" : "RW {$nomor_rw}"));
+        $judul = match ($currentRole) {
+            'admin' => 'Laporan Pengaduan (Semua RW)',
+            'rt'    => "Laporan Pengaduan RT {$nomor_rt}/RW {$nomor_rw}",
+            'rw'    => "Laporan Pengaduan RW {$nomor_rw}",
+        };
+
+        $sheet->setCellValue('B1', $judul);
+
         $sheet->mergeCells('B1:G1');
         $sheet->setCellValue('B2', "{$namaBulan} {$tahun}");
         $sheet->mergeCells('B2:G2');
@@ -969,7 +1013,11 @@ class ExportController extends Controller
         $formatBulan = strtolower($namaBulan);
 
         $writer = new Xlsx($spreadsheet);
-        $filename = "laporan-pengaduan-" . ($currentRole === 'rt' ? "rt{$nomor_rt}/rw{$nomor_rw}" : "rw{$nomor_rw}") . "-{$formatBulan}-{$tahun}.xlsx";
+        $filename = match ($currentRole) {
+            'admin' => "laporan-pengaduan-semua-rw-{$formatBulan}-{$tahun}.xlsx",
+            'rt'    => "laporan-pengaduan-rt{$nomor_rt}-rw{$nomor_rw}-{$formatBulan}-{$tahun}.xlsx",
+            'rw'    => "laporan-pengaduan-rw{$nomor_rw}-{$formatBulan}-{$tahun}.xlsx",
+        };
 
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         header("Content-Disposition: attachment; filename=\"$filename\"");
@@ -1010,10 +1058,21 @@ class ExportController extends Controller
 
         Log::info('nama bulan yg didapet', [$namaBulan]);
 
-        $nomor_rt = Auth::user()->rukunTetangga->nomor_rt ?? null;
-        $nomor_rw = Auth::user()->rw->nomor_rw ?? null;
+$nomor_rt = null;
+$nomor_rw = null;
+
+        if ($currentRole === 'admin') {
+            $pengaduan = Pengaduan::with(['warga'])
+                ->when($search, fn($q) => $q->where('judul', 'like', "%$search%"))
+                ->when($tahun, fn($q) => $q->whereYear('created_at', $tahun))
+                ->when($bulan, fn($q) => $q->whereMonth('created_at', $bulan))
+                ->when($kategori, fn($q) => $q->where('level', $kategori))
+                ->when($status, fn($q) => $q->where('status', $status))
+                ->orderBy('created_at', 'desc');
+        }
 
         if ($currentRole === 'rw') {
+            $nomor_rw = Auth::user()->rw->nomor_rw;
             $pengaduan = Pengaduan::with(['warga'])->where(function ($query) use ($idRw) {
                 $query->where(function ($q) use ($idRw) {
                     $q->where('level', 'rw')
@@ -1035,6 +1094,8 @@ class ExportController extends Controller
         }
 
         if ($currentRole === 'rt') {
+            $nomor_rt = Auth::user()->rukunTetangga->nomor_rt;
+            $nomor_rw = Auth::user()->rukunTetangga->rw->nomor_rw;
             $pengaduan = Pengaduan::with(['warga'])->where(function ($query) use ($idRt) {
                 $query->where(function ($q) use ($idRt) {
                     $q->where('level', 'rt')
