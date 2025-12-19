@@ -14,6 +14,7 @@ use Dompdf\Dompdf;
 use Dompdf\Options;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\View;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class AdminPengumumanController extends Controller
 {
@@ -201,24 +202,59 @@ class AdminPengumumanController extends Controller
 
     public function exportPDF($id)
     {
-        $pengumuman = Pengumuman::findOrFail($id);
+        $data = Pengumuman::with(['rukunTetangga', 'rw.kartuKeluarga'])->findOrFail($id);
 
-        $html = View::make('rt.pengumuman.komponen.export_pengumuman', compact('pengumuman'))->render();
+        /** @var User $user */
+        $user = Auth::user();
+        $role = session('active_role') ?? $user->getRoleNames()->first();
 
-        $options = new Options();
-        $options->set('isHtml5ParserEnabled', true);
-        $options->set('isRemoteEnabled', true);
+        $rt = $data->rukunTetangga; // bisa null
+        $rw = $data->rw;            // wajib ada
 
-        $dompdf = new Dompdf($options);
-        $dompdf->loadHtml($html);
-        $dompdf->setPaper('A4', 'portrait');
-        $dompdf->render();
+        // nomor RT & RW
+        $rtNumber = $rt ? str_pad($rt->nomor_rt, 2, '0', STR_PAD_LEFT) : null;
+        $rwNumber = str_pad($rw->nomor_rw, 2, '0', STR_PAD_LEFT);
 
-        $filename = 'Pengumuman '.$pengumuman->judul.'.pdf';
+        // nomor surat
+        $bulanRomawi = [1=>"I","II","III","IV","V","VI","VII","VIII","IX","X","XI","XII"];
+        $bulan = $bulanRomawi[now()->month];
+        $tahun = now()->year;
+        $urut  = str_pad($data->id, 3, '0', STR_PAD_LEFT);
 
-        return response($dompdf->output(), 200)
-            ->header('Content-Type', 'application/pdf')
-            ->header('Content-Disposition', "attachment; filename=\"{$filename}\"");
+        $no_surat = $rt
+            ? "$urut/RT$rtNumber/$bulan/$tahun"
+            : "$urut/RW$rwNumber/$bulan/$tahun";
+
+        // tanggal
+        $hari    = Carbon::parse($data->tanggal)->translatedFormat('l');
+        $tanggal = Carbon::parse($data->tanggal)->translatedFormat('d F Y');
+        $waktu   = Carbon::parse($data->tanggal)->format('H:i');
+
+        // kartu keluarga (AMAN untuk admin)
+        $kk = $data->rw->kartuKeluarga
+            ->where('no_kk', $rt?->no_kk ?? $rw->no_kk)
+            ->first();
+
+        $pdf = Pdf::loadView('rt.export-pengumuman', [
+            'rt' => $rt?->nomor_rt,
+            'rw' => $rw->nomor_rw,
+            'nama_desa' => 'Nama Desa',
+            'kelurahan' => $kk?->kelurahan,
+            'kecamatan' => $kk?->kecamatan,
+            'kabupaten' => $kk?->kabupaten,
+            'nomor_surat' => $no_surat,
+            'hari' => $hari,
+            'tanggal' => $tanggal,
+            'waktu' => $waktu,
+            'tempat' => $data->tempat,
+            'isi_pengumuman' => $data->isi,
+            'tanggal_surat' => now()->translatedFormat('d F Y'),
+            'nama_penanggung_jawab' => $user->nama,
+            'penanggung_jawab' => ucfirst($role),
+            'judul' => $data->judul,
+        ]);
+
+        return $pdf->download("Surat_Pengumuman_{$data->judul}.pdf");
     }
 
     public function komen(Request $request, $id)
