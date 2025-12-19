@@ -695,7 +695,28 @@ export function FilterWarga({ data, setData, filter, resetFilter, role, total_wa
                         type="button"
                         title={total_warga < 1 ? "Tidak ada data warga yang dapat diexport" : "Export data warga ke Excel"}
                         style={{ borderRadius: "0.2rem" }}
-                        onClick={() => window.location.href = `/${role}/export/warga`}
+                        onClick={() => {
+                            // window.location.href = `/${role}/export/warga`
+
+                            axios({
+                                url: `/${role}/export/warga`,
+                                method: "GET",
+                                responseType: "blob"
+                            })
+                                .then((response) => {
+                                    const url = window.URL.createObjectURL(new Blob([response.data]))
+                                    const link = document.createElement("a")
+                                    link.href = url
+                                    link.setAttribute(
+                                        "download",
+                                        `laporan-warga.xlsx`
+                                    )
+                                    document.body.appendChild(link)
+                                    link.click()
+                                    link.remove() // bersih2
+                                })
+                                .catch((err) => console.error(err))
+                        }}
                         disabled={total_warga < 1}
                     >
                         <i className="fas fa-file-excel"></i>

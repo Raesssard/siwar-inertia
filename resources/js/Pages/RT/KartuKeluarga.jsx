@@ -78,7 +78,7 @@ export default function KartuKeluarga() {
                                         <td className="text-center">{index + 1}</td>
                                         <td className="text-center">{item.no_kk ?? '-'}</td>
                                         <td className="text-center">
-                                            {item.kepala_keluarga.nama ?? '-'}
+                                            {item.kepala_keluarga?.nama ?? '-'}
                                         </td>
                                         <td className="text-center">{item.alamat ?? '-'}</td>
                                         <td className="text-center">{item.rukun_tetangga?.nomor_rt ?? '-'}</td>

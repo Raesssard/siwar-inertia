@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\View;
 use Dompdf\Dompdf;
 use Dompdf\Options;
+use Illuminate\Support\Facades\Log;
 
 class RwPengumumanController extends Controller
 {
@@ -202,7 +203,7 @@ class RwPengumumanController extends Controller
 
     public function exportPDF($id)
     {
-        $data = Pengumuman::with(['rukunTetangga', 'rw.kartuKeluarga'])->findOrFail($id);
+        $data = Pengumuman::with(['rukunTetangga.kartuKeluarga', 'rw.kartuKeluarga'])->findOrFail($id);
 
         /** @var User $user */
         $user = Auth::user();
@@ -228,15 +229,23 @@ class RwPengumumanController extends Controller
         $waktu  = Carbon::parse($data->tanggal)->format('H:i');
         $judul = $data->judul;
 
-        $kk = $data->rw->kartuKeluarga->where('no_kk', $role === 'rw' ? $rw->no_kk : $rt->no_kk)->first();
+        $kkRt = $data->rukunTetangga?->kartuKeluarga
+            ?->where('no_kk', $rt?->no_kk)
+            ?->first();
+
+        $kkRw = $data->rw?->kartuKeluarga
+            ?->where('no_kk', $rw?->no_kk)
+            ?->first();
+
+        $wilayah = $role === 'rt' ? $kkRt : $kkRw;
 
         $pdf = Pdf::loadView('rt.export-pengumuman', [
-            'rt' => $data->rukunTetangga->nomor_rt ?? null,
+            'rt' => $data->rukunTetangga?->nomor_rt,
             'rw' => $data->rw->nomor_rw,
             'nama_desa' => 'Nama Desa',
-            'kelurahan' => $kk->kelurahan,
-            'kecamatan' => $kk->kecamatan,
-            'kabupaten' => $kk->kabupaten,
+            'kelurahan' => $wilayah?->kelurahan,
+            'kecamatan' => $wilayah?->kecamatan,
+            'kabupaten' => $wilayah?->kabupaten,
             'nomor_surat' => $no_surat,
             'hari' => $hari,
             'tanggal' => $tanggal,
@@ -248,6 +257,7 @@ class RwPengumumanController extends Controller
             'penanggung_jawab' => ucfirst($role),
             'judul' => $judul,
         ]);
+
         return $pdf->download("Surat_Pengumuman_$judul.pdf");
     }
 

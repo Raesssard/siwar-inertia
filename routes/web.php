@@ -309,6 +309,9 @@ Route::middleware(['auth'])->group(function () {
             Route::post('/tagihan/upload_foto/{id}', [WargatagihanController::class, 'uploadBukti'])
                 ->middleware(CheckPermission::class . ':view.tagihan')
                 ->name('tagihan.upload_foto');
+            Route::delete('/tagihan/delete_foto/{id}', [WargatagihanController::class, 'deleteFoto'])
+                ->middleware(CheckPermission::class . ':view.tagihan')
+                ->name('tagihan.delete_foto');
 
 
             // 💳 Transaksi

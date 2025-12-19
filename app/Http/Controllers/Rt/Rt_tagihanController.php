@@ -212,6 +212,9 @@ class Rt_tagihanController extends Controller
             }
 
             if ($validated['status_bayar'] === 'belum_bayar') {
+                if ($tagihan->bukti_transfer && Storage::exists('public/' . $tagihan->bukti_transfer)) {
+                    Storage::delete('public/' . $tagihan->bukti_transfer);
+                }
                 $tagihan->update([
                     'bukti_transfer' => null,
                     'tgl_bayar' => null,
@@ -226,7 +229,7 @@ class Rt_tagihanController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Tagihan sudah diperbarui.',
-                'tagihan' => $tagihan->load([
+                'tagihan' => $tagihan->fresh()->load([
                     'transaksi',
                     'iuran',
                     'kartuKeluarga.kepalaKeluarga',

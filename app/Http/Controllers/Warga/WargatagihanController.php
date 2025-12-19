@@ -86,4 +86,26 @@ class WargatagihanController extends Controller
             'tagihan' => $tagihan,
         ]);
     }
+
+    public function deleteFoto($id)
+    {
+        $tagihan = Tagihan::findOrFail($id);
+
+        if ($tagihan->bukti_transfer) {
+            Storage::disk('public')->delete($tagihan->bukti_transfer);
+
+            $tagihan->update(['bukti_transfer' => null]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Berhasil menghapus foto bukti',
+                'tagihan' => $tagihan,
+            ]);
+        }
+
+        return response()->json([
+            'error' => true,
+            'message' => 'Terjadi kesalahan saat menghapus foto, tenang ini bukan salahmu'
+        ]);
+    }
 }

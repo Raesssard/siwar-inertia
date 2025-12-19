@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Pengumuman;
 use App\Models\Rt;
 use App\Models\Rw;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -13,6 +14,7 @@ use Inertia\Inertia;
 use Dompdf\Dompdf;
 use Dompdf\Options;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\View;
 
 class AdminPengumumanController extends Controller
@@ -25,7 +27,7 @@ class AdminPengumumanController extends Controller
         $tahun = $request->input('tahun');
         $bulan = $request->input('bulan');
         $kategori = $request->input('kategori');
-        $level = $request->input('level'); 
+        $level = $request->input('level');
         $allowedMainRoles = ['admin', 'rw', 'rt', 'warga'];
 
         $baseQuery = Pengumuman::with([
@@ -67,25 +69,39 @@ class AdminPengumumanController extends Controller
             ->pluck('kategori');
 
         $list_bulan = [
-            'januari','februari','maret','april','mei','juni',
-            'juli','agustus','september','oktober','november','desember'
+            'januari',
+            'februari',
+            'maret',
+            'april',
+            'mei',
+            'juni',
+            'juli',
+            'agustus',
+            'september',
+            'oktober',
+            'november',
+            'desember'
         ];
 
         $rwList = Rw::whereHas('users', function ($q) use ($allowedMainRoles) {
-                $q->whereHas('roles', fn($qrw) => $qrw->where('name', 'rw'))
-                ->whereDoesntHave('roles', fn($qx) =>
+            $q->whereHas('roles', fn($qrw) => $qrw->where('name', 'rw'))
+                ->whereDoesntHave(
+                    'roles',
+                    fn($qx) =>
                     $qx->whereNotIn('name', $allowedMainRoles)
                 );
-            })
+        })
             ->select('id', 'nomor_rw', 'nama_anggota_rw')
             ->get();
 
         $rtList = Rt::whereHas('user', function ($q) use ($allowedMainRoles) {
-                $q->whereHas('roles', fn($qrt) => $qrt->where('name', 'rt'))
-                ->whereDoesntHave('roles', fn($qx) =>
+            $q->whereHas('roles', fn($qrt) => $qrt->where('name', 'rt'))
+                ->whereDoesntHave(
+                    'roles',
+                    fn($qx) =>
                     $qx->whereNotIn('name', $allowedMainRoles)
                 );
-            })
+        })
             ->select('id', 'id_rw', 'nomor_rt', 'nama_anggota_rt')
             ->get();
 
@@ -120,7 +136,7 @@ class AdminPengumumanController extends Controller
 
         if ($request->hasFile('dokumen')) {
             $file = $request->file('dokumen');
-            $name = time().'_'.$file->getClientOriginalName();
+            $name = time() . '_' . $file->getClientOriginalName();
             $path = $file->storeAs('documents/pengumuman-admin', $name, 'public');
         }
 
@@ -136,7 +152,7 @@ class AdminPengumumanController extends Controller
             'dokumen_name' => $name,
         ]);
 
-        return response()->json($pengumuman->load(['rw','rukunTetangga']));
+        return response()->json($pengumuman->load(['rw', 'rukunTetangga']));
     }
 
     public function update(Request $request, $id)
@@ -167,12 +183,11 @@ class AdminPengumumanController extends Controller
                 Storage::disk('public')->delete($pengumuman->dokumen_path);
             }
             $file = $request->file('dokumen');
-            $name = time().'_'.$file->getClientOriginalName();
+            $name = time() . '_' . $file->getClientOriginalName();
             $path = $file->storeAs('documents/pengumuman-admin', $name, 'public');
 
             $updateData['dokumen_path'] = $path;
             $updateData['dokumen_name'] = $name;
-
         } elseif ($request->boolean('hapus_dokumen_lama')) {
             if ($pengumuman->dokumen_path && Storage::disk('public')->exists($pengumuman->dokumen_path)) {
                 Storage::disk('public')->delete($pengumuman->dokumen_path);
@@ -201,24 +216,63 @@ class AdminPengumumanController extends Controller
 
     public function exportPDF($id)
     {
-        $pengumuman = Pengumuman::findOrFail($id);
+        $data = Pengumuman::with(['rukunTetangga.kartuKeluarga', 'rw.kartuKeluarga'])->findOrFail($id);
 
-        $html = View::make('rt.pengumuman.komponen.export_pengumuman', compact('pengumuman'))->render();
+        /** @var User $user */
+        $user = Auth::user();
+        $role = session('active_role') ?? $user->getRoleNames()->first();
+        $rt = $data->rukunTetangga;
+        $rw = $data->rw;
 
-        $options = new Options();
-        $options->set('isHtml5ParserEnabled', true);
-        $options->set('isRemoteEnabled', true);
+        $rtNumber = $rt ? str_pad($rt->nomor_rt, 2, '0', STR_PAD_LEFT) : null;
+        $rwNumber = $rw ? str_pad($rw->nomor_rw, 2, '0', STR_PAD_LEFT) : null;
 
-        $dompdf = new Dompdf($options);
-        $dompdf->loadHtml($html);
-        $dompdf->setPaper('A4', 'portrait');
-        $dompdf->render();
+        $bulanRomawi = [1 => "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII"];
+        $bulan = $bulanRomawi[now()->format('n')];
+        $tahun = now()->year;
 
-        $filename = 'Pengumuman '.$pengumuman->judul.'.pdf';
+        $urut = str_pad($data->id, 3, '0', STR_PAD_LEFT);
 
-        return response($dompdf->output(), 200)
-            ->header('Content-Type', 'application/pdf')
-            ->header('Content-Disposition', "attachment; filename=\"{$filename}\"");
+        $no_surat = $rt
+            ? "$urut/RT$rtNumber/$bulan/$tahun"
+            : "$urut/RW$rwNumber/$bulan/$tahun";
+
+        $hari   = Carbon::parse($data->tanggal)->translatedFormat('l');
+        $tanggal = Carbon::parse($data->tanggal)->translatedFormat('d F Y');
+        $waktu  = Carbon::parse($data->tanggal)->format('H:i');
+        $judul = $data->judul;
+
+        // $kk = $data->rw->kartuKeluarga->where('no_kk', $role === 'rw' ? $rw->no_kk : $rt->no_kk)->first();
+        $kkRt = $data->rukunTetangga?->kartuKeluarga
+            ?->where('no_kk', $rt?->no_kk)
+            ?->first();
+
+        $kkRw = $data->rw?->kartuKeluarga
+            ?->where('no_kk', $rw?->no_kk)
+            ?->first();
+
+        $wilayah = $role === 'rt' ? $kkRt : $kkRw;
+
+        $pdf = Pdf::loadView('rt.export-pengumuman', [
+            'rt' => $data->rukunTetangga?->nomor_rt,
+            'rw' => $data->rw->nomor_rw,
+            'nama_desa' => 'Nama Desa',
+            'kelurahan' => $wilayah?->kelurahan,
+            'kecamatan' => $wilayah?->kecamatan,
+            'kabupaten' => $wilayah?->kabupaten,
+            'nomor_surat' => $no_surat,
+            'hari' => $hari,
+            'tanggal' => $tanggal,
+            'waktu' => $waktu,
+            'tempat' => $data->tempat,
+            'isi_pengumuman' => $data->isi,
+            'tanggal_surat' => now()->format('d F Y'),
+            'nama_penanggung_jawab' => $user->nama,
+            'penanggung_jawab' => ucfirst($role),
+            'judul' => $judul,
+        ]);
+
+        return $pdf->download("Surat_Pengumuman_$judul.pdf");
     }
 
     public function komen(Request $request, $id)
@@ -235,7 +289,7 @@ class AdminPengumumanController extends Controller
 
         if ($request->hasFile('file')) {
             $file = $request->file('file');
-            $fileName = time().'_'.$file->getClientOriginalName();
+            $fileName = time() . '_' . $file->getClientOriginalName();
             $filePath = $file->storeAs('file_pengumuman', $fileName, 'public');
         }
 

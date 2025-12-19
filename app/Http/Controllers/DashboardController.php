@@ -219,7 +219,7 @@ class DashboardController extends Controller
             $pengaduan_rw = $user->rw->nomor_rw;
 
             $pengaduan_rw_saya = Pengaduan::WhereHas('warga.kartuKeluarga.rw', function ($aduan) use ($pengaduan_rw) {
-                $aduan->where('konfirmasi_rw', '!=', 'belum')->where('nomor_rw', $pengaduan_rw);
+                $aduan->where('nomor_rw', $pengaduan_rw);
             })->count();
 
             $jumlah_warga = Warga::count();

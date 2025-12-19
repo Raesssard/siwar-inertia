@@ -9,6 +9,7 @@ import { route } from "ziggy-js"
 import { motion } from "framer-motion"
 import Select from "react-select"
 import CreatableSelect from "react-select/creatable"
+import Swal from "sweetalert2"
 
 export function ModalSidebar({ modalIsOpen, modalShow, localStorageHistory }) {
     const [openMenus, setOpenMenus] = useState(() => {
@@ -1688,15 +1689,15 @@ export function DetailPengaduan({ selectedData, detailShow, onClose, onUpdated, 
                                             ) : (role.includes('rt') || role.includes('rw')) ? (
                                                 <div className="d-flex justify-between">
                                                     <h5 className="fw-bold mb-1 mt-2">{selectedData.judul}</h5>
-                                                    <Role role={selectedData.level === 'rt' ? ["rt", "sekretaris"] : ["rw", "sekretaris"]}>
-                                                        {(selectedData.konfirmasi_rw === 'sudah') && (
-                                                            <input type="checkbox"
-                                                                name="selesai"
-                                                                title="Selesai"
-                                                                checked={selectedData.status === 'selesai'}
-                                                                onChange={(e) => handleCheckboxChange(e.target.checked)}
-                                                            />
-                                                        )}
+                                                    <Role role={selectedData.level === 'rt' ? ["rt", "rw", "sekretaris"] : ["rw", "sekretaris"]}>
+                                                        {/* {(selectedData.konfirmasi_rw === 'sudah') && ( */}
+                                                        <input type="checkbox"
+                                                            name="selesai"
+                                                            title="Selesai"
+                                                            checked={selectedData.status === 'selesai'}
+                                                            onChange={(e) => handleCheckboxChange(e.target.checked)}
+                                                        />
+                                                        {/* )} */}
                                                     </Role>
                                                 </div>
                                             ) : (
@@ -1945,129 +1946,123 @@ export function DetailPengaduan({ selectedData, detailShow, onClose, onUpdated, 
                                                     backgroundColor: 'white',
                                                 } : {}
                                         }>
-                                            {((role.includes('rt') || role.includes('rw')) && !isConfirm && selectedData.level === 'rt') ? (
-                                                <button className="btn btn-primary w-100" type="button" onClick={handleConfirm}>
-                                                    <i className="fas fa-check me-2"></i>
-                                                    Konfirmasi
-                                                </button>
-                                            ) : (
-                                                <>
-                                                    {previewBukti && (
-                                                        <div
-                                                            className="flex-fill border-end bg-black d-flex align-items-center justify-content-center mb-3"
+                                            <>
+                                                {previewBukti && (
+                                                    <div
+                                                        className="flex-fill border-end bg-black d-flex align-items-center justify-content-center mb-3"
+                                                        style={{
+                                                            width: "200px",
+                                                            height: "200px",
+                                                            overflow: "hidden",
+                                                            borderRadius: "10px",
+                                                            position: "relative",
+                                                        }}>
+                                                        <button
+                                                            onClick={handleClear}
                                                             style={{
-                                                                width: "200px",
-                                                                height: "200px",
-                                                                overflow: "hidden",
-                                                                borderRadius: "10px",
-                                                                position: "relative",
-                                                            }}>
-                                                            <button
-                                                                onClick={handleClear}
-                                                                style={{
-                                                                    position: "absolute",
-                                                                    top: "5px",
-                                                                    right: "5px",
-                                                                    zIndex: 10,
-                                                                    background: "rgba(0, 0, 0, 0.5)",
-                                                                    color: "white",
-                                                                    border: "none",
-                                                                    borderRadius: "50%",
-                                                                    width: "25px",
-                                                                    height: "25px",
-                                                                    cursor: "pointer",
-                                                                    fontWeight: "bold",
-                                                                    lineHeight: "1",
-                                                                }}
-                                                                title="Hapus file"
-                                                            >
-                                                                ✕
-                                                            </button>
-                                                            <div id="preview" style={{ width: "100%", height: "100%" }}>
-                                                                {previewBukti && previewBukti.type === "image" && (
-                                                                    <img
-                                                                        src={getFileUrl(previewBukti.src)}
-                                                                        alt="Preview"
-                                                                        style={{
-                                                                            maxWidth: "100%",
-                                                                            maxHeight: "100%",
-                                                                            objectFit: "contain"
-                                                                        }}
-                                                                    />
-                                                                )}
-                                                                {previewBukti && previewBukti.type === "video" && (
-                                                                    <video
-                                                                        ref={previewVideoRef}
-                                                                        src={getFileUrl(previewBukti.src)}
-                                                                        controls
-                                                                        autoPlay
-                                                                        loop
-                                                                        style={{
-                                                                            maxWidth: "100%",
-                                                                            maxHeight: "100%",
-                                                                            objectFit: "contain",
-                                                                            backgroundColor: "black"
-                                                                        }}
-                                                                    />
-                                                                )}
-                                                                {previewBukti && previewBukti.type === "pdf" && (
-                                                                    <embed
-                                                                        src={getFileUrl(previewBukti.src)}
-                                                                        type="application/pdf"
-                                                                        className="pdf-preview"
-                                                                        style={{
-                                                                            width: "100%",
-                                                                            height: "100%",
-                                                                            backgroundColor: "black"
-                                                                        }}
-                                                                    />
-                                                                )}
-                                                                {previewBukti && previewBukti.type === "other" && (
-                                                                    <p style={{ color: "white", textAlign: "center" }}>
-                                                                        File dipilih: {previewBukti.name}
-                                                                    </p>
-                                                                )}
-                                                            </div>
+                                                                position: "absolute",
+                                                                top: "5px",
+                                                                right: "5px",
+                                                                zIndex: 10,
+                                                                background: "rgba(0, 0, 0, 0.5)",
+                                                                color: "white",
+                                                                border: "none",
+                                                                borderRadius: "50%",
+                                                                width: "25px",
+                                                                height: "25px",
+                                                                cursor: "pointer",
+                                                                fontWeight: "bold",
+                                                                lineHeight: "1",
+                                                            }}
+                                                            title="Hapus file"
+                                                        >
+                                                            ✕
+                                                        </button>
+                                                        <div id="preview" style={{ width: "100%", height: "100%" }}>
+                                                            {previewBukti && previewBukti.type === "image" && (
+                                                                <img
+                                                                    src={getFileUrl(previewBukti.src)}
+                                                                    alt="Preview"
+                                                                    style={{
+                                                                        maxWidth: "100%",
+                                                                        maxHeight: "100%",
+                                                                        objectFit: "contain"
+                                                                    }}
+                                                                />
+                                                            )}
+                                                            {previewBukti && previewBukti.type === "video" && (
+                                                                <video
+                                                                    ref={previewVideoRef}
+                                                                    src={getFileUrl(previewBukti.src)}
+                                                                    controls
+                                                                    autoPlay
+                                                                    loop
+                                                                    style={{
+                                                                        maxWidth: "100%",
+                                                                        maxHeight: "100%",
+                                                                        objectFit: "contain",
+                                                                        backgroundColor: "black"
+                                                                    }}
+                                                                />
+                                                            )}
+                                                            {previewBukti && previewBukti.type === "pdf" && (
+                                                                <embed
+                                                                    src={getFileUrl(previewBukti.src)}
+                                                                    type="application/pdf"
+                                                                    className="pdf-preview"
+                                                                    style={{
+                                                                        width: "100%",
+                                                                        height: "100%",
+                                                                        backgroundColor: "black"
+                                                                    }}
+                                                                />
+                                                            )}
+                                                            {previewBukti && previewBukti.type === "other" && (
+                                                                <p style={{ color: "white", textAlign: "center" }}>
+                                                                    File dipilih: {previewBukti.name}
+                                                                </p>
+                                                            )}
                                                         </div>
-                                                    )}
-                                                    <div className="input-group">
+                                                    </div>
+                                                )}
+                                                <div className="input-group">
+                                                    <input
+                                                        type="text"
+                                                        className="form-control komen"
+                                                        placeholder="Tambah komentar..."
+                                                        value={data.isi_komentar}
+                                                        onChange={(e) => setData("isi_komentar", e.target.value)}
+                                                        title="Masukkan Pesan"
+                                                    />
+                                                    <Role role={['rt', 'rw', 'sekretaris', 'admin']}>
                                                         <input
-                                                            type="text"
-                                                            className="form-control komen"
-                                                            placeholder="Tambah komentar..."
-                                                            value={data.isi_komentar}
-                                                            onChange={(e) => setData("isi_komentar", e.target.value)}
-                                                            title="Masukkan Pesan"
+                                                            ref={fileInputRef}
+                                                            type="file"
+                                                            id="fileInput"
+                                                            name="file"
+                                                            className="d-none"
+                                                            accept="image/*"
+                                                            onChange={handleFileChange}
                                                         />
-                                                        <Role role={['rt', 'rw', 'sekretaris', 'admin']}>
-                                                            <input
-                                                                ref={fileInputRef}
-                                                                type="file"
-                                                                id="fileInput"
-                                                                name="file"
-                                                                className="d-none"
-                                                                onChange={handleFileChange}
-                                                            />
-                                                            <button
-                                                                className="btn komen btn-primary my-0"
-                                                                type="button"
-                                                                onClick={() => document.getElementById('fileInput').click()}
-                                                                title="Masukkan Lampiran"
-                                                            >
-                                                                <i className="fas fa-paperclip"></i>
-                                                            </button>
-                                                        </Role>
                                                         <button
                                                             className="btn komen btn-primary my-0"
                                                             type="button"
-                                                            onClick={handleSubmit}
-                                                            title="Kirim Pesan"
+                                                            onClick={() => document.getElementById('fileInput').click()}
+                                                            title="Masukkan Lampiran"
                                                         >
-                                                            <i className="far fa-paper-plane"></i>
+                                                            <i className="fas fa-paperclip"></i>
                                                         </button>
-                                                    </div>
-                                                </>
-                                            )}
+                                                    </Role>
+                                                    <button
+                                                        className="btn komen btn-primary my-0"
+                                                        type="button"
+                                                        onClick={handleSubmit}
+                                                        title="Kirim Pesan"
+                                                    >
+                                                        <i className="far fa-paper-plane"></i>
+                                                    </button>
+                                                </div>
+                                            </>
                                         </div>
                                     </div>
                                 </div>
@@ -4288,7 +4283,7 @@ export function DetailPengumuman({ kategori, selectedData, detailShow, onClose, 
                                             {(userData?.rukun_tetangga?.id === selectedData.id_rt || userData?.rw?.id === selectedData.id_rw || role === 'admin') ? (
                                                 <div className="d-flex">
                                                     <h5 className="fw-bold mb-1 mt-2 me-auto">{selectedData.judul}</h5>
-                                                    <Role role={["rt", "rw", 'sekretaris', 'admin']}>
+                                                    <Role role={selectedData.rukun_tetangga ? ["rt", "rw", 'admin'] : ['rw', 'admin']}>
                                                         <button
                                                             className="btn komen btn-primary my-auto px-1"
                                                             title="Export Pengumuman ke PDF"
@@ -6918,17 +6913,69 @@ export function EditTagihan({ editShow, onClose, onUpdated, role, selectedData }
     const [previewBuktiTransfer, setPreviewBuktiTransfer] = useState(null)
     const fileInputRef = useRef(null)
 
-    useEffect(() => {
-        if (data.status_bayar === 'belum_bayar') {
-            setData({
-                ...data,
-                tgl_bayar: "",
-                nominal_bayar: "",
-                kategori_pembayaran: "tunai",
-                bukti_transfer: null,
-            })
+    const handleStatusChange = (e) => {
+        const value = e.target.value
+
+        setData(prev => ({
+            ...prev,
+            status_bayar: value,
+            ...(value === 'belum_bayar'
+                ? {
+                    tgl_bayar: "",
+                    nominal_bayar: "",
+                    kategori_pembayaran: "",
+                    bukti_transfer: null,
+                }
+                : {}
+            )
+        }))
+
+        if (value === 'belum_bayar') {
+            setBuktiLama(null)
+            setPreviewBuktiTransfer(null)
+            if (fileInputRef.current) fileInputRef.current.value = ""
         }
-    }, [data.status_bayar])
+    }
+
+    useEffect(() => {
+        if (!selectedData) return
+
+        setData({
+            status_bayar: selectedData.status_bayar || "",
+            tgl_bayar: selectedData.tgl_bayar || "",
+            nominal_bayar: selectedData.nominal_bayar || "",
+            kategori_pembayaran:
+                selectedData.kategori_pembayaran ??
+                (selectedData.bukti_transfer ? 'transfer' : ''),
+            bukti_transfer: null, // ⬅️ PENTING
+        })
+
+        setBuktiLama(selectedData.bukti_transfer || null)
+        setPreviewBuktiTransfer(
+            selectedData.bukti_transfer
+                ? `/storage/${selectedData.bukti_transfer}`
+                : null
+        )
+
+    }, [selectedData])
+
+    const isInitRef = useRef(true)
+
+    useEffect(() => {
+        if (!selectedData) return
+
+        if (isInitRef.current) {
+            isInitRef.current = false
+            return
+        }
+
+        if (data.kategori_pembayaran === 'tunai') {
+            setData("bukti_transfer", null)
+            setBuktiLama(null)
+            setPreviewBuktiTransfer(null)
+            if (fileInputRef.current) fileInputRef.current.value = ""
+        }
+    }, [data.kategori_pembayaran, selectedData])
 
     const handleFileChange = (e) => {
         const selectedFile = e.target.files[0]
@@ -6949,19 +6996,6 @@ export function EditTagihan({ editShow, onClose, onUpdated, role, selectedData }
             reader.readAsDataURL(selectedFile)
         }
     }
-
-    useEffect(() => {
-        if (selectedData) {
-            setData({
-                status_bayar: selectedData.status_bayar || "",
-                tgl_bayar: selectedData.tgl_bayar || "",
-                nominal_bayar: selectedData.nominal_bayar || "",
-                kategori_pembayaran: selectedData.kategori_pembayaran || "tunai",
-                bukti_transfer: selectedData.bukti_transfer || null,
-            });
-            setBuktiLama(selectedData.bukti_transfer || null)
-        }
-    }, [selectedData, setData, editShow]);
 
     const handleSubmit = (e) => {
         e.preventDefault()
@@ -6986,7 +7020,7 @@ export function EditTagihan({ editShow, onClose, onUpdated, role, selectedData }
                     status_bayar: "",
                     tgl_bayar: "",
                     nominal_bayar: "",
-                    kategori_pembayaran: "tunai",
+                    kategori_pembayaran: "",
                     bukti_transfer: null,
                 })
                 onClose()
@@ -7020,26 +7054,6 @@ export function EditTagihan({ editShow, onClose, onUpdated, role, selectedData }
         return `/storage/${src}`
     }
 
-    useEffect(() => {
-        if (data.status_bayar === 'belum_bayar') {
-            setBuktiLama(null)
-            setData(prev => ({
-                ...prev,
-                kategori_pembayaran: "tunai",
-                bukti_transfer: null,
-            }))
-        }
-    }, [data.status_bayar])
-
-    useEffect(() => {
-        if (data.kategori_pembayaran === 'tunai') {
-            setData("bukti_transfer", null)
-            setBuktiLama(null)
-            setPreviewBuktiTransfer(null)
-            if (fileInputRef.current) fileInputRef.current.value = ""
-        }
-    }, [data.kategori_pembayaran])
-
     if (!editShow) return null
 
     return (
@@ -7070,7 +7084,7 @@ export function EditTagihan({ editShow, onClose, onUpdated, role, selectedData }
                                                 name="status_bayar"
                                                 value={data.status_bayar}
                                                 className="tambah-judul form-control"
-                                                onChange={(e) => setData('status_bayar', e.target.value)}
+                                                onChange={handleStatusChange}
                                                 required
                                                 style={{
                                                     border: '0',
@@ -7111,6 +7125,7 @@ export function EditTagihan({ editShow, onClose, onUpdated, role, selectedData }
                                                     borderRadius: '0',
                                                 }}
                                             >
+                                                <option value="" disabled>Jenis Pembayaran</option>
                                                 <option value="tunai">Tunai</option>
                                                 <option value="transfer">Transfer</option>
                                             </select>
@@ -7162,7 +7177,7 @@ export function EditTagihan({ editShow, onClose, onUpdated, role, selectedData }
                                             />
                                         </div>
 
-                                        {data.kategori_pembayaran === 'transfer' && (
+                                        {(data.kategori_pembayaran === 'transfer' || buktiLama) && (
                                             <div className="mb-3">
                                                 {(previewBuktiTransfer || buktiLama) && (
                                                     <div
@@ -7196,6 +7211,7 @@ export function EditTagihan({ editShow, onClose, onUpdated, role, selectedData }
                                                                 lineHeight: "1",
                                                             }}
                                                             title="Hapus file"
+                                                            disabled={data.status_bayar === "belum_bayar"}
                                                         >
                                                             ✕
                                                         </button>
@@ -7235,23 +7251,13 @@ export function EditTagihan({ editShow, onClose, onUpdated, role, selectedData }
                                                     title="Upload File"
                                                     onClick={() => fileInputRef.current?.click()}
                                                     value={data.status_bayar === "belum_bayar" && null}
-                                                    disabled={data.status_bayar === "belum_bayar"}
+                                                    disabled={data.status_bayar === "belum_bayar" || selectedData.bukti_transfer}
                                                 >
                                                     <i className="fas fa-upload me-2"></i>
                                                     <small>
                                                         Upload Bukti Transfer
                                                     </small>
                                                 </button>
-                                                {(selectedData?.bukti_transfer !== data.bukti_transfer) && (
-                                                    <small className="text-mute d-block mt-2">
-                                                        File dipilih: {data.bukti_transfer?.name || "(Tidak ada file)"}
-                                                    </small>
-                                                )}
-                                                {(selectedData?.bukti_transfer === data.bukti_transfer) && (
-                                                    <small className="text-mute d-block mt-2">
-                                                        File tidak bisa sama dengan yang sebelumnnya
-                                                    </small>
-                                                )}
                                             </div>
                                         )}
 
@@ -7311,6 +7317,7 @@ export function DetailTagihan({ selectedData, detailShow, onClose }) {
                 setData({
                     bukti_transfer: null,
                 })
+                Swal.fire('Sukses', res.data.message, 'success')
             })
             .catch((err) => {
                 console.error(err.response?.data || err)
@@ -7319,10 +7326,27 @@ export function DetailTagihan({ selectedData, detailShow, onClose }) {
     }
 
     const handleClear = () => {
-        setData("bukti_transfer", null)
-        setBuktiLama(null)
-        setPreviewBuktiTransfer(null)
-        if (fileInputRef.current) fileInputRef.current.value = ""
+        Swal.fire({
+            title: "Yakin hapus foto bukti ini?",
+            text: "Foto akan dihapus, harap pilih foto bukti yang baru.",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#d33",
+            cancelButtonColor: "#3085d6",
+            confirmButtonText: "Ya, hapus",
+            cancelButtonText: "Batal",
+        }).then((result) => {
+            if (result.isConfirmed) {
+                axios.delete(`/warga/tagihan/delete_foto/${selectedData.id}`)
+                    .then((res) => {
+                        Swal.fire("Terhapus!", res.data.message, "success")
+                        setData("bukti_transfer", null)
+                        setBuktiLama(null)
+                        setPreviewBuktiTransfer(null)
+                        if (fileInputRef.current) fileInputRef.current.value = ""
+                    })
+            }
+        })
     }
 
     useEffect(() => {
