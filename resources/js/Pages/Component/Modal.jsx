@@ -3251,6 +3251,7 @@ export function TambahEditKK({ show, onClose, dataKK = null, kategoriIuran, daft
 export function DetailKK({ selectedData, detailShow, onClose, role, userData, onUpload, hapusFoto }) {
     if (!detailShow || !selectedData) return null
 
+    const [kkSelected, setKkSelected] = useState(selectedData ?? null)
     const [selectedFile, setSelectedFile] = useState(null)
     const [previewUrl, setPreviewUrl] = useState(null)
     const [isPdf, setIsPdf] = useState(false)
@@ -3262,7 +3263,7 @@ export function DetailKK({ selectedData, detailShow, onClose, role, userData, on
     const [windowHeight, setWindowHeight] = useState(window.innerHeight)
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [wargaToDelete, setWargaToDelete] = useState(null);
-
+    const fileInputRef = useRef(null)
 
     useEffect(() => {
         function handleResize() {
@@ -3309,11 +3310,15 @@ export function DetailKK({ selectedData, detailShow, onClose, role, userData, on
         formData.append("kk_file", selectedFile)
         formData.append("_method", "PUT")
 
-        axios.post(`/${role}/kartu_keluarga/${selectedData?.no_kk}/upload-foto`, formData)
+        axios.post(`/${role}/kartu_keluarga/${kkSelected?.no_kk}/upload-foto`, formData)
             .then((res) => {
                 const foto = res.data.kartuKeluarga
                 if (onUpload) onUpload(foto)
                 Swal.fire("Sukses", "Dokumen berhasil diunggah!", "success")
+                setPreviewUrl(null)
+                setSelectedFile(null)
+                setKkSelected(foto)
+                if (fileInputRef.current) fileInputRef.current.value = ""
             })
             .catch((err) => {
                 console.error("Upload gagal:", err.response?.data || err)
@@ -3334,10 +3339,14 @@ export function DetailKK({ selectedData, detailShow, onClose, role, userData, on
             cancelButtonText: "Batal",
         }).then((result) => {
             if (result.isConfirmed) {
-                axios.delete(`/${role}/kartu_keluarga/${selectedData?.no_kk}/delete-foto`)
+                axios.delete(`/${role}/kartu_keluarga/${kkSelected?.no_kk}/delete-foto`)
                     .then((res) => {
                         if (hapusFoto) hapusFoto(res.data.kartuKeluarga)
-                        Swal.fire('Sukses', 'Dokumen berhasil dihapus', 'success')
+                        Swal.fire('Sukses', res.data.message, 'success')
+                        setPreviewUrl(null)
+                        setSelectedFile(null)
+                        setKkSelected(res.data.kartuKeluarga)
+                        if (fileInputRef.current) fileInputRef.current.value = ""
                     })
                     .catch((err) => {
                         console.error(err)
@@ -3381,10 +3390,10 @@ export function DetailKK({ selectedData, detailShow, onClose, role, userData, on
                                 <div className="kk-header-top-line">
                                     <div className="kk-header-left-space"></div>
                                     <div className="kk-header-right-reg">
-                                        {selectedData?.no_registrasi && (
+                                        {kkSelected?.no_registrasi && (
                                             <p>
                                                 No. Registrasi:
-                                                <strong>{selectedData?.no_registrasi}</strong>
+                                                <strong>{kkSelected?.no_registrasi}</strong>
                                             </p>
                                         )}
                                     </div>
@@ -3393,7 +3402,7 @@ export function DetailKK({ selectedData, detailShow, onClose, role, userData, on
                                 <div className="kk-header-main-title">
                                     <h4>KARTU KELUARGA</h4>
                                     <p className="no-kk-big">
-                                        No. KK: <strong>{selectedData?.no_kk}</strong>
+                                        No. KK: <strong>{kkSelected?.no_kk}</strong>
                                     </p>
                                 </div>
                             </div>
@@ -3401,35 +3410,35 @@ export function DetailKK({ selectedData, detailShow, onClose, role, userData, on
                             <div className="kk-info-grid mb-2">
                                 <div className="kk-info-item">
                                     <p><strong>Nama Kepala Keluarga</strong> :{" "}
-                                        {selectedData?.kepala_keluarga?.nama ?? '-'}
+                                        {kkSelected?.kepala_keluarga?.nama ?? '-'}
                                     </p>
                                     <p><strong>Alamat</strong> :{" "}
-                                        {selectedData?.alamat ?? '-'}
+                                        {kkSelected?.alamat ?? '-'}
                                     </p>
                                     <p><strong>RT/RW</strong> :{" "}
-                                        {selectedData?.rukun_tetangga?.nomor_rt ?? '-'}/{selectedData?.rw?.nomor_rw ?? '-'}
+                                        {kkSelected?.rukun_tetangga?.nomor_rt ?? '-'}/{kkSelected?.rw?.nomor_rw ?? '-'}
                                     </p>
                                     <p>
                                         <strong>Desa/Kelurahan</strong> :{" "}
-                                        {selectedData?.kelurahan ?? "-"}
+                                        {kkSelected?.kelurahan ?? "-"}
                                     </p>
                                 </div>
                                 <div className="kk-info-item">
                                     <p>
                                         <strong>Kecamatan</strong> :{" "}
-                                        {selectedData?.kecamatan ?? "-"}
+                                        {kkSelected?.kecamatan ?? "-"}
                                     </p>
                                     <p>
                                         <strong>Kabupaten/Kota</strong> :{" "}
-                                        {selectedData?.kabupaten ?? "-"}
+                                        {kkSelected?.kabupaten ?? "-"}
                                     </p>
                                     <p>
                                         <strong>Kode Pos</strong> :{" "}
-                                        {selectedData?.kode_pos ?? "-"}
+                                        {kkSelected?.kode_pos ?? "-"}
                                     </p>
                                     <p>
                                         <strong>Provinsi</strong> :{" "}
-                                        {selectedData?.provinsi ?? "-"}
+                                        {kkSelected?.provinsi ?? "-"}
                                     </p>
                                 </div>
                             </div>
@@ -3448,7 +3457,7 @@ export function DetailKK({ selectedData, detailShow, onClose, role, userData, on
                                         className="btn btn-primary btn-sm"
                                         onClick={() => {
                                             const routeName = role === "admin" ? "admin.warga.create" : "rw.warga.create";
-                                            router.visit(route(routeName, { no_kk: selectedData?.no_kk }));
+                                            router.visit(route(routeName, { no_kk: kkSelected?.no_kk }));
                                         }}
                                     >
                                         <i className="bi bi-person-plus"></i> Tambah Warga
@@ -3486,9 +3495,9 @@ export function DetailKK({ selectedData, detailShow, onClose, role, userData, on
                                         </tr>
                                     </thead>
                                     <tbody className="small">
-                                        {selectedData?.warga &&
-                                            selectedData?.warga.length > 0 ? (
-                                            selectedData?.warga
+                                        {kkSelected?.warga &&
+                                            kkSelected?.warga.length > 0 ? (
+                                            kkSelected?.warga
                                                 .sort((a, b) => {
                                                     const getRank = (hubungan) => {
                                                         if (hubungan === "Kepala Keluarga") return 2
@@ -3627,6 +3636,7 @@ export function DetailKK({ selectedData, detailShow, onClose, role, userData, on
                                     className="input-group mb-2 d-flex"
                                 >
                                     <input
+                                        ref={fileInputRef}
                                         type="file"
                                         name="kk_file"
                                         className="form-control"
@@ -3669,7 +3679,7 @@ export function DetailKK({ selectedData, detailShow, onClose, role, userData, on
                                     </div>
                                 )}
 
-                                {selectedData?.foto_kk && (
+                                {kkSelected?.foto_kk && (
                                     <div className="mt-4">
                                         <h6>Dokumen Saat Ini:</h6>
                                         <div className="d-flex align-items-center gap-3">
@@ -3678,7 +3688,7 @@ export function DetailKK({ selectedData, detailShow, onClose, role, userData, on
                                                 className="btn btn-outline-primary"
                                                 onClick={() =>
                                                     setViewDoc(
-                                                        `/storage/${selectedData?.foto_kk}`
+                                                        `/storage/${kkSelected?.foto_kk}`
                                                     )
                                                 }
                                             >

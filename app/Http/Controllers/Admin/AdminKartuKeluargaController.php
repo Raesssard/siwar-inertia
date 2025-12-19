@@ -48,9 +48,9 @@ class AdminKartuKeluargaController extends Controller
                 $q->whereHas('roles', function ($r) {
                     $r->where('name', 'rt');
                 })
-                ->whereDoesntHave('roles', function ($r) {
-                    $r->whereIn('name', ['sekretaris', 'bendahara', 'seksi']);
-                });
+                    ->whereDoesntHave('roles', function ($r) {
+                        $r->whereIn('name', ['sekretaris', 'bendahara', 'seksi']);
+                    });
             })
             ->get();
 
@@ -69,19 +69,19 @@ class AdminKartuKeluargaController extends Controller
 
         $kategori_iuran = Kategori_golongan::select('id', 'jenis')->get();
         $daftar_rt = Rt::select('id', 'nomor_rt', 'id_rw')
-        ->with(['rw', 'user.roles'])
-        ->where(function ($q) {
-            $q->whereHas('user', function ($u) {
-                $u->whereHas('roles', function ($r) {
-                    $r->where('name', 'rt'); 
+            ->with(['rw', 'user.roles'])
+            ->where(function ($q) {
+                $q->whereHas('user', function ($u) {
+                    $u->whereHas('roles', function ($r) {
+                        $r->where('name', 'rt');
+                    })
+                        ->whereDoesntHave('roles', function ($r) {
+                            $r->whereIn('name', ['sekretaris', 'bendahara', 'seksi']);
+                        });
                 })
-                ->whereDoesntHave('roles', function ($r) {
-                    $r->whereIn('name', ['sekretaris', 'bendahara', 'seksi']);
-                });
+                    ->orDoesntHave('user');
             })
-            ->orDoesntHave('user'); 
-        })
-        ->get();
+            ->get();
 
         return Inertia::render('FormKK', [
             'title' => $title,
@@ -94,7 +94,8 @@ class AdminKartuKeluargaController extends Controller
 
     public function store(Request $request)
     {
-            $validated = $request->validate([
+        $validated = $request->validate(
+            [
                 'no_kk' => 'required|digits:16|unique:kartu_keluarga,no_kk',
                 'no_registrasi' => 'required|string|max:255',
                 'alamat' => 'required|string',
@@ -115,18 +116,19 @@ class AdminKartuKeluargaController extends Controller
             [
                 'no_kk.unique' => 'No. KK sudah terdaftar.',
                 'no_kk.digits' => 'No. KK harus terdiri dari 16 digit.',
-            ]);
+            ]
+        );
 
-            Log::info('Admin Data KK diterima:', $request->all());
+        Log::info('Admin Data KK diterima:', $request->all());
 
-            if ($request->filled('id_rt')) {
-                $rt = Rt::find($request->id_rt);
-                $validated['id_rw'] = $rt ? $rt->id_rw : null;
-            }
+        if ($request->filled('id_rt')) {
+            $rt = Rt::find($request->id_rt);
+            $validated['id_rw'] = $rt ? $rt->id_rw : null;
+        }
 
-            Kartu_keluarga::create($validated);
+        Kartu_keluarga::create($validated);
 
-            return back()->with('success', 'Kartu Keluarga berhasil ditambahkan!');
+        return back()->with('success', 'Kartu Keluarga berhasil ditambahkan!');
     }
 
     public function edit($id)
@@ -138,19 +140,19 @@ class AdminKartuKeluargaController extends Controller
 
         $kategori_iuran = Kategori_golongan::select('id', 'jenis')->get();
         $daftar_rt = Rt::select('id', 'nomor_rt', 'id_rw')
-        ->with(['rw', 'user.roles'])
-        ->where(function ($q) {
-            $q->whereHas('user', function ($u) {
-                $u->whereHas('roles', function ($r) {
-                    $r->where('name', 'rt'); 
+            ->with(['rw', 'user.roles'])
+            ->where(function ($q) {
+                $q->whereHas('user', function ($u) {
+                    $u->whereHas('roles', function ($r) {
+                        $r->where('name', 'rt');
+                    })
+                        ->whereDoesntHave('roles', function ($r) {
+                            $r->whereIn('name', ['sekretaris', 'bendahara', 'seksi']);
+                        });
                 })
-                ->whereDoesntHave('roles', function ($r) {
-                    $r->whereIn('name', ['sekretaris', 'bendahara', 'seksi']);
-                });
+                    ->orDoesntHave('user');
             })
-            ->orDoesntHave('user'); 
-        })
-        ->get();
+            ->get();
 
         return Inertia::render('FormKK', [
             'title' => $title,
@@ -163,9 +165,10 @@ class AdminKartuKeluargaController extends Controller
 
     public function update(Request $request, $id)
     {
-            $kk = Kartu_keluarga::findOrFail($id);
+        $kk = Kartu_keluarga::findOrFail($id);
 
-            $validated = $request->validate([
+        $validated = $request->validate(
+            [
                 'no_kk' => 'required|digits:16|unique:kartu_keluarga,no_kk,' . $kk->id,
                 'no_registrasi' => 'required|string|max:255',
                 'alamat' => 'required|string',
@@ -185,18 +188,19 @@ class AdminKartuKeluargaController extends Controller
             [
                 'no_kk.unique' => 'No. KK sudah terdaftar.',
                 'no_kk.digits' => 'No. KK harus terdiri dari 16 digit.',
-            ]);
+            ]
+        );
 
-            if ($request->filled('id_rt')) {
-                $rt = Rt::find($request->id_rt);
-                $validated['id_rw'] = $rt ? $rt->id_rw : null;
-            } else {
-                $validated['id_rw'] = null;
-            }
+        if ($request->filled('id_rt')) {
+            $rt = Rt::find($request->id_rt);
+            $validated['id_rw'] = $rt ? $rt->id_rw : null;
+        } else {
+            $validated['id_rw'] = null;
+        }
 
-            $kk->update($validated);
+        $kk->update($validated);
 
-            return back()->with('success', 'Kartu Keluarga berhasil diperbarui!');
+        return back()->with('success', 'Kartu Keluarga berhasil diperbarui!');
     }
 
     public function destroy($id)
@@ -216,7 +220,7 @@ class AdminKartuKeluargaController extends Controller
         }
     }
 
-        public function uploadFoto(Request $request, $no_kk)
+    public function uploadFoto(Request $request, $no_kk)
     {
         try {
             $kartuKeluarga = Kartu_keluarga::where('no_kk', $no_kk)->firstOrFail();
@@ -237,7 +241,15 @@ class AdminKartuKeluargaController extends Controller
 
             return response()->json([
                 'message' => 'Dokumen berhasil diunggah!',
-                'path' => asset("storage/{$path}")
+                'path' => asset("storage/{$path}"),
+                'kartuKeluarga' => $kartuKeluarga->load([
+                    'warga.kartuKeluarga.rukunTetangga',
+                    'rukunTetangga',
+                    'rw',
+                    'warga.kartuKeluarga.rw',
+                    'kategoriGolongan',
+                    'kepalaKeluarga'
+                ])
             ]);
         } catch (\Exception $e) {
             Log::error('Upload KK RW error: ' . $e->getMessage());
@@ -247,14 +259,29 @@ class AdminKartuKeluargaController extends Controller
 
     public function deleteFoto($no_kk)
     {
-        $kartuKeluarga = Kartu_keluarga::where('no_kk', $no_kk)->firstOrFail();
+        try {
+            $kartuKeluarga = Kartu_keluarga::where('no_kk', $no_kk)->firstOrFail();
 
-        if ($kartuKeluarga->foto_kk) {
-            Storage::disk('public')->delete($kartuKeluarga->foto_kk);
-            $kartuKeluarga->update(['foto_kk' => null]);
-            return response()->json(['success', 'Dokumen berhasil dihapus!'], 200);
+            if ($kartuKeluarga->foto_kk) {
+                Storage::disk('public')->delete($kartuKeluarga->foto_kk);
+                $kartuKeluarga->update(['foto_kk' => null]);
+                return response()->json([
+                    'message' => 'Dokumen Kartu Keluarga berhasil dihapus!',
+                    'kartuKeluarga' => $kartuKeluarga->load([
+                        'warga.kartuKeluarga.rukunTetangga',
+                        'rukunTetangga',
+                        'rw',
+                        'warga.kartuKeluarga.rw',
+                        'kategoriGolongan',
+                        'kepalaKeluarga'
+                    ])
+                ]);
+            }
+
+            return response()->json(['error' => 'Tidak ada dokumen untuk dihapus.'], 404);
+        } catch (\Exception $e) {
+            Log::error('Upload KK RW error: ' . $e->getMessage());
+            return response()->json(['error' => 'Upload gagal'], 500);
         }
-
-        return response()->json(['error' => 'Tidak ada dokumen untuk dihapus.'], 404);
     }
 }

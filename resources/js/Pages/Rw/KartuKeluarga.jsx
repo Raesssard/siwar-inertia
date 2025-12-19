@@ -6,12 +6,17 @@ import { DetailKK, TambahEditKK } from "../Component/Modal"
 import "../../../css/kk.css"
 
 export default function KartuKeluarga() {
-    const { kartu_keluarga, kategori_iuran, title } = usePage().props
+    const { 
+        kartu_keluarga: kk,
+        kategori_iuran,
+        title } = usePage().props
     const { props } = usePage()
+    const user = props.auth?.user
     const role = props.auth?.currentRole
     const { get, data, setData } = useForm({ search: "" })
 
     // 🟩 State untuk modal
+    const [kartuKeluarga, setKartuKeluarga] = useState(kk.data ?? [])
     const [showModal, setShowModal] = useState(false)
     const [selected, setSelected] = useState(null)
     const [modalTambah, setModalTambah] = useState(false)
@@ -101,8 +106,8 @@ export default function KartuKeluarga() {
                             </tr>
                         </thead>
                         <tbody>
-                            {kartu_keluarga.data.length > 0 ? (
-                                kartu_keluarga.data.map((item, index) => (
+                            {kartuKeluarga.length > 0 ? (
+                                kartuKeluarga.map((item, index) => (
                                     <tr key={item.id}>
                                         <td className="text-center">{index + 1}</td>
                                         <td className="text-center">{item.no_kk ?? "-"}</td>
@@ -162,10 +167,10 @@ export default function KartuKeluarga() {
                 </div>
 
                 {/* Pagination */}
-                {kartu_keluarga.links && (
+                {kk.links && (
                     <div className="pagination-container">
                         <ul className="pagination-custom">
-                            {kartu_keluarga.links.map((link, index) => {
+                            {kk.links.map((link, index) => {
                                 let label = link.label
                                 if (label.includes("Previous")) label = "&lt;"
                                 if (label.includes("Next")) label = "&gt;"
@@ -197,8 +202,21 @@ export default function KartuKeluarga() {
                 <DetailKK
                     selectedData={selected}
                     detailShow={showModal}
+                    onUpload={(foto) => setKartuKeluarga(prev =>
+                        prev.map(item =>
+                            item.id === foto.id ? foto : item
+                        ))}
+                    hapusFoto={(foto) =>
+                        setKartuKeluarga(prev =>
+                            prev.map(item =>
+                                item.id === foto.id
+                                    ? { ...item, foto_kk: null }
+                                    : item
+                            )
+                        )}
                     onClose={() => setShowModal(false)}
                     role={role}
+                    userData={user}
                 />
 
                 <TambahEditKK
