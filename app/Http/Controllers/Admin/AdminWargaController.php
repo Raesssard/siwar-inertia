@@ -161,7 +161,7 @@ class AdminWargaController extends Controller
             }
         }
 
-            return redirect('admin.kartu_keluarga.index')->with('success', 'Warga berhasil ditambahkan.');
+        return back()->with('success', 'Warga berhasil ditambahkan.');
     }
 
     public function edit($id)
@@ -293,7 +293,7 @@ class AdminWargaController extends Controller
         }
 
 
-            return redirect('admin.kartu_keluarga.index')->with('success', 'Data warga berhasil diperbarui.');
+            return back()->with('success', 'Data warga berhasil diperbarui.');
     }
 
     public function destroy(Request $request, $id)

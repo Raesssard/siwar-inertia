@@ -122,7 +122,7 @@ class RwKartuKeluargaController extends Controller
         $validated = $request->validate(
             [
                 'no_kk' => 'required|digits:16|unique:kartu_keluarga,no_kk',
-                'no_registrasi' => 'required|string|max:255',
+                'no_registrasi' => 'required|string|max:255|unique:kartu_keluarga,no_registrasi',
                 'alamat' => 'required|string',
                 'id_rt' => 'nullable|exists:rt,id',
                 'kelurahan' => 'required|string|max:255',
@@ -140,8 +140,9 @@ class RwKartuKeluargaController extends Controller
             [
                 'no_kk.unique' => 'No. KK sudah terdaftar.',
                 'no_kk.digits' => 'No. KK harus terdiri dari 16 digit.',
-            ]
-        );
+                'no_registrasi.required' => 'No. Registrasi wajib diisi.',
+                'no_registrasi.unique' => 'No. Registrasi sudah terdaftar.',
+            ]);
 
         $validated['id_rw'] = $userRw->id;
         Log::info('Data KK diterima:', $request->all());
@@ -194,7 +195,7 @@ class RwKartuKeluargaController extends Controller
         $validated = $request->validate(
             [
                 'no_kk' => 'required|digits:16|unique:kartu_keluarga,no_kk,' . $kk->id,
-                'no_registrasi' => 'required|string|max:255',
+                'no_registrasi' => 'required|string|max:255|unique:kartu_keluarga,no_registrasi,' . $kk->id,
                 'alamat' => 'required|string',
                 'id_rt' => 'nullable|exists:rt,id',
                 'kelurahan' => 'required|string|max:255',
@@ -212,8 +213,9 @@ class RwKartuKeluargaController extends Controller
             [
                 'no_kk.unique' => 'No. KK sudah terdaftar.',
                 'no_kk.digits' => 'No. KK harus terdiri dari 16 digit.',
-            ]
-        );
+                'no_registrasi.required' => 'No. Registrasi wajib diisi.',
+                'no_registrasi.unique' => 'No. Registrasi sudah terdaftar.',
+            ]);
 
         $kk->update($validated);
         return back()->with('success', 'Kartu Keluarga berhasil diperbarui!');
