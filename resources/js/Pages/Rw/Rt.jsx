@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Layout from "@/Layouts/Layout";
 import { Head, Link, router, usePage } from "@inertiajs/react";
 import { route } from "ziggy-js";
@@ -33,6 +33,25 @@ export default function Rt() {
         keyword: filters?.keyword || "",
         nomor_rt: filters?.nomor_rt || "",
     });
+
+    const handleSelectChange = (name, selected) => {
+        setForm({
+            ...form,
+            [name]: selected?.value || ""
+        });
+    };
+    useEffect(() => {
+        if (form.nik) {
+            const namaWarga = form.nik ? warga.find(n => n.nik === form.nik).nama : ""
+            const noRt = form.nik ? warga.find(n => n.nik === form.nik).kartu_keluarga.rukun_tetangga.nomor_rt : ""
+
+            setForm({
+                ...form,
+                nomor_rt: noRt,
+                nama_anggota_rt: namaWarga,
+            })
+        }
+    }, [form.nik])
 
     // 🔹 Handle form input
     const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
@@ -306,6 +325,7 @@ export default function Rt() {
                     dataWarga={warga}
                     form={form}
                     handleChange={handleChange}
+                    handleSelectChange={handleSelectChange}
                     handleAdd={handleAdd}
                     onClose={() => setShowAdd(false)}
                     isRw={true}

@@ -27,32 +27,32 @@ class AdminPermissionController extends Controller
         ]);
     }
 
-    public function store(Request $request)
-    {
-        $request->validate([
-            'name' => 'required|string|max:255|unique:permissions,name',
-        ]);
+    // public function store(Request $request)
+    // {
+    //     $request->validate([
+    //         'name' => 'required|string|max:255|unique:permissions,name',
+    //     ]);
 
-        Permission::create(['name' => $request->name]);
+    //     Permission::create(['name' => $request->name]);
 
-        return redirect()->back()->with('success', 'Permission berhasil ditambahkan.');
-    }
+    //     return redirect()->back()->with('success', 'Permission berhasil ditambahkan.');
+    // }
 
-    public function update(Request $request, Permission $permission)
-    {
-        $request->validate([
-            'name' => 'required|string|max:255|unique:permissions,name,' . $permission->id,
-        ]);
+    // public function update(Request $request, Permission $permission)
+    // {
+    //     $request->validate([
+    //         'name' => 'required|string|max:255|unique:permissions,name,' . $permission->id,
+    //     ]);
 
-        $permission->update(['name' => $request->name]);
+    //     $permission->update(['name' => $request->name]);
 
-        return redirect()->back()->with('success', 'Permission berhasil diperbarui.');
-    }
+    //     return redirect()->back()->with('success', 'Permission berhasil diperbarui.');
+    // }
 
-    public function destroy(Permission $permission)
-    {
-        $permission->delete();
+    // public function destroy(Permission $permission)
+    // {
+    //     $permission->delete();
 
-        return redirect()->back()->with('success', 'Permission berhasil dihapus.');
-    }
+    //     return redirect()->back()->with('success', 'Permission berhasil dihapus.');
+    // }
 }

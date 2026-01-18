@@ -123,7 +123,7 @@ export default function Roles({ roles, permissions, filters, title }) {
 
             {/* 🔹 Table Section */}
             <div className="table-container">
-                <div className="table-header d-flex justify-content-between align-items-center">
+                {/* <div className="table-header d-flex justify-content-between align-items-center">
                     <h4>Manajemen Roles</h4>
                     <button
                         className="btn btn-success btn-sm"
@@ -131,7 +131,7 @@ export default function Roles({ roles, permissions, filters, title }) {
                     >
                         Tambah Role
                     </button>
-                </div>
+                </div> */}
 
                 <div className="table-scroll">
                     <table className="table-custom">
@@ -161,13 +161,13 @@ export default function Roles({ roles, permissions, filters, title }) {
                                         </td>
                                         <td className="text-center">
                                             <div className="d-flex justify-content-center gap-2">
-                                                <button
+                                                {/* <button
                                                     className="btn btn-warning btn-sm"
                                                     onClick={() => openEdit(item)}
                                                     title="Edit Role"
                                                 >
                                                     <i className="fas fa-edit"></i>
-                                                </button>
+                                                </button> */}
 
                                                 <Link
                                                     preserveScroll

@@ -538,7 +538,6 @@ export function AddRtModal({ dataWarga, form, handleChange, handleSelectChange, 
                             <div className="p-3">
                                 <form onSubmit={handleAdd} id="tambahRt">
                                     <div className="space-y-3">
-                                        {/* kan ada komponen Role kocag 🤣🤣🦅🤣 */}
                                         <Role role={'admin'}>
                                             <div>
                                                 <Select

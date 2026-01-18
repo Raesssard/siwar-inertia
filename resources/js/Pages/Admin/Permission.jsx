@@ -105,7 +105,7 @@ export default function Permission({ permissions, filters, title }) {
 
             {/* 📋 Table Section */}
             <div className="table-container">
-                <div className="table-header d-flex justify-content-between align-items-center">
+                {/* <div className="table-header d-flex justify-content-between align-items-center">
                     <h4>Manajemen Permissions</h4>
                     <button
                         className="btn btn-success btn-sm"
@@ -113,7 +113,7 @@ export default function Permission({ permissions, filters, title }) {
                     >
                         Tambah Permission
                     </button>
-                </div>
+                </div> */}
 
                 <div className="table-scroll">
                     <table className="table-custom">
@@ -121,7 +121,7 @@ export default function Permission({ permissions, filters, title }) {
                             <tr>
                                 <th className="text-center px-3">No.</th>
                                 <th className="text-center px-3">Nama Permission</th>
-                                <th className="text-center px-3">Aksi</th>
+                                {/* <th className="text-center px-3">Aksi</th> */}
                             </tr>
                         </thead>
                         <tbody>
@@ -130,7 +130,7 @@ export default function Permission({ permissions, filters, title }) {
                                     <tr key={item.id}>
                                         <td className="text-center">{permissions.from + index}</td>
                                         <td className="text-center">{item.name}</td>
-                                        <td className="text-center">
+                                        {/* <td className="text-center">
                                             <div className="d-flex justify-content-center gap-2">
                                                 <button
                                                     className="btn btn-warning btn-sm"
@@ -145,7 +145,7 @@ export default function Permission({ permissions, filters, title }) {
                                                     <i className="fas fa-trash"></i>
                                                 </button>
                                             </div>
-                                        </td>
+                                        </td> */}
                                     </tr>
                                 ))
                             ) : (

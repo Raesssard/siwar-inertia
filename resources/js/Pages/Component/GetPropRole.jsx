@@ -13,7 +13,7 @@ export function formatRupiah(angka, withDecimals = false) {
 
 export function AutoDotNumeric(value) {
     if (!value) return "";
-
+console.log(value);
     // hapus semua selain angka
     const number = value.split('.')[0].toString().replace(/\D/g, "");
 
