@@ -129,6 +129,11 @@ class AdminWargaController extends Controller
         // Hitung umur berdasarkan tanggal lahir
         $usiaHari = Carbon::parse($warga->tanggal_lahir)->diffInDays(now());
 
+        $kk = Kartu_keluarga::where('no_kk', $warga->no_kk)->first();
+
+        $id_rt = $kk?->id_rt;
+        $id_rw = $kk?->id_rw;
+
         // Tentukan keterangan history
         $keterangan = $usiaHari < 365
             ? 'Bayi baru lahir'
@@ -137,6 +142,8 @@ class AdminWargaController extends Controller
         HistoryWarga::create([
             'warga_nik' => $warga->nik,
             'nama' => $warga->nama,
+            'nomor_rw' => $id_rw,
+            'nomor_rt' => $id_rt,
             'jenis' => 'masuk',
             'keterangan' => $keterangan,
             'tanggal' => now()->toDateString(),
@@ -300,9 +307,16 @@ class AdminWargaController extends Controller
     {
         $warga = Warga::findOrFail($id);
 
+        $kk = Kartu_keluarga::where('no_kk', $warga->no_kk)->first();
+
+        $id_rt = $kk?->id_rt;
+        $id_rw = $kk?->id_rw;
+
         HistoryWarga::create([
             'warga_nik' => $warga->nik,
             'nama' => $warga->nama,
+            'nomor_rw' => $id_rw,
+            'nomor_rt' => $id_rt,
             'jenis' => 'keluar',
             'keterangan' => $request->keterangan,
             'tanggal' => now(),

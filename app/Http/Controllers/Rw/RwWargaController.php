@@ -143,6 +143,11 @@ class RwWargaController extends Controller
 
         $usiaHari = Carbon::parse($warga->tanggal_lahir)->diffInDays(now());
 
+        $kk = Kartu_keluarga::where('no_kk', $warga->no_kk)->first();
+
+        $id_rt = $kk?->id_rt;
+        $id_rw = $kk?->id_rw;
+
         // Tentukan keterangan history
         $keterangan = $usiaHari < 365
             ? 'Bayi baru lahir'
@@ -150,10 +155,12 @@ class RwWargaController extends Controller
 
         HistoryWarga::create([
             'warga_nik' => $warga->nik,
-            'nama' => $warga->nama,
-            'jenis' => 'masuk',
-            'keterangan' => $keterangan,
-            'tanggal' => now()->toDateString(),
+            'nama'      => $warga->nama,
+            'nomor_rt'     => $id_rt,
+            'nomor_rw'     => $id_rw,
+            'jenis'     => 'masuk',
+            'keterangan'=> $keterangan,
+            'tanggal'   => now()->toDateString(),
         ]);
 
         if ($warga->status_hubungan_dalam_keluarga === 'kepala keluarga') {
@@ -321,9 +328,16 @@ class RwWargaController extends Controller
     {
         $warga = Warga::findOrFail($id);
 
+        $kk = Kartu_keluarga::where('no_kk', $warga->no_kk)->first();
+
+        $id_rt = $kk?->id_rt;
+        $id_rw = $kk?->id_rw;
+
         HistoryWarga::create([
             'warga_nik' => $warga->nik,
             'nama' => $warga->nama,
+            'nomor_rw' => $id_rw,
+            'nomor_rt' => $id_rt,
             'jenis' => 'keluar',
             'keterangan' => $request->keterangan,
             'tanggal' => now(),

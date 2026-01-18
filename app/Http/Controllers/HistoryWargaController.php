@@ -14,75 +14,62 @@ class HistoryWargaController extends Controller
         $title = 'History Warga';
 
         $currentRole = session('active_role');
-        $idRw = Auth::user()->rw->id ?? null;
-        $idRt = Auth::user()->rukunTetangga->id ?? null;
+
+        // ambil nomor RW / RT dari user login
+        $nomorRw = Auth::user()->rw->nomor_rw ?? null;
+        $nomorRt = Auth::user()->rukunTetangga->nomor_rt ?? null;
 
         $search = $request->input('search');
-        $jenis = $request->input('jenis');
+        $jenis  = $request->input('jenis');
 
         // ======================
-        // ADMIN → semua data
+        // BASE QUERY
         // ======================
-        if ($currentRole === 'admin') {
-            $history = HistoryWarga::with('warga')
-                ->when($search, fn ($q) =>
-                    $q->where('nama', 'like', "%$search%")
-                      ->orWhere('warga_nik', 'like', "%$search%")
-                )
-                ->when($jenis, fn ($q) =>
-                    $q->where('jenis', $jenis)
-                )
-                ->orderBy('tanggal', 'desc');
-        }
+        $history = HistoryWarga::query();
 
         // ======================
-        // RW → semua warga di RW itu
+        // FILTER ROLE
         // ======================
         if ($currentRole === 'rw') {
-            $history = HistoryWarga::with('warga')
-                ->whereHas('warga.kartuKeluarga.rukunTetangga.rw', function ($q) use ($idRw) {
-                    $q->where('id', $idRw);
-                })
-                ->when($search, fn ($q) =>
-                    $q->where('nama', 'like', "%$search%")
-                      ->orWhere('warga_nik', 'like', "%$search%")
-                )
-                ->when($jenis, fn ($q) =>
-                    $q->where('jenis', $jenis)
-                )
-                ->orderBy('tanggal', 'desc');
+            $history->where('nomor_rw', $nomorRw);
         }
 
-        // ======================
-        // RT → hanya warga di RT itu
-        // ======================
         if ($currentRole === 'rt') {
-            $history = HistoryWarga::with('warga')
-                ->whereHas('warga.kartuKeluarga.rukunTetangga', function ($q) use ($idRt) {
-                    $q->where('id', $idRt);
-                })
-                ->when($search, fn ($q) =>
-                    $q->where('nama', 'like', "%$search%")
-                      ->orWhere('warga_nik', 'like', "%$search%")
-                )
-                ->when($jenis, fn ($q) =>
-                    $q->where('jenis', $jenis)
-                )
-                ->orderBy('tanggal', 'desc');
+            $history->where('nomor_rw', $nomorRw)
+                    ->where('nomor_rt', $nomorRt);
         }
 
-        $historyWarga = $history->paginate(10)->withQueryString();
+        // ======================
+        // FILTER SEARCH
+        // ======================
+        $history->when($search, function ($q) use ($search) {
+            $q->where(function ($qq) use ($search) {
+                $qq->where('nama', 'like', "%{$search}%")
+                   ->orWhere('warga_nik', 'like', "%{$search}%");
+            });
+        });
 
-        if ($request->wantsJson()) {
-            return response()->json($historyWarga);
-        }
+        // ======================
+        // FILTER JENIS
+        // ======================
+        $history->when($jenis, fn ($q) =>
+            $q->where('jenis', $jenis)
+        );
+
+        // ======================
+        // FINAL RESULT
+        // ======================
+        $historyWarga = $history
+            ->orderBy('tanggal', 'desc')
+            ->paginate(10)
+            ->withQueryString();
 
         return Inertia::render('HistoryWarga', [
             'title' => $title,
             'historyWarga' => $historyWarga,
             'filters' => [
                 'search' => $search,
-                'jenis' => $jenis,
+                'jenis'  => $jenis,
             ],
         ]);
     }

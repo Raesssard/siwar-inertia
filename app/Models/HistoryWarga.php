@@ -15,6 +15,8 @@ class HistoryWarga extends Model
         'warga_nik',
         'nama',
         'jenis',
+        'nomor_rw',
+        'nomor_rt',
         'keterangan',
         'tanggal',
     ];

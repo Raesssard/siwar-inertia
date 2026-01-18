@@ -5,18 +5,30 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration {
-    
+
     public function up(): void
     {
         Schema::create('history_warga', function (Blueprint $table) {
             $table->id();
+
+            // snapshot identitas warga
             $table->char('warga_nik', 16);
             $table->string('nama');
+
+            // patokan wilayah (PENTING)
+            $table->unsignedBigInteger('nomor_rw')->nullable();
+            $table->unsignedBigInteger('nomor_rt')->nullable();
+
             $table->enum('jenis', ['masuk', 'keluar']);
             $table->text('keterangan')->nullable();
             $table->date('tanggal')->nullable();
+
             $table->timestamps();
             $table->softDeletes();
+
+            // index biar query RW / RT cepat
+            $table->index('nomor_rw');
+            $table->index('nomor_rt');
         });
     }
 
