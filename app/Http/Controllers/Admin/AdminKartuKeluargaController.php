@@ -38,7 +38,7 @@ class AdminKartuKeluargaController extends Controller
                     });
             })
             ->orderBy('created_at', 'desc')
-            ->paginate(10)
+            ->paginate(5)
             ->withQueryString();
 
         $kategori_iuran = Kategori_golongan::select('id', 'jenis')->get();

@@ -6871,7 +6871,7 @@ export function TambahTagihan({ tambahShow, onClose, onUpdated, role, iuran, kk_
                                             <input
                                                 type="text"
                                                 name="nominal"
-                                                value={AutoDotNumeric(data.nominal)}
+                                                value={AutoDotNumeric(String(data.nominal ?? ''))}
                                                 className="form-control"
                                                 onChange={(e) => {
                                                     const raw = unformatRupiah(e.target.value)
