@@ -7,6 +7,7 @@ use App\Models\Rt;
 use App\Models\User;
 use App\Models\Warga;
 use App\Models\Setting;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -156,6 +157,8 @@ class RwRukunTetanggaController extends Controller
             }
         }
 
+        $mulaiMenjabat = Carbon::parse($request->mulai_menjabat);
+
         $rt = Rt::create([
             'nik' => $request->nik,
             'no_kk' => $request->filled('nik')
@@ -163,8 +166,8 @@ class RwRukunTetanggaController extends Controller
                 : null,
             'nomor_rt' => $request->nomor_rt,
             'nama_anggota_rt' => $request->nama_anggota_rt,
-            'mulai_menjabat' => $request->mulai_menjabat,
-            'akhir_jabatan' => $request->akhir_jabatan,
+            'mulai_menjabat' => $mulaiMenjabat->toDateString(),
+            'akhir_jabatan' => $mulaiMenjabat->copy()->addYears(5)->toDateString(),
             'id_rw' => $id_rw,
             'status' => $request->status ?? 'nonaktif',
         ]);

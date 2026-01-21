@@ -340,10 +340,10 @@ export function AddRwModal({ dataWarga, form, handleChange, handleSelectChange, 
                                             <label className="block text-sm font-medium">Mulai Menjabat</label>
                                             <input type="date" name="mulai_menjabat" value={form.mulai_menjabat || ""} onChange={handleChange} className="w-full border rounded-md p-2" />
                                         </div>
-                                        <div>
+                                        {/* <div>
                                             <label className="block text-sm font-medium">Akhir Jabatan</label>
                                             <input type="date" name="akhir_jabatan" value={form.akhir_jabatan || ""} onChange={handleChange} className="w-full border rounded-md p-2" />
-                                        </div>
+                                        </div> */}
 
                                         {/* 🔹 Tambahan Jabatan */}
                                         <div>
@@ -661,7 +661,7 @@ export function AddRtModal({ dataWarga, form, handleChange, handleSelectChange, 
                                             />
                                         </div>
 
-                                        <div>
+                                        {/* <div>
                                             <label className="block text-sm font-medium">Akhir Jabatan</label>
                                             <input
                                                 type="date"
@@ -670,7 +670,7 @@ export function AddRtModal({ dataWarga, form, handleChange, handleSelectChange, 
                                                 onChange={handleChange}
                                                 className="w-full border rounded-md p-2"
                                             />
-                                        </div>
+                                        </div> */}
 
                                         {/* 🔹 Pilih RW (hanya untuk admin) */}
                                         {/* {!isRw && (

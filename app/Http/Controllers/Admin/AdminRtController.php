@@ -8,6 +8,7 @@ use App\Models\Rw;
 use App\Models\User;
 use App\Models\Warga;
 use App\Models\Setting;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
@@ -49,31 +50,36 @@ class AdminRtController extends Controller
             ->get()
             ->filter(function ($rw) {
 
-                // Pastikan RW punya user
-                if ($rw->users->isEmpty()) return false;
+                // 1. Jika RW belum punya NIK → tampilkan
+                if (!$rw->nik) {
+                    return true;
+                }
 
-                // Ambil user yang punya role "rw"
-                $userRw = $rw->users->first(function ($user) {
-                    return $user->roles->pluck('name')->contains('rw');
-                });
+                // 2. Cari user dengan nik yang sama dengan RW
+                $userRw = $rw->users->firstWhere('nik', $rw->nik);
 
-                if (!$userRw) return false;
+                // 3. Kalau user belum ada → tampilkan
+                if (!$userRw) {
+                    return true;
+                }
 
-                // Ambil semua role dari user RW itu
-                $roles = $userRw->roles->pluck('name')->toArray();
+                // 4. Ambil roles user tsb
+                $roles = $userRw->roles->pluck('name')->map('strtolower')->toArray();
 
-                // Role yang diperbolehkan
+                // 5. Role yang diperbolehkan
                 $allowed = ['rw', 'warga'];
 
-                // Jika ada role lain, tolak
-                foreach ($roles as $r) {
-                    if (!in_array($r, $allowed)) return false;
+                // 6. Kalau ada role di luar allowed → tolak
+                foreach ($roles as $role) {
+                    if (!in_array($role, $allowed)) {
+                        return false;
+                    }
                 }
 
                 return true;
             })
             ->values()
-            ->map(fn($rw) => [
+            ->map(fn ($rw) => [
                 'id' => $rw->id,
                 'nomor_rw' => $rw->nomor_rw,
                 'nama_anggota_rw' => $rw->nama_anggota_rw,
@@ -176,6 +182,7 @@ class AdminRtController extends Controller
                     }
                 }
             }
+            $mulaiMenjabat = Carbon::parse($request->mulai_menjabat);
 
             $rt = Rt::create([
                 'nik' => $request->nik,
@@ -184,8 +191,8 @@ class AdminRtController extends Controller
                     : null,
                 'nomor_rt' => $request->nomor_rt,
                 'nama_anggota_rt' => $request->nama_anggota_rt,
-                'mulai_menjabat' => $request->mulai_menjabat,
-                'akhir_jabatan' => $request->akhir_jabatan,
+                'mulai_menjabat' => $mulaiMenjabat->toDateString(),
+                'akhir_jabatan' => $mulaiMenjabat->copy()->addYears(5)->toDateString(),
                 'id_rw' => $request->id_rw,
                 'status' => $request->status ?? 'nonaktif',
             ]);

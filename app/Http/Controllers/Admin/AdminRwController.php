@@ -7,6 +7,7 @@ use App\Models\Rw;
 use App\Models\User;
 use App\Models\Kartu_keluarga;
 use App\Models\Warga;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
@@ -108,6 +109,8 @@ class AdminRwController extends Controller
             }
         }
 
+        $mulaiMenjabat = Carbon::parse($request->mulai_menjabat);
+
         $rw = Rw::create([
             'nik' => $request->nik,
             'no_kk' => $request->filled('nik')
@@ -115,8 +118,8 @@ class AdminRwController extends Controller
                 : null,
             'nomor_rw' => $request->nomor_rw,
             'nama_anggota_rw' => $request->nama_anggota_rw,
-            'mulai_menjabat' => $request->mulai_menjabat,
-            'akhir_jabatan' => $request->akhir_jabatan,
+            'mulai_menjabat' => $mulaiMenjabat->toDateString(),
+            'akhir_jabatan' => $mulaiMenjabat->copy()->addYears(5)->toDateString(),
             'status' => $request->status,
         ]);
 
