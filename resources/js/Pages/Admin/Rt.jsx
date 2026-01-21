@@ -236,7 +236,7 @@ export default function Rt() {
                                     }).filter(Boolean)
 
                                     const jabatanRt = jabatanPerUser.find(j => j.nik === item.nik)
-                                    console.log(jabatanRt)
+
                                     return (
                                         <>
                                             <tr key={item.id}>

@@ -25,7 +25,7 @@ class AdminSeeder extends Seeder
         $admin = User::updateOrCreate(
             ['nik' => '0000000000000001'],
             [
-                'nama' => 'Admin',
+                'nama' => 'Wahyu Admin',
                 'password' => Hash::make('password'), // ganti sesuai kebutuhan
                 'id_rw' => null,
             ]

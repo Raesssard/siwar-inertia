@@ -67,9 +67,11 @@ class RwRukunTetanggaController extends Controller
 
         $roles = collect(['ketua'])->merge($roles)->values();
 
-        $warga = Warga::whereDoesntHave('user.roles', function ($q) {
-            $q->where('name', 'rw');
-        })->get();
+        $warga = Warga::with('kartuKeluarga.rukunTetangga')
+            ->whereDoesntHave('user.roles', function ($q) {
+                $q->where('name', 'rw');
+            })
+            ->get();
 
         return Inertia::render('Rw/Rt', [
             'rukun_tetangga' => $rukun_tetangga,

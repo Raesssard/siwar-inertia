@@ -724,7 +724,7 @@ export function AddRtModal({ dataWarga, form, handleChange, handleSelectChange, 
     );
 }
 
-export function EditRtModal({ dataWarga, form, handleChange, handleEdit, onClose, rwList = [], isRw = false, roles = [] }) {
+export function EditRtModal({ dataWarga, form, handleChange, handleSelectChange, handleEdit, onClose, rwList = [], isRw = false, roles = [] }) {
     return (
         <div
             className="modal fade show"

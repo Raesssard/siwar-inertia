@@ -428,7 +428,7 @@ export function getAdminLinks() {
             children: [
                 {
                     href: "/admin/kartu_keluarga",
-                    text: "Warga",
+                    text: "Warga & Kartu Keluarga",
                     icon: "id-card",
                     permission: "view.kartu_keluarga",
                 },
@@ -768,7 +768,7 @@ export function getRwLinks() {
                 },
                 {
                     href: "/rw/kartu_keluarga",
-                    text: "Data Kartu Keluarga",
+                    text: "Warga & Kartu Keluarga",
                     icon: "id-card",
                     permission: "view.kartu_keluarga",
                 },

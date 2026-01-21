@@ -228,7 +228,6 @@ export default function Rt() {
                                     }).filter(Boolean)
 
                                     const jabatanRt = jabatanPerUser.find(j => j.nik === item.nik)
-                                    console.log(jabatanRt)
                                     return (
                                         <>
                                             <tr key={item.id}>
@@ -338,6 +337,7 @@ export default function Rt() {
                     dataWarga={warga}
                     form={form}
                     handleChange={handleChange}
+                    handleSelectChange={handleSelectChange}
                     handleEdit={handleEdit}
                     onClose={() => setShowEdit(null)}
                     isRw={true}
